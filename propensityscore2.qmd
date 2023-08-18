@@ -1,0 +1,464 @@
+## PSM in CCHS {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(MatchIt)
+require(tableone)
+require(survey)
+require(cobalt)
+require(Publish)
+require(optmatch)
+```
+
+### Load data
+
+```{r data, cache=TRUE}
+load(file="Data/propensityscore/cchs123c.RData")
+head(analytic11n)
+
+# later we will create another variable called weights
+# hence to avoid any conflict/ambiguity,
+# renaming weight variable to survey.weight
+analytic.miss$survey.weight <- analytic.miss$weight
+analytic11n$survey.weight <- analytic11n$weight
+analytic.miss$weight <- analytic11n$weight <- NULL
+```
+
+### Analysis
+
+We are going to apply propensity score analysis (Matching) in our OA - CVD problem from CCHS. For computation considerations, we will only work with cycle 1.1, and the people from Northern provinces in Canada (`analytic11n` data).
+
+### Step 1
+
+#### Specify PS
+
+```{r step1, cache=TRUE}
+ps.formula <- as.formula("OA ~ age + sex + stress + married + 
+                         income + race + bmi + phyact + smoke +
+                        doctor + drink + bp + 
+                         immigrate + fruit + diab + edu")
+var.names <- c("age", "sex", "stress", "married", 
+               "income", "race", "bmi", "phyact", "smoke", 
+               "doctor", "drink", "bp", 
+               "immigrate", "fruit", "diab", "edu")
+```
+
+#### Fit model
+
+The software fits the PS model using a logistic regression by default. This package actually performs stap 1 and 2 with one command `matchit`.
+
+Look at the website for arguments of matchit [@Matchit]\]. It looks like this
+
+```{r  step1b, eval=FALSE}
+matchit(formula, data, model="logit", discard=0, reestimate=FALSE, nearest=TRUE,
+                 replace=FALSE, m.order=2, ratio=1, caliper=0, calclosest=FALSE,
+                 subclass=0, sub.by="treat", mahvars=NULL, exact=FALSE, counter=TRUE, full=FALSE, full.options=list(),...)
+```
+
+### Step 2
+
+#### Match subjects by PS
+
+We are going to match using a Nearest neighbor algorithm. This is a greedy matching algorithm. Note that we are not even defining any caliper
+
+```{r step2, cache=TRUE}
+# set seed
+set.seed(123)
+# match
+matching.obj <- matchit(ps.formula,
+                        data = analytic11n,
+                        method = "nearest",
+                        ratio = 1)
+# see how many matched
+matching.obj
+# create the "matched"" data
+OACVD.match <- match.data(matching.obj)
+# see the dimension
+dim(analytic11n)
+dim(OACVD.match)
+```
+
+Let's try to understand how this is working.
+
+#### Extract matched IDs
+
+```{r matchitstrata2, cache=TRUE }
+m.mat<-matching.obj$match.matrix
+head(m.mat)
+```
+
+#### Extract the matched treated IDs
+
+```{r step2b, cache=TRUE}
+treated.id<-as.numeric(row.names(m.mat))
+treated.id # basically row names
+```
+
+#### Extract the matched untreated IDs
+
+```{r step2c, cache=TRUE}
+untreated.id <- as.numeric(m.mat)
+untreated.id # basically row names
+```
+
+#### Extract the matched treated data
+
+```{r step2d, cache=TRUE}
+tx <- analytic11n[rownames(analytic11n) %in% treated.id,]
+head(tx[c("OA", "CVD", "sex", "age", "race", "edu")])
+```
+
+#### Extract the matched untreated data
+
+```{r step2e, cache=TRUE}
+utx <- analytic11n[rownames(analytic11n) %in% untreated.id,]
+head(utx[c("OA", "CVD", "sex", "age", "race", "edu")])
+```
+
+#### Extract the matched data altogether
+
+Simply using `match.data` is enough (as done earlier).
+
+```{r step2f, cache=TRUE}
+OACVD.match <- match.data(matching.obj)
+```
+
+#### Assign match ID
+
+```{r step2g, cache=TRUE}
+OACVD.match$match.ID <- NA
+OACVD.match$match.ID[rownames(OACVD.match) %in% treated.id] <- 1:length(treated.id)
+OACVD.match$match.ID[rownames(OACVD.match) %in% untreated.id] <- 1:length(untreated.id)
+table(OACVD.match$match.ID)
+```
+
+Take a look at individual matches for the first match
+
+```{r step2h, cache=TRUE}
+na.omit(OACVD.match[OACVD.match$match.ID == 1,])
+```
+
+Take a look at individual matches for the second match
+
+```{r step2i, cache=TRUE}
+na.omit(OACVD.match[OACVD.match$match.ID == 2,])
+```
+
+### Step 3
+
+#### Examining PS graphically
+
+#### matchit package
+
+```{r step3, cache=TRUE}
+# plot(matching.obj) # covariate balance
+plot(matching.obj, type = "jitter") # propensity score locations
+plot(matching.obj, type = "hist") #check matched treated vs matched control
+summrize.output <- summary(matching.obj, standardize = TRUE)
+plot(summrize.output)
+```
+
+#### Overalp check
+
+```{r step3b, cache=TRUE}
+# plot propensity scores by exposure group
+plot(density(OACVD.match$distance[OACVD.match$OA==1]), 
+     col = "red", main = "")
+lines(density(OACVD.match$distance[OACVD.match$OA==0]), 
+      col = "blue", lty = 2)
+legend("topright", c("Non-arthritis","OA"), 
+       col = c("red", "blue"), lty=1:2)
+```
+
+#### cobalt package
+
+Overlap check in a more convenient way
+
+```{r step3c, cache=TRUE}
+# different badwidth
+bal.plot(matching.obj, var.name = "distance")
+```
+
+#### Look at the data
+
+```{r step3d, cache=TRUE}
+# what is distance variable here?
+head(OACVD.match)
+```
+
+#### Numerical values of PS
+
+```{r step3e, cache=TRUE}
+summary(OACVD.match$distance)
+by(OACVD.match$distance, OACVD.match$OA, summary)
+```
+
+#### Question for the students
+
+-   Are you happy with the matching after reviewing the plots?
+
+#### Covariate balance in matched sample
+
+```{r step3f, cache=TRUE}
+tab1 <- CreateTableOne(strata = "OA", data = OACVD.match, 
+                       test = FALSE, vars = var.names)
+print(tab1, smd = TRUE)
+```
+
+#### Question for the students
+
+-   All SMD \< 0.20?
+
+#### Other balance measures
+
+##### Individual categories
+
+If you want to check balance at each category (not very useful in general situations). We are generally interested if the variables are balanced or not (not categories).
+
+```{r step3g, cache=TRUE}
+baltab <- bal.tab(matching.obj)
+baltab
+```
+
+##### Individual plots
+
+You could plot each variables individually
+
+```{r step3h, cache=TRUE}
+bal.plot(matching.obj, var.name = "income")
+bal.plot(matching.obj, var.name = "age")
+bal.plot(matching.obj, var.name = "race")
+bal.plot(matching.obj, var.name = "diab")
+bal.plot(matching.obj, var.name = "immigrate")
+```
+
+##### Love plot
+
+```{r loveplot, cache=TRUE}
+# Individual categories again
+love.plot(baltab, threshold = .2)
+```
+
+### Repeat of Step 1-3 again
+
+#### Add caliper
+
+```{r step3i, cache=TRUE}
+logitPS <-  -log(1/OACVD.match$distance - 1) 
+# logit of the propensity score
+.2*sd(logitPS) # suggested in the literature
+
+
+# Step 1 and 2
+matching.obj <- matchit(ps.formula,
+                        data = analytic11n,
+                        method = "nearest",
+                        ratio = 1,
+                        caliper = .2*sd(logitPS))
+# see how many matched
+matching.obj
+OACVD.match <- match.data(matching.obj)
+```
+
+```{r step3j, cache=TRUE}
+# Step 3
+by(OACVD.match$distance, OACVD.match$OA, summary)
+tab1 <- CreateTableOne(strata = "OA", data = OACVD.match, 
+                       test = FALSE, vars = var.names)
+print(tab1, smd = TRUE)
+```
+
+#### Question for the students
+
+-   Did all of the SMDs decrease?
+
+#### Look at the data
+
+```{r step3k, cache=TRUE}
+# what is weights variable for pair matching?
+head(OACVD.match)
+summary(OACVD.match$weights)
+```
+
+### Step 4
+
+#### Estimate treatment effect for matched data
+
+#### Unconditional logistic
+
+```{r step4, cache=TRUE}
+# Wrong model for population!!
+outcome.model <- glm(CVD ~ OA, data = OACVD.match, family = binomial())
+publish(outcome.model)
+```
+
+#### Survey design
+
+##### Convert data to design
+
+```{r step4b, cache=TRUE}
+analytic.miss$matched <- 0
+length(analytic.miss$ID) # full data
+length(OACVD.match$ID) # matched data
+length(analytic.miss$ID[analytic.miss$ID %in% OACVD.match$ID])
+analytic.miss$matched[analytic.miss$ID %in% OACVD.match$ID] <- 1
+table(analytic.miss$matched)
+w.design0 <- svydesign(id=~1, weights=~survey.weight, 
+                      data=analytic.miss)
+w.design.m <- subset(w.design0, matched == 1)
+```
+
+##### Balance in matched population?
+
+```{r step4c, cache=TRUE}
+tab1 <- svyCreateTableOne(strata = "OA", data = w.design.m, 
+                       test = FALSE, vars = var.names)
+print(tab1, smd = TRUE)
+```
+
+##### Outcome analysis
+
+```{r step4d, cache=TRUE}
+fit.design <- svyglm(CVD ~ OA, design = w.design.m, 
+       family = binomial(logit))
+publish(fit.design)
+```
+
+### Matched data with increase ratio
+
+```{r ratio, cache=TRUE}
+# Step 1 and 2
+matching.obj <- matchit(ps.formula,
+                        data = analytic11n,
+                        method = "nearest",
+                        ratio = 5,
+                        caliper = 0.2)
+# see how many matched
+matching.obj
+OACVD.match <- match.data(matching.obj)
+# Step 3
+by(OACVD.match$distance, OACVD.match$OA, summary)
+tab1 <- CreateTableOne(strata = "OA", data = OACVD.match, 
+                       test = FALSE, vars = var.names)
+print(tab1, smd = TRUE)
+```
+
+##### Question for the students
+
+-   Did all of the SMDs decrease?
+
+##### Look at the data
+
+```{r summdata, cache=TRUE}
+# what is weights variable now for 1:5 ratio?
+head(OACVD.match)
+summary(OACVD.match$weights)
+```
+
+#### Combining matching weights
+
+#### Not incorporating matching weights
+
+```{r ratio1, cache=TRUE}
+analytic.miss$matched <- 0
+length(analytic.miss$ID) # full data
+length(OACVD.match$ID) # matched data
+length(analytic.miss$ID[analytic.miss$ID %in% OACVD.match$ID])
+analytic.miss$matched[analytic.miss$ID %in% OACVD.match$ID] <- 1
+table(analytic.miss$matched)
+w.design0 <- svydesign(id=~1, weights=~survey.weight, 
+                      data=analytic.miss)
+w.design.m <- subset(w.design0, matched == 1)
+```
+
+```{r ratio2, cache=TRUE}
+fit.design <- svyglm(CVD ~ OA, design = w.design.m, 
+       family = binomial(logit))
+publish(fit.design)
+```
+
+##### Incorporating matching weights
+
+```{r ratio3, cache=TRUE}
+analytic.miss$matched <- 0
+length(analytic.miss$ID) # full data
+length(OACVD.match$ID) # matched data
+length(analytic.miss$ID[analytic.miss$ID %in% OACVD.match$ID])
+analytic.miss$matched[analytic.miss$ID %in% OACVD.match$ID] <- 1
+table(analytic.miss$matched)
+```
+
+```{r ratio4, cache=TRUE}
+# multiply with matching (ratio) weights with survey weights
+analytic.miss$combined.weight <- 0
+analytic.miss$combined.weight[analytic.miss$ID %in% OACVD.match$ID] <-
+  OACVD.match$weights*OACVD.match$survey.weight
+w.design0 <- svydesign(id=~1, weights=~combined.weight, 
+                      data=analytic.miss)
+w.design.m <- subset(w.design0, matched == 1)
+```
+
+```{r ratio5, cache=TRUE}
+fit.design <- svyglm(I(CVD=="event") ~ OA, design = w.design.m, 
+       family = binomial(logit))
+publish(fit.design)
+```
+
+#### Matched with replacement
+
+```{r ratio6, cache=TRUE}
+# Step 1 and 2
+matching.obj <- matchit(ps.formula,
+                        data = analytic11n,
+                        method = "nearest",
+                        ratio = 5,
+                        caliper = 0.2,
+                        replace = TRUE)
+# see how many matched
+matching.obj
+OACVD.match <- match.data(matching.obj)
+# Step 3
+by(OACVD.match$distance, OACVD.match$OA, summary)
+tab1 <- CreateTableOne(strata = "OA", data = OACVD.match, 
+                       test = FALSE, vars = var.names)
+print(tab1, smd = TRUE)
+```
+
+#### Question for the students
+
+-   Did all of the SMDs decrease?
+
+#### Look at the data
+
+```{r ratio7, cache=TRUE}
+# what is weights variable now for 1:5 ratio?
+head(OACVD.match)
+summary(OACVD.match$weights)
+```
+
+#### Survey design
+
+```{r new0, cache=TRUE}
+analytic.miss$matched <- 0
+length(analytic.miss$ID) # full data
+length(OACVD.match$ID) # matched data
+length(analytic.miss$ID[analytic.miss$ID %in% OACVD.match$ID])
+analytic.miss$matched[analytic.miss$ID %in% OACVD.match$ID] <- 1
+table(analytic.miss$matched)
+```
+
+```{r new1, cache=TRUE}
+# multiply with matching (ratio) weights with survey weights
+analytic.miss$combined.weight <- 0
+analytic.miss$combined.weight[analytic.miss$ID %in% OACVD.match$ID] <-
+  OACVD.match$weights*OACVD.match$survey.weight
+w.design0 <- svydesign(id=~1, weights=~combined.weight, 
+                      data=analytic.miss)
+w.design.m <- subset(w.design0, matched == 1)
+```
+
+```{r new2, cache=TRUE}
+fit.design <- svyglm(I(CVD=="event") ~ OA, design = w.design.m, 
+       family = binomial(logit))
+publish(fit.design)
+```

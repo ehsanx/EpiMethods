@@ -1,0 +1,257 @@
+## Data manipulation {.unnumbered}
+
+Data manipulation is a foundational skill for data analysis. This guide introduces common methods for subsetting datasets, handling variable types, creating summary tables, and dealing with missing values using R.
+
+```{r setup, warning=FALSE, message=FALSE, cache = TRUE, include=FALSE}
+# Load required packages
+library(dplyr)
+require(tableone)
+```
+
+### Load dataset
+
+Understanding the dataset's structure is the first step in data manipulation. Here, we're using the `mpg` dataset, which provides information on various car models:
+
+```{r load1, cache=TRUE}
+mpg <- read.csv("Data/wrangling/mpg.csv", header = TRUE)
+```
+
+### Subset
+
+Often, you'll need to subset your data for analysis. Here, we'll explore different methods to both drop unwanted variables and keep desired observations.
+
+#### Drop variables
+
+Sometimes, only part of the variables will be used in your analysis. Therefore, you may want to drop the variables you do not need. There are multiple ways to drop variables from a dataset. Below are two examples without using any package and using the `dplyr` package.
+
+::: callout-tip
+**Option 1: No package needed**
+
+dataset.name\[, c(the columns you want to KEEP)\]
+:::
+
+Say, we want to keep only three variables in the mpg dataset: manufacturer, model and cyl. For Option 1 (without package), we can use the following R codes to keep these three variables:
+
+```{r load2, cache=TRUE}
+mpg1 <- mpg[, c("manufacturer", "model", "cyl")]
+head(mpg1)
+```
+
+Here `mpg1` is a new dataset containing only three variables (manufacturer, model and cyl).
+
+::: callout-tip
+**Option 2: use select in dplyr**
+
+select(dataset.name, ...(columns names you want to KEEP))
+:::
+
+For Option 2, the `dplyr` package offers the `select` function, which provides a more intuitive way to subset data.
+
+```{r load3, cache=TRUE}
+mpg2 <- select(mpg, c("manufacturer", "model", "cyl"))
+head(mpg2)
+```
+
+We can also exclude any variables from the dataset by using the minus (-) sign with the `select` function. For example, we we want to drop `trans`, `drv`, and `cty` from the `mpg` dataset, we can use the following codes:
+
+```{r load4, cache=TRUE}
+mpg3 <- select(mpg, -c("trans", "drv", "cty"))
+head(mpg3)
+```
+
+This `mpg3` is a new dataset from `mpg` after dropping three variables (trans, drv, and cty).
+
+#### Keep observations
+
+It often happens that we only want to investigate a subset of a population which only requires a subset of our dataset. In this case, we need to subset the dataset to meet certain requirements. Again, there are multiple ways to do this task. Below is an example without a package and with the `dplyr` package:
+
+::: callout-tip
+**Option 1: No package needed**
+
+dataset.name\[the rows you want to KEEP, \]
+:::
+
+::: callout-tip
+**Option 2: No package needed**
+
+subset(dataset.name, ...(logical tests))
+:::
+
+::: callout-tip
+**Option 3: use select in dplyr**
+
+filter(dataset.name, ...(logical tests))
+:::
+
+::: callout-tip
+Common logical tests are:
+
+```{r, echo=FALSE, warning=FALSE,message=FALSE}
+library(knitr)
+library(kableExtra)
+
+df <- data.frame(Syntax = c("X <(=) Y", "X >(=) Y", "X == Y", "X != Y", "is.na(X)"),
+                 Meaning = c("Smaller (equal) than", "Larger (equal) than", "Equal to", "Not equal to", "is NA/missing?"))
+
+kable(df, "html", align = c("l", "l")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = F)
+```
+:::
+
+Say, we want to keep the observations for which cars are manufactured in 2008. We can use the following R codes to do it:
+
+```{r keep1, cache=TRUE}
+mpg4 <- mpg[mpg$year == "2008",] # Option 1
+head(mpg4)
+```
+
+The following codes with the `subset` and `filter` function will do the same:
+
+```{r keep2, cache=TRUE}
+mpg5 <- subset(mpg, year == "2008") # Option 1
+head(mpg5)
+```
+
+```{r keep3, cache=TRUE}
+mpg6 <- filter(mpg, year == "2008") # Option 3
+head(mpg6)
+```
+
+The filter function can also work when you have multiple criteria (i.e., multiple logical tests) to satisfy. Here, we need Boolean operators to connect different logical tests.
+
+::: callout-tip
+Common boolean operators are:
+
+```{r, echo=FALSE, warning=FALSE,message=FALSE}
+df <- data.frame(Syntax = c("&", "|", "!", "==", "!=", ">", "<", ">=", "<="),
+                 Meaning = c("and", "or", "not", "equals to", "not equal to", "greater than", "less than", "greater than or equal to", "less than or equal to"))
+
+kable(df, "html", align = c("l", "l")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = F)
+
+```
+:::
+
+Say, we want to keep the observations for 6 and 8 cylinders (cyl) and engine displacement (displ) greater than or equal to 4 litres. We can use the following codes to do the task:
+
+```{r keep4, cache=TRUE}
+mpg7 <- filter(mpg, cyl %in% c("6","8") & displ >= 4)
+head(mpg7)
+```
+
+::: column-margin
+The `%in%` operator is used to determine whether the values of the first argument are present in the second argument.
+:::
+
+#### Handling Variable Types
+
+::: callout-tip
+Most common types of variable in R are
+
+-   numbers,
+-   factors and
+-   strings(or character).
+
+Understanding and manipulating these types are crucial for data analysis.
+:::
+
+1.  Identifying Variable Type
+
+When we analyze the data, we usually just deal with numbers and factors. If there are variables are strings, we could convert them to factors using **as.factors(variable.name)**
+
+```{r keep5, cache=TRUE}
+mode(mpg$trans)
+```
+
+```{r keep6, cache=TRUE}
+str(mpg$trans)
+```
+
+2.  Converting Characters to Factors
+
+Sometimes, it's necessary to treat text data as categorical by converting them into factors. **as.numeric()** converts other types of variables to numbers. For a factor variable, we usually we want to access the categories (or levels) it has. We can use a build-in function to explore: **levels(variable.name)**
+
+```{r keep7, cache=TRUE}
+# no levels for character
+levels(mpg$trans)
+```
+
+```{r keep8, cache=TRUE}
+## Ex check how many different trans the dataset has
+mpg$trans <- as.factor(mpg$trans)
+levels(mpg$trans)
+```
+
+The levels usually will be ordered alphabetically. The first level is called "baseline". However, the users may/may not want to keep this baseline and want to relevel/change the reference group. We can do it using the `relevel` function:
+
+**relevel(variable.name, ref=)**
+
+```{r keep9, cache=TRUE}
+mpg$trans <- relevel(mpg$trans, ref = "auto(s6)")
+levels(mpg$trans)
+nlevels(mpg$trans)
+```
+
+`factor` function can be also used to combine factors. If the user want to combine multiple factors to one factors
+
+```{r keep10, cache=TRUE}
+## EX re-group trans to "auto" and "manual"
+levels(mpg$trans) <- list(auto = c("auto(av)", "auto(l3)", "auto(l4)", "auto(l5)", "auto(l6)", 
+                                   "auto(s4)", "auto(s5)", "auto(s6)"), 
+                          manual = c("manual(m5)", "manual(m6)"))
+levels(mpg$trans)
+```
+
+You can also change the order of all factors using the following code: **factor(variable.name, levels = c("new order"))**
+
+```{r keep11, cache=TRUE}
+## EX. Change the order of trans to manual
+mpg$trans <- factor(mpg$trans, levels = c("manual", "auto"))
+levels(mpg$trans)
+```
+
+#### Convert continuous variables to categorical variables
+
+::: callout-tip
+`ifelse`, `cut`, `recode` all are helpful functions to convert numerical variables to categorical variables.
+:::
+
+Let's see the summary of the cty variable first.
+
+```{r convert1, cache=TRUE}
+summary(mpg$cty)
+```
+
+say, we may want to change continuous 'cty' into groups 0-14, 15-18, and 18-40. Below is an example with the `cut` function.
+
+```{r convert2, cache=TRUE}
+## EX. change the cty into two categories (0,14], (14,18] and (18,40]
+mpg$cty.num <- cut(mpg$cty, c(0, 14, 18, 40), right = TRUE)
+table(mpg$cty.num)
+```
+
+```{r convert3, cache=TRUE}
+## Try this: do you see a difference?: [0,14), [14,18) and [18,40)
+mpg$cty.num2 <- cut(mpg$cty, c(0, 14, 18, 40), right = FALSE)
+table(mpg$cty.num2)
+```
+
+::: column-margin
+`]` stands for closed interval, i.e., right = TRUE. On the other hand, `)` means open interval. Hence, there will be a huge difference when setting right = TRUE vs. right = FALSE
+:::
+
+### Missing value
+
+::: callout-tip
+Incomplete datasets can distort analysis. Identifying and managing these missing values is thus crucial.
+:::
+
+We can check how many missing values we have by: **table(is.na(variable.name))**
+
+Let's us check whether the cty variable contains any missing values:
+
+```{r missval, cache=TRUE, warning=FALSE}
+table(is.na(mpg$cty))
+```
+
+If you want to return all non-missing values, i.e., complete case values: **na.omit(variable.name)**. For more extensive methods on handling missing values, see subsequent tutorials.

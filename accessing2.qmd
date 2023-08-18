@@ -1,0 +1,460 @@
+## Importing CCHS to R {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(knitr)
+```
+
+This is a short instruction document of how to get CCHS dataset from the UBC library site to your RStudio environment. Once we bring the dataset into RStudio, the next step is to think about creating analytic dataset.
+
+### Downloading CCHS data from UBC
+
+-   **Step 1**: Go to [dvn.library.ubc.ca](http://dvn.library.ubc.ca), and press 'log-in'
+
+```{r ubc1, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX1.png")
+```
+
+-   **Step 2**: Select 'UBC' from the dropdown menu
+
+```{r ubc2, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX2.png")
+```
+
+-   **Step 3**: Enter your CWL or UBC library authentication information
+
+```{r ubc3, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus3.png")
+```
+
+-   **Step 4**: Once you log-in, search the term 'cchs' in the search-box
+
+```{r ubc4, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX4.png")
+```
+
+-   **Step 5**: For illustrative purposes, let us work with the Cycle 3.1 of the CCHS dataset from the list of results. In that case, type 'cchs 3.1'
+
+```{r ubc5, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX5.png")
+```
+
+-   **Step 6**: CCHS Cycle 3.1 information
+
+```{r ubc6, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus6X.png")
+```
+
+-   **Step 7**: Choose the 'Data: CD' from the menu
+
+```{r ubc7, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX7.png")
+```
+
+-   **Step 8**: Download the entire data (about 159 MB) as a zip file
+
+```{r ubc8, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX8.png")
+```
+
+-   **Step 9**: Accept the 'terms of use'
+
+```{r ubc9, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX9.png")
+```
+
+-   **Step 10**: Select a directory to download the zip file. The path of the download directory is important (we need to use this `path` exactly later). For example, below we are in `"C:\CCHS\"` folder, but we will create a "Data" folder there, so that the download path is `"C:\CCHS\Data\"`.
+
+```{r ubc10, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX10.png")
+```
+
+```{r ubc10b, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX10b.png")
+```
+
+```{r ubc10c, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX10c.png")
+```
+
+```{r ubc10d, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX10d.png")
+```
+
+-   **Step 11**: Extract the zip file
+
+```{r ubc11, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus11.png")
+```
+
+-   **Step 12**: Be patient with the extraction
+
+```{r ubc12, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus12.png")
+```
+
+-   **Step 13**: Once extraction is complete, take a look at the folders inside. You will see that there is a folder named 'SAS_SPSS'
+
+```{r ubc13, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus13.png")
+```
+
+### Reading and Formatting the data
+
+#### Option 1: Processing data using SAS
+
+SAS is a commercial software. You may be able to get access to educational version. In case you don't have access to it, later we outline how to use free packages to read these datasets.
+
+-   **Step 1**: Inside that 'SAS_SPSS' folder, find the file *hs_pfe.sas*. It is a long file, but we are going to work on part of it. First thing we want to do it to change all the directory names to where you have unzipped the downloaded file (for example, here the zip file was extracted to C:/CCHS/Data/cchs_cycle3-1CD/). We only need the first part of the code (as shown below; only related to data 'hs'). Delete the rest of the codes for now. The resulting code should like like this:
+
+```{r sasproc1, eval=FALSE}
+%include "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hs_pfe.sas";
+
+data hs;
+        %let datafid="C:\CCHS\Data\cchs_cycle3-1CD\Data\hs.txt";
+		%include "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hs_i.sas";
+        %include "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hs_fmt.sas";
+        %include "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hs_lbe.sas";
+run;
+```
+
+Once the modifications are done, submit the codes in SAS. Note that, the name of the data is 'hs'.
+
+```{r ubc14, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus14.png")
+```
+
+-   **Step 2**: Once you submit the code, you can check the log window in SAS to see how the code submission went. It should tell you how many observations and variables were read.
+
+```{r ubc15, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus15.png")
+```
+
+-   **Step 3**: If you one to view the dataset, you can go to 'Explorer' window within SAS.
+
+```{r ubc16, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus16.png")
+```
+
+-   **Step 4**: Generally, if you haven't specified where to load the files, SAS will by default save the data into a library called 'Work'
+
+```{r ubc17, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus17.png")
+```
+
+-   **Step 5**: Open that folder, and you will be able to find the dataset 'Hs'.
+
+```{r ubc18, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus18.png")
+```
+
+-   **Step 6**: Right click on the data, and click 'open' to view the datafile.
+
+```{r ubc19, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus19.png")
+```
+
+-   **Step 7**: To export the data into a CSV format data (so that we can read this data into other software packages), ckick 'Menu'.
+
+```{r ubc20, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus20.png")
+```
+
+-   **Step 8**: then press 'Export Data'.
+
+```{r ubc21, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus21.png")
+```
+
+-   **Step 9**: choose the library and the data.
+
+```{r ubc22, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus22.png")
+```
+
+-   **Step 10**: choose the format in which you may want to save the existing data.
+
+```{r ubc23, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus23.png")
+```
+
+-   **Step 11**: also specify where you want to save the csv file and the name of that file (e.g., cchs3.csv).
+
+```{r ubc24, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus24.png")
+```
+
+-   **Step 12**: go to that directory to see the file cchs3.csv
+
+```{r ubc25, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus25.png")
+```
+
+-   **Step 13**: If you want to save the file in SAS format, you can do so by writing the following sas code into the 'Editor' window. Here we are saving the data Hs within the Work library in to a data called cchs3 within the SASLib library. Note that, the directory name has to be where you want to save the output file.
+
+```{r sasproc2, eval=FALSE}
+LIBNAME SASLib "C:\CCHS\Data";
+DATA SASLib.cchs3;
+    set Work.Hs;
+run;
+```
+
+Submit these codes into SAS:
+
+```{r ubc26, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus26.png")
+```
+
+-   **Step 13**: go to that directory to see the file cchs3.sas7dbat
+
+```{r ubc27, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus27.png")
+```
+
+#### Option 2: Processing data using PSPP (Free)
+
+PSPP is a free package; alternative to commercial software SPSS. We can use the same SPSS codes to read the datafile into PSPP, and save.
+
+-   **Step 1**: Get the free PSPP software from the website: [www.gnu.org/software/pspp/](http://www.gnu.org/software/pspp/)
+
+PSPP is available for GNU/Hurd, GNU/Linux, Darwin (Mac OS X), OpenBSD, NetBSD, FreeBSD, and Windows
+
+```{r ubc30, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus30.png")
+```
+
+For windows, download appropriate version.
+
+```{r ubc30aa, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/psppdownload0.png")
+```
+
+Download the file
+
+```{r ubc30ab, echo=FALSE, out.width = '25%'}
+knitr::include_graphics("Images/accessing/psppdownload.png")
+```
+
+Install
+
+```{r ubc30install, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/psppinstall.png")
+```
+
+```{r ubc30install2, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/psppinstall2.png")
+```
+
+```{r ubc30install3, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/psppinstall3.png")
+```
+
+Click the icon shorcut after installing
+
+```{r ubc30aa5, echo=FALSE, out.width = '25%'}
+knitr::include_graphics("Images/accessing/psppicon.png")
+```
+
+-   **Step 2**: Open PSPP
+
+```{r ubc31, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus31.png")
+```
+
+-   **Step 3**: Go to 'file' menu and click 'open'
+
+```{r ubc32, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus32.png")
+```
+
+-   **Step 4**: Specify the *readfile.sps* file from the 'SAS_SPSS' folder.
+
+```{r ubc33, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus33.png")
+```
+
+You will see the following file:
+
+```{r ubc33bb, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX33.png")
+```
+
+-   **Step 5**: Similar to before, change the directories as appropriate. Get rid of the extra lines of codes. Resulting codes are as follows (you can copy and replace the code in the file with the following codes):
+
+```{r sasproc3, eval=FALSE}
+file handle infile/name = 'C:\CCHS\Data\cchs_cycle3-1CD\DATA\hs.txt'.
+data list file = infile notable/.
+include file = "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hs_i.sps".
+include file = "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hsvale.sps".
+include file = "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hsvare.sps".
+include file = "C:\CCHS\Data\cchs_cycle3-1CD\SAS_SPSS\Layouts\hs\hsmiss.sps".
+execute.
+```
+
+```{r ubc34, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusX34.png")
+```
+
+For Mac users, it should be as follows (e.g., `username` should be your user name, if you are saving under the path `"/Users/username/CCHS/Data/"`):
+
+```{r sasproc4, eval=FALSE}
+file handle infile/name ="/Users/username/CCHS/Data/cchs_cycle3-1CD/Data/hs.txt".
+data list file = infile notable/.
+include file = "/Users/username/CCHS/Data/cchs_cycle3-1CD/SAS_SPSS/Layouts/hs/hs_i.sps".
+include file = "/Users/username/CCHS/Data/cchs_cycle3-1CD/SAS_SPSS/Layouts/hs/hsvale.sps".
+include file = "/Users/username/CCHS/Data/cchs_cycle3-1CD/SAS_SPSS/Layouts/hs/hsvare.sps".
+include file = "/Users/username/CCHS/Data/cchs_cycle3-1CD/SAS_SPSS/Layouts/hs/hsmiss.sps".
+
+execute.
+```
+
+-   **Step 6**: Run the codes.
+
+```{r ubc35, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus35.png")
+```
+
+-   **Step 7**: This is a large data, and will take some time to load the data into the PSPP data editor. **Be patient**.
+
+```{r ubc12xyg, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/waitX.png")
+```
+
+Once loading is complete, it will show the 'output' and 'data view'.
+
+```{r ubc36v, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacusNew.png")
+```
+
+```{r ubc36, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus36.png")
+```
+
+Note that, you will get error message, if your files were not in the correct path. In our example, the path was `"C:\CCHS\Data\"` for the zip file content (see the previous steps).
+
+-   **Step 7**: You can also check the 'variable view'.
+
+```{r ubc37, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus37.png")
+```
+
+-   **Step 8**: Save the data by clicking 'File' and then 'save as ...'
+
+```{r ubc38, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus38.png")
+```
+
+-   **Step 9**: Specify the name of the datafile and the location / folder to save the data file.
+
+```{r ubc39, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus39.png")
+```
+
+-   **Step 10**: See the SAV file saved in the directory.
+
+```{r ubc40, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus40.png")
+```
+
+-   **Step 11**: To save CSV format data, use the following syntax.
+
+```{r sasproc5, eval=FALSE}
+SAVE TRANSLATE
+  /OUTFILE="C:/CCHS/Data/cchs3b.csv"  
+  /TYPE=CSV
+  /FIELDNAMES      
+  /CELLS=VALUES.
+```
+
+Note that, for categorical data, you can either save values or labels. For our purpose, we prefer values, and hence saved with values here.
+
+```{r ubc41, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus41.png")
+```
+
+-   **Step 12**: See the CSV file saved in the directory extracted from PSPP.
+
+```{r ubc42, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus42.png")
+```
+
+#### Option 3: Processing data using SPSS
+
+Log into [ubc.onthehub.com](https://ubc.onthehub.com) to download SPSS. With your CWL account, UBC students should be able to download it. UBC [IT website for SPSS](https://it.ubc.ca/services/desktop-print-services/software-licensing/spss) says:
+
+`The SPSS software license with UBC specifies that SPSS must only be used by UBC Faculty, Students, and Research Staff and only for Teaching and non-commercial Research purposes related to UBC.`
+
+Both network (for UBC owened devices) or standalone / home versions (for non-UBC owened devices) should be available. Once downloaded, same process of importing CCHS data in PSPP can also be applied on SPSS (same syntax files should work). Let me know if that is not the case.
+
+### Processing data in R
+
+#### Download software
+
+-   **Step 1**: Download either 'R' from CRAN [www.r-project.org](https://www.r-project.org/) or 'R open' from Microsoft [mran.microsoft.com/open](https://mran.microsoft.com/open)
+
+```{r R03, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/R03.png")
+```
+
+```{r R01, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/R01.png")
+```
+
+-   **Step 2**: Download RStudio from [www.rstudio.com/](https://www.rstudio.com/)
+
+```{r R02, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/R02.png")
+```
+
+-   **Step 3**: Open RStudio
+
+```{r R04, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/R04.png")
+```
+
+#### Import, export and load data into R
+
+-   **Step 1**: Set working directory
+
+```{r sasproc6, eval=FALSE}
+setwd("C:/CCHS/Data/") # or something appropriate
+```
+
+-   **Step 2**: Read the dataset created from PSPP with cell values. We can also do a small check to see if the cell values are visible. For example, we choose a variable 'CCCE_05A', and tabulate it.
+
+```{r eval=FALSE}
+Hs <- read.csv("cchs3b.csv", header = TRUE)
+table(Hs$CCCE_05A)
+```
+
+```{r ubc46, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus46.png")
+```
+
+-   **Step 3**: Save the RData file from R into a folder `SurveyData`:
+
+```{r save, eval=FALSE}
+save(Hs, file = "SurveyData/cchs3.RData")
+```
+
+-   **Step 4**: See the RData file saved in the directory extracted from R.
+
+```{r ubc43, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus43.png")
+```
+
+-   **Step 5**: Close R / RStudio and restart it. Environment window within RStudio should be empty.
+
+```{r ubc44, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus44.png")
+```
+
+-   **Step 6**: Load the saved RData into R. Environment window within RStudio should have 'Hs' dataset.
+
+```{r save6, eval=FALSE}
+load("SurveyData/cchs3.RData")
+```
+
+```{r ubc45, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/abacus45.png")
+```

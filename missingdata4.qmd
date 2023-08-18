@@ -1,0 +1,202 @@
+## Model performance {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+library(ROCR)
+library(WeightedROC)
+```
+
+This is a short instruction document of how to estimate model performance while analyzing survey weighted data with missing values.
+
+```{r setup1, cache=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+svyROCw3 <- function(fit=fit7,outcome=analytic2$CVD=="event", weight = NULL,plot=FALSE){
+  # ROC curve for
+  # Survey Data with Logistic Regression
+  if (is.null(weight)){ # require(ROCR)
+    prob <- predict(fit, type = "response")
+  pred <- prediction(as.vector(prob), outcome)
+  perf <- performance(pred, "tpr", "fpr")
+  auc <- performance(pred, measure = "auc")
+  auc <- auc@y.values[[1]]
+  if (plot == TRUE){
+    roc.data <- data.frame(fpr = unlist(perf@x.values), tpr = unlist(perf@y.values), 
+      model = "Logistic")
+    with(data = roc.data,plot(fpr, tpr, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,
+     xlab="1 - specificity", ylab="Sensitivity",
+     main = paste("AUC = ", round(auc,3))))
+  mtext("Unweighted ROC")
+  abline(0,1, lty=2)
+  }
+  } else { # library(WeightedROC)
+    outcome <- as.numeric(outcome)
+  pred <- predict(fit, type = "response")
+  tp.fp <- WeightedROC(pred, outcome, weight)
+  auc <- WeightedAUC(tp.fp)
+  if (plot == TRUE){
+    with(data = tp.fp,plot(FPR, TPR, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,
+     xlab="1 - specificity", ylab="Sensitivity",
+     main = paste("AUC = ", round(auc,3))))
+  abline(0,1, lty=2)
+  mtext("Weighted ROC")
+  }
+  }
+  return(auc)
+}
+AL.gof3 <- function(fit=fit7, data = analytic2, weight = "weight", psu = "psu", strata= "strata"){
+  # Archer-Lemeshow Goodness of Fit Test for
+  # Survey Data with Logistic Regression
+  r <- residuals(fit, type="response") 
+  f<-fitted(fit) 
+  breaks.g <- c(-Inf, quantile(f,  (1:9)/10), Inf)
+  breaks.g <- breaks.g + seq_along(breaks.g) * .Machine$double.eps
+  g<- cut(f, breaks.g)
+  data2g <- cbind(data,r,g)
+  if (is.null(psu)){
+    newdesign <- svydesign(id=~1,
+                         weights=as.formula(paste0("~",weight)), 
+                        data=data2g, nest = TRUE)
+  }
+  if (!is.null(psu)) {
+    newdesign <- svydesign(id=as.formula(paste0("~",psu)),
+                         strata=as.formula(paste0("~",strata)),
+                         weights=as.formula(paste0("~",weight)), 
+                        data=data2g, nest = TRUE)
+  }
+  decilemodel<- svyglm(r~g, design=newdesign) 
+  res <- regTermTest(decilemodel, ~g)
+  return(as.numeric(res$p)) 
+}
+```
+
+### Load imputed 5 sets of data
+
+Saved at the end of Lab 6 part 2.
+
+```{r data, cache=FALSE}
+# Saved from last lab
+load("Data/missingdata/missOA123CVDnorth.RData")
+str(allImputations)
+```
+
+### Estimating treatment effect
+
+#### Individual beta estimates
+
+```{r est1, cache=TRUE }
+library(survey)
+w.design <- svydesign(ids=~1, weights=~weight,
+                           data = allImputations)
+model.formula <- as.formula("I(CVD=='event') ~ OA + age + sex +
+                            income + race + painmed + ht +
+                            copd + diab + OA:painmed +
+                            age:copd + sex:copd")
+estimates <- with(w.design, svyglm(model.formula, family=quasibinomial))
+estimates
+```
+
+#### Pooled / averaged estimates for beta and OR
+
+```{r est2, cache=TRUE }
+library("mitools")
+pooled.estimates <- MIcombine(estimates)
+pooled.estimates
+
+sum.pooled <- summary(pooled.estimates,logeffect=TRUE, digits = 2)
+sum.pooled
+```
+
+### Estimating model performance (AUC and AL)
+
+#### Individual AUC estimates (with interactions)
+
+```{r auc1, cache=TRUE }
+library(ROCR)
+library(WeightedROC)
+model.formula <- as.formula("I(CVD=='event') ~ OA + age + sex +
+                            income + race + painmed + ht +
+                            copd + diab + OA:painmed +
+                            age:copd + sex:copd")
+AL.scalar <- AUC.scalar <- vector("list", 5)
+for (i in 1:5) {
+  analytic.i <- allImputations$imputations[[i]]
+  w.design <- svydesign(id=~1, weights=~weight,
+                        data=analytic.i)
+  model.fit <- svyglm(model.formula, design=w.design, family=quasibinomial)
+  auc <- svyROCw3(fit=model.fit,outcome=w.design$variables$CVD=='event', 
+                  weight = w.design$variables$weight, plot = FALSE)
+  
+  AL <- AL.gof3(fit=model.fit, data = analytic.i, 
+                   weight = "weight", 
+                   psu = NULL, 
+                   strata= NULL)
+  AL.scalar[[i]] <- AL
+  AUC.scalar[[i]] <- auc 
+  cat("AUC calculated for data", i, "\n")
+}
+str(AUC.scalar)
+AL.scalar
+```
+
+#### Averaged estimates for AUC (with interactions)
+
+```{r auc2, cache=TRUE }
+# summary of AUC
+mean(unlist(AUC.scalar))
+sd(unlist(AUC.scalar))
+round(range(unlist(AUC.scalar)),3)
+# p-values (from AL) by majority
+sum(AL.scalar>0.05)
+```
+
+### Model performance without interactions
+
+#### Individual AUC estimates / AL p-values
+
+```{r auc3, cache=TRUE }
+library(ROCR)
+library(WeightedROC)
+AL.scalar <- AUC.scalar <- vector("list", 5)
+model.formula <- as.formula("I(CVD=='event') ~ OA + age + sex +
+                            income + race + painmed + ht +
+                            copd + diab")
+for (i in 1:5) {
+  analytic.i <- allImputations$imputations[[i]]
+  w.design <- svydesign(id=~1, weights=~weight,
+                        data=analytic.i)
+  model.fit <- svyglm(model.formula, design=w.design, family=quasibinomial)
+  auc <- svyROCw3(fit=model.fit,outcome=w.design$variables$CVD=='event', 
+                  weight = w.design$variables$weight, plot = FALSE)
+  
+  AL <- AL.gof3(fit=model.fit, data = analytic.i, 
+                   weight = "weight", 
+                   psu = NULL, 
+                   strata= NULL)
+  AL.scalar[[i]] <- AL
+  AUC.scalar[[i]] <- auc 
+  cat("AUC calculated for data", i, "\n")
+}
+str(AUC.scalar)
+AL.scalar
+```
+
+#### Averaged estimates for AUC / majority of AL p-values
+
+```{r auc4, cache=TRUE }
+# summary of AUC
+mean(unlist(AUC.scalar))
+sd(unlist(AUC.scalar))
+round(range(unlist(AUC.scalar)),3)
+# p-values (from AL) by majority
+sum(AL.scalar>0.05)
+```
+
+### Appendix
+
+User-written `svyROCw3` and `AL.gof3` functions
+
+```{r gof, cache=TRUE }
+svyROCw3
+AL.gof3
+```

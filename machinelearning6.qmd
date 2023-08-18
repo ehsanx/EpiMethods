@@ -1,0 +1,97 @@
+## Unsupervised learning {.unnumbered}
+
+In this chapter, we will talk about unsupervised learning.
+
+-   Watch the video describing this chapter [![video](https://img.youtube.com/vi/xhjcfvWDZVk/maxresdefault.jpg)](https://youtu.be/xhjcfvWDZVk)
+
+```{r setup07, include=FALSE}
+require(Publish)
+```
+
+### Clustering
+
+Clustering is an unsupervised learning algorithm. These algorithms can classify data into multiple groups. Such classification is based on similarity.
+
+Group characteristics include (to the extent that is possible)
+
+-   low inter-class similarity: observation from different clusters would be dissimilar
+-   high intra-class similarity: observation from the same cluster would be similar
+
+Within-cluster variation will be thus minimized by optimizing within-cluster sum of squares of Euclidean distances [@Cross-validation]
+
+```{r c954xx, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("Images/machinelearning/wcss.png")
+```
+
+### K-means
+
+K-means is a very popular clustering algorithm, that partitions the data into $k$ groups.
+
+Algorithm:
+
+-   Determine a number $k$ (e.g., could be 3)
+-   randomly select $k$ subjects in a data. Use these points as staring points (centers or cluster mean) for each cluster.
+-   By Euclidean distance measure (from the initial centers), try to determine in which cluster the remaining points belong.
+-   compute new mean value for each cluster.
+-   based on this new mean, try to determine again in which cluster the data points belong.
+-   process continues until the data points do not change cluster membership.
+
+### Read previously saved data
+
+```{r data, cache=TRUE}
+ObsData <- readRDS(file = "Data/machinelearning/rhcAnalytic.RDS")
+```
+
+#### Example 1
+
+```{r ex1, cache=TRUE}
+datax0 <- ObsData[c("Heart.rate", "edu")]
+kres0 <- kmeans(datax0, centers = 2, nstart = 10)
+kres0$centers
+plot(datax0, col = kres0$cluster, main = kres0$tot.withinss)
+```
+
+#### Example 2
+
+```{r ex2, cache=TRUE}
+datax0 <- ObsData[c("blood.pressure", "Heart.rate", "Respiratory.rate")]
+kres0 <- kmeans(datax0, centers = 2, nstart = 10)
+kres0$centers
+plot(datax0, col = kres0$cluster, main = kres0$tot.withinss)
+```
+
+#### Example with many variables
+
+```{r exmany, cache=TRUE}
+datax <- ObsData[c("edu", "blood.pressure", "Heart.rate", 
+                   "Respiratory.rate" , "Temperature",
+                   "PH", "Weight", "Length.of.Stay")]
+```
+
+```{r kmeans, cache=TRUE}
+kres <- kmeans(datax, centers = 3)
+#kres
+head(kres$cluster)
+kres$size
+kres$centers
+aggregate(datax, by = list(cluster = kres$cluster), mean)
+aggregate(datax, by = list(cluster = kres$cluster), sd)
+```
+
+### Optimal number of clusters
+
+```{r optk, cache=TRUE, warning=FALSE}
+require(factoextra)
+fviz_nbclust(datax, kmeans, method = "wss")+
+  geom_vline(xintercept=3,linetype=3)
+```
+
+Here the vertical line is chosen based on elbow method [@clustering].
+
+### Discussion
+
+-   We need to supply a number, $k$: but we can test different $k$s to identify optimal value
+-   Clustering can be influenced by outliners, so median based clustering is possible
+-   mere ordering can influence clustering, hence we should choose different initial means (e.g., `nstart` should be greater than 1).
+
+### References

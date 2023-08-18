@@ -1,0 +1,106 @@
+## Model development considerations {.unnumbered}
+
+In this chapter, we will talk about considerations for choosing a machine learning method.
+
+-   Watch the video describing this chapter [![video](https://img.youtube.com/vi/RP3I8m3hIX8/maxresdefault.jpg)](https://youtu.be/RP3I8m3hIX8)
+
+```{r setup08, include=FALSE, warning=FALSE}
+require(Publish)
+```
+
+### Why Machine learning?
+
+Let us assume that our aim is to build a clinical diagnostic tool or risk prediction model.
+
+-   As we have seen earlier, **parametric** (linear or logistic) regression models are capable of producing prediction models.
+    -   relies on expert knowledge to select covariates
+    -   Parsimony vs better prediction
+-   There are different **Machine Learning** (ML) methods that can deal with
+    -   <u>multicollinearity</u> (e.g., LASSO)
+    -   <u>model-specification</u>: interaction term, polynomial or other complex functional form (e.g., tree-based)
+    -   potentially better predictive ability by utilizing <u>many learners</u> (e.g., super learner)
+        -   parametric methods are efficient, but analyst exactly needs to know the model-specification to get the best results
+        -   nonparameteric methods are not as efficient, but less restrictive
+        -   some data adaptive methods are good at transforming the data and find optimal model-specification
+        -   super learner can combine the predictive ability of different type of learners (parametric vs. not)
+    -   ability to handle <u>variety of data</u> (e.g., image)
+    -   ability to handle <u>larger amount of data</u> (e.g., large health admin data; high dimensional data) in identifying variables that are risk factors for the outcome that may not be easily identified by the subject area experts (e.g., may offer new knowledge)
+
+```{block, type='rmdcomment'}
+Analyst should be absolutely clear why they are using a ML method. Contrary to popular belief, ML method may not always provide better results!  
+```
+
+```{r tweet1, echo=FALSE, cache=TRUE, warning=FALSE}
+tweetrmd::tweet_embed("1455175041440694286")
+```
+
+### Data pre-processing
+
+Centering will make the mean of variables 0. Scaling the variables will produce a common standard deviation (1). Often these help in bringing numerical stability. Continuous variables may require some transformation to remove skewness or outlier issues of the data.
+
+```{r tweet2, echo=FALSE, cache=TRUE, warning=FALSE}
+tweetrmd::tweet_embed("1458405599880822787")
+```
+
+### Missing data considerations
+
+```{r tweet3, echo=FALSE, cache=TRUE, warning=FALSE}
+tweetrmd::tweet_embed("1461266045356883968")
+```
+
+[@nijman2022missing] reports and recommends (emphasis added):
+
+-   "Although many types of machine learning methods offer built-in capabilities for handling missing values, these strategies are rarely used. Instead, most ML-based prediction model studies resort to **complete case analysis** or **mean imputation**."
+-   "The handling and reporting of missing data in prediction model studies should be improved. A general recommendation to avoid bias is to use **multiple imputation**. It is also possible to consider machine learning methods with **built-in capabilities for handling missing data** (e.g., decision trees with surrogate splits, use of pattern submodels, or incorporation of autoencoders)."
+
+### Data hungry methods
+
+-   Regression methods require at least 10 **events per variable** (EPV)
+
+```{block, type='rmdcomment'}
+[EPV](https://en.wikipedia.org/wiki/One_in_ten_rule): " ... the one in ten rule is a rule of thumb for how many predictor parameters can be estimated from data when doing regression analysis ... while keeping the risk of overfitting low. The rule states that **one predictive variable** can be studied for **every ten events**." 
+```
+
+-   Single ML methods may require as 50-200 EPV (depending on which method is chosen). See Chapter 3 of [@Steyerberg2019]
+-   Often simpler models are chosen when sample size is not high.
+-   Variable selection via LASSO may be helpful to reduce noisy variables from the model.
+
+### Model tuning
+
+```{block, type='rmdcomment'}
+Hyperparameters are the parameters that are determined by the analysts, and stays the same during the learning process. Often it is the case that analysts do not know which hyperparameter selection will provide better results, and the analyst may need to do a manual search (based on best guesses) or grid search to find out the best set of hyperparameter.
+
+For logistic regression, one example of hyperparameter could be [optimization algorithm](https://stats.stackexchange.com/questions/178492/which-optimization-algorithm-is-used-in-glm-function-in-r) for fitting the model:
+
+- Newton–Raphson
+- Fisher Scoring or Iteratively Reweighted Least Squares (IRLS)
+- Hybrid (start with IRLS for initialization purposes, and then Newton–Raphson)
+```
+
+```{r datapng, echo=FALSE, out.width="50%",fig.align="center"}
+knitr::include_graphics("Images/machinelearning/data.png")
+```
+
+-   Part of the reason these methods may require more time to fit is because of existence of many parameters needing to be optimized to obtain better accuracy of the training model. These are usually known as **hyperparameters**, and the search process is known as **hyperparameter tuning**.
+
+-   Usually training and tuning datasets are used to tune the model for finding better hyperparameters.
+
+-   To enhance reproducibility, <u>cross-validation</u> could also be used in the training and tuning process.
+
+```{block, type='rmdcomment'}
+Validation set and tuning set should be different. If the validation set was used for tuning, then the trained model can still be subject to overfitting. 
+```
+
+### Time resource requirements
+
+-   Some methods are inherently based on repeated fitting of the **same candidate learner** or model in different data (Type - I).
+
+-   Ensemble learning combines predictive ability of **many candidate learners** on the same data. Need to be careful which candidate learner are selected (Type - II; needs variety).
+
+Both of these scenarios may require significantly more time. Also, even some single candidate learners could be time intensive (e.g., deep learning with many layer).
+
+```{block, type='rmdcomment'}
+It is a good idea to report the computing time.
+```
+
+### References

@@ -1,0 +1,461 @@
+## Collapsibility {.unnumbered}
+
+Explanation of collapsibility property of an estimate (RD, RR and OR: conditional or marginal) in absence of confounding
+
+```{r setup, warning=FALSE, message=FALSE,cache=TRUE}
+# Load required packages
+library(simcausal)
+library(tableone)
+library(Publish)
+library(lawstat)
+```
+
+### Data generating process
+
+```{r dgm5, warning=FALSE, message=FALSE, cache = TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("gender", distr = "rbern", 
+       prob = 0.7) +
+  node("age", distr = "rnorm", 
+       mean = 2, sd = 4) +
+  node("smoking", distr = "rbern", 
+       prob = plogis(.1)) +
+  node("hypertension", distr = "rbern", 
+       prob = plogis(1 + log(3.5) * smoking 
+                     + log(.1) * gender  
+                       + log(7) * age))
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag5, warning=FALSE, message=FALSE, cache = TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+
+```
+
+#### Generate Data
+
+```{r data5, warning=FALSE, message=FALSE, cache = TRUE}
+Obs.Data <- sim(DAG = Dset, n = 100000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Balance check
+
+```{r balance5, warning=FALSE, message=FALSE, cache = TRUE}
+require(tableone)
+CreateTableOne(data = Obs.Data, 
+               strata = "smoking", 
+               vars = c("gender", "age"))
+```
+
+### Conditional and crude RD
+
+#### Full list of risk factors for outcome (2 variables)
+
+```{r rd5, warning=FALSE, message=FALSE, cache = TRUE}
+## RD
+require(Publish)
+fitx0 <- glm(hypertension ~ smoking + gender + age, 
+             family=gaussian(link = "identity"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+```
+
+Ref:
+
+-   [@naimi2020estimating] ("For the risk difference, one may use a GLM with a Gaussian (i.e., normal) distribution and identity link function, or, equivalently, an ordinary least squares estimator ...robust variance estimator (or bootstrap) should be used to obtain valid standard errors.")
+
+#### Strtatum specific (2 variables)
+
+```{r eststrata, warning=FALSE, message=FALSE, cache = TRUE}
+fitx1 <- glm(hypertension ~ smoking, family=gaussian(link = "identity"), 
+             data=subset(Obs.Data, gender == 1 & age < 2))
+publish(fitx1, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+
+fitx2 <- glm(hypertension ~ smoking, family=gaussian(link = "identity"), 
+             data=subset(Obs.Data, gender == 0 & age < 2))
+publish(fitx2, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+
+fitx3 <- glm(hypertension ~ smoking, family=gaussian(link = "identity"), 
+             data=subset(Obs.Data, gender == 1 & age >= 2))
+publish(fitx3, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+
+fitx4 <- glm(hypertension ~ smoking, family=gaussian(link = "identity"), 
+             data=subset(Obs.Data, gender == 0 & age >= 2))
+publish(fitx4, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+```
+
+Unweighted mean from all strata (for simplicity, 2 variables)
+
+```{r unwgtmean, warning=FALSE, message=FALSE, cache = TRUE}
+round(mean(c(coef(fitx1)["smoking"],
+             coef(fitx2)["smoking"],
+             coef(fitx3)["smoking"],
+             coef(fitx4)["smoking"])),2)
+```
+
+#### Partial list of risk factors for outcome (1 variable)
+
+```{r riskfactor, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking + gender, 
+             family=gaussian(link = "identity"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+```
+
+#### Strtatum specific (1 variable)
+
+```{r strata1, warning=FALSE, message=FALSE, cache = TRUE}
+fitx1 <- glm(hypertension ~ smoking, family=gaussian(link = "identity"), 
+             data=subset(Obs.Data, gender == 1))
+publish(fitx1, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+
+fitx2 <- glm(hypertension ~ smoking, family=gaussian(link = "identity"), 
+             data=subset(Obs.Data, gender == 0))
+publish(fitx2, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+```
+
+Unweighted mean from all strata (for simplicity, 1 variables)
+
+```{r wmean, warning=FALSE, message=FALSE, cache = TRUE}
+round(mean(c(coef(fitx1)["smoking"],
+             coef(fitx2)["smoking"])),2)
+```
+
+#### Crude (in absence of confounding)
+
+```{r crude, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking, 
+             family=gaussian(link = "identity"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[2,]
+```
+
+### Conditional and crude RR
+
+Ref:
+
+-   [@naimi2020estimating] ("For the risk ratio, one may use a GLM with a Poisson distribution and log link function .... one should use the robust (or sandwich) variance estimator to obtain valid standard errors (the bootstrap can also be used)").
+
+#### Full list of risk factors for outcome (2 variables)
+
+```{r fullrisk, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking + gender + age, 
+             family=poisson(link = "log"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+#### Strtatum specific (2 variables)
+
+```{r strata2, warning=FALSE, message=FALSE, cache = TRUE}
+fitx1 <- glm(hypertension ~ smoking, 
+             family=poisson(link = "log"), 
+             data=subset(Obs.Data, gender == 1 & age < 2))
+publish(fitx1, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+
+fitx2 <- glm(hypertension ~ smoking, 
+             family=poisson(link = "log"), 
+             data=subset(Obs.Data, gender == 0 & age < 2))
+publish(fitx2, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+
+fitx3 <- glm(hypertension ~ smoking, 
+             family=poisson(link = "log"), 
+             data=subset(Obs.Data, gender == 1 & age >= 2))
+publish(fitx3, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+
+fitx4 <- glm(hypertension ~ smoking, 
+             family=poisson(link = "log"), 
+             data=subset(Obs.Data, gender == 0 & age >= 2))
+publish(fitx4, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+Unweighted mean from all strata (for simplicity, 2 variables)
+
+```{r unwgtmean2, warning=FALSE, message=FALSE, cache = TRUE}
+mean(exp(c(coef(fitx1)["smoking"],
+           coef(fitx2)["smoking"],
+           coef(fitx3)["smoking"],
+           coef(fitx4)["smoking"])))
+```
+
+#### Partial list of risk factors for outcome (1 variable)
+
+```{r riskpartial, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking + gender, 
+             family=poisson(link = "log"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+#### Strtatum specific (1 variable)
+
+```{r strata11, warning=FALSE, message=FALSE, cache = TRUE}
+fitx1 <- glm(hypertension ~ smoking, 
+             family=poisson(link = "log"), 
+             data=subset(Obs.Data, gender == 1))
+publish(fitx1, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+fitx2 <- glm(hypertension ~ smoking, 
+             family=poisson(link = "log"), 
+             data=subset(Obs.Data, gender == 0))
+publish(fitx2, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+Unweighted mean from all strata (for simplicity, 1 variable)
+
+```{r unwgtmean3, warning=FALSE, message=FALSE, cache = TRUE}
+mean(exp(c(coef(fitx1)["smoking"],
+           coef(fitx2)["smoking"])))
+```
+
+#### Crude (in absence of confounding)
+
+```{r crude11, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking, 
+             family=poisson(link = "log"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+### Conditional and crude OR
+
+#### Full list of risk factors for outcome (2 variables)
+
+```{r orest, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking + gender + age, family=binomial(link = "logit"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", pvalue.method = "robust")$regressionTable[1,]
+```
+
+#### Strtatum specific (2 variables)
+
+```{r strata12, warning=FALSE, message=FALSE, cache = TRUE}
+fitx1 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), 
+             data=subset(Obs.Data, gender == 1 & age < 2))
+publish(fitx1, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+
+fitx2 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), 
+             data=subset(Obs.Data, gender == 0 & age < 2))
+publish(fitx2, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+
+fitx3 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), 
+             data=subset(Obs.Data, gender == 1 & age >= 2))
+publish(fitx3, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+
+fitx4 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), 
+             data=subset(Obs.Data, gender == 0 & age >= 2))
+publish(fitx4, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+Unweighted mean from all strata (for simplicity, 2 variables)
+
+```{r unwgtmean4, warning=FALSE, message=FALSE, cache = TRUE}
+mean(exp(c(coef(fitx1)["smoking"],
+           coef(fitx2)["smoking"],
+           coef(fitx3)["smoking"],
+           coef(fitx4)["smoking"])))
+```
+
+#### Partial list of risk factors for outcome (1 variable)
+
+```{r riskpartial11, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking + gender, 
+             family=binomial(link = "logit"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+#### Strtatum specific (1 variable)
+
+```{r strata21, warning=FALSE, message=FALSE, cache = TRUE}
+fitx1 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), 
+             data=subset(Obs.Data, gender == 1))
+publish(fitx1, print = FALSE, confint.method = "robust",
+        pvalue.method = "robust")$regressionTable[1,]
+
+fitx2 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), 
+             data=subset(Obs.Data, gender == 0))
+publish(fitx2, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+Unweighted mean from all strata (for simplicity, 1 variable)
+
+```{r wmean12, warning=FALSE, message=FALSE, cache = TRUE}
+mean(exp(c(coef(fitx1)["smoking"],
+           coef(fitx2)["smoking"])))
+```
+
+#### Mantel-Haenszel adjusted ORs with 1 variable
+
+```{r mhor, warning=FALSE, message=FALSE, cache = TRUE}
+tabx <- xtabs( ~ hypertension + smoking + gender, data = Obs.Data)
+ftable(tabx)    
+# require(samplesizeCMH)
+# apply(tabx, 3, odds.ratio)
+
+library(lawstat)
+cmh.test(tabx)
+# mantelhaen.test(tabx, exact = TRUE)
+```
+
+#### Crude (in absence of confounding)
+
+```{r crude12, warning=FALSE, message=FALSE, cache = TRUE}
+fitx0 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), data=Obs.Data)
+publish(fitx0, print = FALSE, confint.method = "robust", 
+        pvalue.method = "robust")$regressionTable[1,]
+```
+
+### Marginal RD, RR and OR
+
+Below we show a procedure for calculating marginal probabilities $p_1$ (for treated) and $p_0$ (for untreated).
+
+#### Adjustment of 2 variables
+
+```{r adj12, warning=FALSE, message=FALSE, cache = TRUE}
+fitx3 <- glm(hypertension ~ smoking + gender + age, 
+             family=binomial(link = "logit"), data=Obs.Data)
+Obs.Data.all.tx <- Obs.Data
+Obs.Data.all.tx$smoking <- 1
+p1 <- mean(predict(fitx3, 
+                   newdata = Obs.Data.all.tx, type = "response"))
+Obs.Data.all.utx <- Obs.Data
+Obs.Data.all.utx$smoking <- 0
+p0 <- mean(predict(fitx3, 
+                   newdata = Obs.Data.all.utx, type = "response"))
+
+RDm <- p1 - p0
+RRm <- p1 / p0
+ORm <- (p1 / (1-p1)) / (p0 / (1-p0))
+ORc <- as.numeric(exp(coef(fitx3)["smoking"]))
+RRz <- ORm / ((1-p0) + p0 * ORm) # Zhang and Yu (1998)
+cat("RD marginal = ", round(RDm,2), 
+    "\nRR marginal = ", round(RRm,2), 
+    "\nOR marginal = ", round(ORm,2), 
+    "\nOR conditional = ", round(ORc,2), 
+    "\nRR (ZY)= ", round(RRz,2))
+```
+
+#### Adjustment of 1 variable
+
+```{r adj13, warning=FALSE, message=FALSE, cache = TRUE}
+fitx2 <- glm(hypertension ~ smoking + gender, 
+             family=binomial(link = "logit"), data=Obs.Data)
+Obs.Data.all.tx <- Obs.Data
+Obs.Data.all.tx$smoking <- 1
+p1 <- mean(predict(fitx2, 
+                   newdata = Obs.Data.all.tx, type = "response"))
+Obs.Data.all.utx <- Obs.Data
+Obs.Data.all.utx$smoking <- 0
+p0 <- mean(predict(fitx2, 
+                   newdata = Obs.Data.all.utx, type = "response"))
+
+RDm <- p1 - p0
+RRm <- p1 / p0
+ORm <- (p1 / (1-p1)) / (p0 / (1-p0))
+ORc <- as.numeric(exp(coef(fitx2)["smoking"]))
+RRz <- ORm / ((1-p0) + p0 * ORm) # Zhang and Yu (1998)
+cat("RD marginal = ", round(RDm,2), 
+    "\nRR marginal = ", round(RRm,2), 
+    "\nOR marginal = ", round(ORm,2), 
+    "\nOR conditional = ", round(ORc,2), 
+    "\nRR (ZY)= ", round(RRz,2))
+```
+
+#### No adjustment
+
+```{r crude15, warning=FALSE, message=FALSE, cache = TRUE}
+fitx1 <- glm(hypertension ~ smoking, 
+             family=binomial(link = "logit"), data=Obs.Data)
+Obs.Data.all.tx <- Obs.Data
+Obs.Data.all.tx$smoking <- 1
+p1 <- mean(predict(fitx0, 
+                   newdata = Obs.Data.all.tx, type = "response"))
+Obs.Data.all.utx <- Obs.Data
+Obs.Data.all.utx$smoking <- 0
+p0 <- mean(predict(fitx0, 
+                   newdata = Obs.Data.all.utx, type = "response"))
+
+RDm <- p1 - p0
+RRm <- p1 / p0
+ORm <- (p1 / (1-p1)) / (p0 / (1-p0))
+ORc <- as.numeric(exp(coef(fitx1)["smoking"]))
+RRz <- ORm / ((1-p0) + p0 * ORm) # Zhang and Yu (1998)
+cat("RD marginal = ", round(RDm,2), 
+    "\nRR marginal = ", round(RRm,2), 
+    "\nOR marginal = ", round(ORm,2), 
+    "\nOR conditional = ", round(ORc,2), 
+    "\nRR (ZY)= ", round(RRz,2))
+```
+
+Bootstrap could be used to estimate confidence intervals.
+
+Ref:
+
+-   [@kleinman2009s] ("this paper demonstrates how to move from a nonlinear model to estimates of marginal effects that are quantified as the adjusted risk ratio or adjusted risk difference")
+-   [@austin2010absolute] ("clinically meaningful measures of treatment effect using logistic regression model")
+-   [@luijken2022comparison] ("marginal odds ratio")
+-   [@muller2014estimating] ("marginal standardization")
+-   [@greenland2004model] ("standardized / population-averaged")
+-   [@bieler2010estimating] ("standardized /population-averaged risk from the logistic model")
+
+### Summary
+
+Here are the summary of the results based on a scenario where confounding was absent:
+
+| Modelling strategy                                         | RD (conditional)          | RR (conditional)            | OR (conditional)                            |
+|-------------------|------------------|------------------|------------------|
+| age + gender in regression                                 | 0.06 \[0.05;0.06\]        | 1.08 \[1.08;1.09\]          | 3.37 \[3.17;3.58\]                          |
+| stratified by age and gender (mean)                        | 0.05 (*0.11, 0.1,0.01,0*) | 1.16 (*1.41, 1.21, 1.01,1*) | 2.18 (unweighted; *1.65, 1.49, 3.45, 2.14*) |
+| gender in regression                                       | 0.05 \[0.05;0.06\]        | 1.08 \[1.07;1.09\]          | 1.29 \[1.26;1.33\]                          |
+| stratified by gender (mean)                                | 0.05 (*0.6,0.5*)          | 1.08 (*1.09, 1.06*)         | 1.29 (*1.29, 1.29*; **M-H** 1.29)           |
+| **Marginal estimates**                                     |                           |                             |                                             |
+| crude                                                      | 0.05 \[0.05;0.06\]        | 1.08 \[1.07;1.09\]          | 1.29 \[1.25;1.32\]                          |
+| Based on marginal probabilities (any variable combination) | 0.05                      | 1.08                        | 1.29                                        |
+
+Let us assume we have a regression of hypertension ($Y$), smoking ($A$) and a risk factor for outcome, gender ($L$). Then let us set up 2 regression models:
+
+-   1st regression model is $Y \sim \beta \times A + \alpha \times L$. Here we are conditioning on gender ($L$).
+-   2nd regression model is $Y \sim \beta' \times A$
+
+Then regression is collapsible for $\beta$ over $L$ if $\beta = \beta'$ from the 2nd regression omitting $L$. $\beta \ne \beta'$ would mean non-collapsibility. A measure of association (say, risk difference) is collapsible if the marginal measure of association is equal to a weighted average of the stratum-specific measures of association. Non-collapsibility is also knows as Simpson's Paradox (in absence of confoinding of course): a statistical phenomenon where an association between two factors (say, hypertension and smoking) in a population (we are talking about marginal estimate here) is different than the associations of same relationship in subpopulations (conditional on some other factor, say, age; hence talking about conditional estimates).
+
+Odds ratio can be non-collapsible. It can produce different treatment effect estimate for different covariate adjustment sets (see our above example of when adjusting form age and sex vs. when adjusting none). This is true even in the absence of confounding. However, according to our definition here, OR is collapsible when we consider gender in the adjustment set.
+
+Note that, OR non-collapsibility is a consequence of the fact that it is estimated via a logit link function (nonlinearity of the logistic transformation).
+
+Ref:
+
+-   [@greenland1999confounding]
+-   [@mansournia2015relation]
+
+### References

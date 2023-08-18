@@ -1,0 +1,65 @@
+---
+title: "Quiz on confounding and bias"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+# Load required packages
+library(learnr)
+library(xfun)
+```
+
+```{r confounding_quiz1, echo=FALSE}
+question("Q1. Say, you are exploring the relationship between A (a binary treatment variable) and Y (a continuous outcome variable), adjusting for confounders. From the literature, two confounders L1 and L2 are identified. Which code could be used to run the regression analysis in R? (select ALL that apply)",
+  answer("mod1 <- glm(Y ~ A, family = 'gaussian', data = mydata)", message = "Remember to adjust for confounders."),
+  answer("mod1 <- glm(Y ~ A, family = 'binomial', data = mydata)", message = "See the outcome variable. Is it continuous or binary? The family argument is important here."),
+  answer("mod1 <- glm(Y ~ A + L1 + L2, family = 'binomial', data = mydata)", message = "See the outcome variable. Is it continuous or binary? The family argument is important here."),
+  answer("mod1 <- glm(Y ~ A + L1 + L2, family = 'gaussian', data = mydata)", correct = TRUE),
+  answer("mod1 <- glm(Y ~ A + L1 + L2, data = mydata)", correct = TRUE),
+  answer("mod1 <- lm(Y ~ A + L1 + L2, data = mydata)", correct = TRUE, message = "In this example, lm and glm would produce the same estimates. In practice, the results could be different since the estimation methods are different for these two techniques and also one can specify different link functions in glm."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r confounding_quiz2, echo=FALSE}
+question("Q2. In Q1, a mediator (M1) is also identified from the literature. Which code could be used to run the regression analysis in R to estimate the total effect of A on Y?",
+  answer("mod2 <- glm(Y ~ A + L1 + L2, family = 'binomial', data = mydata)"),
+  answer("mod2 <- glm(Y ~ A + L1 + L2 + M1, family = 'binomial', data = mydata"),
+  answer("mod2 <- glm(Y ~ A + L1 + L2 + M1, family = 'gaussian', data = mydata)"),
+  answer("mod2 <- glm(Y ~ A + L1 + L2, family = 'gaussian', data = mydata)", correct = TRUE),
+  answer("mod2 <- lm(Y ~ A + L1 + L2 + M1, data = mydata)"),
+  allow_retry = TRUE,
+  incorrect = "Two important notes here: (i) the family argument and (ii) whether or not adjusting for mediators in the model when estimating the total effect of a treatment.",
+  random_answer_order = TRUE
+)
+```
+
+```{r confounding_quiz3, echo=FALSE}
+question("Q3. In Q2, say, M1 is actually a collider than a mediator. How could you fit the model in this case?",
+  answer("mod3 <- glm(Y ~ A + L1 + L2, family = 'binomial', data = mydata)"),
+  answer("mod3 <- glm(Y ~ A + L1 + L2, family = 'gaussian', data = mydata)", correct = TRUE),
+  answer("mod3 <- glm(Y ~ A + L1 + L2 + M1, family = 'binomial', data = mydata"),
+  answer("mod3 <- lm(Y ~ A + L1 + L2 + M1, data = mydata)"),
+  answer("mod3 <- glm(Y ~ A + L1 + L2 + M1, family = 'gaussian', data = mydata)"),
+  allow_retry = TRUE,
+  incorrect = "Two important notes for this question as well: (i) the family argument and (ii) whether or not adjusting for colliders in the model.",
+  random_answer_order = FALSE
+)
+```
+
+```{r confounding_quiz4, echo=FALSE}
+question("Q4. In Q2, say, M1 is an instrumental variable. How could you fit the model when aiming to estimate the effect of A on Y?",
+  answer("mod4 <- glm(Y ~ M1, family = 'binomial', data = mydata)"),
+  answer("mod4 <- glm(Y ~ A + M1, family = 'binomial', data = mydata"),
+  answer("mod4 <- glm(Y ~ A + M1, family = 'gaussian', data = mydata)"),
+  answer("mod4 <- lm(Y ~ A + M1, data = mydata)"),
+  answer("mod4 <- lm(Y ~ A + L1 + L2 + M1, data = mydata)"),
+  answer("mod4 <- glm(Y ~ A + L1 + L2, family = 'gaussian', data = mydata)", correct = TRUE),
+  answer("mod4 <- glm(Y ~ A + L1 + L2 + M1, family = 'gaussian', data = mydata)"),
+  allow_retry = TRUE,
+  incorrect = "Two important notes for this question as well: (i) the family argument and (ii) whether or not adjusting for instrumental variables in the model.",
+  random_answer_order = FALSE
+)
+```

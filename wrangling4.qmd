@@ -1,0 +1,139 @@
+## Import external data {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache = TRUE}
+# Load required packages
+library(dplyr)
+require(Hmisc)
+```
+
+When dealing with data analysis in R, it's common to need to import external data. This tutorial will walk you through importing data in different formats.
+
+### CSV format data
+
+CSV stands for "Comma-Separated Values" and it's a widely used format for data. We'll be looking at the "Employee Salaries - 2017" dataset, which contains salary information for permanent employees of Montgomery County in 2017.
+
+::: column-margin
+[Employee Salaries - 2017 data](https://data.amerigeoss.org/it/dataset/employee-salaries-2017/resource/c6abf511-62fb-457d-b90b-e0d11a5e4ab8)
+:::
+
+::: callout-tip
+We'll be loading the `Employee_Salaries_-_2017.csv` dataset into R from its saved location at `Data/wrangling/`. Do note, the directory path might vary for you based on where you've stored the downloaded data.
+::: 
+
+```{r load, cache=TRUE}
+data.download <- read.csv("Data/wrangling/Employee_Salaries_-_2017.csv")
+```
+
+Here, the `read.csv` function reads the data from the CSV file and stores it in a variable called `data.download`.
+
+To understand the structure of our dataset, We can see the number of rows and columns and the names of the columns/variables as follows:
+
+```{r load1, cache=TRUE}
+dim(data.download) # check dimension / row / column numbers
+nrow(data.download) # check row numbers
+names(data.download) # check column names
+```
+
+::: callout-tip
+`head` shows the first 6 elements of an object, giving you a sneak peek into the data you're dealing with, while `tail` shows the last 6 elements.
+:::
+
+We can see the first see six rows of the dataset as follows:
+
+```{r load2, cache=TRUE}
+head(data.download)
+```
+
+Next, for learning purposes, let's artificially assign all male genders in our dataset as missing:
+
+```{r load3, cache=TRUE}
+# Assigning male gender as missing
+data.download$Gender[data.download$Gender == "M"] <- NA
+head(data.download)
+```
+
+This chunk sets the Gender column's value to NA (missing) wherever the gender is "M". This is a form of data manipulation, sometimes used to handle missing or incorrect data. If you want to work with datasets that exclude any missing values:
+
+
+::: callout-tip
+`na.omit` and `complete.cases` are useful functions to to create datasets with non-NA values
+:::
+
+```{r load4, cache=TRUE}
+# deleting/dropping missing components
+data.download2 <- na.omit(data.download)
+head(data.download2)
+dim(data.download2)
+```
+
+Here, na.omit is used to remove rows with any missing values. This can be essential when preparing data for certain analyses.
+
+Alternatively, we could have selected only females to drop all males:
+
+```{r load5, cache=TRUE}
+data.download3 <- filter(data.download, Gender != "M")
+head(data.download3)
+```
+
+And to check the size of this new dataset:
+
+```{r load6, cache=TRUE}
+# new dimension / row / column numbers
+dim(data.download3)
+```
+
+### SAS format data
+
+::: callout-tip
+SAS is another data format, commonly used in professional statistics and analytics.
+::: 
+
+Let's explore importing a SAS dataset. We download a SAS formatted dataset from the CDC website.
+
+
+```{r sas, cache=TRUE, warning=FALSE}
+NHANES1516data <- sasxport.get("https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.XPT")
+dim(NHANES1516data) # check dimension / row / column numbers
+nrow(NHANES1516data) # check row numbers
+names(NHANES1516data)[1:10] # check first 10 names
+```
+
+The `sasxport.get` function retrieves the SAS dataset. The following lines, just like before, help understand its structure.
+
+To analyze some of the data:
+
+```{r sas2, cache=TRUE, warning=FALSE}
+table(NHANES1516data$riagendr) # tabulating gender variable
+```
+
+::: column-margin
+Verify these numbers from [CDC website](https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.htm#RIAGENDR)
+:::
+
+This code creates a frequency table of the `riagendr` variable, which represents gender.
+
+### Saving working dataset
+
+::: callout-tip
+Once you've made modifications or conducted some preliminary analysis, it's important to save your dataset. We can save the dataset in a different format, e.g., CSV, txt, or even R, SAS or other formats.
+:::
+
+We can save our working dataset in different formats. Say, we want to save our `NHANES1516data` dataset in `csv` format. We can use the `write.csv()` command:
+
+```{r savecsv, cache=TRUE}
+write.csv(NHANES1516data, "Data/wrangling/NHANES1516.csv", row.names = FALSE)
+```
+
+We can also save the dataset in `R` format:
+
+```{r saveR, cache=TRUE}
+save(NHANES1516data, file = "Data/wrangling/NHANES1516.RData")
+```
+
+## YouTube Videos
+
+::: column-margin
+Some helpful videos related to the `R for wrangling` chapter are added here as optional materials.
+:::
+
+You could watch the videos describing [R basics](https://youtu.be/wMwH7iroGIo), [R for loops and functions](https://youtu.be/A5TTDqhvBrM), and [manipulating real datasets using R](https://youtu.be/3Hn1QsQHo-w).

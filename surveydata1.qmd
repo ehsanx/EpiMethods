@@ -1,0 +1,651 @@
+## Creating dataset {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+library(knitr)
+library(car)
+```
+
+### Load data
+
+```{r data, warning=FALSE, message=FALSE, cache = FALSE}
+# CCHS 1.1
+load("Data/surveydata/cchsc1.RData")
+
+# CCHS 2.1
+load("Data/surveydata/cchsc2.RData")
+
+# CCHS 3.1
+load("Data/surveydata/cchsc3.RData")
+
+# objects loaded
+ls()
+```
+
+```{r dim, warning=FALSE, message=FALSE, cache = TRUE}
+# Dimensions
+dim(c1)
+dim(c2)
+dim(c3)
+```
+
+### Subset the data (subset variables)
+
+#### Understand variable coding
+
+Ref:
+
+-   page 60 in CCHS 3.1 guide [@statistics2005canadian]
+
+-   link for variable list: [@varlist]
+
+| **Variable Concept**                                              | **CCHS 1.1** | **CCHS 2.1** | **CCHS 3.1** |
+|------------------------|----------------|----------------|----------------|
+| **Has heart disease**                                             | CCCA_121     | CCCC_121     | CCCE_121     |
+| **Has arthritis or rheumatism**                                   | CCCA_051     | CCCC_051     | CCCE_051     |
+| **Kind of arthritis**                                             | CCCA_05A     | CCCC_05A     | CCCE_05A     |
+| **Age**                                                           | DHHAGAGE     | DHHCGAGE     | DHHEGAGE     |
+| **Sex**                                                           | DHHA_SEX     | DHHC_SEX     | DHHE_SEX     |
+| **Marital Status**                                                | DHHAGMS      | DHHCGMS      | DHHEGMS      |
+| **Cultural / racial origin**                                      | SDCAGRAC     | SDCCGRAC     | SDCEGCGT     |
+| **Immigrant status**                                              | SDCAFIMM     | SDCCFIMM     | SDCEFIMM     |
+| **Length of time in Canada since immigration**                    | SDCAGRES     | SDCCGRES     | SDCEGRES     |
+| **Highest level of education - respondent**                       | EDUADR04     | EDUCDR04     | EDUEDR04     |
+| **Total household income from all sources**                       | INCAGHH      | INCCGHH      | INCEGHH      |
+| **Body mass index**                                               | HWTAGBMI     | HWTCGBMI     | HWTEGBMI     |
+| **Physical activity index**                                       | PACADPAI     | PACCDPAI     | PACEDPAI     |
+| **Has a regular medical doctor**                                  | TWDA_5       | HCUC_1AA     | HCUE_1AA     |
+| **Self-perceived stress**                                         | GENA_07      | GENC_07      | GENE_07      |
+| **Type of smoker**                                                | SMKADSTY     | SMKCDSTY     | SMKEDSTY     |
+| **Type of drinker**                                               | ALCADTYP     | ALCCDTYP     | ALCEDTYP     |
+| **Daily consumption - total fruits and vegetables**               | FVCADTOT     | FVCCDTOT     | FVCEDTOT     |
+| **Has high blood pressure**                                       | CCCA_071     | CCCC_071     | CCCE_071     |
+| **Has emphysema or chronic obstructive pulmonary disease (COPD)** | CCCA_91B     | CCCC_91B     | CCCE_91F     |
+| **Has diabetes**                                                  | CCCA_101     | CCCC_101     | CCCE_101     |
+| **Province**                                                      | GEOAGPRV     | GEOCGPRV     | GEOEGPRV     |
+| **Sampling weight - master weight**                               | WTSAM        | WTSC_M       | WTSE_M       |
+
+We only focus on CCHS 3.1 content here, but need to check all other cycles as well.
+
+Most variables have: Universe \`All respondents'.
+
+Below are some exceptions:
+
+-   CCCE_05A universe: (Kind of arthritis / rheumatism)
+
+-   Respondents who answered CCCE_051 = (1, 7 or 8) or CCCE_011 = 8
+
+-   CCCE_051: All respondents
+
+-   CCCE_011: All respondents
+
+-   SDCEGRES universe: (Length of time in Canada since immigration)
+
+    -   Respondents who answered SDCE_2 = (2, 7 or 8) or SDCE_1 = (97 or 98)
+    -   SDCE_2 doesn't exist!
+    -   (master file variable; not available in PUMF)
+    -   Public Use Microdata File (PUMF)
+    -   SDCE_1 doesn't exist!
+    -   (master file variable; not available in PUMF)
+
+-   HWTEGBMI universe: (Body Mass Index (BMI) / self-report)
+
+    -   All respondents excluding pregnant women (MAME_037 = 1)
+        -   MAME_037 doesn't exist!
+        -   (master file variable; not available in PUMF)
+
+-   GENE_07 universe: (Self-perceived stress)
+
+    -   Respondents aged 15 and over
+
+-   CCCE_91F universe: (Has chronic obstructive pulmonary disease)
+
+    -   Respondents aged 30 and over
+
+-   FVCEDTOT universe: (Daily consumption - total fruits and vegetables)
+
+    -   Respondents with FVCEFOPT = 1
+        -   FVCEFOPT: Optional module: Fruit and vegetable consumption - (F)
+
+Ref:
+
+-   page 66 in CCHS 3.1 guide [@statistics2005canadian]
+
+-   Potential problematic variables:
+
+    -   Self-perceived stress
+    -   Has chronic obstructive pulmonary disease / copd
+    -   Daily consumption - total fruits and vegetables
+
+We will make decisions about these variables later: for now, let's keep them.
+
+#### Restrict the dataset with variables of interest only
+
+##### Cycle 1.1
+
+```{r data1, warning=FALSE, message=FALSE, cache = TRUE}
+var.names1 <- c("CCCA_121", 
+                "CCCA_051", 
+                "CCCA_05A", 
+                "DHHAGAGE", 
+                "DHHA_SEX", 
+                "DHHAGMS", 
+                "SDCAGRAC", 
+                "SDCAFIMM", 
+                "SDCAGRES", 
+                "EDUADR04", 
+                "INCAGHH", 
+                "HWTAGBMI", 
+                "PACADPAI", 
+                "TWDA_5", 
+                "GENA_07", 
+                "SMKADSTY", 
+                "ALCADTYP", 
+                "FVCADTOT", 
+                "CCCA_071",
+                "CCCA_91B",
+                "CCCA_101",
+                "GEOAGPRV",
+                "WTSAM")
+cc11 <- c1[var.names1]
+dim(cc11)
+table(cc11$CCCA_051)
+```
+
+##### Cycle 2.1
+
+```{r data2, warning=FALSE, message=FALSE, cache = TRUE}
+var.names2 <- c("CCCC_121", 
+                "CCCC_051", 
+                "CCCC_05A", 
+                "DHHCGAGE", 
+                "DHHC_SEX", 
+                "DHHCGMS", 
+                "SDCCGRAC", 
+                "SDCCFIMM", 
+                "SDCCGRES", 
+                "EDUCDR04", 
+                "INCCGHH", 
+                "HWTCGBMI", 
+                "PACCDPAI", 
+                "HCUC_1AA", 
+                "GENC_07", 
+                "SMKCDSTY", 
+                "ALCCDTYP", 
+                "FVCCDTOT", 
+                "CCCC_071",
+                "CCCC_91B",
+                "CCCC_101",
+                "GEOCGPRV",
+                "WTSC_M")
+cc21 <- c2[var.names2]
+dim(cc21)
+table(cc21$CCCC_051)
+```
+
+##### Cycle 3.1
+
+```{r data3, warning=FALSE, message=FALSE, cache = TRUE}
+var.names3 <- c("CCCE_121", 
+                "CCCE_051", 
+                "CCCE_05A", 
+                "DHHEGAGE", 
+                "DHHE_SEX", 
+                "DHHEGMS", 
+                "SDCEGCGT", 
+                "SDCEFIMM", 
+                "SDCEGRES", 
+                "EDUEDR04", 
+                "INCEGHH", 
+                "HWTEGBMI", 
+                "PACEDPAI", 
+                "HCUE_1AA", 
+                "GENE_07", 
+                "SMKEDSTY", 
+                "ALCEDTYP", 
+                "FVCEDTOT", 
+                "CCCE_071", 
+                "CCCE_91F", 
+                "CCCE_101", 
+                "GEOEGPRV", 
+                "WTSE_M")
+cc31 <- c3[var.names3]
+dim(cc31)
+table(cc31$CCCE_051)
+```
+
+### Making variable names the same
+
+```{r data4, warning=FALSE, message=FALSE, cache = TRUE}
+new.var.names <- c("CVD", 
+                   "arthritis", 
+                   "arthritis.kind", 
+                   "age", 
+                   "sex", 
+                   "married", 
+                   "race", 
+                   "immigration", 
+                   "recent.immigrant", 
+                   "edu", 
+                   "income", 
+                   "bmi", 
+                   "phyact", 
+                   "doctor", 
+                   "stress", 
+                   "smoke", 
+                   "drink", 
+                   "fruit", 
+                   "bp", 
+                   "copd", 
+                   "diab",  
+                   "province", 
+                   "weight")
+cbind(new.var.names, var.names1, var.names2, var.names3)
+names(cc11) <- names(cc21) <- names(cc31) <- new.var.names
+
+table(cc11$arthritis)
+table(cc21$arthritis)
+table(cc31$arthritis)
+
+cc11$cycle <- 11
+cc21$cycle <- 21
+cc31$cycle <- 31
+```
+
+### Appending
+
+```{r append, warning=FALSE, message=FALSE, cache = TRUE}
+cc123a <- rbind(cc11,cc21,cc31)
+dim(cc123a)
+names(cc123a)
+cc123a$ID <- 1:nrow(cc123a)
+```
+
+### Variables
+
+#### Sampling weight
+
+```{r summ, warning=FALSE, message=FALSE, cache = TRUE}
+summary(cc123a$weight)
+```
+
+#### Exposure
+
+```{r tab0, warning=FALSE, message=FALSE, cache = TRUE}
+table(cc123a$arthritis)
+table(cc123a$arthritis.kind)
+sum(cc123a$arthritis=="NO")
+sum(cc123a$arthritis.kind=="NOT APPLICABLE")
+```
+
+```{r recodeOA, warning=FALSE, message=FALSE, cache = TRUE}
+c123sub1 <- cc123a
+c123sub1$arthritis.kind <- car::recode(c123sub1$arthritis.kind, 
+                            "'OSTEOARTHRITIS'='OSTEOARTHRITIS';
+                            'NOT APPLICABLE' = 'NOT APPLICABLE';
+                            else = NA",  
+                            as.factor = FALSE)
+table(c123sub1$arthritis.kind, useNA = "always")
+```
+
+```{r recode1, warning=FALSE, message=FALSE, cache = TRUE}
+# c123sub1 <- subset(cc123a, arthritis.kind == "OSTEOARTHRITIS" | 
+#                      arthritis.kind == "NOT APPLICABLE" )
+# dim(c123sub1)
+table(c123sub1$arthritis.kind)
+table(c123sub1$arthritis)
+require(car)
+c123sub1$arthritis.kind <- car::recode(c123sub1$arthritis.kind, 
+                                  "'OSTEOARTHRITIS'='OA';
+                         'NOT APPLICABLE'='Control';
+                         else=NA", as.factor = FALSE)
+table(c123sub1$arthritis.kind, useNA = "always")
+c123sub1$OA <- c123sub1$arthritis.kind
+c123sub1$arthritis.kind <- NULL
+c123sub1$arthritis <- NULL
+dim(c123sub1)
+dim(c123sub1)[1]-dim(cc123a)[1]
+```
+
+#### Outcome
+
+```{r recodecvd, warning=FALSE, message=FALSE, cache = TRUE}
+c123sub2 <- c123sub1
+table(c123sub2$CVD)
+c123sub2$CVD <- car::recode(c123sub2$CVD, 
+                            "'YES'='YES';
+                            'NO' = 'NO';
+                            else = NA",  
+                            as.factor = FALSE)
+```
+
+```{r recodecvd3, warning=FALSE, message=FALSE, cache = TRUE}
+# table(c123sub1$CVD)
+# c123sub2 <- subset(c123sub1, CVD == "YES" | CVD == "NO")
+# table(c123sub2$CVD)
+dim(c123sub2)
+c123sub2$CVD <- car::recode(c123sub2$CVD, 
+                       "'YES'='event';
+                       'NO'='no event';
+                       else=NA",
+                       as.factor = FALSE)
+table(c123sub2$CVD, useNA = "always")
+dim(c123sub2)
+dim(c123sub2)[1]-dim(c123sub1)[1]
+```
+
+#### Covariates
+
+##### age
+
+```{r recode4, warning=FALSE, message=FALSE, cache = TRUE}
+c123sub2$age <- car::recode(c123sub2$age, 
+                       "c('12 TO 14 YEARS','15 TO 19 YEARS',
+                       '15 TO 17 YEARS', '18 TO 19 YEARS')='teen';
+                       c('20 TO 24 YEARS','25 TO 29 YEARS')='20-29 years';
+                       c('30 TO 34 YEARS','35 TO 39 YEARS')='30-39 years';
+                       c('40 TO 44 YEARS','45 TO 49 YEARS')='40-49 years';
+                       c('50 TO 54 YEARS','55 TO 59 YEARS')='50-59 years';
+                       c('60 TO 64 YEARS')='60-64 years';   
+                       else='65 years and over'",
+                       as.factor = FALSE)
+table(c123sub2$age)
+```
+
+```{r recode5, warning=FALSE, message=FALSE, cache = TRUE}
+c123sub3 <- c123sub2
+# c123sub3$age[c123sub3$age == 'teen'] <- NA
+# c123sub3$age[c123sub3$age == '65 years and over'] <- NA
+```
+
+```{r tabage, warning=FALSE, message=FALSE, cache = TRUE}
+# dim(c123sub2)
+# c123sub3 <- subset(c123sub2, age != 'teen' & age != '65 years and over')
+table(c123sub3$age, useNA = "always")
+dim(c123sub3)
+```
+
+##### sex
+
+```{r recode6, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$sex)
+c123sub3$sex <- car::recode(c123sub3$sex, 
+                            "'MALE'='Male';
+                            'FEMALE' = 'Female';
+                            else = NA",  
+                            as.factor = FALSE)
+table(c123sub3$sex, useNA = "always")
+```
+
+##### marital status
+
+```{r recode7, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$married)
+c123sub3$married <- car::recode(c123sub3$married, 
+                             "c('MARRIED', 'COMMON-LAW')='not single';
+                             c('WIDOW/SEP/DIV', 'SINGLE', 'SINGLE/NEVER MAR') = 'single';
+                             else = NA",  
+                             as.factor = FALSE)
+table(c123sub3$married, useNA = "always")
+```
+
+##### race
+
+```{r recode8, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$race)
+c123sub3$race <- car::recode(c123sub3$race, 
+                             "'WHITE'='White';
+                             'VISIBLE MINORITY' = 'Non-white';
+                             else = NA",  
+                             as.factor = FALSE)
+table(c123sub3$race, useNA = "always")
+```
+
+##### immigration
+
+```{r recode9, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$recent.immigrant)
+c123sub3$immigrate <- car::recode(c123sub3$recent.immigrant,
+                            "'0 TO 9 YEARS'='recent';
+                            '10 YEARS OR MORE' = '> 10 years';
+                            'NOT APPLICABLE' = 'not immigrant';
+                            else = NA",
+                            as.factor = FALSE)
+table(c123sub3$immigrate, useNA = "always")
+c123sub3$recent.immigrant <- NULL
+c123sub3$immigration <- NULL
+```
+
+##### education
+
+```{r recode10, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$edu)
+c123sub3$edu <- car::recode(c123sub3$edu,
+                            "'< THAN SECONDARY'='< 2ndary';
+                            'SECONDARY GRAD.' = '2nd grad.';
+                            'POST-SEC. GRAD.' = 'Post-2nd grad.';
+                            'OTHER POST-SEC.' = 'Other 2nd grad.';
+                            else = NA",
+                            as.factor = FALSE)
+table(c123sub3$edu, useNA = "always")
+```
+
+##### income
+
+```{r recode11, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$income)
+# cycle 1.1 has: 'NO INCOME','LESS THAN 15,000'
+# Other cycles have: 'NO OR <$15,000'
+c123sub3$income <- car::recode(c123sub3$income, 
+                               "c('NO OR <$15,000', 'NO INCOME','LESS THAN 15,000',
+                               '$15,000-$29,999')='$29,999 or less';
+                               '$30,000-$49,999' = '$30,000-$49,999';
+                               '$50,000-$79,999' = '$50,000-$79,999';
+                               '$80,000 OR MORE' = '$80,000 or more';
+                               else = NA",  
+                               as.factor = FALSE)
+table(c123sub3$income, useNA = "always")
+```
+
+##### BMI
+
+If you want to reuse the continuous variable later (usually a good idea in statistical sense), keep a second copy of the variable.
+
+```{r recode12, warning=FALSE, message=FALSE, cache = TRUE}
+# table(c123sub3$bmi)
+sum(c123sub3$bmi=="NOT APPLICABLE")+
+  sum(c123sub3$bmi=="REFUSAL")+
+  sum(c123sub3$bmi=="NOT STATED")+
+  sum(c123sub3$bmi=="DON'T KNOW")
+c123sub3$bmi <- car::recode(c123sub3$bmi, 
+                               'c("NOT APPLICABLE", "REFUSAL", "NOT STATED", "DON\'T KNOW")=NA',
+                               as.factor = FALSE)
+#table(c123sub3$bmi, useNA = "always")
+c123sub3$bmi <- as.numeric(as.character(c123sub3$bmi))
+summary(c123sub3$bmi)
+c123sub3$bmi2 <- cut(c123sub3$bmi,
+                       breaks = c(0,18.5,25,Inf),
+                       right = TRUE,
+                       labels = c("Underweight", 
+                                  "healthy weight", 
+                                  "Overweight"))
+c123sub3$bmi <- c123sub3$bmi2
+c123sub3$bmi2 <- NULL
+table(c123sub3$bmi, useNA = "always")
+```
+
+##### physical activity
+
+```{r recode13, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$phyact)
+c123sub3$phyact <- car::recode(c123sub3$phyact,
+                               "'ACTIVE'='Active';
+                               'MODERATE' = 'Moderate';
+                               'INACTIVE' = 'Inactive';
+                               else = NA",
+                               as.factor = FALSE)
+table(c123sub3$phyact, useNA = "always")
+```
+
+##### doctor
+
+```{r recode14, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$doctor)
+c123sub3$doctor <- car::recode(c123sub3$doctor, 
+                            "'YES'='Yes';
+                            'NO' = 'No';
+                            else = NA",  
+                            as.factor = FALSE)
+table(c123sub3$doctor, useNA = "always")
+```
+
+##### stress
+
+```{r recode16, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$stress)
+c123sub3$stress <- car::recode(c123sub3$stress,
+                              "c('NOT AT ALL','NOT VERY','A BIT')='Not too stressed';
+                              c('QUITE A BIT','EXTREMELY') = 'stressed';
+                              else = NA",
+                              as.factor = FALSE)
+table(c123sub3$stress, useNA = "always")
+```
+
+##### smoking
+
+```{r recode17, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$smoke)
+c123sub3$smoke <- car::recode(c123sub3$smoke,
+                              "c('DAILY','OCCASIONAL',
+                              'ALWAYS OCCASION.')='Current smoker';
+                              c('FORMER DAILY','FORMER OCCASION.',
+                              'ALWAYS OCCASION.') = 'Former smoker';
+                              'NEVER SMOKED' = 'Never smoker';
+                              else = NA",
+                              as.factor = FALSE)
+table(c123sub3$smoke, useNA = "always")
+```
+
+##### alcohol
+
+```{r recode18, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$drink)
+c123sub3$drink <- car::recode(c123sub3$drink,
+                              "c('REGULAR DRINKER',
+                              'OCC. DRINKER')='Current drinker';
+                              c('FORMER DRINKER') = 'Former driker';
+                              'NEVER DRANK' = 'Never drank';
+                              else = NA",
+                              as.factor = FALSE)
+table(c123sub3$drink, useNA = "always")
+```
+
+##### fruit and vegetable consumption
+
+If you want to reuse the continuous variable later (usually a good idea in statistical sense), keep a second copy of the variable.
+
+```{r recode19, warning=FALSE, message=FALSE, cache = TRUE}
+str(c123sub3$fruit)
+#c123sub3$fruit.cont <- c123sub3$fruit
+c123sub3$fruit2 <- as.numeric(as.character(c123sub3$fruit))
+# Note: do not use as.numeric(c123sub3$fruit)
+summary(c123sub3$fruit2)
+c123sub3$fruit2 <- cut(c123sub3$fruit2,
+                       breaks = c(0,3,6,Inf),
+                       right = TRUE,
+                       labels = c("0-3 daily serving",
+                                  "4-6 daily serving",
+                                  "6+ daily serving"))
+table(c123sub3$fruit2, useNA = "always")
+c123sub3$fruit <- c123sub3$fruit2
+c123sub3$fruit2 <- NULL
+```
+
+##### hypertension
+
+```{r recode20, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$bp)
+c123sub3$bp <- car::recode(c123sub3$bp,
+                           "'YES'='Yes';
+                           'NO' = 'No';
+                           else = NA",
+                           as.factor = FALSE)
+table(c123sub3$bp, useNA = "always")
+```
+
+##### COPD
+
+```{r recode21, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$copd)
+c123sub3$copd <- car::recode(c123sub3$copd,
+                             "'YES'='Yes';
+                             'NO' = 'No';
+                             else = NA",
+                             as.factor = FALSE)
+table(c123sub3$copd, useNA = "always")
+```
+
+##### Diabetes
+
+```{r recode22, warning=FALSE, message=FALSE, cache = TRUE}
+table(c123sub3$diab)
+c123sub3$diab <- car::recode(c123sub3$diab,
+                             "'YES'='Yes';
+                             'NO' = 'No';
+                             else = NA",
+                             as.factor = FALSE)
+table(c123sub3$diab, useNA = "always")
+```
+
+##### North
+
+-   Note that the category names might not exactly match with the data dictionary:
+    -   Particularly note two versions of `QUEBEC`
+    -   `PEI` was written in short
+    -   None in
+        -   DON'T KNOW
+        -   REFUSAL
+        -   NOT STATED
+        -   NOT APPLICABLE
+
+```{r recode23, warning=FALSE, message=FALSE, cache = TRUE}
+c123sub3$province.check <- c123sub3$province
+table(c123sub3$province)
+# c123sub3$province <- car::recode(c123sub3$province,
+#                               "c('YUKON/NWT/NUNAVT','YUKON/NWT/NUNA.')='North';
+#                               c('NEWFOUNDLAND', 'PEI', 'NOVA SCOTIA', 'NEW BRUNSWICK', 
+# 'QU?BEC', 'ONTARIO', 'MANITOBA', 'SASKATCHEWAN', 'ALBERTA', 
+# 'BRITISH COLUMBIA', 'QUEBEC', 'NFLD & LAB.') = 'South';
+#                               else = NA",
+#                               as.factor = FALSE)
+c123sub3$province <- car::recode(c123sub3$province,
+                              "c('YUKON/NWT/NUNAVT','YUKON/NWT/NUNA.')='North';
+                              else = 'South'",
+                              as.factor = FALSE)
+table(c123sub3$province, useNA = "always")
+```
+
+##### Dimension testing
+
+```{r dims2, warning=FALSE, message=FALSE, cache = TRUE}
+save.c123sub3 <- c123sub3
+names(c123sub3)
+# c123sub3$phyact <- NULL
+# c123sub3$stress <- NULL
+# c123sub3$fruit <- NULL
+# c123sub3$copd <- NULL
+# c123sub3$province.check <- NULL
+dim(c123sub3)
+dim(c123sub2)[1]-dim(c123sub3)[1]
+analytic <- c123sub3
+dim(analytic)
+analytic$cycle <- as.factor(analytic$cycle)
+names(analytic)
+```
+
+### Saving data
+
+```{r save, warning=FALSE, message=FALSE, cache = TRUE}
+save(cc123a, analytic, file = "Data/surveydata/cchs123.RData")
+```

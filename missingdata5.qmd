@@ -1,0 +1,373 @@
+## Subpopulations {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(dplyr)
+library(kableExtra)
+library(tableone)
+library(survey)
+library(Publish)
+library(DataExplorer)
+library(mice)
+library(mitools)
+```
+
+### Purpose
+
+Let us we are interested in exploring the relationship between **rheumatoid arthritis** and **cardiovascular disease** (CVD) among US adults aged 20 years or more. For that, we will use NHANES 2017--2018 dataset, which follows a complex survey design.
+
+The purpose of this example is to *demonstrate how to do the missing data analysis with multiple imputation in the context of complex surveys*.
+
+The main idea is:
+
+-   working with the analytic data
+-   imputing missing values based on that analytic dataset
+-   keep count of the ineligible subjects from the full data who are not included in the analytic data
+-   adding those ineligible subjects back in the imputed datasets, so that we can utilize the survey features and subset the design.
+
+Let us import the dataset:
+
+```{r load, cache=TRUE}
+load("Data/missingdata/MIexample.RData")
+ls()
+```
+
+```{r data, cache=TRUE}
+dim(dat.full)
+head(dat.full)
+```
+
+The dataset (`dat.full`) contains 9,254 subjects with 15 variables:
+
+**Survey information**
+
+-   `studyid`: Respondent sequence number
+-   `survey.weight`: Full sample 2 year interview weight
+-   `psu`: Masked pseudo PSU
+-   `strata`: Masked pseudo strata
+
+**Outcome variable**
+
+-   `cvd`: Whether having cardiovascular disease
+
+**Exposure variable**
+
+-   `rheumatoid`: Whether having rheumatoid arthritis
+
+**Covariates**
+
+-   `age`: age in years at screening
+-   `sex`
+-   `education`
+-   `race`: Race/Ethnicity
+-   `income`: Family income in \$
+-   `bmi`: Body Mass Index in kg/m$^2$
+-   `smoking`: Smoking status
+-   `htn`: Having hypertension
+-   `diabetes`: Having diabetes
+
+### Analytic dataset
+
+#### Subsetting according to eligibility
+
+Let us create an analytic dataset for
+
+-   adults aged 20 years or more
+-   without missing values in outcome (cvd) or exposure (rheumatoid arthritis).
+
+```{r analytic0, cache=TRUE}
+# Drop < 20 years
+dat.with.miss <- subset(dat.full, age >= 20)
+
+# Frequency for outcome and exposure 
+table(dat.with.miss$cvd, useNA = "always") # 6 missing
+table(dat.with.miss$rheumatoid, useNA = "always") # 1375 missing
+
+# Drop missing in outcome and exposure - dataset with missing values only in covariates
+dat.analytic <- dat.with.miss[complete.cases(dat.with.miss$cvd),]
+dat.analytic <- dat.analytic[complete.cases(dat.analytic$rheumatoid),]
+nrow(dat.analytic)
+```
+
+As we can see, we have 4,191 participants aged 20 years or more without missing values in outcome or exposure. Let us count the ineligible subjects from the full data and create an indicator variable.
+
+```{r analytic1, cache=TRUE}
+dat.full$ineligible <- 1
+dat.full$ineligible[dat.full$studyid %in% dat.analytic$studyid] <- 0
+table(dat.full$ineligible, useNA = "always")
+```
+
+We have 4,191 eligible and 5,063 ineligible subjects based on the eligibility criteria.
+
+**General strategy of solution**:
+
+-   We will build the imputation model on 4,191 eligible subjects, and
+-   later we will include 5,063 ineligible subjects in the data so that we can utilize survey features.
+
+#### Table 1
+
+Let us see the summary statistics, i.e., create Table 1 stratified by outcome (cvd). Before that, we will categorize `age` and recode `rheumatoid`:
+
+```{r analytic2, cache=TRUE}
+# Categorical age
+dat.analytic$age.cat <- with(dat.analytic, ifelse(age >= 20 & age < 50, "20-49", 
+                                  ifelse(age >= 50 & age < 65, "50-64", "65+")))
+dat.analytic$age.cat <- factor(dat.analytic$age.cat, levels = c("20-49", "50-64", "65+"))
+table(dat.analytic$age.cat, useNA = "always")
+
+# Recode rheumatoid to arthritis
+dat.analytic$arthritis <- car::recode(dat.analytic$rheumatoid, " 'No' = 'No arthritis';
+                                      'Yes' = 'Rheumatoid arthritis' ", as.factor = T)
+table(dat.analytic$arthritis, useNA = "always")
+
+# Keep only relevant variables
+vars <-  c("studyid", "survey.weight", "psu", "strata", "cvd", "arthritis", "age.cat", 
+           "sex", "education", "race", "income", "bmi", "smoking", "htn", "diabetes")
+dat.analytic2 <- dat.analytic[, vars]
+```
+
+```{r tab1, cache=TRUE}
+# Create Table 1
+vars <- c("arthritis", "age.cat", "sex", "education", "race", "income", "bmi", "smoking",
+          "htn", "diabetes")
+tab1 <- CreateTableOne(vars = vars, strata = "cvd", data = dat.analytic2, includeNA = F,
+                       addOverall = T, test = F)
+print(tab1, format = "f", showAllLevels = T)
+```
+
+#### Check missingness using a plot
+
+Now we will see the percentage of missing values in the variables.
+
+```{r miss0, out.width = '80%'}
+DataExplorer::plot_missing(dat.analytic2)
+```
+
+We have about 10% missing values in income, followed by hypertension (8.4%), bmi (6.8%), education (0.2%), and diabetes (0.1%).
+
+### Dealing with missing values in covariates
+
+-   Now we will perform multiple imputation to deal with missing values only in covariates. We will use the `dat.analytic2` dataset that contains missing values in the covariates but no missing values in the outcome or exposure.
+-   For this exercise, we will consider 5 imputed datasets, 3 iterations, and the predictive mean matching method for bmi and income.
+    -   We have already set up the data such that the variables are of appropriate types, e.g., numeric bmi, factor age, sex, and so on.
+    -   We will use the strata variable as an auxiliary variable in the imputation model but not the survey weight or PSU variable.
+    -   Now we will set up the initial model and set up the methods and predictor matrix before imputing 5 datasets.
+
+#### Step 0: Set up the imputation model
+
+```{r step0, cache=TRUE}
+# Step 0: Set imputation model
+ini <- mice(data = dat.analytic2, maxit = 0, print = FALSE)
+pred <- ini$pred
+
+# Use the strata variable as an auxiliary variable in the imputation model
+pred["strata",] <- 0
+
+# Do not use survey weight or PSU variable as auxiliary variables
+pred[,"studyid"] <- pred["studyid",] <- 0
+pred[,"psu"] <- pred["psu",] <- 0
+pred[,"survey.weight"] <- pred["survey.weight",] <- 0
+
+# Set imputation method
+meth <- ini$meth
+meth["bmi"] <- "pmm"
+meth["income"] <- "pmm"
+meth
+```
+
+-   There is no missing for studyid, survey.weight, psu, strata, cvd, arthritis, age, sex, race, smoking. Hence, no method is assigned for these variables.
+-   For education, `polyreg` (Polytomous logistic regression) will be used.
+-   Similarly, we will use `pmm` (Predictive mean matching) for bmi, income and used `logreg` (Logistic regression) for htn, diabetes.
+
+#### Step 1: Imputing missing values using mice
+
+##### 1.1 Imputing dataset for eligible subjects
+
+```{r step1a, cache=TRUE}
+# Step 1: impute the incomplete data
+imputation <- mice(data = dat.analytic2,
+                   seed = 123,
+                   predictorMatrix = pred,
+                   method = meth,
+                   m = 5,
+                   maxit = 3,
+                   print = FALSE)
+```
+
+Now we will combine m = 5 datasets and create a stacked dataset. This dataset should contain 5\*4,191 = 20,955 rows.
+
+```{r step1b, cache=TRUE}
+impdata <- mice::complete(imputation, action="long")
+
+table(impdata$age.cat)
+```
+
+Note that age has no missing values, and everyone is above 20.
+
+```{r step1c, cache=TRUE}
+#Remove .id variable from the model as it was created in an intermediate step
+impdata$.id <- NULL
+
+# Create an indicator of eligible subjects 
+impdata$ineligible <- 0
+
+# Number of subjects
+nrow(impdata)
+```
+
+Let's see whether there is any missing value after imputation:
+
+```{r step1d, cache=TRUE}
+DataExplorer::plot_missing(impdata)
+```
+
+-   There is no missing value after imputation.
+-   As we can see, there is an additional variable (`.imp`) in the imputed dataset. This `.imp` goes from 1 to m = 5, indicating the first to the fifth imputed datasets.
+
+##### 1.2 Preparing dataset for ineligible subjects
+
+The next task is adding the **ineligible subjects** in the imputed datasets, so that we can set up the survey design on the full dataset and then subset the design.
+
+```{r step1e, cache=TRUE}
+# Number of ineligible subjects
+#dat.full$ineligible <- 1
+#dat.full$ineligible[dat.full$studyid %in% dat.analytic$studyid] <- 0
+table(dat.full$ineligible, useNA = "always")
+```
+
+Now we will subset the data for ineligible subjects and create `m = 5` copies.
+
+```{r step1f, cache=TRUE}
+# Subset for ineligible
+dat.ineligible <- subset(dat.full, ineligible == 1)
+
+# Create m = 5 datasets with .imp 1 to m = 5
+dat31 <- dat.ineligible; dat31$.imp <- 1
+dat32 <- dat.ineligible; dat32$.imp <- 2
+dat33 <- dat.ineligible; dat33$.imp <- 3
+dat34 <- dat.ineligible; dat34$.imp <- 4
+dat35 <- dat.ineligible; dat35$.imp <- 5
+```
+
+The next step is combining ineligible datasets. Before merging the `stacked dataset for ineligible subjects` to the `imputed stacked dataset for eligible subjects,` we must ensure the variable names are the same.
+
+```{r step1g, cache=TRUE}
+# Stacked data for ineligible subjects
+dat.ineligible.stacked <- rbind(dat31, dat32, dat33, dat34, dat35)
+```
+
+We should have missing value in this ineligible part of the data:
+
+```{r step1h, cache=TRUE}
+DataExplorer::plot_missing(dat.ineligible.stacked)
+```
+
+##### 1.3 Combining eligible (imputed) and ineligible (unimputed) subjects
+
+```{r step1i, cache=TRUE}
+names(impdata)
+```
+
+```{r step1j, cache=TRUE}
+names(dat.ineligible.stacked)
+```
+
+As we can see, the variable names are different in the two datasets. Particularly, `arthritis` and `age.cat` variables are not available in the `dat.ineligible.stacked` dataset. Now we will recode these variables in the same format as done for `impdata`:
+
+```{r step1k, cache=TRUE}
+# Categorical age
+summary(dat.ineligible.stacked$age)
+dat.ineligible.stacked$age.cat <- with(dat.ineligible.stacked, 
+                                       ifelse(age >= 20 & age < 50, "20-49", 
+                                              ifelse(age >= 50 & age < 65, "50-64", 
+                                                    ifelse(age >= 65, "65+", NA))))
+dat.ineligible.stacked$age.cat <- factor(dat.ineligible.stacked$age.cat, 
+                                         levels = c("20-49", "50-64", "65+"))
+```
+
+Note that, we are assigning anyone with less than 20 age as missing.
+
+```{r step1l, cache=TRUE}
+table(dat.ineligible.stacked$age.cat, useNA = "always")
+# Recode arthritis
+dat.ineligible.stacked$arthritis <- car::recode(dat.ineligible.stacked$rheumatoid, 
+                                                " 'No' = 'No arthritis'; 'Yes' = 
+                                                'Rheumatoid arthritis' ", as.factor = T)
+```
+
+Note: In the above step, we could also create two variables with missing values rather than recoding. The reason is that we will subset the design; no matter whether we recode or create missing values for ineligible, the only information we need from ineligible subjects is their survey features when creating the design.
+
+The next step is to combine these two datasets (`impdata` and `dat.ineligible.stacked`).
+
+```{r step1m, cache=TRUE}
+# Variable names in the imputed dataset
+vars <- names(impdata) 
+
+# Set up the dataset for ineligible - same variables as impdata
+dat.ineligible.stacked <- dat.ineligible.stacked[, vars]
+```
+
+Now we will merge ineligible and eligible subjects to make the full dataset of 5 $\times$ 9,254 = 46,270 subjects.
+
+```{r step1n, cache=TRUE}
+impdata2 <- rbind(impdata, dat.ineligible.stacked)
+impdata2 <- impdata2[order(impdata2$.imp, impdata2$studyid),]
+dim(impdata2)
+```
+
+##### 1.4 Prepating Survey design and subpopulation of eligible
+
+The next step is to create the design on full dataset \[with eligible (imputed) and ineligible (unimputed) subjects\] of 5 $\times$ 9,254 = 46,270 subjects and subset the design for 5 $\times$ 4,716 = 23,580 subjects.
+
+```{r step1o, cache=TRUE}
+m <- 5
+allImputations <- imputationList(lapply(1:m, function(n) subset(impdata2, subset=.imp==n)))
+
+# Step 2: Survey data analysis
+w.design0 <- svydesign(ids = ~psu, 
+                       weights = ~survey.weight, 
+                       strata = ~strata,
+                      data = allImputations, 
+                      nest = TRUE) # Design on full data
+w.design <- subset(w.design0, ineligible == 0) # Subset the design
+```
+
+We can see the length of the subsetted design:
+
+```{r step1p, cache=TRUE}
+dim(w.design)
+```
+
+The subsetted design contains 4,191 subjects with 17 variables and 5 imputed datasets. Now we will run the design-adjusted logistic regression on and pool the estimate using Rubin's rule:
+
+#### Step 2: Design adjusted regression analysis
+
+```{r step2, cache=TRUE}
+# Design-adjusted logistic regression
+fit <- with(w.design, svyglm(I(cvd == "Yes") ~ arthritis + age.cat + sex + education + 
+                               race + income + bmi + smoking + htn + diabetes, 
+                             family = quasibinomial))
+res <- exp(as.data.frame(cbind(coef(fit[[1]]),
+      coef(fit[[2]]),
+      coef(fit[[3]]),
+      coef(fit[[4]]),
+      coef(fit[[5]]))))
+names(res) <- paste("OR from m =", 1:5)
+round(t(res),2)
+```
+
+#### Step 3: Pooling estimates
+
+```{r step3, cache=TRUE}
+# Step 3: Pooled estimates
+pooled.estimates <- MIcombine(fit)
+OR <- round(exp(pooled.estimates$coefficients), 2)
+OR <- as.data.frame(OR)
+CI <- round(exp(confint(pooled.estimates)), 2)
+OR <- cbind(OR, CI)
+OR
+```
+
+### Conclusion
+
+Among US adults aged 20 years or more, the odds of CVD was approximately twice among those with rheumatoid arthritis than no arthritis.

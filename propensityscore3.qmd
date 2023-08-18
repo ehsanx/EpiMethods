@@ -1,0 +1,391 @@
+## PSM in NHANES {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
+# Load required packages
+library(MatchIt)
+require(tableone)
+require(survey)
+require(cobalt)
+require(Publish)
+require(optmatch)
+require(data.table)
+require(jtools)
+require(ggstance)
+require(DataExplorer)
+```
+
+### Pre-processing
+
+#### Load data
+
+```{r data, cache=TRUE}
+load(file="Data/propensityscore/NHANES17.RData") 
+ls()
+```
+
+```{r mplot, cache=TRUE, warning=FALSE}
+library(dplyr)
+analytic.with.miss <- dplyr::select(analytic.with.miss, 
+                  cholesterol, #outcome
+                  gender, age, born, race, education, 
+                  married, income, bmi, diabetes, #predictors
+                  weight, psu, strata) #survey features
+
+dim(analytic.with.miss)
+str(analytic.with.miss)
+names(analytic.with.miss)
+
+library(DataExplorer)
+plot_missing(analytic.with.miss)
+```
+
+#### Formatting variables
+
+```{r format, cache=TRUE}
+# to avaoid any confusion later
+# rename weight variable as weights 
+# is reserved for matching weights
+analytic.with.miss$survey.weight <- analytic.with.miss$weight
+analytic.with.miss$weight <- NULL
+
+#Creating binary variable for cholesterol
+analytic.with.miss$cholesterol.bin <- ifelse(analytic.with.miss$cholesterol <200, 
+                                             1, #"healthy",
+                                             0) #"unhealthy")
+# exposure recoding
+analytic.with.miss$diabetes <- ifelse(analytic.with.miss$diabetes == "Yes", 1, 0)
+
+# ID
+analytic.with.miss$ID <- 1:nrow(analytic.with.miss)
+
+# covariates
+analytic.with.miss$born <- ifelse(analytic.with.miss$born == "Other", 
+                                             0,
+                                             1)
+
+vars = c("gender", "race", "education", 
+         "married", "income", "bmi")
+
+numeric.names <- c("cholesterol", "bmi")
+factor.names <- vars[!vars %in% numeric.names] 
+
+analytic.with.miss[factor.names] <- apply(X = analytic.with.miss[factor.names],
+                               MARGIN = 2, FUN = as.factor)
+
+analytic.with.miss[numeric.names] <- apply(X = analytic.with.miss[numeric.names],
+                                MARGIN = 2, FUN =function (x) 
+                                  as.numeric(as.character(x)))
+analytic.with.miss$income <- factor(analytic.with.miss$income, 
+                                    ordered = TRUE, 
+                                levels = c("<25k", "Between.25kto54k", 
+                                           "Between.55kto99k", 
+                                           "Over100k"))
+
+# features
+table(analytic.with.miss$strata)
+table(analytic.with.miss$psu)
+table(analytic.with.miss$strata,analytic.with.miss$psu)
+
+# impute
+# require(mice)
+# imputation1 <- mice(analytic.with.miss, seed = 123,
+#                    m = 1, # Number of multiple imputations. 
+#                    maxit = 10 # Number of iteration; mostly useful for convergence
+#                    )
+# analytic.with.miss <- complete(imputation1)
+# plot_missing(analytic.with.miss)
+```
+
+#### Complete case data
+
+```{r ccdata, cache=TRUE}
+dim(analytic.with.miss)
+analytic.data <- as.data.frame(na.omit(analytic.with.miss))
+dim(analytic.data) # complete case
+```
+
+### Zanutto (2006)
+
+-   Ref: [@zanutto2006comparison]
+
+#### Set seed
+
+```{r seed, cache=TRUE}
+set.seed(123)
+```
+
+-   "it is not necessary to use survey-weighted estimation for the propensity score model"
+
+Propensity score analysis in 4 steps:
+
+#### Step 1
+
+Specify the propensity score model to estimate propensity scores
+
+```{r Zanstep1, cache=TRUE}
+ps.formula <- as.formula(diabetes ~ gender + born +
+                         race + education + married + income + bmi)
+```
+
+#### Step 2
+
+Match treated and untreated subjects on the estimated propensity scores
+
+```{r Zanstep2, cache=TRUE}
+require(MatchIt)
+set.seed(123)
+# This function fits propensity score model (using logistic 
+# regression as above) when specified distance = 'logit'
+# performs nearest-neighbor (NN) matching, 
+# without replacement 
+# with caliper = .2*SD of propensity score  
+# within which to draw control units 
+# with 1:1 ratio (pair-matching)
+match.obj <- matchit(ps.formula, data = analytic.data,
+                     distance = 'logit', 
+                     method = "nearest", 
+                     replace=FALSE,
+                     caliper = .2, 
+                     ratio = 1)
+# see matchit function options here
+# https://www.rdocumentation.org/packages/MatchIt/versions/1.0-1/topics/matchit
+analytic.data$PS <- match.obj$distance
+summary(match.obj$distance)
+plot(match.obj, type = "jitter")
+plot(match.obj, type = "hist")
+tapply(analytic.data$PS, analytic.data$diabetes, summary)
+# check how many matched
+match.obj
+# extract matched data
+matched.data <- match.data(match.obj)
+```
+
+#### Step 3
+
+compare the similarity of baseline characteristics between treated and untreated subjects in a the propensity score-matched sample. In this case, we will compare SMD \< 0.2 or not.
+
+```{r Zanstep3, cache=TRUE}
+require(tableone)
+baselinevars <- c("gender", "born", "race", "education", 
+                  "married", "income", "bmi")
+tab1 <- CreateTableOne(strata = "diabetes", vars = baselinevars,
+                       data = analytic.data, test = FALSE)
+print(tab1, smd = TRUE)
+```
+
+```{r Zanstep3b, cache=TRUE}
+tab1m <- CreateTableOne(strata = "diabetes", vars = baselinevars, 
+                        data = matched.data, test = FALSE)
+print(tab1m, smd = TRUE)
+```
+
+#### Step 4
+
+Estimate the effect of treatment on outcomes using propensity score-matched sample
+
+-   "it is important to incorporate the survey design in both linear regression and propensity score analysis. Ignoring the survey weights affects the estimates of population-level effects substantially"
+
+```{r Zanstep4, cache=TRUE}
+require(survey)
+# setup the design with survey features
+analytic.with.miss$matched <- 0
+length(analytic.with.miss$ID) # full data
+length(matched.data$ID) # matched data
+length(analytic.with.miss$ID[analytic.with.miss$ID %in% matched.data$ID])
+analytic.with.miss$matched[analytic.with.miss$ID %in% matched.data$ID] <- 1
+table(analytic.with.miss$matched)
+w.design0 <- svydesign(strata=~strata, id=~psu, weights=~survey.weight, 
+                      data=analytic.with.miss, nest=TRUE)
+w.design.m <- subset(w.design0, matched == 1)
+```
+
+```{r Zanstep4b, cache=TRUE}
+out.formula <- as.formula(cholesterol.bin ~ diabetes)
+sfit <- svyglm(out.formula,family=binomial(logit), design = w.design.m)
+require(jtools)
+summ(sfit, exp = TRUE, confint = TRUE)
+```
+
+### DuGoff et al. (2014)
+
+-   Ref: [@dugoff2014generalizing]
+
+Propensity score analysis in 4 steps (PATT)
+
+#### Step 1
+
+Specify the propensity score model to estimate propensity scores
+
+```{r Dugstep1, cache=TRUE}
+# response = exposure variable
+# independent variables = baseline covariates
+ps.formula <- as.formula(diabetes ~ gender + born + race + education + 
+                            married + income + bmi+
+                           psu+strata+survey.weight)
+```
+
+#### Step 2
+
+Match treated and untreated subjects on the estimated propensity scores
+
+```{r Dugstep2, cache=TRUE}
+require(MatchIt)
+set.seed(123)
+match.obj <- matchit(ps.formula, data = analytic.data,
+                     distance = 'logit', 
+                     method = "nearest", 
+                     replace=FALSE,
+                     caliper = .2, 
+                     ratio = 1)
+analytic.data$PS <- match.obj$distance
+summary(match.obj$distance)
+plot(match.obj, type = "jitter")
+plot(match.obj, type = "hist")
+tapply(analytic.data$PS, analytic.data$diabetes, summary)
+# check how many matched
+match.obj
+# extract matched data
+matched.data <- match.data(match.obj)
+```
+
+#### Step 3
+
+Compare the similarity of baseline characteristics between treated and untreated subjects in a the propensity score-matched sample. In this case, we will compare SMD \< 0.2 or not.
+
+```{r Dugstep3, cache=TRUE}
+require(tableone)
+baselinevars <- c("gender", "born", "race", "education", 
+                  "married", "income", "bmi", 
+                  "psu", "strata", "survey.weight")
+matched.data$survey.weight <- as.numeric(as.character(matched.data$survey.weight))
+matched.data$strata <- as.numeric(as.character(matched.data$strata))
+tab1m <- CreateTableOne(strata = "diabetes", vars = baselinevars, 
+                        data = matched.data, test = FALSE)
+print(tab1m, smd = TRUE)
+```
+
+#### Step 4
+
+Estimate the effect of treatment on outcomes using propensity score-matched sample
+
+```{r Dugstep4, cache=TRUE}
+# setup the design with survey features
+analytic.with.miss$matched <- 0
+length(analytic.with.miss$ID) # full data
+length(matched.data$ID) # matched data
+length(analytic.with.miss$ID[analytic.with.miss$ID %in% matched.data$ID])
+analytic.with.miss$matched[analytic.with.miss$ID %in% matched.data$ID] <- 1
+table(analytic.with.miss$matched)
+w.design0 <- svydesign(strata=~strata, id=~psu, weights=~survey.weight, 
+                      data=analytic.with.miss, nest=TRUE)
+w.design.m <- subset(w.design0, matched == 1)
+```
+
+```{r Dugstep4b, cache=TRUE}
+out.formula <- as.formula(cholesterol.bin ~ diabetes)
+sfit <- svyglm(out.formula,family=binomial, design = w.design.m)
+require(jtools)
+summ(sfit, exp = TRUE, confint = TRUE)
+```
+
+### Austin et al. (2018)
+
+-   Ref: [@austin2018propensity]
+
+Propensity score analysis in 4 steps (PATT)
+
+#### Step 1
+
+Specify the propensity score model to estimate propensity scores
+
+```{r Ausstep1, cache=TRUE}
+# response = exposure variable
+# independent variables = baseline covariates
+ps.formula <- as.formula(diabetes ~ gender + born + race + education + 
+                            married + income + bmi)
+require(survey)
+analytic.design <- svydesign(id=~psu,weights=~survey.weight, 
+                             strata=~strata,
+                             data=analytic.data, nest=TRUE)
+ps.fit <- svyglm(ps.formula, design=analytic.design, family=quasibinomial)
+analytic.data$PS <- fitted(ps.fit)
+summary(analytic.data$PS)
+```
+
+#### Step 2
+
+Match treated and untreated subjects on the estimated propensity scores
+
+```{r Ausstep2a, cache=TRUE}
+require(Matching)
+match.obj2 <- Match(Y=analytic.data$cholesterol, 
+                    Tr=analytic.data$diabetes, 
+                    X=analytic.data$PS, 
+                    M=1, 
+                    estimand = "ATT",
+                    replace=FALSE, 
+                    caliper = 0.2)
+summary(match.obj2)
+matched.data2 <- analytic.data[c(match.obj2$index.treated, 
+                                 match.obj2$index.control),]
+dim(matched.data2)
+```
+
+```{r Ausstep2b, cache=TRUE}
+require(MatchIt)
+set.seed(123)
+match.obj <- matchit(ps.formula, data = analytic.data,
+                     distance = analytic.data$PS, 
+                     method = "nearest", 
+                     replace=FALSE,
+                     caliper = .2, 
+                     ratio = 1)
+analytic.data$PS <- match.obj$distance
+summary(match.obj$distance)
+plot(match.obj, type = "jitter")
+plot(match.obj, type = "hist")
+tapply(analytic.data$PS, analytic.data$diabetes, summary)
+# check how many matched
+match.obj
+# extract matched data
+matched.data2 <- match.data(match.obj)
+dim(matched.data2)
+```
+
+#### Step 3
+
+Compare the similarity of baseline characteristics between treated and untreated subjects in a the propensity score-matched sample. In this case, we will compare SMD \< 0.2 or not.
+
+```{r Ausstep3, cache=TRUE}
+baselinevars <- c("gender", "born", "race", "education", 
+                  "married", "income", "bmi")
+tab1m <- CreateTableOne(strata = "diabetes", 
+                           vars = baselinevars,
+                           data = matched.data2, test = FALSE)
+print(tab1m, smd = TRUE)
+```
+
+#### Step 4
+
+Estimate the effect of treatment on outcomes using propensity score-matched sample.
+
+```{r Ausstep4, cache=TRUE}
+# setup the design with survey features
+analytic.with.miss$matched <- 0
+length(analytic.with.miss$ID) # full data
+length(matched.data2$ID) # matched data
+length(analytic.with.miss$ID[analytic.with.miss$ID %in% matched.data2$ID])
+analytic.with.miss$matched[analytic.with.miss$ID %in% matched.data2$ID] <- 1
+table(analytic.with.miss$matched)
+w.design0 <- svydesign(strata=~strata, id=~psu, weights=~survey.weight, 
+                      data=analytic.with.miss, nest=TRUE)
+w.design.m2 <- subset(w.design0, matched == 1)
+```
+
+```{r Ausstep4b, cache=TRUE}
+out.formula <- as.formula(cholesterol.bin ~ diabetes)
+sfit <- svyglm(out.formula,family=binomial, design = w.design.m2)
+
+require(jtools)
+summ(sfit, exp = TRUE, confint = TRUE)
+```

@@ -1,0 +1,123 @@
+## Cross-validation {.unnumbered}
+
+Now, we will describe the ideas of cross-validation.
+
+-   Watch the video describing this chapter [![video](https://img.youtube.com/vi/BSDrIrSxqFU/maxresdefault.jpg)](https://youtu.be/BSDrIrSxqFU)
+
+```{r setup04, include=FALSE, cache=TRUE}
+require(Publish)
+require(caret)
+perform <- function(new.data,
+                    model.fit,model.formula=NULL, 
+                    y.name = "Y",
+                    digits=3){
+  # data dimension
+  p <- dim(model.matrix(model.fit))[2]
+  # predicted value
+  pred.y <- predict(model.fit, new.data)
+  # sample size
+  n <- length(pred.y)
+  # outcome
+  new.data.y <- as.numeric(new.data[,y.name])
+  # R2
+  R2 <- caret:::R2(pred.y, new.data.y)
+  # adj R2 using alternate formula
+  df.residual <- n-p
+  adjR2 <- 1-(1-R2)*((n-1)/df.residual)
+  # RMSE
+  RMSE <-  caret:::RMSE(pred.y, new.data.y)
+  # combine all of the results
+  res <- round(cbind(n,p,R2,adjR2,RMSE),digits)
+  # returning object
+  return(res)
+}
+```
+
+### Load previously saved data
+
+```{r data, cache=TRUE}
+ObsData <- readRDS(file = "Data/machinelearning/rhcAnalytic.RDS")
+out.formula1 <- readRDS(file = "Data/machinelearning/form1.RDS")
+```
+
+### k-fold cross-vaildation
+
+See [@Cross-validation]
+
+```{r c954, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("Images/machinelearning/kf.png")
+```
+
+```{r kcv, cache=TRUE}
+k = 5
+dim(ObsData)
+set.seed(567)
+# create folds (based on outcome)
+folds <- createFolds(ObsData$Length.of.Stay, k = k, 
+                     list = TRUE, returnTrain = TRUE)
+mode(folds)
+dim(ObsData)*4/5 # approximate training data size
+dim(ObsData)/5  # approximate test data size
+length(folds[[1]])
+length(folds[[5]])
+str(folds[[1]])
+str(folds[[5]])
+```
+
+#### Calculation for Fold 1
+
+```{r fold1, cache=TRUE}
+fold.index <- 1
+fold1.train.ids <- folds[[fold.index]]
+head(fold1.train.ids)
+fold1.train <- ObsData[fold1.train.ids,]
+fold1.test <- ObsData[-fold1.train.ids,]
+out.formula1
+model.fit <- lm(out.formula1, data = fold1.train)
+predictions <- predict(model.fit, 
+                       newdata = fold1.test)
+perform(new.data=fold1.test,
+        y.name = "Length.of.Stay",
+        model.fit=model.fit)
+```
+
+#### Calculation for Fold 2
+
+```{r fold2, cache=TRUE}
+fold.index <- 2
+fold1.train.ids <- folds[[fold.index]]
+head(fold1.train.ids)
+fold1.train <- ObsData[fold1.train.ids,]
+fold1.test <- ObsData[-fold1.train.ids,]
+model.fit <- lm(out.formula1, data = fold1.train)
+predictions <- predict(model.fit, 
+                       newdata = fold1.test)
+perform(new.data=fold1.test,
+        y.name = "Length.of.Stay",
+        model.fit=model.fit)
+```
+
+### Using caret package to automate
+
+See [@tuning]
+
+```{r cvcaret, cache= TRUE}
+# Using Caret package
+set.seed(504)
+# make a 5-fold CV
+ctrl<-trainControl(method = "cv",number = 5)
+# fit the model with formula = out.formula1
+# use training method lm
+fit.cv<-train(out.formula1, trControl = ctrl,
+               data = ObsData, method = "lm")
+fit.cv
+# extract results from each test data 
+summary.res <- fit.cv$resample
+summary.res
+mean(fit.cv$resample$Rsquared)
+sd(fit.cv$resample$Rsquared)
+mean(fit.cv$resample$RMSE)
+sd(fit.cv$resample$RMSE)
+```
+
+### References

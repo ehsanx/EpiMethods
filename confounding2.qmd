@@ -1,0 +1,100 @@
+## Mediator {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(simcausal)
+```
+
+Let us consider
+
+-   M is continuous variable
+-   A is binary treatment
+-   Y is continuous outcome
+
+### Non-null effect
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm, cache = TRUE, warning=FALSE, message=FALSE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("A", distr = "rbern", prob = plogis(-10)) +
+  node("M", distr = "rnorm", mean = 10 + 0.9 * A, sd = 1) + 
+  node("Y", distr = "rnorm", mean = 0.5 * M + 1.3 * A, sd = .1)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag, cache = TRUE, warning=FALSE, message=FALSE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data, cache = FALSE, warning=FALSE, message=FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect
+
+```{r est, cache = TRUE, warning=FALSE, message=FALSE}
+# Not adjusted for M
+fit0 <- glm(Y ~ A, family="gaussian", data=Obs.Data)
+round(coef(fit0),2)
+
+# Adjusted for M
+fit <- glm(Y ~ A + M, family="gaussian", data=Obs.Data)
+round(coef(fit),2)
+```
+
+### Null effect
+
+-   True treatment effect = 0
+
+#### Data generating process
+
+```{r dgm0, cache = TRUE, warning=FALSE, message=FALSE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("A", distr = "rbern", prob = plogis(-10)) +
+  node("M", distr = "rnorm", mean = 10 + 0.9 * A, sd = 1) + 
+  node("Y", distr = "rnorm", mean = 0.5 * M, sd = .1)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag0, cache = TRUE, warning=FALSE, message=FALSE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data0, cache = FALSE, warning=FALSE, message=FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect
+
+```{r est0, cache = TRUE, warning=FALSE, message=FALSE}
+# Not adjusted for M
+fit0 <- glm(Y ~ A, family="gaussian", data=Obs.Data)
+round(coef(fit0),2)
+
+# Adjusted for M
+fit <- glm(Y ~ A + M, family="gaussian", data=Obs.Data)
+round(coef(fit),2)
+```

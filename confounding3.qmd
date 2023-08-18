@@ -1,0 +1,100 @@
+## Collider {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(simcausal)
+```
+
+Let us consider
+
+-   L is continuous variable
+-   A is binary treatment
+-   Y is continuous outcome
+
+### Non-null effect
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm3, cache = TRUE, warning=FALSE, message=FALSE}
+D <- DAG.empty()
+D <- D + 
+  node("A", distr = "rbern", prob = plogis(-10)) +
+  node("Y", distr = "rnorm", mean = 1.3 * A, sd = .1) +
+  node("L", distr = "rnorm", mean = 10 * Y + 1.3 * A, sd = 1)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag3, cache = TRUE, warning=FALSE, message=FALSE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate data
+
+```{r data3, cache = FALSE, warning=FALSE, message=FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect
+
+```{r est3, cache = TRUE, warning=FALSE, message=FALSE}
+# Not adjusted for L
+fit0 <- glm(Y ~ A, family="gaussian", data=Obs.Data)
+round(coef(fit0),2)
+
+# Adjusted for L
+fit <- glm(Y ~ A + L, family="gaussian", data=Obs.Data)
+round(coef(fit),2)
+```
+
+### Null effect
+
+-   True treatment effect = 0
+
+#### Data generating process
+
+```{r dgm4, cache = TRUE, warning=FALSE, message=FALSE}
+D <- DAG.empty()
+D <- D + 
+  node("A", distr = "rbern", prob = plogis(-10)) +
+  node("Y", distr = "rnorm", mean = 0, sd = .1) +
+  node("L", distr = "rnorm", mean = 10 * Y + 1.3 * A, sd = 1)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag4, cache = TRUE, warning=FALSE, message=FALSE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate data
+
+```{r data4, cache = FALSE, warning=FALSE, message=FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect
+
+```{r est4, cache = TRUE, warning=FALSE, message=FALSE}
+# Not adjusted for L
+fit0 <- glm(Y ~ A, family="gaussian", data=Obs.Data)
+round(coef(fit0),2)
+
+# Adjusted for L
+fit <- glm(Y ~ A + L, family="gaussian", data=Obs.Data)
+round(coef(fit),2)
+```
+
+Even 1,000,000 observations were not enough to recover true treatment effect! But we are close enough.

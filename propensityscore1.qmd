@@ -1,0 +1,299 @@
+## Matching using CCHS {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(MatchIt)
+require(tableone)
+require(Publish)
+require(survey)
+```
+
+This is the CCHS data, for the OA - CVD problem.
+
+### Load data
+
+```{r data, cache=TRUE}
+load("Data/propensityscore/cchs123b.RData")
+ls()
+str(analytic.miss) # is there any character variable?
+```
+
+### Data pre-pocessing
+
+```{r data2, cache=TRUE}
+var.names <- c("age", "sex", "stress", "married", "income", "race", 
+               "bmi", "phyact", "smoke", "doctor", "drink", "bp", "province",
+               "immigrate", "fruit", "diab", "edu", "CVD", "OA")
+analytic.miss[var.names] <- lapply(analytic.miss[var.names] , factor)
+table(analytic.miss$OA)
+analytic.miss$OA <- as.numeric(analytic.miss$OA=="OA") 
+table(analytic.miss$OA)
+```
+
+### Identify subjects with missing
+
+```{r miss, cache=TRUE}
+analytic.miss$miss <- 1
+head(analytic.miss$ID) # full data
+head(analytic2$ID) # complete case
+head(analytic.miss$ID[analytic.miss$ID %in% analytic2$ID])
+# if associated with complete case, assign miss <- 0
+analytic.miss$miss[analytic.miss$ID %in% analytic2$ID] <- 0
+table(analytic.miss$miss)
+```
+
+### Setting Design
+
+#### Unconditional design
+
+```{r design, cache=TRUE}
+summary(analytic.miss$weight)
+w.design0 <- svydesign(id=~1, weights=~weight, 
+                      data=analytic.miss)
+summary(weights(w.design0))
+sd(weights(w.design0))
+sum(weights(w.design0))
+```
+
+#### Conditioning the design
+
+```{r design2, cache=TRUE}
+w.design <- subset(w.design0, miss == 0)
+summary(weights(w.design))
+sd(weights(w.design))
+sum(weights(w.design))
+```
+
+#### Subset data (more!)
+
+We subset the data for fast results (less computation). We will only work with cycle 1.1, and the people from Northern provinces in Canada.
+
+```{r design3, cache=TRUE}
+w.design1 <- subset(w.design, cycle == 11 & province == "North")
+sum(weights(w.design1))
+```
+
+### Priliminary analysis
+
+#### Table 1
+
+Is the data balanced? Check SMD.
+
+```{r tab, cache=TRUE}
+var.names <- c("age", "sex")
+tab0 <- svyCreateCatTable(var = var.names, strata= "OA", data=w.design1,test=FALSE)
+print(tab0, smd = TRUE)
+```
+
+#### Treatment effect
+
+```{r tx, cache=TRUE}
+fit.outcome <- svyglm(I(CVD=="event") ~ OA + age + sex + stress + married + 
+                         income + race + bmi + phyact + smoke +
+                         immigrate + fruit + diab + edu,
+                   design = w.design1,
+                   family = binomial(logit))
+publish(fit.outcome)
+```
+
+### Matching: Estimating treatment effect
+
+Going back to the data (not working on design here while matching)
+
+```{r effect, cache=TRUE}
+# Create the dataset without design features
+analytic2 <- as.data.frame(na.omit(analytic.miss))
+analytic11n <- subset(analytic2, cycle == 11 & province == "North")
+dim(analytic11n)
+table(analytic11n$OA)
+table(analytic11n$OA,analytic11n$age)
+```
+
+#### Matching by 1 matching variable
+
+First we are working with a few covariates:
+
+```{r match1, cache=TRUE}
+match.formula <- as.formula("OA ~ age")
+matching.obj <- matchit(match.formula,
+                        data = analytic11n,
+                        method = "exact")
+matching.obj
+```
+
+#### Matching by 2 matching variables
+
+```{r match2, cache=TRUE}
+var.comb <- do.call('paste0', 
+                    analytic11n[, c('age', 'sex')])
+table(var.comb)
+length(table(var.comb))
+match.formula <- as.formula("OA ~ age + sex")
+matching.obj <- matchit(match.formula,
+                        data = analytic11n,
+                        method = "exact")
+matching.obj
+```
+
+#### Matching by 3 matching variables
+
+```{r match3, cache=TRUE}
+var.comb <- do.call('paste0', 
+                    analytic11n[, c('age', 'sex', 'stress')])
+table(var.comb)
+length(table(var.comb))
+table(var.comb,analytic11n$OA)
+match.formula <- as.formula("OA ~ age + sex + stress")
+matching.obj <- matchit(match.formula,
+                        data = analytic11n,
+                        method = "exact")
+matching.obj
+```
+
+#### Matching by 4 matching variables
+
+```{r match4, cache=TRUE}
+var.comb <- do.call('paste0', 
+                    analytic11n[, c('age', 'sex',
+                                    'stress','income')])
+#table(var.comb)
+length(table(var.comb))
+match.formula <- as.formula("OA ~ age + sex + stress + income")
+matching.obj <- matchit(match.formula,
+                        data = analytic11n,
+                        method = "exact")
+matching.obj
+```
+
+#### Matching by 5 matching variables
+
+```{r match5, cache=TRUE}
+var.comb <- do.call('paste0', 
+                    analytic11n[, c('age', 'sex',
+                                    'stress','income','race')])
+length(table(var.comb))
+match.formula <- as.formula("OA ~ age + sex + stress + income + race")
+matching.obj <- matchit(match.formula,
+                        data = analytic11n,
+                        method = "exact")
+matching.obj
+```
+
+#### Matching by 6 matching variables
+
+```{r match6, cache=TRUE}
+var.comb <- do.call('paste0', 
+                    analytic11n[, c('age', 'sex',
+                                    'stress','income','race','edu')])
+length(table(var.comb))
+match.formula <- as.formula("OA ~ age + sex + stress + income + race + edu")
+matching.obj <- matchit(match.formula,
+                        data = analytic11n,
+                        method = "exact")
+matching.obj
+OACVD.match.11n <- match.data(matching.obj)
+var.names <- c("age", "sex", "stress", "income", "race", "edu")
+tab1 <- CreateCatTable(var = var.names, strata= "OA", data=OACVD.match.11n,test=FALSE)
+print(tab1, smd = TRUE)
+```
+
+### Treatment effect
+
+#### Convert data to design
+
+```{r tx2, cache=TRUE}
+analytic.miss$matched <- 0
+length(analytic.miss$ID) # full data
+length(OACVD.match.11n$ID) # matched data
+length(analytic.miss$ID[analytic.miss$ID %in% OACVD.match.11n$ID])
+analytic.miss$matched[analytic.miss$ID %in% OACVD.match.11n$ID] <- 1
+table(analytic.miss$matched)
+w.design0 <- svydesign(id=~1, weights=~weight, 
+                      data=analytic.miss)
+w.design.m <- subset(w.design0, matched == 1)
+```
+
+#### Outcome analysis
+
+##### Crude
+
+```{r est2, cache=TRUE}
+fit.outcome <- svyglm(I(CVD=="event") ~ OA,
+                   design = w.design.m,
+                   family = binomial(logit))
+publish(fit.outcome)
+```
+
+##### Adjusted
+
+```{r est3, cache=TRUE}
+fit.outcome <- svyglm(I(CVD=="event") ~ OA + 
+                        age + sex + stress + income + race + edu,
+                   design = w.design.m,
+                   family = binomial(logit))
+publish(fit.outcome)
+```
+
+#### Questions for the students
+
+-   Look at all the ORs. Some of them are VERY high. Why?
+-   Look at the CI in the above table. Some of them are Inf. Why?
+-   Should we match matching variables in the regression?
+
+### Matching by a lot of variables
+
+#### Matching part in data
+
+```{r match10, cache=TRUE}
+match.formula <- as.formula("OA ~ age + sex + stress + married + 
+                         income + race + bmi + phyact + smoke +
+                         immigrate + fruit + diab + edu")
+matching.obj2 <- matchit(match.formula,
+                        data = analytic11n,
+                        method = "exact")
+matching.obj2
+OACVD.match.11n2 <- match.data(matching.obj2)
+var.names <- c("age", "sex", "stress", "married", "income", "race", 
+               "bmi", "phyact", "smoke", "immigrate", "fruit", "diab", "edu")
+tab2 <- CreateCatTable(var = var.names, strata= "OA", data=OACVD.match.11n2,test=FALSE)
+print(tab2, smd = TRUE)
+```
+
+#### Treatment effect estimation in design
+
+##### Create design
+
+```{r match11, cache=TRUE}
+analytic.miss$matched2 <- 0
+length(analytic.miss$ID) # full data
+length(OACVD.match.11n2$ID) # matched data
+length(analytic.miss$ID[analytic.miss$ID %in% OACVD.match.11n2$ID])
+analytic.miss$matched2[analytic.miss$ID %in% OACVD.match.11n2$ID] <- 1
+table(analytic.miss$matched2)
+w.design0 <- svydesign(id=~1, weights=~weight, 
+                      data=analytic.miss)
+w.design.m2 <- subset(w.design0, matched2 == 1)
+```
+
+##### outcome analysis
+
+```{r match12, eval=FALSE, cache=TRUE}
+fit.outcome <- svyglm(I(CVD=="event") ~ OA + age + sex + stress + married +
+                         income + race + bmi + phyact + smoke +
+                         immigrate + fruit + diab + edu,
+                   design = w.design.m2,
+                   family = binomial(logit))
+publish(fit.outcome)
+# Error in `contrasts<-`(`*tmp*`, value = contr.funs[1 + isOF[nn]]) : 
+#   contrasts can be applied only to factors with 2 or more levels
+```
+
+##### Questions for the students
+
+-   Why the above model not fitting?
+
+### Save data for later use
+
+```{r savedata, cache=TRUE}
+save(analytic11n, analytic2, analytic.miss, file="Data/propensityscore/cchs123c.RData")
+```

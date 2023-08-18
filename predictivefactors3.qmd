@@ -1,0 +1,108 @@
+## Binary outcome {.unnumbered}
+
+```{r setup, warning=FALSE, echo=FALSE,cache=TRUE}
+# Load required packages
+library(rms)
+library(Hmisc)
+library(Publish)
+library(car)
+library(pROC)
+```
+
+### Explore relationships for binary outcome variable
+
+#### Load data
+
+```{r load, warning=FALSE, cache=TRUE}
+load(file = "Data/predictivefactors/cholesterolNHANES15part1.RData")
+```
+
+#### Creating binary variable
+Let us create a binary variable using the `ifelse` function:
+
+```{r binary, warning=FALSE, cache=TRUE}
+# Binary variable
+analytic3$cholesterol.bin <- ifelse(analytic3$cholesterol < 200, "healthy", "unhealthy")
+table(analytic3$cholesterol.bin)
+
+# Changing the reference category
+analytic3$cholesterol.bin <- as.factor(analytic3$cholesterol.bin)
+analytic3$cholesterol.bin <- relevel(analytic3$cholesterol.bin, ref = "unhealthy")
+table(analytic3$cholesterol.bin)
+```
+
+#### Modelling data
+
+::: callout-tip
+We use the `glm` function to run generalized linear models. The default family is gaussian with identity link. Setting binomial family with logit link (logit link is default for binomial family) means fitting logistic regression.
+:::
+
+```{r glm, warning=FALSE, cache=TRUE}
+# Regression model
+formula5x <- as.formula("cholesterol.bin~gender + age + born + 
+             race + education + married + 
+             income + diastolicBP + systolicBP + 
+             bmi + bodyweight + bodyheight + waist +  
+             triglycerides + uric.acid + 
+             protein + bilirubin + phosphorus + sodium + potassium + 
+             globulin + calcium + physical.work + physical.recreational + 
+             diabetes")
+
+# Summary
+fit5x <- glm(formula5x, family = binomial(), data = analytic3)
+publish(fit5x)
+
+# VIF
+car::vif(fit5x)
+```
+
+#### AUC
+
+Let us measure the accuracy for classification models fit5x.
+
+::: callout-tip
+We can use the `roc` function to build a ROC curve and `auc` function to calculate the AUC (are under the ROC curve) value.
+:::
+
+```{r auc1, warning=FALSE, cache=TRUE}
+require(pROC)
+pred.y <- predict(fit5x, type = "response")
+rocobj <- roc(analytic3$cholesterol.bin, pred.y)
+rocobj
+
+auc(rocobj)
+```
+
+#### Re-modelling
+Let us re-fit the model and measure the AUC:
+```{r refit1, warning=FALSE, cache=TRUE}
+formula5 <- as.formula("cholesterol.bin~gender + age + born + 
+             race + education + married + 
+             income + diastolicBP + systolicBP + 
+             bmi +
+             triglycerides + uric.acid + 
+             protein + bilirubin + phosphorus + sodium + potassium + 
+             globulin + calcium + physical.work + physical.recreational + 
+             diabetes")
+fit5 <- glm(formula5, family = binomial(), data = analytic3)
+publish(fit5)
+
+# VIF
+car::vif(fit5)
+```
+
+```{r auc2, warning=FALSE, cache=TRUE}
+#### AUC
+pred.y <- predict(fit5, type = "response")
+rocobj <- roc(analytic3$cholesterol.bin, pred.y)
+rocobj
+auc(rocobj)
+```
+
+### Save data
+
+```{r save, warning=FALSE, cache=TRUE}
+save.image(file = "Data/predictivefactors/cholesterolNHANES15part2.RData")
+```
+
+### References

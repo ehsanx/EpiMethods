@@ -1,0 +1,162 @@
+## Bivariate analysis {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+library(knitr)
+library(car)
+library(tableone)
+library(DataExplorer)
+library(Publish)
+library(ROCR)
+library(WeightedROC)
+library(jtools)
+```
+
+### Load data
+
+```{r load, warning=FALSE, message=FALSE, cache = TRUE}
+load("Data/surveydata/cchs123b.RData")
+ls()
+```
+
+### Preparing data
+
+#### Weights
+
+```{r wgt, warning=FALSE, message=FALSE, cache = TRUE}
+analytic.miss$weight <- analytic.miss$weight/3 # 3 cycles combined
+```
+
+#### Fixing variable types
+
+```{r vartype, warning=FALSE, message=FALSE, cache = TRUE}
+var.names <- c("CVD", "age", "sex", "married", "race", "edu", "income", "bmi", 
+               "phyact", "doctor", "stress", "smoke", "drink", "fruit", "bp", 
+               "diab", "province", "OA", "immigrate")
+analytic.miss[var.names] <- lapply(analytic.miss[var.names] , factor)
+str(analytic.miss)
+```
+
+```{r vartype2, warning=FALSE, message=FALSE, cache = TRUE}
+analytic.miss$miss <- 1
+head(analytic.miss$ID) # full data
+head(analytic2$ID) # complete case
+head(analytic.miss$ID[analytic.miss$ID %in% analytic2$ID])
+analytic.miss$miss[analytic.miss$ID %in% analytic2$ID] <- 0
+table(analytic.miss$miss)
+```
+
+### Setting Design
+
+```{r desgin0, warning=FALSE, message=FALSE, cache = TRUE}
+require(survey)
+summary(analytic.miss$weight)
+w.design0 <- svydesign(id=~1, weights=~weight, 
+                      data=analytic.miss)
+summary(weights(w.design0))
+sd(weights(w.design0))
+```
+
+```{r desgin1, warning=FALSE, message=FALSE, cache = TRUE}
+w.design <- subset(w.design0, miss == 0)
+summary(weights(w.design))
+sd(weights(w.design))
+```
+
+### Bivariate analysis
+
+#### Table 1 (weighted)
+
+##### Stratified by exposure
+
+This table will be useful for propensity score analysis
+
+```{r tab2, warning=FALSE, message=FALSE, cache = TRUE}
+require(tableone)
+var.names <- c("CVD", "age", "sex", "married", "race", "edu", "income", "bmi", 
+               "phyact", "doctor", "stress", "smoke", "drink", "fruit", "bp", 
+               "diab", "province", "immigrate") # exclude "OA"
+# tab1 <- CreateTableOne(var = var.names, strata= "OA", data=analytic.miss, test = TRUE)
+# print(tab1)
+tab2 <- svyCreateTableOne(var = var.names, strata= "OA", 
+                          data=w.design, test = TRUE)
+print(tab2)
+```
+
+##### Stratified by outcome
+
+This table is generally useful for logistic regression analysis
+
+```{r tab3, warning=FALSE, message=FALSE, cache = TRUE}
+var.names <- c("OA", "age", "sex", "married", "race", "edu", "income", "bmi", 
+               "phyact", "doctor", "stress", "smoke", "drink", "fruit", "bp", 
+               "diab", "province", "immigrate") # exclude "CVD"
+tab3 <- svyCreateTableOne(var = var.names, strata= "CVD", data=w.design, test = TRUE)
+print(tab3)
+```
+
+How did they calculate the p-values? Hint: `svychisq` (see below).
+
+#### Proportions and Design Effect
+
+```{r fit0, warning=FALSE, message=FALSE, cache = TRUE}
+require(survey)
+# Computing survey statistics on subsets of a survey defined by factor(s).
+fit0a <- svyby(~CVD,~OA,design=w.design, svymean,deff=TRUE)
+fit0a
+confint(fit0a)
+# 7.45% OA patients estimated to have CVD event.
+# 95% CI:  (0.067, 0.0816)
+```
+
+Let
+
+-   $\theta$ = parameter (population slope) and\
+-   $\hat(\theta)$ = statistic (estimated slope).
+
+$b = \frac{\sum[w (y_i-\bar{y}) (x_i-\bar{x})]}{\sum[w (x_i-\bar{x})^2]}$
+
+DE = Effect of complex survey on the SEs, relative to a SRS of equal size.
+
+-   $D^2(\hat{\theta}) = \frac{Var(\hat{\theta})_{Complex Survey}}{Var(\hat{\theta})_{SRS}}$
+-   $D^2(\hat{\theta}) = \frac{SE(\hat{\theta})^2_{Complex Survey}}{SE(\hat{\theta})^2_{SRS}}$
+
+Note:
+
+1.  SE increases as value of weight increases (CCHS).
+2.  NHANES has more things to worry about (strata, PSU)
+
+DEFF = 2 means that the variance of the sample proportion, when choosing the sample by complex survey sampling, is nearly 2 times as large as the variance of the same estimator under simple random sampling/SRS.
+
+```{r fit1, warning=FALSE, message=FALSE, cache = TRUE}
+fit0b <- svyby(~CVD,~diab,design=w.design, svymean,deff=TRUE)
+fit0b
+confint(fit0b)
+```
+
+#### Testing association
+
+-   Tests for hypothesis
+    -   Rao-Scott modifications (chi-sq)
+    -   Thomas-Rao modifications (F)
+
+```{r testchisq, warning=FALSE, message=FALSE, cache = TRUE}
+# Rao-Scott modifications (chi-sq)
+svychisq(~CVD+OA,design=w.design, statistic="Chisq")
+
+# Thomas-Rao modifications (F)
+svychisq(~CVD+OA,design=w.design, statistic="F") 
+
+# Both provide strong evidence to reject the null hypothesis.
+# Conclusion: there is a significant (at 5%) association 
+# between CVD prevalence and OA.
+svychisq(~CVD+fruit,design=w.design, statistic="F") 
+svychisq(~CVD+province,design=w.design, statistic="Chisq") 
+```
+
+### Saving data
+
+```{r save, cache = TRUE}
+save(w.design, analytic.miss, analytic2, file = "Data/surveydata/cchs123w.RData")
+```

@@ -1,0 +1,278 @@
+## Supervised learning {.unnumbered}
+
+In this chapter, we will move beyond statistical regression, and introduce some of the popular machine learning methods.
+
+-   Watch the video describing this chapter - I [![video 1](https://img.youtube.com/vi/lzr8GOq_Ph0/maxresdefault.jpg)](https://youtu.be/lzr8GOq_Ph0)
+-   Watch the video describing this chapters -II [![video 2](https://img.youtube.com/vi/Q59yffGr8qI/maxresdefault.jpg)](https://youtu.be/Q59yffGr8qI)
+
+```{r setup06, include=FALSE, warning=FALSE}
+require(Publish)
+require(rpart)
+require(rattle)
+require(rpart.plot)
+require(RColorBrewer)
+require(caret)
+```
+
+### Read previously saved data
+
+```{r data, cache= TRUE}
+ObsData <- readRDS(file = "Data/machinelearning/rhcAnalytic.RDS")
+levels(ObsData$Death)=c("No","Yes")
+out.formula1 <- readRDS(file = "Data/machinelearning/form1.RDS")
+out.formula2 <- readRDS(file = "Data/machinelearning/form2.RDS")
+```
+
+### Continuous outcome
+
+#### Cross-validation LASSO
+
+```{r plotlasso22, echo=FALSE}
+knitr::include_graphics("Images/machinelearning/enet.png")
+```
+
+```{r cvbinlasso22, cache = TRUE}
+ctrl <- trainControl(method = "cv", number = 5)
+fit.cv.con <- train(out.formula1, 
+                    trControl = ctrl,
+                    data = ObsData, method = "glmnet",
+                    lambda= 0,
+                    tuneGrid = expand.grid(alpha = 1, lambda = 0),
+                    verbose = FALSE)
+fit.cv.con
+```
+
+#### Cross-validation Ridge
+
+```{r cvbinridge22, cache = TRUE}
+ctrl <- trainControl(method = "cv", number = 5)
+fit.cv.con <-train(out.formula1, 
+                   trControl = ctrl,
+                   data = ObsData, method = "glmnet",
+                   lambda= 0,
+                   tuneGrid = expand.grid(alpha = 0, lambda = 0),
+                   verbose = FALSE)
+fit.cv.con
+```
+
+### Binary outcome
+
+#### Cross-validation LASSO
+
+```{r cvbinlasso, cache= TRUE}
+ctrl<-trainControl(method = "cv", number = 5,
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+fit.cv.bin<-train(out.formula2, 
+                  trControl = ctrl,
+                  data = ObsData, 
+                  method = "glmnet",
+                  lambda= 0,
+                  tuneGrid = expand.grid(alpha = 1, lambda = 0),
+                  verbose = FALSE,
+                  metric="ROC")
+fit.cv.bin
+```
+
+-   Not okay to select variables from a shrinkage model, and then use them in a regular regression
+
+#### Cross-validation Ridge
+
+```{r cvbinridge, cache= TRUE}
+ctrl<-trainControl(method = "cv", number = 5,
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+fit.cv.bin<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "glmnet",
+               lambda= 0,
+               tuneGrid = expand.grid(alpha = 0,  
+                                      lambda = 0),
+               verbose = FALSE,
+               metric="ROC")
+fit.cv.bin
+```
+
+#### Cross-validation Elastic net
+
+-   Alpha = mixing parameter
+-   Lambda = regularization or tuning parameter
+-   We can use `expand.grid` for model tuning
+
+```{r cvbinenet, cache= TRUE}
+ctrl<-trainControl(method = "cv", number = 5,
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+fit.cv.bin<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "glmnet",
+               tuneGrid = expand.grid(alpha = seq(0.1,.2,by = 0.05),  
+                                      lambda = seq(0.05,0.3,by = 0.05)),
+               verbose = FALSE,
+               metric="ROC")
+fit.cv.bin
+plot(fit.cv.bin)
+```
+
+#### Decision tree
+
+-   Decision tree
+    -   Referred to as Classification and regression trees or CART
+    -   Covers
+        -   Classification (categorical outcome)
+        -   Regression (continuous outcome)
+    -   Flexible to incorporate non-linear effects automatically
+        -   No need to specify higher order terms / interactions
+    -   Unstable, prone to overfitting, suffers from high variance
+
+##### Simple CART
+
+```{r cart, cache= TRUE, warning=FALSE}
+require(rpart)
+summary(ObsData$DASIndex) # Duke Activity Status Index
+cart.fit <- rpart(Death~DASIndex, data = ObsData)
+par(mfrow = c(1,1), xpd = NA)
+plot(cart.fit)
+text(cart.fit, use.n = TRUE)
+print(cart.fit)
+require(rattle)
+require(rpart.plot)
+require(RColorBrewer)
+fancyRpartPlot(cart.fit, caption = NULL)
+```
+
+###### AUC
+
+```{r auc1, cache= TRUE}
+require(pROC)
+obs.y2<-ObsData$Death
+pred.y2 <- as.numeric(predict(cart.fit, type = "prob")[, 2])
+rocobj <- roc(obs.y2, pred.y2)
+rocobj
+plot(rocobj)
+auc(rocobj)
+```
+
+##### Complex CART
+
+More variables
+
+```{r cart2, cache= TRUE}
+out.formula2
+require(rpart)
+cart.fit <- rpart(out.formula2, data = ObsData)
+```
+
+##### CART Variable importance
+
+```{r cart3, cache= TRUE}
+cart.fit$variable.importance
+```
+
+###### AUC
+
+```{r auc2, cache= TRUE}
+require(pROC)
+obs.y2<-ObsData$Death
+pred.y2 <- as.numeric(predict(cart.fit, type = "prob")[, 2])
+rocobj <- roc(obs.y2, pred.y2)
+rocobj
+plot(rocobj)
+auc(rocobj)
+```
+
+##### Cross-validation CART
+
+```{r cvbincart, cache= TRUE}
+set.seed(504)
+require(caret)
+ctrl<-trainControl(method = "cv", number = 5, 
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+# fit the model with formula = out.formula2
+fit.cv.bin<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "rpart",
+              metric="ROC")
+fit.cv.bin
+# extract results from each test data 
+summary.res <- fit.cv.bin$resample
+summary.res
+```
+
+### Ensemble methods (Type I)
+
+Training same model to different samples (of the same data)
+
+#### Cross-validation bagging
+
+-   Bagging or bootstrap aggregation
+    -   independent bootstrap samples (sampling with replacement, B times),
+    -   applies CART on each i (no prunning)
+    -   Average the resulting predictions
+    -   Reduces variance as a result of using bootstrap
+
+```{r cvbinbag, cache= TRUE}
+set.seed(504)
+require(caret)
+ctrl<-trainControl(method = "cv", number = 5,
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+# fit the model with formula = out.formula2
+fit.cv.bin<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "bag",
+               bagControl = bagControl(fit = ldaBag$fit, 
+                                       predict = ldaBag$pred, 
+                                       aggregate = ldaBag$aggregate),
+               metric="ROC")
+fit.cv.bin
+```
+
+-   Bagging improves prediction accuracy
+    -   over prediction using a single tree
+-   Looses interpretability
+    -   as this is an average of many diagrams now
+-   But we can get a summary of the importance of each variable
+
+##### Bagging Variable importance
+
+```{r baggvar, cache= TRUE}
+caret::varImp(fit.cv.bin, scale = FALSE)
+```
+
+#### Cross-validation boosting
+
+-   Boosting
+    -   sequentially updated/weighted bootstrap based on previous learning
+
+```{r cvbinboost, cache= TRUE}
+set.seed(504)
+require(caret)
+ctrl<-trainControl(method = "cv", number = 5,
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+# fit the model with formula = out.formula2
+fit.cv.bin<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "gbm",
+               verbose = FALSE,
+               metric="ROC")
+fit.cv.bin
+```
+
+```{r plotcv, cache= TRUE}
+plot(fit.cv.bin)
+```
+
+### Ensemble methods (Type II)
+
+Training different models on the same data
+
+#### Super Learner
+
+-   Large number of candidate learners (CL) with different strengths
+    -   Parametric (logistic)
+    -   Non-parametric (CART)
+-   Cross-validation: CL applied on training data, prediction made on test data
+-   Final prediction uses a weighted version of all predictions
+    -   Weights = coef of Observed outcome \~ prediction from each CL
+
+#### Steps
+
+Refer to [this tutorial](https://ehsanx.github.io/TMLEworkshop/g-computation-using-ml.html#g-comp-using-superlearner) for steps and examples!

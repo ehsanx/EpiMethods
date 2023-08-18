@@ -1,0 +1,134 @@
+## Checking dataset {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+library(knitr)
+library(car)
+library(tableone)
+library(DataExplorer)
+```
+
+### Load data
+
+```{r load, warning=FALSE, message=FALSE, cache = TRUE}
+load("Data/surveydata/cchs123.RData")
+ls()
+```
+
+### Checking
+
+#### Check the data for missingness
+
+```{r miss0, warning=FALSE, message=FALSE, cache = TRUE}
+dim(analytic)
+require("tableone")
+#CreateTableOne(data = analytic, includeNA = TRUE)
+CreateTableOne(data = analytic, strata = "CVD", includeNA = TRUE)
+CreateTableOne(data = analytic, strata = "OA", includeNA = TRUE)
+
+require(DataExplorer)
+plot_missing(analytic)
+```
+
+#### Look for zero-cells
+
+```{r cells0, warning=FALSE, message=FALSE, cache = TRUE}
+analytic$age.65p <- analytic$age.teen <- 0
+analytic$age.teen[analytic$age == "teen"] <- 1
+analytic$age.65p[analytic$age == "65 years and over"] <- 1
+CreateTableOne(data = analytic, strata = "age.teen", includeNA = TRUE)
+# copd has zero cells
+# analytic$age[analytic$age == 'teen'] <- NA (will set this if we use copd)
+```
+
+```{r tab0, warning=FALSE, message=FALSE, cache = TRUE}
+CreateTableOne(data = analytic, strata = "age.65p", includeNA = TRUE)
+analytic$age.65p <- analytic$age.teen <- NULL
+```
+
+```{r tab1, warning=FALSE, message=FALSE, cache = TRUE}
+table(analytic$province.check,analytic$fruit)
+table(analytic$age)
+table(analytic$copd, analytic$age)
+table(analytic$stress, analytic$age) 
+```
+
+-   universe 15 + is not an issue for `stress` as age starts from 20
+-   `copd` is problematic!
+-   But wasn't `fruit` variable measured in an optional component?
+
+```{r tab2, warning=FALSE, message=FALSE, cache = TRUE}
+table(analytic$province.check[analytic$cycle==11],
+      analytic$fruit[analytic$cycle==11])
+```
+
+```{r tab3, warning=FALSE, message=FALSE, cache = TRUE}
+table(analytic$province.check[analytic$cycle==21],
+      analytic$fruit[analytic$cycle==21])
+# a different QUEBEC spelling used
+```
+
+```{r tab4, warning=FALSE, message=FALSE, cache = TRUE}
+table(analytic$province.check[analytic$cycle==31],
+      analytic$fruit[analytic$cycle==31])
+# The real problem!
+```
+
+-   Look at data dictionaries in all cycles
+    -   cycle 1.1 FVCADTOT Universe: All respondents
+    -   cycle 2.1 FVCCDTOT Universe: All respondents
+    -   cycle 3.1 FVCEDTOT Universe: Respondents with FVCEFOPT = 1
+
+Need to make a decision about what to do about this. Delete or keep/impute later?
+
+```{r analytic0, warning=FALSE, message=FALSE, cache = TRUE}
+dim(analytic)
+analytic1 <- analytic
+# analytic1$South[analytic1$province.check == "NFLD & LAB."] <- NA
+# analytic1$South[analytic1$province.check == "YUKON/NWT/NUNA."] <- NA
+# analytic1 <- subset(analytic, province.check != "NFLD & LAB." & 
+#                       province.check != "YUKON/NWT/NUNA." )
+dim(analytic1)
+
+analytic1$copd <- NULL # will bring this later for missing data analysis
+# CreateTableOne(data = analytic1, strata = "OA", includeNA = TRUE)
+# analytic1 <- droplevels.data.frame(analytic1)
+analytic1$province.check <- NULL # we already have simplified province variable
+# CreateTableOne(data = analytic1, strata = "OA", includeNA = TRUE)
+```
+
+#### Set appropriate reference
+
+Save the original data (with missing values)!
+
+```{r analytic2, warning=FALSE, message=FALSE, cache = TRUE}
+analytic.miss <- analytic1
+```
+
+```{r analytic3, warning=FALSE, message=FALSE, cache = TRUE}
+analytic.miss$smoke <- relevel(as.factor(analytic.miss$smoke), ref='Never smoker')
+analytic.miss$drink <- relevel(as.factor(analytic.miss$drink), ref='Never drank')
+analytic.miss$province <- relevel(as.factor(analytic.miss$province), ref='South')
+analytic.miss$immigrate <- relevel(as.factor(analytic.miss$immigrate), ref='not immigrant')
+```
+
+#### Complete data options
+
+```{r analytic4, warning=FALSE, message=FALSE, cache = TRUE}
+# Wrong thing to do for survey data analysis!!
+analytic2 <- as.data.frame(na.omit(analytic1)) 
+dim(analytic2)
+# tab1 <- CreateTableOne(data = analytic2, strata = "OA", includeNA = TRUE)
+# print(tab1, test=FALSE, showAllLevels = TRUE)
+```
+
+### Saving dataset
+
+```{r saveall, warning=FALSE, message=FALSE, cache = TRUE}
+dim(cc123a)
+dim(analytic)
+dim(analytic.miss)
+dim(analytic2)
+save(analytic.miss, analytic2, file = "Data/surveydata/cchs123b.RData")
+```

@@ -1,0 +1,338 @@
+## PSM in NHANES {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
+# Load required packages
+library(MatchIt)
+require(tableone)
+require(survey)
+require(cobalt)
+require(Publish)
+require(optmatch)
+require(data.table)
+require(ggstance)
+require(DataExplorer)
+require(jtools)
+```
+
+### Propensity analysis problem
+
+-   Perform a **propensity score matching** (pair matching, without replacement, using SMD cut-point 0.2, may adjust for imbalanced and/or all covariates in the outcome model, if any) analysis as per the following recommendations
+    -   [@zanutto2006comparison]
+    -   [@dugoff2014generalizing]
+    -   [@austin2018propensity]
+
+#### Dataset
+
+-   The following modified NHANES dataset
+    -   NHANES15lab5.RData
+-   use the data set "analytic.with.miss" within this file.
+    -   for obtaining the final treatment effect estimates, you can omit missing values, but only after creating the design (e.g., subset the design, not the data itself directly).
+
+#### Variables
+
+-   Outcome: diabetes
+    -   'No' as the reference category
+-   Exposure: bmi
+    -   convert to binary with \>25 vs. \<= 25,
+    -   with \> 25 as the reference category
+-   Confounder list:
+    -   gender
+    -   age
+        -   assume continuous
+    -   race
+    -   income
+    -   education
+    -   married
+    -   cholesterol
+    -   diastolicBP
+    -   systolicBP
+-   Mediator:
+    -   physical.work
+        -   'No' as the reference category
+-   Survey features
+    -   psu
+    -   strata
+    -   weight
+
+### Pre-processing
+
+#### Load data
+
+```{r data, cache=TRUE}
+load(file="Data/propensityscore/NHANES15lab5.RData")
+```
+
+#### Variable summary
+
+```{r varsum, cache=TRUE}
+# Exposure
+analytic.with.miss$bmi <- with(analytic.with.miss, 
+                                   ifelse(bmi>25, "Overweight", 
+                                          ifelse(bmi<=25, "Not overweight", NA)))
+analytic.with.miss$bmi <- as.factor(analytic.with.miss$bmi)
+analytic.with.miss$bmi <- relevel(analytic.with.miss$bmi, ref = "Overweight")
+
+# Drop unnecessary variables 
+analytic.with.miss$born <- NULL
+analytic.with.miss$physical.work <- NULL
+
+# Rename the weight variable into interview.weight
+names(analytic.with.miss)[names(analytic.with.miss) == "weight"] <- "interview.weight"
+```
+
+#### Reproducibility
+
+```{r seed, cache=TRUE}
+set.seed(504)
+```
+
+### Approach by Zanutto (2006)
+
+#### Step 1
+
+```{r Zanstep1, cache=TRUE}
+# Specify the PS model to estimate propensity scores
+ps.formula <- as.formula(I(bmi=="Not overweight") ~ gender + age + race + income + education + 
+                           married + cholesterol + diastolicBP + systolicBP)
+```
+
+#### Step 2
+
+```{r Zanstep2, cache=TRUE}
+require(MatchIt)
+# Complete data for matching
+analytic.data <- analytic.with.miss[complete.cases(analytic.with.miss),]
+
+# Create a missing variable in the original dataset
+analytic.with.miss$miss <- 1
+analytic.with.miss$miss[analytic.with.miss$ID %in% analytic.data$ID] <- 0
+
+# Propensity scores
+ps.fit <- glm(ps.formula, data = analytic.data, family = binomial("logit"))
+analytic.data$PS <- predict(ps.fit, type = "response", newdata = analytic.data)
+
+# Caliper fixing to 0.2*sd(logit of PS)
+caliper <- 0.2*sd(log(analytic.data$PS/(1-analytic.data$PS)))
+
+# Match exposed and unexposed subjects 
+match.obj <- matchit(ps.formula, data = analytic.data,
+                     distance = analytic.data$PS, 
+                     method = "nearest", 
+                     replace = FALSE,
+                     caliper = caliper, 
+                     ratio = 1)
+analytic.data$PS <- match.obj$distance
+
+# Extract matched data
+matched.data <- match.data(match.obj) 
+```
+
+#### Step 3
+
+```{r Zanstep3, cache=TRUE}
+# Balance checking
+cov <- c("gender", "age", "race", "income", 
+         "education", "married", "cholesterol", 
+         "diastolicBP", "systolicBP")
+
+tab1m <- CreateTableOne(strata = "bmi", vars = cov, data = matched.data, test = F)
+print(tab1m, smd = TRUE)
+```
+
+All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.
+
+#### Step 4
+
+```{r Zanstep4, warning=F, message=F, cache=TRUE}
+require(survey)
+# Setup the design with survey features
+analytic.with.miss$matched <- 0
+analytic.with.miss$matched[analytic.with.miss$ID %in% matched.data$ID] <- 1
+
+# Survey setup for full data
+w.design0 <- svydesign(strata = ~strata, id = ~psu, weights = ~interview.weight, 
+                      data = analytic.with.miss, nest = TRUE)
+
+# Subset matched data
+w.design.m <- subset(w.design0, matched == 1)
+
+# Outcome model
+out.formula <- as.formula(I(diabetes == "Yes") ~ bmi)
+fit <- svyglm(out.formula, design = w.design.m, family = binomial("logit"))
+require(jtools)
+summ(fit, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+#### Double adjustment
+
+```{r Zandoubleadj, message=F, warning=F, cache=TRUE}
+library(survey)
+# Outcome model with covariates adjustment
+fit.DA <- svyglm(I(diabetes == "Yes") ~ bmi + gender + age + race + income + 
+                 education + married + cholesterol + diastolicBP + systolicBP, 
+               design = w.design.m, family = binomial("logit"))
+summ(fit.DA, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+### Approach by DuGoff et al. (2014)
+
+#### Step 1
+
+```{r duGstep1, cache=TRUE}
+# Specify the PS model to estimate propensity scores
+ps.formula2 <- as.formula(I(bmi == "Not overweight") ~ gender + age + race + income + education + 
+                           married + cholesterol + diastolicBP + systolicBP + 
+                           psu + strata + interview.weight)
+```
+
+#### Step 2
+
+```{r duGstep2, cache=TRUE}
+# Propensity scores
+ps.fit2 <- glm(ps.formula2, data = analytic.data, family = binomial("logit"))
+analytic.data$PS2 <- fitted(ps.fit2)
+
+# Caliper fixing to 0.2*sd(logit of PS)
+caliper2 <- 0.2*sd(log(analytic.data$PS2/(1-analytic.data$PS2)))
+
+# Match exposed and unexposed subjects 
+set.seed(504)
+match.obj2 <- matchit(ps.formula2, data = analytic.data,
+                     distance = analytic.data$PS2, 
+                     method = "nearest", 
+                     replace = FALSE,
+                     caliper = caliper2, 
+                     ratio = 1)
+analytic.data$PS2 <- match.obj2$distance
+
+# Extract matched data
+matched.data2 <- match.data(match.obj2) 
+```
+
+#### Step 3
+
+```{r duGstep3, cache=TRUE}
+# Balance checking
+cov2 <- c("gender", "age", "race", "income", 
+          "education", "married", "cholesterol", 
+         "diastolicBP", "systolicBP", 
+         "psu", "strata", "interview.weight")
+
+tab1m2 <- CreateTableOne(strata = "bmi", vars = cov2, data = matched.data2, test = F)
+print(tab1m2, smd = TRUE)
+```
+
+All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.
+
+#### Step 4
+
+```{r duGstep4, message=F, warning=F, cache=TRUE}
+# Setup the design with survey features
+analytic.with.miss$matched2 <- 0
+analytic.with.miss$matched2[analytic.with.miss$ID %in% matched.data2$ID] <- 1
+
+# Survey setup for full data
+w.design02 <- svydesign(strata = ~strata, id = ~psu, weights = ~interview.weight, 
+                       data = analytic.with.miss, nest = TRUE)
+
+# Subset matched data
+w.design.m2 <- subset(w.design02, matched2 == 1)
+
+# Outcome model
+out.formula <- as.formula(I(diabetes == "Yes") ~ bmi)
+fit2 <- svyglm(out.formula, design = w.design.m2, family = binomial("logit"))
+summ(fit2, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+#### Double adjustment
+
+```{r duGdoubleadj2, warning=F, message=F, cache=TRUE}
+# Outcome model with covariates adjustment
+fit2.DA <- svyglm(I(diabetes == "Yes") ~ bmi + gender + age + race + income + 
+                 education + married + cholesterol + diastolicBP + systolicBP, 
+               design = w.design.m, family = binomial("logit"))
+summ(fit2.DA, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+### Approach by Austin et al. (2018)
+
+#### Step 1
+
+```{r Ausstep1, cache=TRUE}
+# Specify the PS model to estimate propensity scores
+ps.formula3 <- as.formula(I(bmi == "Not overweight") ~ gender + age + race + income + education + 
+                           married + cholesterol + diastolicBP + systolicBP)
+
+# Survey design
+require(survey)
+analytic.design <- svydesign(id = ~psu, weights = ~interview.weight, strata = ~strata,
+                             data = analytic.data, nest = TRUE)
+```
+
+#### Step 2
+
+```{r Ausstep2, warning=F, message=F, cache=TRUE}
+# Propensity scores
+ps.fit3 <- svyglm(ps.formula3, design = analytic.design, family = binomial("logit"))
+analytic.data$PS3 <- fitted(ps.fit3)
+
+# Caliper fixing to 0.2*sd(logit of PS)
+caliper3 <- 0.2*sd(log(analytic.data$PS3/(1-analytic.data$PS3)))
+
+# Match exposed and unexposed subjects 
+set.seed(504)
+match.obj3 <- matchit(ps.formula, data = analytic.data,
+                     distance = analytic.data$PS3, 
+                     method = "nearest", 
+                     replace = FALSE,
+                     caliper = caliper3, 
+                     ratio = 1)
+analytic.data$PS3 <- match.obj3$distance
+
+# Extract matched data
+matched.data3 <- match.data(match.obj3) 
+```
+
+#### Step 3
+
+```{r Ausstep, cache=TRUE}
+# Balance checking
+cov <- c("gender", "age", "race", "income", 
+         "education", "married", "cholesterol", 
+         "diastolicBP", "systolicBP")
+
+tab1m3 <- CreateTableOne(strata = "bmi", vars = cov, data = matched.data3, test = F)
+print(tab1m3, smd = TRUE)
+```
+
+All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.
+
+#### Step 4
+
+```{r Ausstep4, warning=F, message=F, cache=TRUE}
+# Setup the design with survey features
+analytic.with.miss$matched3 <- 0
+analytic.with.miss$matched3[analytic.with.miss$ID %in% matched.data3$ID] <- 1
+
+# Survey setup for full data
+w.design03 <- svydesign(strata = ~strata, id = ~psu, weights = ~interview.weight, 
+                       data = analytic.with.miss, nest = TRUE)
+
+# Subset matched data
+w.design.m3 <- subset(w.design03, matched3 == 1)
+
+# Outcome model
+out.formula <- as.formula(I(diabetes == "Yes") ~ bmi)
+fit3 <- svyglm(out.formula, design = w.design.m3, family = binomial("logit"))
+summ(fit3, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+#### Double adjustment
+
+```{r Ausdoubleadj, warning=F, message=F, cache=TRUE}
+# Outcome model with covariates adjustment
+fit3.DA <- svyglm(I(diabetes == "Yes") ~ bmi + gender + age + race + income + 
+                 education + married + cholesterol + diastolicBP + systolicBP, 
+               design = w.design.m, family = binomial("logit"))
+summ(fit3.DA, exp = TRUE, confint = TRUE, digits = 3)
+```

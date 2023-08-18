@@ -1,0 +1,157 @@
+## Effect modification {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+require(interactions)
+require(mitools)
+require(mice)
+require(miceadds)
+library(modelsummary)
+
+tidy.pool_mi <- function(x, ...) {
+  msg <- capture.output(out <- summary(x, ...))
+  out$term <- row.names(out)
+  colnames(out) <- c("estimate", "std.error", "statistic", "p.value",
+                     "conf.low", "conf.high", "miss", "term")
+  return(out)
+}
+```
+
+### Data
+
+```{r data, cache=TRUE}
+require(mitools)
+data(smi)
+length(smi)
+length(smi[[1]])
+head(smi[[1]][[1]])
+```
+
+### Model with interaction and ORs
+
+Wave is exposure here.
+
+For effect modifier sex = 0
+
+```{r em0, cache=TRUE}
+models <- with(smi, glm(drinkreg~ wave + sex + wave*sex, family = binomial()))
+summary(pool(models, rule = "rubin1987"), conf.int = TRUE, exponentiate = TRUE)[2,]
+```
+
+For effect modifier sex = 1 (just changing reference)
+
+```{r em1, cache=TRUE}
+models2<-with(smi, glm(drinkreg~ wave + I(sex==0) + wave*I(sex==0),family=binomial()))
+summary(pool(models2, rule = "rubin1987"),conf.int = TRUE, exponentiate = TRUE)[2,]
+```
+
+-   Notice the ORs for `wave` in the above 2 analyses. These are basically our target.
+-   For proper survey data analysis, you will have to work with design and make sure you subset your subpopulation (those eligible) appropriately.
+
+### Simple slopes analyses
+
+```{r em2, cache=TRUE}
+a1 <- sim_slopes(models[[1]], pred = wave, modx = sex)
+a2 <- sim_slopes(models[[2]], pred = wave, modx = sex)
+a3 <- sim_slopes(models[[3]], pred = wave, modx = sex)
+a4 <- sim_slopes(models[[4]], pred = wave, modx = sex)
+a5 <- sim_slopes(models[[5]], pred = wave, modx = sex)
+```
+
+### Pooled results for sex = 0
+
+```{r em3, cache=TRUE}
+# For sex = 0
+ef.lev <- 1
+est <- c(a1$slopes$Est.[ef.lev],
+         a2$slopes$Est.[ef.lev],
+         a3$slopes$Est.[ef.lev],
+         a4$slopes$Est.[ef.lev],
+         a5$slopes$Est.[ef.lev])
+se <- c(a1$slopes$S.E.[ef.lev],
+        a2$slopes$S.E.[ef.lev],
+        a3$slopes$S.E.[ef.lev],
+        a4$slopes$S.E.[ef.lev],
+        a5$slopes$S.E.[ef.lev])
+vr <- se^2
+OR <- exp(est)
+OR.se <- OR * se
+OR.v <- OR.se^2
+
+mod_pooled <- miceadds::pool_mi(qhat=OR, u=OR.v)
+tidy.pool_mi(mod_pooled)
+summary(MIcombine(as.list(OR), as.list(OR.v)))
+```
+
+### Pooled results for sex = 1
+
+```{r em4, cache=TRUE}
+# For sex = 1
+ef.lev <- 2
+est <- c(a1$slopes$Est.[ef.lev],
+         a2$slopes$Est.[ef.lev],
+         a3$slopes$Est.[ef.lev],
+         a4$slopes$Est.[ef.lev],
+         a5$slopes$Est.[ef.lev])
+se <- c(a1$slopes$S.E.[ef.lev],
+        a2$slopes$S.E.[ef.lev],
+        a3$slopes$S.E.[ef.lev],
+        a4$slopes$S.E.[ef.lev],
+        a5$slopes$S.E.[ef.lev])
+vr <- se^2
+OR <- exp(est)
+OR.se <- OR * se
+OR.v <- OR.se^2
+
+mod_pooled <- miceadds::pool_mi(qhat=OR, u=OR.v)
+tidy.pool_mi(mod_pooled)
+summary(MIcombine(as.list(OR), as.list(OR.v)))
+```
+
+```{r em5, include=FALSE, echo=FALSE, cache=TRUE}
+# (Optional) log-odds
+# Optional: Breakdown of results
+mod_pooled <- miceadds::pool_mi(qhat=est, u=se)
+tidy.pool_mi(mod_pooled)
+summary(pool(models2, rule = "rubin1987"),conf.int = TRUE)[2,]
+summary(MIcombine(models2))[2,]
+# beta coef estimates
+m.number <- length(models)
+estimate <- mean(est)
+estimate
+ubar.var <- mean(se^2)
+ubar.var
+b.var <- var(est)
+b.var
+t.var <- ubar.var + b.var + b.var/m.number
+t.var
+riv = (b.var + b.var/m.number)/ubar.var
+riv
+lambda = (b.var + b.var/m.number)/t.var
+lambda
+dfcom <- nrow(smi[[1]][[1]]) - 4
+dfcom
+df.large.sample <- (m.number - 1)/lambda^2
+df.large.sample
+df.obs <- (dfcom + 1)/(dfcom + 3) * dfcom * (1 - lambda)
+df.c <- df.large.sample * df.obs/(df.large.sample + df.obs)
+df.c
+fmi = (riv + 2/(df.c +3)) / (1 + riv)
+fmi
+# p-values (correction needed)
+# https://stats.stackexchange.com/questions/69130/how-to-get-pooled-p-values-on-tests-done-in-multiple-imputed-datasets
+# Licht and Rubin for one-sided tests
+pv <- c(a1$slopes$p[1],a2$slopes$p[1],a3$slopes$p[1],a4$slopes$p[1],a5$slopes$p[1])
+z <- qnorm(pv)  
+num <- mean(z)
+den <- sqrt(1 + var(z))
+pnorm( num / den)
+median(pv) # Eekhout et al (2017) 
+```
+
+## YouTube Videos
+
+You could watch the videos describing [missingness type](https://youtu.be/KnBkYkHfGG0), [single imputation](https://youtu.be/TO_HlHuHbgU), [multiple imputation](https://youtu.be/izQB-n-euro), [variable selection with multiple imputation](https://youtu.be/cOGP_dELgyo), [diagnostics and convergence](https://youtu.be/umY1gmMhriA), [multiple imputation in complex survey](https://youtu.be/nFOL9fdJTY8), []()
+
+

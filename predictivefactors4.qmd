@@ -1,0 +1,224 @@
+## Overfitting and performance {.unnumbered}
+
+```{r setup, warning=FALSE, cache=TRUE, message=FALSE}
+# Load required packages
+library(caret)
+library(knitr)
+library(Publish)
+library(car)
+```
+
+### Load data
+
+Load the data saved at the end of previous part of the lab.
+
+```{r load, warning=FALSE, cache=TRUE}
+load(file="Data/predictivefactors/cholesterolNHANES15part2.RData")
+```
+
+Now we will fit the final model that we decided at the end of previous part of the lab.
+
+```{r lm, warning=FALSE, cache=TRUE}
+formula4 <- as.formula("cholesterol~gender + age + born + 
+             race + education + married + 
+             income + diastolicBP + systolicBP + 
+             bmi +
+             triglycerides + uric.acid + 
+             protein + bilirubin + phosphorus + sodium + potassium + 
+             globulin + calcium + physical.work + physical.recreational + 
+             diabetes")
+formula4
+fit4 <- lm(formula4, data = analytic3)
+summary(fit4)
+```
+
+### Design Matrix
+
+Expands factors to a set of dummy variables.
+
+::: callout-tip
+We can use the `model.matrix` function to construct a design/model matrix, such as expand factor variables to a matrix of dummy variable 
+:::
+
+
+```{r dim, warning=FALSE, cache=TRUE}
+head(model.matrix(fit4))
+
+# Dimension of the model matrix
+dim(model.matrix(fit4))
+
+# Number of parameters = intercept + slopes
+p <- dim(model.matrix(fit4))[2] 
+p
+```
+
+### Check prediction
+
+```{r pred, warning=FALSE, cache=TRUE}
+obs.y <- analytic3$cholesterol
+summary(obs.y)
+
+# Predict the above fit on analytic3 data
+pred.y <- predict(fit4, analytic3)
+summary(pred.y)
+n <- length(pred.y)
+n
+plot(obs.y,pred.y)
+lines(lowess(obs.y,pred.y), col = "red")
+
+# Prediction on a new data: fictitious.data
+str(fictitious.data)
+pred.y.new1 <- predict(fit4, fictitious.data)
+summary(pred.y.new1)
+```
+
+### Measuring prediction error
+
+Continuous outcomes
+
+#### R2
+
+::: column-margin 
+See @coefd
+:::
+
+```{r pe, warning=FALSE, cache=TRUE}
+# Find SSE
+SSE <- sum( (obs.y - pred.y)^2 )
+SSE
+
+# Find SST
+mean.obs.y <- mean(obs.y)
+SST <- sum( (obs.y - mean.obs.y)^2 )
+SST
+
+# Find R2
+R.2 <- 1- SSE/SST
+R.2
+
+require(caret)
+R2(pred.y, obs.y)
+```
+
+#### RMSE
+
+::: column-margin 
+See @anova
+:::
+
+```{r rmse, warning=FALSE, cache=TRUE}
+# Find RMSE
+Rmse <- sqrt(SSE/(n-p)) 
+Rmse
+
+RMSE(pred.y, obs.y)
+```
+
+#### Adj R2
+
+::: column-margin 
+See @coefd
+:::
+
+```{r adjr2, warning=FALSE, cache=TRUE}
+# Find adj R2
+adjR2 <- 1-(1-R.2)*((n-1)/(n-p))
+adjR2
+```
+
+### Writing function
+
+#### Syntax for Writing Functions
+
+```{r func, eval=FALSE}
+func_name <- function (argument) {
+  A statement or multiple lines of statements
+  return(output)
+}
+```
+
+#### Example of a simple function
+
+```{r simfunc, warning=FALSE, cache=TRUE}
+f1 <- function(a,b){
+  result <- a + b
+  return(result)
+}
+f1(a=1,b=3)
+f1(a=1,b=6)
+# setting default values
+f1 <- function(a=1,b=1){
+  result <- a + b
+  return(result)
+}
+f1()
+f1(b = 10)
+```
+
+#### A bit more complicated
+
+```{r compfunc, warning=FALSE, cache=TRUE}
+# one argument
+model.fit <- function(data.for.fitting){
+  formulax <- as.formula("cholesterol~gender + age + born")
+  fitx <- lm(formulax, data = data.for.fitting)
+  result <- coef(fitx)
+  return(result)
+}
+model.fit(data.for.fitting=analytic)
+model.fit(data.for.fitting=analytic3)
+```
+
+```{r compfunc2, warning=FALSE, cache=TRUE}
+# adding one more argument: digits
+model.fit <- function(data.for.fitting, digits=2){
+  formulax <- as.formula("cholesterol~gender + age + born")
+  fitx <- lm(formulax, data = data.for.fitting)
+  result <- coef(fitx)
+  result <- round(result,digits)
+  return(result)
+}
+model.fit(data.for.fitting=analytic)
+model.fit(data.for.fitting=analytic3)
+```
+
+#### Function that gives performance measures
+let us create a function that will give us the performance measures:
+
+```{r perfom, warning=FALSE, cache=TRUE}
+perform <- function(new.data,
+                    model.fit,model.formula=NULL, 
+                    y.name = "Y",
+                    digits=3){
+  # data dimension
+  p <- dim(model.matrix(model.fit))[2]
+  
+  # predicted value
+  pred.y <- predict(model.fit, new.data)
+  
+  # sample size
+  n <- length(pred.y)
+  
+  # outcome
+  new.data.y <- as.numeric(new.data[,y.name])
+  
+  # R2
+  R2 <- caret:::R2(pred.y, new.data.y)
+  
+  # adj R2 using alternate formula
+  df.residual <- n-p
+  adjR2 <- 1-(1-R2)*((n-1)/df.residual)
+  
+  # RMSE
+  RMSE <-  caret:::RMSE(pred.y, new.data.y)
+  
+  # combine all of the results
+  res <- round(cbind(n,p,R2,adjR2,RMSE),digits)
+  
+  # returning object
+  return(res)
+}
+perform(new.data = analytic3, y.name = "cholesterol", model.fit = fit4)
+```
+
+### References

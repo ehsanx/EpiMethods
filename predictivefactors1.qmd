@@ -1,0 +1,46 @@
+## Collinear predictors {.unnumbered}
+
+```{r setup, warning=FALSE, cache=TRUE, message=FALSE}
+# Load required packages
+library(rms)
+library(Hmisc)
+```
+
+### Load data
+Let us load the dataset and see structure of the variables:
+```{r load, warning=FALSE, cache=TRUE}
+load(file = "Data/predictivefactors/cholesterolNHANES15.RData")
+#head(analytic)
+str(analytic)
+```
+
+### Describe the data
+
+```{r data, warning=FALSE, cache=TRUE}
+require(rms)
+describe(analytic) 
+```
+
+### Identify collinear predictors
+
+::: callout-tip
+We can use `hclust` and `varclus` or variable clustering, i.e., to identify collinear predictors
+:::
+
+::: column-margin 
+`hclust` is the hierarchical clustering function where default is squared Spearman correlation coefficients to detect monotonic but nonlinear relationships.
+:::
+
+```{r collinear, warning=FALSE, cache=TRUE}
+require(Hmisc)
+sel.names <- c("gender", "age", "born", "race", "education", "married", 
+               "income", "diastolicBP", "systolicBP", 
+               "bodyweight", "bodyheight", "bmi", "waist", "smoke", "alcohol", 
+               "cholesterol", "triglycerides", "uric.acid", 
+               "protein", "bilirubin", "phosphorus", "sodium", "potassium", 
+               "globulin", "calcium", "physical.work", "physical.recreational", 
+               "diabetes")
+var.cluster <- varclus(~., data = analytic[sel.names])
+# var.cluster
+plot(var.cluster)
+```

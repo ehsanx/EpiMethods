@@ -1,0 +1,208 @@
+## MI in complex survey {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(mice)
+library(DataExplorer)
+library(VIM)
+library(jtools)
+library(survey)
+library(mitools)
+```
+
+### Complex Survey data
+
+```{r load, cache=TRUE}
+load("Data/missingdata/NHANES17.RData")
+
+Vars <- c("ID", "weight", "psu", "strata", 
+          "gender", "born", "race", 
+          "bmi", "cholesterol", "diabetes")
+analyticx <- analytic.with.miss[,Vars]
+plot_missing(analyticx)
+md.pattern(analyticx)
+```
+
+### Imputing
+
+```{r imp, cache=TRUE}
+# imputation <- mice(analyticx, m=5, maxit=5, seed = 504007)
+set.seed(504)
+imputation <- parlmice(analyticx, m=5, maxit=5, cluster.seed=504007)
+```
+
+### Create new variable
+
+```{r newvar, cache=TRUE}
+impdata <- complete(imputation, action="long") #stacked data
+impdata$cholesterol.bin <- ifelse(impdata$cholesterol < 200, "healthy", "unhealthy")
+impdata$cholesterol.bin <- as.factor(impdata$cholesterol.bin)
+dim(impdata)
+head(impdata)
+```
+
+### Checking the data
+
+```{r check1, cache=TRUE }
+plot_missing(subset(impdata, subset=.imp==1))
+plot_missing(subset(impdata, subset=.imp==2))
+```
+
+```{r check2, cache=TRUE }
+analytic.miss1 <- subset(impdata, subset=.imp==1)
+head(analytic.miss1$ID) # full data
+
+analytic1 <- as.data.frame(na.omit(analytic.miss1))
+head(analytic1$ID) # complete case
+
+head(analytic.miss1$ID[analytic.miss1$ID %in% analytic1$ID])
+
+analytic.miss1$miss <- 1
+analytic.miss1$miss[analytic.miss1$ID %in% analytic1$ID] <- 0
+table(analytic.miss1$miss)
+
+head(analytic.miss1$ID[analytic.miss1$miss==1])
+tail(analytic.miss1$ID[analytic.miss1$miss==1])
+```
+
+```{r check3, cache=TRUE }
+analytic.miss2 <- subset(impdata, subset=.imp==2)
+head(analytic.miss2$ID) # full data
+
+analytic2 <- as.data.frame(na.omit(analytic.miss2))
+head(analytic2$ID) # complete case
+
+head(analytic.miss2$ID[analytic.miss2$ID %in% analytic2$ID])
+
+analytic.miss2$miss <- 1
+analytic.miss2$miss[analytic.miss2$ID %in% analytic2$ID] <- 0
+table(analytic.miss2$miss)
+
+head(analytic.miss1$ID[analytic.miss1$miss==1])
+tail(analytic.miss1$ID[analytic.miss1$miss==1])
+```
+
+```{r check4, cache=TRUE }
+impdata$miss<-1
+m <- 5
+for (i in 1:m){
+  impdata$miss[impdata$.imp == i] <- analytic.miss2$miss
+  print(table(impdata$miss[impdata$.imp == i]))
+}
+```
+
+### Combining data
+
+```{r combine1, cache=TRUE }
+library(mitools) 
+allImputations <- imputationList(list(
+  subset(impdata, subset=.imp==1),
+  subset(impdata, subset=.imp==2),
+  subset(impdata, subset=.imp==3),
+  subset(impdata, subset=.imp==4), 
+  subset(impdata, subset=.imp==5)))
+str(allImputations)
+```
+
+### Combining data efficiently
+
+```{r combine2, cache=TRUE, warning=FALSE, message=FALSE}
+m <- 5
+set.seed(123)
+allImputations <-  imputationList(lapply(1:m, 
+                                         function(n)  
+                                           subset(impdata, subset=.imp==n)))
+                                           #mice::complete(imputation, action = n)))
+summary(allImputations)
+str(allImputations)
+```
+
+### Logistic regression
+
+```{r fit0, cache=TRUE, warning=FALSE, message=FALSE}
+require(jtools)
+require(survey)
+data.list <- vector("list", m)
+model.formula <- as.formula("I(cholesterol.bin=='healthy')~diabetes+gender+born+race+bmi")
+```
+
+```{r fit1, cache=TRUE}
+summary(allImputations$imputations[[1]]$weight)
+sum(allImputations$imputations[[1]]$weight==0)
+w.design0 <- svydesign(ids=~psu, weights=~weight, strata=~strata,
+                           data = allImputations, nest = TRUE)
+w.design <- subset(w.design0, miss == 0)
+fits <- with(w.design, svyglm(model.formula, family=quasibinomial))
+# Estimate from first data
+exp(coef(fits[[1]]))[2]
+exp(confint(fits[[1]]))[2,]
+# Estimate from second data
+exp(coef(fits[[2]]))[2]
+exp(confint(fits[[2]]))[2,]
+```
+
+### Pooled / averaged estimates
+
+```{r fit2, cache=TRUE}
+pooled.estimates <- MIcombine(fits)
+sum.pooled <- summary(pooled.estimates)
+exp(sum.pooled[,1])
+OR <- round(exp(pooled.estimates$coefficients),2) 
+OR <- as.data.frame(OR)
+CI <- round(exp(confint(pooled.estimates)),2)
+sig <- (CI[,1] < 1 & CI[,2] > 1)
+sig <- ifelse(sig==FALSE, "*", "")
+OR <- cbind(OR,CI,sig)
+OR
+```
+
+### Step-by-step example
+
+```{r fit3, cache=TRUE}
+fits2 <- vector("list", m)
+for (i in 1:m) {
+  analytic.i <- allImputations$imputations[[i]]
+  w.design0.i <- svydesign(id=~psu, strata=~strata, weights=~weight,
+                        data=analytic.i, nest = TRUE)
+  w.design.i <- subset(w.design0.i, miss == 0)
+  fit <- svyglm(model.formula, design=w.design.i, 
+                family = quasibinomial("logit"))
+  print(summ(fit))
+  fits2[[i]] <- fit
+}
+```
+
+```{r fit4, cache=TRUE}
+pooled.estimates <- MIcombine(fits2)
+summary(pooled.estimates)
+summary(pooled.estimates,logeffect=TRUE, digits = 2)
+```
+
+### Variable selection
+
+```{r fit5, cache=TRUE}
+require(jtools)
+require(survey)
+data.list <- vector("list", m)
+model.formula <- as.formula("cholesterol~diabetes+gender+born+race+bmi")
+scope <- list(upper = ~ diabetes+gender+born+race+bmi,
+              lower = ~ diabetes)
+for (i in 1:m) {
+  analytic.i <- allImputations$imputations[[i]]
+  w.design0.i <- svydesign(id=~psu, strata=~strata, weights=~weight,
+                        data=analytic.i, nest = TRUE)
+  w.design.i <- subset(w.design0.i, miss == 0)
+  fit <- svyglm(model.formula, design=w.design.i)
+  fitstep <- step(fit, scope = scope, trace = FALSE,
+                              direction = "backward")
+  data.list[[i]] <- fitstep
+}
+```
+
+Variables selected
+
+```{r stepTab, cache=TRUE}
+x <- all.vars(formula(fit))
+for (i in 1:m) x <- c(x, all.vars(formula(data.list[[i]])))
+table(x)-1
+```

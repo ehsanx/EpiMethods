@@ -1,0 +1,77 @@
+## Importing dataset {.unnumbered}
+
+### Introduction to Data Importing
+
+Before analyzing data in R, one of the first steps you'll typically undertake is importing your dataset. R provides numerous methods to do this, depending on the format of your dataset.
+
+```{r setup, warning=FALSE, message=FALSE, cache = TRUE, include=FALSE}
+# Load required packages
+library(tidyverse)
+library(dplyr)
+```
+
+Datasets come in a variety of file formats, with .csv (Comma-Separated Values) and .txt (Text file) being among the most common. While R's interface offers manual ways to load these datasets, knowing how to code this step ensures better reproducibility and automation.
+
+### Importing .txt files
+
+A .txt data file can be imported using the `read.table` function. As an example, consider you have a dataset named grade in the specified path. 
+
+Let's briefly glance at the file without concerning ourselves with its formatting.
+
+```{r, warning=FALSE, message=FALSE}
+# Read and print the content of the TXT file
+content <- readLines("Data/wrangling/grade.txt")
+cat(content, sep = "\n")
+```
+
+Using the `read.table` function, you can load this dataset in R properly. It's important to specify `header = TRUE` if the first row of your dataset contains variable names.
+
+> **Tip**: Always ensure the `header` argument matches the structure of your dataset. If your dataset contains variable names, set `header = TRUE`.
+
+```{r load1, cache=TRUE}
+## Read a text dataset
+grade <- read.table("Data/wrangling/grade.txt", header = TRUE, sep = "\t", quote = "\"")
+# Display the first few rows of the dataset
+head(grade)
+```
+
+### Importing .csv files
+
+Similarly, .csv files can be loaded using the `read.csv` function. Here's how you can load a .csv dataset named mpg:
+
+```{r load2, cache=TRUE}
+## Read a csv dataset
+mpg <- read.csv("Data/wrangling/mpg.csv", header = TRUE)
+# Display the first few rows of the dataset
+head(mpg)
+```
+
+While we've discussed two popular data formats, R can handle a plethora of other formats. For further details, refer to @importdata. Notably, some datasets come built-in with R packages, like the mpg dataset in the ggplot2 package. To load such a dataset:
+
+```{r load3, cache=TRUE}
+data(mpg, package = "ggplot2")
+head(mpg)
+```
+
+To understand more about the variables and the dataset's structure, you can consult the documentation:
+
+```{r load4, cache=TRUE, eval=FALSE}
+?mpg
+```
+
+### Data Screening and Understanding Your Dataset
+
+`dim()`, `nrow()`, `ncol()`, and `str()` are incredibly handy functions when initially exploring your dataset.
+
+Once your data is in R, the next logical step is to get familiar with it. Knowing the dimensions of your dataset, types of variables, and the first few entries can give you a quick sense of what you're dealing with.
+
+For instance, `str` (short for structure) is a concise way to display information about your data. It reveals the type of each variable, the first few entries, and the total number of observations:
+
+```{r screen, cache=TRUE}
+str(mpg)
+```
+
+In summary, becoming proficient in data importing and initial screening is a fundamental step in any data analysis process in R. It ensures that subsequent stages of data manipulation and analysis are based on a clear understanding of the dataset at hand.
+
+### References
+

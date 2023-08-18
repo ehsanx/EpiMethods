@@ -1,0 +1,384 @@
+## Analyzing NHANES data 2 {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+library(Publish)
+library(tableone)
+library(ROCR)
+library(WeightedROC)
+library(jtools)
+library(dplyr)
+```
+
+### Preprocessing
+
+#### Analytic data set
+
+We will use `cholesterolNHANES15part1.RData` in this prediction goal question (predicting cholesterol in adults).
+
+For this exercise, we are assuming that:
+
+-   outcome: cholesterol
+
+-   predictors:
+
+    -   gender
+    -   whether born in US
+    -   race
+    -   education
+    -   whether married
+    -   income level
+    -   BMI
+    -   whether has diabetes
+
+-   survey features:
+
+    -   survey weights
+    -   strata
+    -   cluster/PSU; where strata is nested within clusters
+
+    -- restrict to those participants who are of 18 years of age or older
+
+```{r load, message=FALSE, warning=FALSE}
+load("Data/surveydata/cholesterolNHANES15part1.rdata") #Loading the dataset
+ls()
+```
+
+#### Retaining only useful variables
+
+```{r retain, message=FALSE, warning=FALSE}
+# Data dimensions
+dim(analytic)
+
+# Variable names
+names(analytic)
+
+#Subsetting dataset with variables needed:
+require(dplyr)
+anadata <- select(analytic, 
+                  cholesterol, #outcome
+                  gender, age, born, race, education, married, income, bmi, diabetes, #predictors
+                  weight, psu, strata) #survey features
+
+# new data sizes
+dim(anadata)
+
+# retained variable names
+names(anadata)
+
+#Restricting to participants who are 18 or older
+summary(anadata$age) #The age range is already 20-80
+
+#Recoding the born variable
+table(anadata$born, useNA = "always")
+levels(anadata$born)
+anadata$born <- car::recode(anadata$born,
+                            "'Born in 50 US states or Washingt' = 'Born.in.US';
+                            'Others' = 'Others';
+                            else=NA")
+table(anadata$born, useNA = "always")
+```
+
+#### Checking the data for missing
+
+```{r miss0, message=FALSE, warning=FALSE}
+require(DataExplorer)
+plot_missing(anadata) #no missing data
+```
+
+#### Preparing factor and continuous variables appropriately
+
+```{r vars, message=FALSE, warning=FALSE}
+vars = c("cholesterol", "gender", "born", "race", "education", 
+         "married", "income", "bmi", "diabetes")
+numeric.names <- c("cholesterol", "bmi")
+factor.names <- vars[!vars %in% numeric.names] 
+
+anadata[factor.names] <- apply(X = anadata[factor.names],
+                               MARGIN = 2, FUN = as.factor)
+
+anadata[numeric.names] <- apply(X = anadata[numeric.names],
+                                MARGIN = 2, FUN =function (x) 
+                                  as.numeric(as.character(x)))
+```
+
+#### Table 1
+
+```{r tab1, message=FALSE, warning=FALSE}
+library(tableone)
+tab1 <- CreateTableOne(data = anadata, includeNA = TRUE, vars = vars)
+print(tab1, showAllLevels = TRUE,  varLabels = TRUE)
+```
+
+### Q1: Linear regression when cholesterol is continuous
+
+Fit a linear regression, and report the VIFs.
+
+```{r lm, message=FALSE, warning=FALSE}
+#Fitting initial regression
+
+fit0 <- lm(cholesterol ~ gender + born + race + education +
+              married + income + bmi + diabetes,
+            data = anadata)
+
+library(Publish)
+publish(fit0)
+
+#Checking VIFs
+car::vif(fit0) 
+```
+
+All VIFs are small.
+
+### Q2: Test of association when cholesterol is binary
+
+Dichotomize the outcome such that cholesterol\<200 is labeled as 'healthy'; otherwise label it as 'unhealthy', and name it 'cholesterol.bin'. Test the association between this binary variable and gender.
+
+```{r binary, message=FALSE, warning=FALSE}
+#Creating binary variable for cholesterol
+anadata$cholesterol.bin <- ifelse(anadata$cholesterol <200, "healthy", "unhealthy")
+#If cholesterol is <200, then "healthy", if not, "unhealthy"
+
+table(anadata$cholesterol.bin)
+anadata$cholesterol.bin <- as.factor(anadata$cholesterol.bin)
+anadata$cholesterol.bin <- relevel(anadata$cholesterol.bin, ref = "unhealthy")
+```
+
+#### Test of association between cholesterol and gender (no survey features)
+
+```{r test, message=FALSE, warning=FALSE}
+# Simple Chi-square testing
+chisq.chol.gen <- chisq.test(anadata$cholesterol.bin, anadata$gender)
+chisq.chol.gen
+```
+
+#### Setting up survey design
+
+```{r design, message=FALSE, warning=FALSE}
+require(survey)
+summary(anadata$weight)
+w.design <- svydesign(id = ~psu, weights = ~weight, strata = ~strata,
+                      nest = TRUE, data = anadata)
+summary(weights(w.design))
+```
+
+#### Test of association accounting for survey design
+
+```{r raotest, message=FALSE, warning=FALSE}
+#Rao-Scott modifications (chi-sq)
+svychisq(~cholesterol.bin + gender, design = w.design, statistic = "Chisq")
+
+#Thomas-Rao modifications (F)
+svychisq(~cholesterol.bin + gender, design = w.design, statistic = "F") 
+```
+
+All three tests indicate strong evidence to reject the H0. There seems to be an association between gender and cholesterol level (healthy/unhealthy)
+
+### Q3: Table 1
+
+Create a Table 1 (summarizing the covariates) stratified by the binary outcome: cholesterol.bin, utilizing the above survey features.
+
+```{r tab11, message=FALSE, warning=FALSE}
+# Creating Table 1 stratified by binary outcome (cholesterol)
+# Using the survey features
+
+vars2 = c("gender", "born", "race", "education", 
+         "married", "income", "bmi", "diabetes")
+
+
+kableone <- function(x, ...) {
+  capture.output(x <- print(x, showAllLevels= TRUE, padColnames = TRUE, insertLevel = TRUE))
+  knitr::kable(x, ...)
+}
+kableone(svyCreateTableOne(var = vars2, strata= "cholesterol.bin", data=w.design, test = TRUE)) 
+```
+
+### Q4: Logistic regression model
+
+Run a logistic regression model using the same variables, utilizing the survey features. Report the corresponding odds ratios and the 95% confidence intervals.
+
+```{r logistic, message=FALSE, warning=FALSE}
+formula1 <- as.formula(I(cholesterol.bin=="unhealthy") ~ gender + born +
+                         race + education + married + income + bmi +
+                         diabetes)
+
+fit1 <- svyglm(formula1,
+               design = w.design, 
+               family = binomial(link = "logit"))
+
+publish(fit1)
+```
+
+### Q5: Wald test (survey version)
+
+Perform a Wald test (survey version) to test the null hypothesis that all coefficients associated with the income variable are zero, and interpret.
+
+```{r wald, message=FALSE, warning=FALSE}
+#Testing the H0 that all coefficients associated with the income variable are zero
+regTermTest(fit1, ~income)
+```
+
+The Wald test here gives a large p-value; We do not have evidence to reject the H0 of coefficient being 0. If the coefficient for income variable is 0, this means that the outcome in the model (cholesterol) is not affected by income. This suggests that removing income from the model does not statistically improve the model fit. So we can remove income variable from the model.
+
+### Q6: Backward elimination
+
+Run a backward elimination (using the AIC criteria) on the above logistic regression fit (keeping important variables gender, race, bmi, diabetes in the model), and report the odds ratios and the 95% confidence intervals from the resulting final logistic regression fit.
+
+```{r backward, message=FALSE, warning=FALSE}
+#Running backward elimination based on AIC
+require(MASS)
+scope <- list(upper = ~ gender + born + race + education + 
+                married + income + bmi + diabetes,
+              lower = ~ gender + race + bmi + diabetes)
+
+fit3 <- step(fit1, scope = scope, trace = FALSE,
+                k = 2, direction = "backward")
+
+#Odds Ratios
+publish(fit3)
+```
+
+Born and married are also found to be useful on top of gender + race + bmi + diabetes.
+
+### Q7: Interaction terms
+
+Checking interaction terms
+
+-- gender and whether married
+
+-- gender and whether born in the US
+
+-- gender and diabetes
+
+-- whether married and diabetes
+
+```{r int4, message=FALSE, warning=FALSE}
+#gender and married
+fit4 <- update(fit3, .~. + interaction(gender, married))
+anova(fit3, fit4)
+```
+
+Do not include interaction term
+
+```{r int3, message=FALSE, warning=FALSE}
+#gender and born in us
+fit5 <- update(fit3, .~. + interaction(gender, born))
+anova(fit3, fit5)
+```
+
+Do not include interaction term
+
+```{r int2, message=FALSE, warning=FALSE}
+#gender and diabetes
+fit6 <- update(fit3, .~. + interaction(gender, diabetes))
+anova(fit3, fit6)
+```
+
+Do not include interaction term
+
+```{r int1, message=FALSE, warning=FALSE}
+#married and diabetes
+fit7 <- update(fit3, .~. + interaction(married, diabetes))
+anova(fit3, fit7)
+```
+
+Do not include interaction term
+
+None of the interaction terms are improving the model fit.
+
+### Q8: AUC
+
+Report AUC of the final model (only using weight argument) and interpret.
+
+AUC of the final model (only using weight argument) and interpret
+
+```{r auc, message=FALSE, warning=FALSE}
+require(ROCR)
+# WeightedROC may not be on cran for all R versions
+# devtools::install_github("tdhock/WeightedROC")
+
+library(WeightedROC)
+svyROCw <- function(fit = fit3, outcome = anadata$cholesterol.bin == "unhealthy", weight = anadata$weight){
+  if (is.null(weight)){ # require(ROCR)
+    prob <- predict(fit, type = "response")
+  pred <- prediction(as.vector(prob), outcome)
+  perf <- performance(pred, "tpr", "fpr")
+  auc <- performance(pred, measure = "auc")
+  auc <- auc@y.values[[1]]
+  roc.data <- data.frame(fpr = unlist(perf@x.values), tpr = unlist(perf@y.values), 
+      model = "Logistic")
+  with(data = roc.data,plot(fpr, tpr, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,
+     xlab="1 - specificity", ylab="Sensitivity",
+     main = paste("AUC = ", round(auc,3))))
+  mtext("Unweighted ROC")
+  abline(0,1, lty=2)
+  } else { 
+    outcome <- as.numeric(outcome)
+  pred <- predict(fit, type = "response")
+  tp.fp <- WeightedROC(pred, outcome, weight)
+  auc <- WeightedAUC(tp.fp)
+  with(data = tp.fp,plot(FPR, TPR, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,
+     xlab="1 - specificity", ylab="Sensitivity",
+     main = paste("AUC = ", round(auc,3))))
+  abline(0,1, lty=2)
+  mtext("Weighted ROC")
+  }
+}
+svyROCw(fit = fit3, outcome = anadata$cholesterol.bin == "unhealthy", weight = anadata$weight)
+```
+
+The area under the curve in the final model is 0.611, using the survey weighted ROC. The AUC of 0.611 indicates that this model has poor discrimination.
+
+### Q9: Archer-Lemeshow Goodness of fit
+
+Report Archer-Lemeshow Goodness of fit test and interpret (utilizing all the survey features).
+
+```{r gof, message=FALSE, warning=FALSE}
+#Archer-Lemeshow Goodness of fit test utilizing all survey features
+AL.gof2 <- function(fit = fit3, data = anadata, 
+                   weight = "weight", psu = "psu", strata = "strata"){
+  r <- residuals(fit, type = "response") 
+  f<-fitted(fit) 
+  breaks.g <- c(-Inf, quantile(f, (1:9)/10), Inf)
+  breaks.g <- breaks.g + seq_along(breaks.g) * .Machine$double.eps
+  g<- cut(f, breaks.g)
+  data2g <- cbind(data,r,g)
+  newdesign <- svydesign(id=as.formula(paste0("~",psu)),
+                         strata=as.formula(paste0("~",strata)),
+                         weights=as.formula(paste0("~",weight)), 
+                         data=data2g, nest = TRUE)
+  decilemodel <- svyglm(r~g, design=newdesign) 
+  res <- regTermTest(decilemodel, ~g)
+  return(res) 
+}
+
+AL.gof2(fit3, anadata, weight = "weight", psu = "psu", strata = "strata")
+```
+
+Archer and Lemeshow GoF test was used to test the fit of this model. The p-value of 0.3043, which is greater than 0.05. This means that there is no evidence of lack of fit to this model.
+
+### Q10: Add `age` as a predictor for linear regression
+
+Fit another logistic regression (similar to Q1) with the above-mentioned predictors (as obtained in Q7) and age, utilizing the survey features. What difference do you see from the previous fit results?
+
+```{r lin0, message=FALSE, warning=FALSE}
+aic.int.model <- eval(fit3$call[[2]])
+aic.int.model
+
+formula3 <- as.formula(cholesterol.bin ~ gender + born + race + married + bmi + diabetes + age)
+fit9 <- svyglm(formula3,
+               design = w.design,
+               family = binomial(link="logit"))
+summary(fit9)
+publish(fit9)
+```
+
+### Comparing with previous model fit
+
+```{r lin, message=FALSE, warning=FALSE}
+publish(fit3)
+publish(fit9)
+AIC(fit3)
+AIC(fit9)
+```

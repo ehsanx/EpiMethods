@@ -1,0 +1,261 @@
+## Continuous outcome {.unnumbered}
+
+```{r setup, warning=FALSE, cache=TRUE, message=FALSE}
+# Load required packages
+library(rms)
+library(Hmisc)
+library(dplyr)
+library(Publish)
+library(car)
+library(corrplot)
+library(olsrr)
+```
+
+### Explore relationships for continuous outcome variable
+
+#### Load data
+
+```{r load, warning=FALSE, cache=TRUE}
+load(file = "Data/predictivefactors/cholesterolNHANES15.RData")
+```
+
+#### Correlation plot
+
+::: callout-tip
+We can use the `cor` function to see the correlation between numeric variables and then use the `corrplot` function to plot the `cor` object.
+:::
+
+```{r corr, warning=FALSE, cache=TRUE}
+require(corrplot)
+numeric.names <- c("age", "diastolicBP", "systolicBP", 
+                   "bodyweight", "bodyheight", "bmi", "waist", "alcohol", 
+                   "cholesterol", "triglycerides", "uric.acid", 
+                   "protein", "bilirubin", "phosphorus", "sodium", "potassium", 
+                   "globulin", "calcium")
+correlationMatrix <- cor(analytic[numeric.names])
+mat.num <- round(correlationMatrix,2)
+mat.num[mat.num>0.8 & mat.num < 1]
+corrplot(correlationMatrix, method="number", type="upper")
+```
+
+#### Examine descriptive associations
+Let us examine the descriptive associations with the dependent variable by stratifying separately by key predictors
+
+::: callout-tip
+There are multiple ways to examine the descriptive associations by strata/groups, e.g., `summarize`, `aggregate`, `describeBy`, `tapply`, `summary`
+:::
+
+```{r desc, warning=FALSE, cache=TRUE}
+mean(analytic$cholesterol)
+
+# Process 1
+mean(analytic$cholesterol[analytic$gender == "Male"])
+mean(analytic$cholesterol[analytic$gender == "Female"])
+
+# Process 2
+library(dplyr)
+analytic %>%
+  group_by(gender) %>%
+  summarize(mean.ch=mean(cholesterol), .groups = 'drop') 
+
+# process 3
+with(analytic, aggregate( analytic$cholesterol, by=list(gender) , FUN=summary))
+
+# process 4
+psych::describeBy(analytic$cholesterol, analytic$gender)
+
+# process 5
+tapply(analytic$cholesterol, analytic$gender, summary)
+
+# A general process
+sel.names <- c("gender", "age", "born", "race", "education", "married", 
+               "income", "diastolicBP", "systolicBP", 
+               "bodyweight", "bodyheight", "bmi", "waist", "smoke", "alcohol", 
+               "cholesterol", "triglycerides", "uric.acid", 
+               "protein", "bilirubin", "phosphorus", "sodium", "potassium", 
+               "globulin", "calcium", "physical.work", "physical.recreational", 
+               "diabetes")
+var.summ <- summary(cholesterol~ ., data = analytic[sel.names])
+var.summ
+plot(var.summ)
+
+summary(analytic$diastolicBP)
+
+analytic$diastolicBP[analytic$diastolicBP == 0] <- NA
+
+# Bivariate Summaries Computed Separately by a Series of Predictors
+var.summ2 <- spearman2(cholesterol~ ., data = analytic[sel.names])
+plot(var.summ2)
+```
+
+#### Regression: Linear regression
+We can also use regression analysis to examine the association:
+
+::: callout-tip
+We use `lm` function to fit the linear regression
+:::
+
+```{r lm, warning=FALSE, cache=TRUE}
+# set up formula with just 1 variable
+formula0 <- as.formula("cholesterol~triglycerides")
+
+# fitting regression on the analytic2 data
+fit0 <- lm(formula0,data = analytic2)
+
+# extract results
+summary(fit0)
+
+# extract just the coefficients/estimates
+coef(fit0)
+
+# extract confidence intervals
+confint(fit0)
+
+# residual plots
+layout(matrix(1:6, byrow = T, ncol = 3))
+plot(fit0, which = 1:6)
+```
+
+#### Diagnosis
+
+##### Identifying problematic data
+
+```{r diag, warning=FALSE, cache=TRUE}
+require(olsrr)
+# Outlier
+plot(cholesterol ~ triglycerides, data = analytic2)
+subset(analytic2, triglycerides > 1500)
+
+# leverage
+ols_plot_resid_lev(fit0)
+analytic2$lev <- hat(model.matrix(fit0))
+plot(analytic2$lev)
+summary(analytic2$lev)
+which(analytic2$lev > 0.05)
+subset(analytic2, lev > 0.05)
+
+# Residual
+analytic2$rstudent.values <- rstudent(fit0)
+plot(analytic2$rstudent.values)
+which(analytic2$rstudent.values < -5)
+# Heteroskedasticity: Test for constant variance
+#ols_test_breusch_pagan(fit0, rhs = TRUE)
+```
+
+##### Deleting suspicious data
+
+```{r del, warning=FALSE, cache=TRUE}
+# condition 1: triglycerides above 1500 needs deleting
+analytic2b <- subset(analytic2, triglycerides < 1500)
+dim(analytic2b)
+
+# condition 2: leverage above 0.05 needs deleting
+analytic3 <- subset(analytic2b, lev < 0.05)
+dim(analytic3)
+
+# Check how many observations are deleted
+nrow(analytic2)-nrow(analytic3)
+```
+
+##### Refitting in cleaned data
+
+```{r refit1, warning=FALSE, cache=TRUE}
+### Re-fit in data analytic3 (without problematic data)
+formula0
+fit0 <- lm(formula0,data = analytic3)
+
+require(Publish)
+publish(fit0)
+layout(matrix(1:6, byrow = T, ncol = 3))
+plot(fit0, which = 1:6)
+
+require(car)
+# component+residual plot or partial-residual plot
+crPlots(fit0)
+```
+
+##### polynomial order 2
+
+```{r refit2, warning=FALSE, cache=TRUE}
+formula1 <- as.formula("cholesterol~poly(triglycerides,2)")
+formula1 <- as.formula("cholesterol~triglycerides^2")
+fit1 <- lm(formula1,data = analytic3)
+publish(fit1)
+
+# Partial Residual Plots
+crPlots(fit1)
+
+# compare fit0 and fit1 models
+anova(fit0,fit1)
+```
+
+##### polynomial order 3
+
+```{r refit3, warning=FALSE, cache=TRUE}
+# Fit a polynomial of order 3
+formula2 <- as.formula("cholesterol~poly(triglycerides,3)")
+formula2 <- as.formula("cholesterol~triglycerides^3")
+fit2 <- lm(formula2,data = analytic3)
+publish(fit2)
+
+# Partial Residual Plots
+crPlots(fit2)
+
+# compare fit1 and fit2 models
+anova(fit1,fit2)
+```
+
+##### Multiple covariates
+
+```{r refit4, warning=FALSE, cache=TRUE}
+# include everything!
+formula3 <- as.formula("cholesterol~gender + age + born + 
+             race + education + married + 
+             income + diastolicBP + systolicBP + 
+             bmi + bodyweight + bodyheight + waist +  
+             triglycerides + uric.acid + 
+             protein + bilirubin + phosphorus + sodium + potassium + 
+             globulin + calcium + physical.work + physical.recreational + 
+             diabetes")
+fit3 <- lm(formula3, data = analytic3)
+publish(fit3)
+```
+
+##### Colinearity
+
+::: column-margin 
+Rule of thumb: variables with VIF > 4 needs further investigation
+:::
+
+```{r vif, warning=FALSE, cache=TRUE}
+car::vif(fit3)
+collinearity <- ols_vif_tol(fit3)
+collinearity
+
+# VIF > 4
+collinearity[collinearity$VIF>4,]
+```
+
+```{r refit5, warning=FALSE, cache=TRUE}
+formula4 <- as.formula("cholesterol~gender + age + born + 
+             race + education + married + 
+             income + diastolicBP + systolicBP + 
+             bmi + # bodyweight + bodyheight + waist +  
+             triglycerides + uric.acid + 
+             protein + bilirubin + phosphorus + sodium + potassium + 
+             globulin + calcium + physical.work + physical.recreational + 
+             diabetes")
+fit4 <- lm(formula4, data = analytic3)
+publish(fit4)
+
+# check if there is still any problematic variable
+# with high collinearity problem
+collinearity <- ols_vif_tol(fit4)
+collinearity[collinearity$VIF>4,]
+```
+
+### Save data
+
+```{r save, warning=FALSE, cache=TRUE}
+save.image(file = "Data/predictivefactors/cholesterolNHANES15part1.RData")
+```

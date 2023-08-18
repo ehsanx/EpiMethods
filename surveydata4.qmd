@@ -1,0 +1,189 @@
+## Regression analysis {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+library(knitr)
+library(car)
+library(tableone)
+library(DataExplorer)
+library(Publish)
+library(ROCR)
+library(WeightedROC)
+library(jtools)
+library(MASS)
+```
+
+### Load data
+
+```{r data, warning=FALSE, message=FALSE, cache = FALSE}
+load("Data/surveydata/cchs123w.RData")
+ls()
+dim(analytic.miss)
+dim(analytic2)
+summary(weights(w.design))
+```
+
+### Logistic for complex survey
+
+```{r logistc, warning=FALSE, message=FALSE, cache = TRUE}
+formula0 <- as.formula(I(CVD=="event") ~ OA)
+
+## Crude regression
+fit2 <- svyglm(formula0, 
+              design = w.design, 
+              family = binomial(logit))
+require(Publish)
+publish(fit2)
+```
+
+### Multivariable analysis
+
+```{r multivariable, warning=FALSE, message=FALSE, cache = TRUE}
+formula1 <- as.formula(I(CVD=="event") ~ OA + age + sex + married + race + 
+              edu + income + bmi + phyact + doctor + stress + 
+              smoke + drink + fruit + bp + diab + province + immigrate)
+
+fit3 <- svyglm(formula1, 
+              design = w.design, 
+              family = binomial(logit))
+publish(fit3)
+```
+
+#### Model fit assessment
+
+#### Variability explained
+
+Pseudo-R-square values indicate how much of the total variability in the outcomes is explainable by the fitted model (analogous to R-square)
+
+1.  Cox/Snell (never reaches max 1)
+2.  Nagelkerke R-square (scaled to max 1)
+
+-   The larger Cox & Snell estimate is the better the model.
+-   These Pseudo-R-square values should be interpreted with caution (if not ignored).
+-   They offer little confidence in interpreting the model fit.
+-   Survey weighted version of them are available.
+-   Not trivial to decide which statistic to use under complex surveys.
+
+```{r fit, warning=FALSE, message=FALSE, cache = TRUE}
+fit3 <- svyglm(formula1, 
+              design = w.design, 
+              family = quasibinomial(logit)) # publish does not work
+AIC(fit3) 
+
+# AIC for survey weighted regressions
+psrsq(fit3, method = "Cox-Snell")
+psrsq(fit3, method = "Nagelkerke")
+# Nagelkerke and Cox-Snell pseudo-rsquared statistics
+```
+
+### Backward Elimination
+
+-   Model comparisons
+    -   LRT-aprroximation
+    -   Wald-based
+
+#### Checking one by one
+
+```{r be, warning=FALSE, message=FALSE, cache = TRUE}
+round(sort(summary(fit3)$coef[,"Pr(>|t|)"]),2)
+# bmiOverweight is associated with largest p-value
+# but what about other categories?
+
+regTermTest(fit3,~bmi) # coef of all bmi cat = 0
+fit4 <- update(fit3, .~. -bmi) 
+
+anova(fit3, fit4)
+# high p-value (in both wald and Anova) makes it more likely that you should exclude bmi
+AIC(fit3,fit4) 
+round(sort(summary(fit4)$coef[,"Pr(>|t|)"]),2)
+```
+
+#### Using AIC to automate
+
+```{r aic, warning=FALSE, message=FALSE, cache = TRUE}
+require(MASS)
+formula1b <- as.formula(I(CVD=="event") ~ OA + age + sex)
+fit1b <- svyglm(formula1b, 
+              design = w.design, 
+              family = binomial(logit))
+fit5 <- stepAIC(fit1b, direction = "backward")
+```
+
+```{r resround, warning=FALSE, message=FALSE, cache = TRUE}
+publish(fit5)
+round(sort(summary(fit5)$coef[,"Pr(>|t|)"]),2)
+```
+
+#### Using AIC, but keeping importants
+
+```{r aic2, warning=FALSE, message=FALSE, cache = TRUE}
+formula1c <- as.formula(I(CVD=="event") ~ OA + age + sex + married + race +
+                         edu + income + bmi + phyact + fruit + bp + diab + 
+                         doctor + stress + smoke + drink + province + immigrate)
+scope <- list(upper = ~ OA + age + sex + married + race +
+                         edu + income + bmi + phyact + fruit + bp + diab + 
+                         doctor + stress + smoke + drink + province + immigrate,
+              lower = ~ OA + age + sex + married + race +
+                         edu + income + bmi + phyact + fruit + bp + diab)
+
+fit1c <- svyglm(formula1c, design = w.design, family = binomial(logit))
+
+fitstep <- step(fit1c, scope = scope, trace = FALSE, k = 2, direction = "backward")
+# k = 2 gives the genuine AIC
+```
+
+```{r res, warning=FALSE, message=FALSE, cache = TRUE}
+publish(fitstep)
+round(sort(summary(fitstep)$coef[,"Pr(>|t|)"]),2)
+```
+
+#### Assess interactions
+
+Check biologically interesting ones.
+
+##### Check one by one
+
+```{r interactions0, warning=FALSE, message=FALSE, cache = TRUE}
+fit8a <- update(fitstep, .~. + interaction(age,sex))
+anova(fitstep, fit8a) # keep interaction
+```
+
+```{r interactions1, warning=FALSE, message=FALSE, cache = TRUE}
+fit8b <- update(fitstep, .~. + interaction(sex,diab))
+anova(fitstep, fit8b) # Do not keep this interaction
+```
+
+```{r interactions2, warning=FALSE, message=FALSE, cache = TRUE}
+fit8c <- update(fitstep, .~. + interaction(bmi,diab))
+anova(fitstep, fit8c) # keep this interaction
+```
+
+##### Add all significant interactions in 1 model
+
+Note that we have 0 effect modifier, 2 interactions
+
+```{r interactions3, warning=FALSE, message=FALSE, cache = TRUE}
+fit9 <- update(fitstep, .~. + interaction(age,sex) + interaction(bmi,diab))
+require(jtools)
+summ(fit9, confint = TRUE, digits = 3)
+```
+
+```{r interactions4, warning=FALSE, message=FALSE, cache = TRUE}
+fit9 <- update(fitstep, .~. + age:sex + bmi:diab)
+publish(fit9)
+```
+
+```{r interactions5, warning=FALSE, message=FALSE, cache = TRUE}
+basic.model <- eval(fit5$call[[2]])
+basic.model
+
+aic.int.model <- eval(fit9$call[[2]])
+aic.int.model
+```
+
+### Saving data
+
+```{r save, warning=FALSE, message=FALSE, cache = TRUE}
+save(basic.model, aic.int.model, file = "Data/surveydata/cchs123w2.RData")
+```

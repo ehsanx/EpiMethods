@@ -1,0 +1,309 @@
+## Bootstrap {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE,cache=TRUE}
+# Load required packages
+library(caret)
+library(knitr)
+library(Publish)
+library(car)
+library(DescTools)
+```
+
+### Load data
+
+Load the data saved at the end of previous part of the lab.
+
+```{r load, warning=FALSE, cache=TRUE}
+load(file="Data/predictivefactors/cholesterolNHANES15part2.RData")
+```
+
+### Resampling a vector
+
+```{r vector, warning=FALSE, cache=TRUE}
+fake.data <- 1:5
+fake.data
+```
+
+```{r sample, warning=FALSE, cache=TRUE}
+resampled.fake.data <- sample(fake.data, size = length(fake.data), replace = TRUE)
+resampled.fake.data
+
+selected.fake.data <- unique(resampled.fake.data)
+selected.fake.data
+
+fake.data[!(fake.data %in% selected.fake.data)]
+```
+
+The samples not selected are known as the out-of-bag samples
+
+```{r oob, warning=FALSE, cache=TRUE}
+B <- 10
+for (i in 1:B){
+  new.boot.sample <- sample(fake.data, size = length(fake.data), replace = TRUE)
+  print(new.boot.sample)
+}
+```
+
+### Calculating SD of a statistics
+
+Idea:
+
+-   Not sure about what distribution is appropriate to make inference?
+-   If that is the case, calculating CI is hard.
+-   resample and get a new bootstrap sample
+-   calculate a statistic (say, mean) from that sample
+-   find SD of those statistic (say, means)
+-   Use those SD to calculate CI
+
+```{r sd, warning=FALSE, cache=TRUE}
+mean(fake.data)
+B <- 5
+resamples <- lapply(1:B, function(i) sample(fake.data, replace = TRUE))
+str(resamples)
+
+B.means <- sapply(resamples, mean)
+B.means
+mean(B.means)
+
+# SD of the distribution of means
+sd(B.means)
+```
+
+```{r sd2, warning=FALSE, cache=TRUE}
+mean(fake.data)
+B <- 200
+resamples <- lapply(1:B, function(i) sample(fake.data, replace = TRUE))
+# str(resamples)
+
+B.means <- sapply(resamples, mean)
+B.medians <- sapply(resamples, median)
+mean(B.means)
+
+# SD of the distribution of means
+sd(B.means)
+mean(B.medians)
+hist(B.means)
+
+# SD of the distribution of medians
+sd(B.medians)
+hist(B.medians)
+```
+
+### Resampling a data or matrix
+
+```{r mat, warning=FALSE, cache=TRUE}
+analytic.mini <- head(analytic)
+kable(analytic.mini[,1:3])
+```
+
+```{r mat2, warning=FALSE, cache=TRUE}
+analytic.boot <- analytic.mini[sample(x = 1:nrow(analytic.mini), 
+                                      size = nrow(analytic.mini), 
+                                      replace = TRUE), ]
+kable(analytic.boot[,1:3])
+selected.subjects <- unique(analytic.boot$ID)
+selected.subjects
+
+# out-of-bag samples
+analytic.mini$ID[!(analytic.mini$ID %in% selected.subjects)]
+```
+
+```{r mat3, warning=FALSE, cache=TRUE}
+analytic.boot <- analytic.mini[sample(x = 1:nrow(analytic.mini), 
+                                      size = nrow(analytic.mini), 
+                                      replace = TRUE), ]
+kable(analytic.boot[,1:3])
+selected.subjects <- unique(analytic.boot$ID)
+selected.subjects
+
+# out-of-bag samples
+analytic.mini$ID[!(analytic.mini$ID %in% selected.subjects)]
+```
+
+### The caret package / boot
+
+Usually B = 200 or 500 is recommended, but we will do 50 for the lab (to save time).
+
+```{r b206, cache= TRUE}
+set.seed(234)
+ctrl<-trainControl(method = "boot", number = 50)
+fit4.boot2<-train(formula4, trControl = ctrl,
+                  data = analytic3, method = "lm")
+fit4.boot2
+
+head(fit4.boot2$resample)
+mean(fit4.boot2$resample$Rsquared)
+sd(fit4.boot2$resample$Rsquared)
+```
+
+### Method boot632
+
+```{r b2, cache= TRUE}
+ctrl<-trainControl(method = "boot632", number = 50)
+fit4.boot2b<-train(formula4, trControl = ctrl,
+                  data = analytic3, method = "lm")
+fit4.boot2b
+
+head(fit4.boot2b$resample)
+mean(fit4.boot2b$resample$Rsquared)
+sd(fit4.boot2b$resample$Rsquared)
+```
+
+### Method boot632 for stepwise
+
+#### A stable model
+
+::: column-margin 
+See @models
+:::
+
+Bias is reduced with 632 bootstrap, but may provide unstable results with a small samples size.
+
+```{r b3, cache= TRUE}
+ctrl <- trainControl(method = "boot632", number = 50)
+fit4.boot2b<-train(formula4, trControl = ctrl,
+                  data = analytic3, method = "lmStepAIC", trace = 0)
+fit4.boot2b
+
+head(fit4.boot2b$resample)
+mean(fit4.boot2b$resample$Rsquared)
+sd(fit4.boot2b$resample$Rsquared)
+```
+
+#### An unstable model
+
+```{r b4, cache= TRUE}
+ctrl<-trainControl(method = "boot632", number = 50)
+
+# formula3 includes collinear variables
+fit4.boot2b<-train(formula3, trControl = ctrl,
+                  data = analytic3, method = "lmStepAIC", trace = 0)
+fit4.boot2b
+
+head(fit4.boot2b$resample)
+mean(fit4.boot2b$resample$Rsquared)
+sd(fit4.boot2b$resample$Rsquared)
+```
+
+Note that SD should be higher for larger B.
+
+### Optimism corrected bootstrap
+
+::: column-margin 
+See @Bootstrap
+:::
+
+Steps:
+
+-   Fit a model M to entire data D and estimate predictive ability R2.
+-   Iterate from b=1 to B:
+    -   Take a resample from the original data, and name it D.star
+    -   Fit the bootstrap model M.stat to D.star and get predictive ability, R2.boot
+    -   Use the bootstrap model M.star to get predictive ability on D, R2.fullData
+-   Optimism Opt is calculated as mean(R2.boot - R2.fullData)
+-   Calculate optimism corrected performance as R2-Opt.
+
+```{r bo, cache= TRUE}
+R2.opt <- function(data, fit, B, y.name = "cholesterol"){
+  D <- data
+  y.index <- which(names(D)==y.name)
+  
+  # M is the model fit to entire data D
+  M <- fit
+  pred.y <- predict(M, D)
+  n <- length(pred.y)
+  y <- as.numeric(D[,y.index])
+  
+  # estimate predictive ability R2.
+  R2.app <- caret:::R2(pred.y, y)
+  
+  # create blank vectors to save results
+  R2.boot <- vector (mode = "numeric", length = B)
+  R2.fullData <- vector (mode = "numeric", length = B)
+  opt <- vector (mode = "numeric", length = B)
+  
+  # Iterate from b=1 to B
+  for(i in 1:B){    
+    # Take a resample from the original data, and name it D.star
+    boot.index <- sample(x=rownames(D), size=nrow(D), replace=TRUE)
+    D.star <- D[boot.index,]
+    M.star <- lm(formula(M), data = D.star)
+    
+    # Fit the bootstrap model M.stat to D.star and get predictive ability, R2.boot
+    D.star$pred.y <- predict(M.star, new.data = D.star)
+    y.index <- which(names(D.star)==y.name)
+    D.star$y <- as.numeric(D.star[,y.index])
+    R2.boot[i] <- caret:::R2(D.star$pred.y, D.star$y)
+    
+    # Use the bootstrap model M.star to get predictive ability on D, R2_fullData
+    D$pred.y <- predict(M.star, newdata=D)
+    R2.fullData[i] <- caret:::R2(D$pred.y, y)
+    
+    # Optimism Opt is calculated as R2.boot - R2.fullData
+    opt[i] <- R2.boot[i] - R2.fullData[i]
+  }
+  boot.res <- round(cbind(R2.boot, R2.fullData,opt),2)
+  # Calculate optimism corrected performance as R2- mean(Opt).
+  R2.oc <- R2.app - (sum(opt)/B)
+  return(list(R2.oc=R2.oc,R2.app=R2.app, boot.res = boot.res))
+}
+
+R2x <- R2.opt(data = analytic3, fit4, B=50)
+R2x
+```
+
+### Binary outcome
+
+AUC from Receiver Operating Characteristic (ROC) = Measure of accuracy for classification models.
+
+AUC = 1 (perfect classification) AUC = 0.5 (random classification)
+
+```{r bin, cache=TRUE}
+set.seed(234)
+formula5
+
+# Bootstrap
+ctrl<-trainControl(method = "boot", 
+                   number = 50, 
+                   classProbs=TRUE,
+                   summaryFunction = twoClassSummary)
+
+fit5.boot<-caret::train(formula5, 
+                        trControl = ctrl,
+                        data = analytic3, 
+                        method = "glm", 
+                        family="binomial",
+                        metric="ROC")
+fit5.boot
+mean(fit5.boot$resample$ROC)
+sd(fit5.boot$resample$ROC)
+
+# CV
+ctrl <- trainControl(method = "cv",
+                   number = 5,
+                   classProbs = TRUE, 
+                   summaryFunction = twoClassSummary)
+
+fit5.cv <- train(formula5, 
+               trControl = ctrl,
+               data = analytic3, 
+               method = "glm", 
+               family="binomial",
+               metric="ROC")
+fit5.cv
+fit5.cv$resample
+mean(fit5.cv$resample$ROC)
+sd(fit5.cv$resample$ROC)
+```
+
+```{r brier, warning=FALSE, cache=TRUE}
+require(DescTools)
+fit5 <- glm(formula5, family = binomial(), data = analytic3)
+BrierScore(fit5)
+```
+
+### YouTube Videos
+
+You could watch the videos describing [Cross-validation](https://youtu.be/5nNZpsuQ_Fg), [Bootstrapping](https://youtu.be/uqCHghT1oIo), [Change-in-estimate](https://youtu.be/AzQ1g5HgCrs) and [Collapsibility](https://youtu.be/h4q70cIPldQ).
+
+### References

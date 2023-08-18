@@ -1,0 +1,88 @@
+## Data spliting {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE,cache=TRUE}
+# Load required packages
+library(caret)
+library(knitr)
+library(Publish)
+library(car)
+library(DescTools)
+```
+
+### Load data anf files
+
+Load the data saved at the end of previous part of the lab.
+
+```{r load, warning=FALSE, cache=TRUE}
+load(file="Data/predictivefactors/cholesterolNHANES15part2.RData")
+```
+
+### Data spliting to avoid model overfitting
+
+::: column-margin 
+@datasplit
+:::
+
+::: column-margin 
+@datasplit2
+:::
+
+::: callout-tip
+We can use the `createDataPartition` function to split a dataset into training and testing datasets
+:::
+
+```{r split0, warning=FALSE, cache=TRUE}
+# Using a seed to randomize in a reproducible way 
+set.seed(123)
+split <- createDataPartition(y = analytic3$cholesterol, p = 0.7, list = FALSE)
+str(split)
+dim(split)
+
+# Approximate train data
+dim(analytic3)*.7 
+
+# Approximate test data
+dim(analytic3)*(1-.7) 
+```
+
+#### Split the data
+Now let us split the dataset into training and testing:
+
+```{r split1, warning=FALSE, cache=TRUE}
+# Create train data
+train.data <- analytic3[split,]
+dim(train.data)
+
+# Create test data
+test.data <- analytic3[-split,]
+dim(test.data)
+```
+
+Our next task is to fit the model (e.g., linear regression) on the training set and evaluate the performance on the test set.
+
+#### Train the model
+
+```{r split2, warning=FALSE, cache=TRUE}
+formula4
+fit4.train1 <- lm(formula4, data = train.data)
+summary(fit4.train1)
+```
+
+#### Extract performance measures
+
+::: callout-tip
+Below we use the `perform` function that we saved to evaluate the model performances
+:::
+
+```{r perf, warning=FALSE, cache=TRUE}
+perform(new.data = train.data,y.name = "cholesterol", model.fit = fit4.train1)
+perform(new.data = test.data,y.name = "cholesterol", model.fit = fit4.train1)
+perform(new.data = analytic3,y.name = "cholesterol", model.fit = fit4.train1)
+perform(new.data = fictitious.data,y.name = "cholesterol", model.fit = fit4.train1)
+```
+
+::: column-margin 
+For more on model training and tuning, see @tuning
+:::
+
+### References

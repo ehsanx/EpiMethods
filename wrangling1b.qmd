@@ -1,0 +1,168 @@
+## Data types {.unnumbered}
+
+### Matrix
+
+::: callout-tip
+In R, matrices are two-dimensional rectangular data sets, which can be created using the `matrix()` function. It's essential to remember that all the elements of a matrix must be of the same type, such as all numeric or all character.
+:::
+
+To construct a matrix, we often start with a vector and specify how we want to reshape it. For instance:
+
+```{r matrix0, cache=TRUE}
+# Matrix 1
+x <- 1:10
+matrix1 <- matrix(x, nrow = 5, ncol = 2, byrow = TRUE)
+matrix1
+```
+
+Here, the vector x contains numbers from 1 to 10. We reshape it into a matrix with 5 rows and 2 columns. The `byrow = TRUE` argument means the matrix will be filled row-wise, with numbers from the vector.
+
+Conversely, if you want the matrix to be filled column-wise, you'd set `byrow = FALSE`:
+
+```{r matrix1, cache=TRUE}
+# matrix 2
+matrix2 <- matrix(x, nrow = 5, ncol = 2, byrow = FALSE)
+matrix2
+```
+
+You can also combine or concatenate matrices. `cbind()` joins matrices by columns while `rbind()` joins them by rows.
+
+```{r matrix2, cache=TRUE}
+# Merging 2 matrices
+cbind(matrix1, matrix2)
+```
+
+```{r matrix3, cache=TRUE}
+# Appending 2 matrices
+rbind(matrix1, matrix2)
+```
+
+### List
+
+::: callout-tip
+In R, lists can be seen as a collection where you can store a variety of different objects under a single name. This includes vectors, matrices, or even other lists. It's very versatile because its components can be of any type of R object.
+:::
+
+For instance:
+
+```{r list1, cache=TRUE}
+# List of 2 matrices
+list1 <- list(matrix1, matrix2)
+list1
+```
+
+Lists can also be expanded to include multiple items:
+
+```{r list2, cache=TRUE}
+x6 <- seq(10, 30, length = 7)
+sex <- c("females", "males", "other")
+# Expanding list to include more items
+list2 <- list(list1, x6, sex, matrix1)
+list2 
+```
+
+Combining different types of data into a single matrix converts everything to a character type:
+
+```{r list3, cache=TRUE}
+# A matrix with numeric and character variables
+id <- c(1, 2)
+score <- c(85, 85)
+sex <- c("M", "F")
+new.matrix <- cbind(id, score, sex)
+new.matrix
+```
+
+To check the type of data in your matrix:
+
+```{r list4, cache=TRUE}
+mode(new.matrix)
+```
+
+### Data frame
+
+::: callout-tip
+As we can see combining both numeric and character variables into a matrix ended up with a matrix of character values. To keep the numeric variables as numeric and character variables as character, we can use the `data.frame` function.
+:::
+
+1.  Creating a data frame
+
+::: column-margin
+A data frame is similar to a matrix but allows for columns of different types (numeric, character, factor, etc.). It's a standard format for storing data sets in R.
+:::
+
+```{r frame1, cache=TRUE}
+df <- data.frame(id, score, sex)
+df
+```
+
+To check the mode or type of your data frame:
+
+```{r frame2, cache=TRUE}
+mode(df)
+```
+
+2.  Extract elements
+
+Data frames allow easy extraction and modification of specific elements. For example, we can extract the values on the first row and first column as follow:
+
+```{r frame3, cache=TRUE}
+df[1,1]
+```
+
+Similarly, the first column can be extracted as follows:
+
+```{r frame4, cache=TRUE}
+df[,1]
+```
+
+The first row can be extracted as follows:
+
+```{r frame5, cache=TRUE}
+df[1,]
+```
+
+3.  Modifying values
+
+We can edit the values in the data frame as well. For example, we can change the score from 85 to 90 for the id 1:
+
+```{r frame6, cache=TRUE}
+df$score[df$id == 1] <- 90
+df
+```
+
+We can also change the name of the variables/columns:
+
+```{r frame7, cache=TRUE}
+colnames(df) <- c("Studyid", "Grade", "Sex")
+df
+```
+
+4.  Combining data frames
+
+We can also merge another data frame with the same variables using the `rbind` function:
+
+```{r frame8, cache=TRUE}
+# Create a new dataset
+df2 <- data.frame(Studyid = c(10, 15, 50), Grade = c(75, 90, 65), Sex = c("F", "M", "M"))
+
+# Combining two data frames
+df.new <- rbind(df, df2)
+
+# Print the first 6 rows
+head(df.new)
+```
+
+5.  Checking the dimensions
+
+To see the dimension of the data frame (i.e., number of rows and columns), we can use the `dim` function:
+
+```{r frame9, cache=TRUE}
+dim(df.new)
+```
+
+As we can see, we have 5 rows and 3 columns. We can use the `nrow` and `ncol` functions respectively for the same output:
+
+```{r frame10, cache=TRUE}
+nrow(df.new)
+ncol(df.new)
+```

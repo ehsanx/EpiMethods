@@ -1,0 +1,120 @@
+## Cross-vaildation {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE,cache=TRUE}
+# Load required packages
+library(caret)
+library(knitr)
+library(Publish)
+library(car)
+library(DescTools)
+```
+
+### Load data
+
+Load the data saved at the end of previous part of the lab.
+
+```{r load, warning=FALSE, cache=TRUE}
+load(file="Data/predictivefactors/cholesterolNHANES15part2.RData")
+```
+
+### k-fold cross-vaildation
+
+::: column-margin
+See @Cross-validation
+:::
+
+```{r kcv, warning=FALSE, cache=TRUE}
+k = 5
+dim(analytic3)
+set.seed(567)
+
+# Create folds (based on the outcome)
+folds <- createFolds(analytic3$cholesterol, k = k, list = TRUE, 
+                     returnTrain = TRUE)
+mode(folds)
+
+# Approximate training data size
+dim(analytic3)*4/5
+
+# Approximate test data size
+dim(analytic3)/5  
+
+length(folds[[1]])
+length(folds[[2]])
+length(folds[[3]])
+length(folds[[4]])
+length(folds[[5]])
+
+str(folds[[1]])
+str(folds[[2]])
+str(folds[[3]])
+str(folds[[4]])
+str(folds[[5]])
+```
+
+#### Calculation for Fold 1
+
+```{r fold1, warning=FALSE, cache=TRUE}
+fold.index <- 1
+fold1.train.ids <- folds[[fold.index]]
+head(fold1.train.ids)
+
+fold1.train <- analytic3[fold1.train.ids,]
+fold1.test <- analytic3[-fold1.train.ids,]
+formula4
+
+model.fit <- lm(formula4, data = fold1.train)
+predictions <- predict(model.fit, newdata = fold1.test)
+
+perform(new.data=fold1.test, y.name = "cholesterol", model.fit = model.fit)
+```
+
+#### Calculation for Fold 2
+
+```{r fold2, warning=FALSE, cache=TRUE}
+fold.index <- 2
+fold1.train.ids <- folds[[fold.index]]
+head(fold1.train.ids)
+
+fold1.train <- analytic3[fold1.train.ids,]
+fold1.test <- analytic3[-fold1.train.ids,]
+
+model.fit <- lm(formula4, data = fold1.train)
+
+predictions <- predict(model.fit, newdata = fold1.test)
+perform(new.data=fold1.test, y.name = "cholesterol", model.fit = model.fit)
+```
+
+#### Using caret package to automate
+
+::: column-margin 
+See @tuning
+:::
+
+
+```{r caret, cache= TRUE}
+# Using Caret package
+set.seed(567)
+
+# make a 5-fold CV
+ctrl<-trainControl(method = "cv",number = 5)
+
+# fit the model with formula = formula4
+# use training method lm
+fit4.cv<-train(formula4, trControl = ctrl,
+               data = analytic3, method = "lm")
+fit4.cv
+
+# extract results from each test data 
+summary.res <- fit4.cv$resample
+summary.res
+mean(fit4.cv$resample$Rsquared)
+sd(fit4.cv$resample$Rsquared)
+
+# # extract adj R2
+# k <- 5
+# p <- 2
+# n <- round(nrow(analytic3)/k)
+# summary.res$adjR2 <- 1-(1-fit4.cv$resample$Rsquared)*((n-1)/(n-p))
+# summary.res
+```

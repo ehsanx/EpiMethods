@@ -1,0 +1,576 @@
+## Imputation {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(mice)
+library(DataExplorer)
+library(VIM)
+library(mitools)
+```
+
+Missing data is common in health research. In this lab, we will learn different ways to impute the values for missing values using the package `mice`. In this lab discussion, our main reference is [@van2018flexible]. Below we also cited the relevant section numbers.
+
+### Type of missing data
+
+-   Ref: [@van2018flexible], Section 1.2
+
+In this section, we are going to introduce three types of missing data that we will encounter in data analysis.
+
+-   Missing completely at random (MCAR)
+    -   missing data is completely independent of the measured and unmeasured variables
+    -   if you could compare the individuals with the missing information with individuals with completed information, they do not differ substantially.
+    -   often unrealistic assumption
+-   Missing at random (MAR)
+    -   the missing data is related to variables that are all measured
+-   Missing not at random (MNAR)
+    -   If the missing data is related to unmeasured variables, we say the missing is not at random.
+
+**Analysis strategy depening on missingness**
+
+-   If the data is MCAR, we may still use complete-case analysis which will not introduce any bias. However, the standard error of the estimate may go up, which results in a wider confidence interval as we have missed some information.
+-   If the data is MNAR, we do not have a good way to address it in the analysis and the estimates, of course, will be biased.
+-   If the data is MAR, we could use imputation to impute the missing values. The following parts of this lab are to introduce the methods of imputing missing values.
+
+### Data imputation
+
+#### Getting to know the data
+
+In this section, we are going to introduce a different method of imputing missing values. We will use the `analytic.with.miss` dataset NHANES.
+
+Note:
+
+1.  Take a look here for those who are interested in how the [analytic data](https://ehsanx.github.io/SurveyDataAnalysis/) was created.
+
+2.  For the purposes of this lab, we are just going to treat the data as SRS, and not going to deal with intricacies of survey data analysis.
+
+```{r load, cache=TRUE}
+require(VIM)
+load("Data/missingdata/NHANES17.RData")
+NHANES17s <- analytic.with.miss[1:30,c("age", "bmi", "cholesterol","diastolicBP")]
+NHANES17s
+NHANES17s[complete.cases(NHANES17s),]
+md.pattern(NHANES17s) 
+# Inspect the missing data pattern (each row = pattern)
+# possible missingness (0,1) pattern and counts
+# last col = missing counts for each variables
+# last row = how many variable values missing in the row
+# First col: Frequency of the pattern 
+# e,g, 2 cases missing for bmi
+
+require(DataExplorer)
+plot_missing(NHANES17s)
+# check the missingness
+
+require(VIM)
+marginplot(NHANES17s[, c("diastolicBP", "bmi")])
+marginplot(NHANES17s[, c("diastolicBP", "cholesterol")])
+marginplot(NHANES17s[, c("cholesterol", "bmi")])
+# distribution of observed data given the other variable is observed
+# for MCAR, blue and red box plots should be similar
+```
+
+#### Single imputation
+
+-   Ref: [@van2018flexible], Section 1.3
+
+Impute NA only once. Below are some examples [@van2011mice]:
+
+##### Mean imputation
+
+-   Ref: [@van2018flexible], Section 1.3.3
+
+-   Ref: [@buuren2010mice]
+
+-   This is the most straightforward method.
+
+-   We replace the missing values by the mean of non-missing/observed values.
+
+-   No variation. NA replaced by mean(complete case values)
+
+```{r meanimp, cache=TRUE}
+# Replace missing values by mean 
+imputation1 <- mice(NHANES17s, 
+                   method = "mean", # Replace by mean of the other values
+                   m = 1, # Number of multiple imputations. 
+                   maxit = 1) # Number of iteration; mostly useful for convergence
+imputation1$imp
+complete(imputation1, action = 1) # this is a function from mice
+# there is another function in tidyr with the same name!
+# use mice::complete() to avoid conflict
+## the imputed dataset
+```
+
+##### Regression Imputation
+
+-   Ref: [@van2018flexible], Section 1.3.4
+-   Mean imputation is straightforward and conceptually easy but tends to lower the variation of your variables.
+-   If the variables are related, we could use a regression model to borrow information from other variables to make better imputations.
+-   In this imputation, a regression model is fitted to predict the missing values
+
+$Y \sim X$
+
+$age \sim bmi + cholesterol + diastolicBP$
+
+```{r regimp, cache=TRUE}
+imputation2 <- mice(NHANES17s, 
+            method = "norm.predict", # regression imputation
+            seed = 1,
+            m = 1, 
+            print = FALSE)
+
+# look at all imputed values
+imputation2$imp
+
+# examine the correlation between age and bmi before and after imputation
+fit1 <- lm(age ~ bmi, NHANES17s) 
+
+summary(fit1) ## original data
+sqrt(summary(fit1)$r.squared)
+
+fit2 <- lm(age ~ bmi, mice::complete(imputation2)) 
+summary(fit2) ## imputed complete data
+sqrt(summary(fit2)$r.squared)
+## Relationship become stronger before imputation. 
+# with(data=NHANES17s, cor(age, bmi, use = "complete.obs"))
+
+with(data=NHANES17s, cor(age, bmi, use = "pairwise.complete.obs"))
+with(data = mice::complete(imputation2), cor(age, bmi))
+```
+
+##### Stochastic regression imputation
+
+-   Ref: [@van2018flexible], Section 1.3.5
+
+-   One disadvantage to regression imputation is that it used the fitted model without error terms. Therefore, the imputed results are too close to the regression line and biased the correlations, reduced the variance of the data.
+
+-   Stochastic regression corrected this problem by adding a error term when imputing the values, which potentially better reflect the correlations between variables
+
+$Y \sim X + e$
+
+$age \sim bmi + cholesterol + diastolicBP + error$
+
+```{r impsto, cache=TRUE}
+imputation3 <- mice(NHANES17s, method = "norm.nob", # stochastic regression imputation
+                    m = 1, maxit = 1, seed = 504, print = FALSE)
+
+# look at all imputed values
+imputation3$imp
+#mice::complete(imputation3)
+
+# examine the correlation between age and bmi before and after imputation
+fit1 <- lm(age ~ bmi, NHANES17s) 
+summary(fit1) 
+fit3 <- lm(age ~ bmi, mice::complete(imputation3)) 
+summary(fit3)
+## Fitted coefficients of bmi are much closer before and after imputation
+# with(data=NHANES17s, cor(age, bmi, use = "complete.obs"))
+
+with(data=NHANES17s, cor(age, bmi, use = "pairwise.complete.obs"))
+with(data = mice::complete(imputation3), cor(age, bmi))
+# see the direction change?
+```
+
+##### Predictive mean matching
+
+-   Assume $Y$ = `age`, a variable with some missing values. $X$ (say, `bmi`, `cholesterol`, `diastolicBP`) are predictors of $Y$.
+-   Estimate beta coef $\beta$ from complete case running $Y \sim X + e$
+-   generate new $\beta* \sim Normal(b,se_b)$.
+-   using $\beta*$, predict new $\hat{Y}$ `predicted age` for all subjects (those with missing and observed `age`):
+    -   If `subject 19` (say) has missing values in `age` variable, find out his `predicted age` $\hat{Y}$ (say, 45.5).
+    -   Find others subjects, `subjects 2, 15, 24` (say) who has their `age` measured and their predicted age $\hat{Y}$ (say, `predicted ages` 43.9,45.7,46.1 with real ages 43,45,46 respectively) are close to `subject 19` (predicted age 45.5).
+    -   Randomly select `subject 2` with real/observed age 43, and impute 43 for `subject 19`'s missing age.
+
+Why this is good? We are imputing something real, observed data; not some averaged out (possibly unrealistic) data (protection against extrapolation?).
+
+```{r imppmm, cache=TRUE}
+imputation3b <- mice(NHANES17s, method = "pmm", 
+                    m = 1, maxit = 1,
+                    seed = 504, print = FALSE)
+with(data=NHANES17s, cor(age, bmi, use = "pairwise.complete.obs"))
+with(data = mice::complete(imputation3b), cor(age, bmi))
+```
+
+#### Multiple imputation and workflow
+
+-   Ref: [@van2018flexible], Sections 1.4 and 5.1
+-   Ref: [@buuren2010mice]
+
+We have learned different methods of imputation. In this section, we will introduce how to incorporate the data imputation into data analysis. In multiple imputation data analysis, three steps will be taken:
+
+-   Step 0: Set imputation model
+-   Step 1: The incomplete dataset will be imputed $m$ times;
+-   Step 2: Each $m$ complete datasets will be analyzed separately by standard analysis (e.g., regression model);
+-   Step 3: The analysis results will be pooled / aggregated together by Rubin's rules (1987).
+
+##### Step 0
+
+*Set imputation model*:
+
+```{r mi0, cache=TRUE}
+ini <- mice(data = NHANES17s, maxit = 0, print = FALSE)
+pred <- ini$pred
+pred
+# A value of 1 indicates that column variables (say, bmi, cholesterol, diastolicBP) 
+# are used as a predictor to impute the a row variable (say, age).
+pred[,"diastolicBP"] <- 0 
+# if you believe 'diastolicBP' should not be a predictor in any imputation model
+pred
+# for cholesterol: bmi and age used to predict cholesterol (diastolicBP is not a predictor)
+# for diastolicBP: bmi, age and cholesterol used to predict diastolicBP 
+# (diastolicBP itself is not a predictor) 
+```
+
+*Set imputation method*:
+
+See Table 1 of [@van2011mice].
+
+```{r mi0a, cache=TRUE}
+meth <- ini$meth
+meth
+# pmm is generally a good method, 
+# but let's see how to work with other methods
+# just as an example.
+# Specifying imputation method:
+meth["bmi"] <- "mean" 
+# for BMI: no predictor used in mean method 
+# (only average of observed bmi)
+meth["cholesterol"] <- "norm.predict" 
+meth["diastolicBP"] <- "norm.nob"
+meth
+```
+
+*Set imputation model based on correlation alone*:
+
+```{r mi0b, cache=TRUE}
+predictor.selection <- quickpred(NHANES17s, 
+                                 mincor=0.1, # absolute correlation 
+                                 minpuc=0.1) # proportion of usable cases
+predictor.selection
+```
+
+##### Step 1
+
+```{r mi1, cache=TRUE}
+# Step 1 Impute the incomplete data m=10 times
+imputation4 <- mice(data=NHANES17s, 
+                    seed=504,
+                    method = meth,
+                    predictorMatrix = predictor.selection,
+                    m=10, # imputation will be done 10 times (i.e., 10 imputed datasets)
+                    maxit=3)
+imputation4$pred
+## look at the variables used for imputation
+mice::complete(imputation4, action = 1) # 1 imputed data  
+all <- mice::complete(imputation4, action="long") # combine all 5 imputed datasets
+dim(all)
+head(all)
+## you can change the way of displaying the data
+data_hori <- mice::complete(imputation4, action="broad") # display five imputations horizontally
+
+dim(data_hori)
+head(data_hori)
+
+## Compare means of each imputed dataset
+colMeans(data_hori)
+```
+
+##### Step 2
+
+```{r mi2, cache=TRUE}
+imputation4
+```
+
+```{r mi2a, cache=TRUE}
+imputation4[[1]]
+```
+
+```{r mi2b, cache=TRUE}
+mice::complete(imputation4, action = 1)
+```
+
+```{r mi2c, cache=TRUE}
+mice::complete(imputation4, action = 10)
+```
+
+```{r mi2d, cache=TRUE, warning=FALSE, message=FALSE}
+# Step 2 Analyze the imputed data
+fit4 <- with(data = imputation4, exp = lm(cholesterol ~ age + bmi + diastolicBP))
+## fit model with each of 10 datasets separately
+fit4
+```
+
+##### Step 3
+
+###### Pooled estimate
+
+```{r mi3, cache=TRUE}
+# Step 3 pool the analysis results
+est1 <- mice::pool(fit4)
+
+## pool all estimated together using Rubin's rule 
+est1
+```
+
+Here:
+
+-   dfcom = df for complete data
+-   df = df with Barnard-Rubin correction
+
+###### Understanding the pooled results
+
+We are using `age` an an example
+
+```{r mi3a, cache=TRUE, warning=FALSE, message=FALSE}
+require(dplyr)
+res10 <- summary(fit4) %>% as_tibble %>% print(n=40)
+m10 <- res10[res10$term == "age",]
+m10
+```
+
+Let us describe the components of the `mice::pool(fit4)` output
+
+```{r mi3b, cache=TRUE, warning=FALSE, message=FALSE}
+m.number <- 10
+# estimate = pooled estimate 
+# = sum of (m “beta-hat” estimates) / m (mean of m estimated statistics)
+estimate <- mean(m10$estimate)
+estimate
+# ubar = sum of (m variance[beta] estimates) / m 
+# = within-imputation variance (mean of estimated variances)
+ubar.var <- mean(m10$std.error^2)
+ubar.var
+# b =  variance of (m “beta-hat” estimates) 
+# = between-imputation variance 
+# (degree to which estimated statistic / 
+# “beta-hat” varies across m imputed datasets). 
+# This b is not available for single imputation when m = 1.
+b.var <- var(m10$estimate)
+b.var
+# t = ubar + b + b/m = total variance according to Rubin’s rules 
+# (within-imputation & between imputation variation)
+t.var <- ubar.var + b.var + b.var/m.number
+t.var
+# riv = relative increase in variance
+riv = (b.var + b.var/m.number)/ubar.var
+riv
+# lambda = proportion of variance to due nonresponse
+lambda = (b.var + b.var/m.number)/t.var
+lambda
+# df (approximate for large sample without correction)
+df.large.sample <- (m.number - 1)/lambda^2
+df.large.sample
+# df (hypothetical complete data)
+dfcom <- m10$nobs[1] - 4 # n = 30, # parameters = 4
+dfcom
+# df (Barnard-Rubin correction)
+df.obs <- (dfcom + 1)/(dfcom + 3) * dfcom * (1 - lambda)
+df.c <- df.large.sample * df.obs/(df.large.sample + df.obs)
+df.c
+# fmi = fraction of missing information per parameter
+fmi = (riv + 2/(df.large.sample +3)) / (1 + riv)
+fmi # based on large sample approximation
+fmi = (riv + 2/(df.c +3)) / (1 + riv)
+fmi # Barnard-Rubin correction
+```
+
+Compare above results with the pooled table from `mice::pool(fit4)` below. Note that `df` is based on Barnard-Rubin correction and `fmi` value is calculated based on that corrected `df`.
+
+```{r}
+est1
+```
+
+### Special case: Variable selection
+
+#### Variable selection in analyzing missing data
+
+-   Ref: [@van2018flexible], Section 5.4
+
+The common workflow for analyzing missing data are (as mentioned above):
+
+1.  Imputing the data $m$ times
+
+2.  Analyzing the $m$ dataset
+
+3.  Pool all analysis together
+
+We could apply variable selection in step 2, especially when we have no idea what is the best model to analyze the data. Howevere, it may become challenging when we pull all data together. With different dataset, the final model may or may not be the same.
+
+We present the three method of variable selection on each imputed dataset presented by Buuren:
+
+1.  Majority: perform the model selection separately with m dataset and choose the variables that appears at least m/2 times
+2.  Stack: combine m datasets into a single dataset, and perform variable selection on this dataset
+3.  Wald (Rubin's rule): model selection was performed at model fitting step and combine the estimates using Rubin's rules. This is considered as gold standard.
+
+##### Majority using NHANES17s
+
+```{r varselect0, cache=TRUE}
+data <- NHANES17s
+imp <- mice(data, seed = 504, m = 100, print = FALSE)
+## Multiple imputation with 100 imputations, resulting in 100 imputed datasets
+scope0 <- list(upper = ~ age + bmi + cholesterol, lower = ~1)
+expr <- expression(f1 <- lm(diastolicBP ~ age),
+                   f2 <- step(f1, scope = scope0, trace = FALSE))
+fit5 <- with(imp, expr)
+
+## apply stepwise on each of the imputed dataset separately
+formulas <- lapply(fit5$analyses, formula)
+## fit5$analyses returns the selection result for each imputed dataset
+terms <- lapply(formulas, terms)
+votes <- unlist(lapply(terms, labels))
+## look at the terms on each models
+table(votes)
+```
+
+```{r varselect1, cache=TRUE}
+## Set up the stepwise variable selection, from null model to full model
+scope <- list(upper = ~ age + bmi + cholesterol, lower = ~ age)
+
+## Set up the stepwise variable selection, from important only model to full model
+expr <- expression(f1 <- lm(diastolicBP ~ age),
+                   f2 <- step(f1, scope = scope, trace = FALSE))
+fit5 <- with(imp, expr)
+## apply stepwise on each of the imputed dataset separately
+formulas <- lapply(fit5$analyses, formula)
+## fit5$analyses returns the selection result for each imputed dataset
+terms <- lapply(formulas, terms)
+votes <- unlist(lapply(terms, labels))
+## look at the terms on each models
+table(votes)
+```
+
+##### Stack using NHANES17s
+
+```{r varselect2, cache=TRUE}
+Stack.data <- mice::complete(imp, action="long")
+head(Stack.data)
+tail(Stack.data)
+fitx <- lm(diastolicBP ~ age + bmi + cholesterol, data = Stack.data)
+fity <- step(fitx, scope = scope0, trace = FALSE)
+require(Publish)
+publish(fity)
+```
+
+##### Wald using NHANES17s
+
+```{r varselect3, cache=TRUE}
+# m = 100
+fit7 <- with(data=imp, expr=lm(diastolicBP ~ 1))
+names(fit7)
+fit7$analyses[[1]]
+fit7$analyses[[100]]
+fit8 <- with(data=imp, expr=lm(diastolicBP ~ bmi))
+fit8$analyses[[45]]
+fit8$analyses[[99]]
+# The D1-statistics is the multivariate Wald test.
+stat <- D1(fit8, fit7)
+## use Wald test to see if we should add bmi into the model
+stat
+# which indicates that adding bmi into our model might not be useful
+```
+
+```{r varselect4, cache=TRUE}
+fit9 <- with(data=imp, expr=lm(diastolicBP ~ age + bmi))
+stat <- D1(fit9, fit8)
+## use Wald test to see if we should add age into the model
+stat
+# which indicates that adding age into our model might not be useful
+```
+
+```{r varselect5, cache=TRUE}
+fit10 <- with(data=imp, expr=lm(diastolicBP ~ age + bmi + cholesterol))
+stat <- D1(fit10, fit9)
+## use Wald test to see if we should add cholesterol into the model
+stat
+# which indicates that adding cholesterol into our model might not be useful
+```
+
+Try `method="likelihood"` as well.
+
+```{r varselect6, cache=TRUE, warning=FALSE, message=FALSE}
+stat <- pool.compare(fit10, fit7, method = "likelihood", data=imp)
+## test to see if we should add all 3 variables into the model
+stat$pvalue
+# which indicates that adding none of the variables into our model might be useful
+```
+
+#### Assess the impact of missing values in model fitting
+
+-   Ref: [@van2018flexible], Section 5.4.3 In the presence of missing value, we imputed the missing data using observed information. Meanwhile, we bring in uncertainties to our data. The following two processes presented by Buuren can be used to assess the impact of missingness. Buuren has presented four methods, but the following two are most common.
+
+1.  Multiple imputation with more number of imputations (i.e., 200). Perform variable selection on each imputed dataset. The differences are attributed to the missing values
+
+2.  Bootstrapping the data from a single imputed dataset and do variable selection for each bootstrapping sample. We could evaluate sampling variation using this method
+
+##### Bootstrap using NHANES17s
+
+```{r impact1, cache=TRUE}
+impx <- mice(NHANES17s, seed = 504, m=1, print=FALSE)
+completedata <- mice::complete(impx)
+  
+set.seed(504) 
+votes <-c()
+formula0 <- as.formula("diastolicBP ~ age + bmi + cholesterol")
+scope <- list(upper = ~ age + bmi + cholesterol, lower = ~ age)
+
+for (i in 1:200){
+     ind <- sample(1:nrow(completedata),replace = TRUE)
+     newdata <- completedata[ind,]
+     full.model <- glm(formula0, data = newdata)
+     f2 <- MASS::stepAIC(full.model, 
+                   scope = scope, trace = FALSE)
+     formulas <- as.formula(f2)
+     temp <- unlist(labels(terms(formulas)))
+     votes <- c(votes,temp)
+ }
+ table(votes)
+ ## among 200 bootstrap samples how many times that each 
+ ## variable appears in the final model. Models have different
+ ## variables are attributed to sampling variation
+```
+
+### Convergence and diagnostics
+
+#### Convergence
+
+-   Ref: [@van2018flexible], Section 6.5.2
+-   The MICE package implements a MCMC algorithm for imputation. The coefficients should be converged and irrelevant to the order which variable is imputed first
+-   The ideal convergence is to check "the different streams should be freely intermingled with one another, without showing any definite trends."
+-   We could plot the imputation object to see the streams.
+
+```{r convergence, cache=TRUE}
+## Recall the imputation we have done before
+imputation5 <- mice(NHANES17s, seed = 504, 
+                   m=10,
+                   maxit = 5,
+                   print=FALSE) 
+plot(imputation5)
+## We hope to see no pattern in the trace lines
+## Sometimes to comfirm this we may want to run with more iterations
+imputation5_2 <- mice(NHANES17s, seed = 504, 
+                    m=10,
+                    maxit = 50,
+                    print=FALSE) 
+plot(imputation5_2)
+```
+
+#### Diagnostics
+
+-   Ref: [@van2018flexible], Section 6.6
+
+Model diagnostics is important in model fitting. In missing value imputations, we used observed information to impute missing values, so it is also important to do model diagnostics. The easiest way is to look at the distributions of observed and imputed data conditioning on variables with missing values:
+
+```{r diagnostics, cache=TRUE}
+## We could compare the imputed and observed data using Density plots
+densityplot(imputation5, layout = c(2, 2))
+imputation5_3 <- mice(NHANES17s, seed = 504, 
+                    m=50,
+                    maxit = 50,
+                    print=FALSE)
+densityplot(imputation5_3)
+## a subjective judgment on whether you think if there is significant discrepancy
+bwplot(imputation5, age + bmi + cholesterol +diastolicBP ~ .imp, layout = c(2, 2))
+bwplot(imputation5_3)
+## Plot a box plot to compare the imputed and observed values
+```
+
+### References

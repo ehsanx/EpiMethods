@@ -1,0 +1,87 @@
+## Analyzing NHANES data 1 {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+```
+
+### Load data
+
+```{r loading, eval=TRUE, cache=TRUE }
+load(file = "Data/surveydata/NHANESsample.Rdata")
+ls()
+```
+
+### Regression summary
+
+#### Bivariate Regression
+
+```{r fit1, eval=TRUE}
+summary(fit1r <- glm(blood.pressure ~ race, data=analytic.data))
+```
+
+```{r fit2, eval=TRUE}
+summary(fit1a <- glm(blood.pressure ~ age.centred, data=analytic.data))
+```
+
+```{r fit3, eval=TRUE}
+summary(fit1g <- glm(blood.pressure ~ gender, data=analytic.data))
+```
+
+```{r fit4, eval=TRUE}
+summary(fit1m <- glm(blood.pressure ~ marital, data=analytic.data))
+```
+
+#### Multivariate Regression
+
+```{r fitm1, eval=TRUE}
+summary(fit1 <- glm(blood.pressure ~ race + age.centred + gender + marital, data=analytic.data))
+```
+
+### Including survey features
+
+```{r survey, eval=TRUE}
+require(survey)
+analytic.design <- svydesign(strata=~SDMVSTRA, id=~SDMVPSU, weights=~WTMEC2YR, data=analytic.data, nest=TRUE)
+```
+
+```{r survey2, eval=TRUE}
+svyboxplot(blood.pressure~race, design = analytic.design, col="grey", 
+           ylab="Blood Pressure", 
+           xlab ="Race")
+svyby(~blood.pressure, by=~race, design = analytic.design, na.rm=TRUE, ci=TRUE, svymean)
+svyboxplot(blood.pressure~gender, design = analytic.design, col="grey", 
+           ylab="Blood Pressure", 
+           xlab ="Gender")
+svyby (~blood.pressure, by=~gender, design = analytic.design, na.rm=TRUE, ci=TRUE, svymean)
+svyboxplot(blood.pressure~marital, design = analytic.design, col="grey", 
+           ylab="Blood Pressure", 
+           xlab ="Marital Status")
+svyby (~blood.pressure, by=~marital, design = analytic.design, na.rm=TRUE, ci=TRUE, svymean)
+```
+
+#### Bivariate Regression
+
+```{r fit1s, eval=TRUE}
+require(survey)
+summary(fit1r <- svyglm(blood.pressure ~ race, design=analytic.design))
+```
+
+```{r fit2s, eval=TRUE}
+summary(fit1a <- svyglm(blood.pressure ~ age.centred, design=analytic.design))
+```
+
+```{r fit3s, eval=TRUE}
+summary(fit1g <- svyglm(blood.pressure ~ gender, design=analytic.design))
+```
+
+```{r fit4s, eval=TRUE}
+summary(fit1m <- svyglm(blood.pressure ~ marital, design=analytic.design))
+```
+
+#### Multivariate Regression
+
+```{r fistm1, eval=TRUE}
+analytic.design2 <- svydesign(strata=~SDMVSTRA, id=~SDMVPSU, weights=~WTMEC2YR, data=analytic.data, nest=TRUE)
+summary(fit1 <- svyglm(blood.pressure ~ race + age.centred + gender + marital, design=analytic.design2))
+```

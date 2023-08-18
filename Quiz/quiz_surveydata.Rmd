@@ -1,0 +1,69 @@
+---
+title: "Quiz on survey data"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+# Load required packages
+library(learnr)
+library(xfun)
+```
+
+```{r surveydata_quiz1, echo=FALSE}
+question("Q1. We are exploring the bivariate association between treatment (1: received treatment, 0: otherwise) and diabetes (1: yes, 0: otherwise) with a complex survey dataset. The name of the analytic dataset is `dat.analytic`, and the design `survey.design` is created using the svydesign function. Which R code could be used to explore the association? Note: survey features should be utilized to answer this and next questions.",
+  answer("table(dat.analytic$treatment, dat.analytic$diabetes)", message = "The table function provides the contingency tables without any test."),
+  answer("prop.table(table(dat.analytic$treatment, dat.analytic$diabetes))", message = "The prop.test function can be used for testing the association. However, this function is likely inappropriate when data are collected using a complex survey design."),
+  answer("svyby(~treatment, ~diabetes, design = survey.design, svymean, deff = TRUE)", message = "The svyby function provides survey statistics."),
+  answer("svychisq(~diabetes + treatment, design = survey.design, statistic = 'F')", correct = TRUE, message = "statistic = 'F' is the Thomas-Rao version of th test, while statistic = 'Chisq' is the Rao-Scott test."),
+  allow_retry = TRUE,
+  random_answer_order = FALSE
+)
+```
+
+```{r surveydata_quiz2, echo=FALSE}
+question("Q2. Which codes could be used to explore the relationship between treatment and diabetes in Q1 using regression analysis?",
+  answer("fit2 <- glm(diabetes ~ treatment, data = dat.analytic); summary(fit)", message = "Remember to utilize survey features in the analysis."),
+  answer("fit2 <- svyglm(diabetes ~ treatment, design = survey.design); summary(fit)", message = "The family argument is fundamental here. Check the svyglm help menu to see how this family argument works and which is the default family in svyglm."),
+  answer("fit2 <- svyglm(diabetes ~ treatment, design = survey.design, family = binomial); summary(fit)", correct = TRUE, message = "For the binomial family, logit is the default link function."),
+  answer("fit2 <- svyglm(treatment ~ diabetes, design = survey.design, family = binomial); summary(fit)", message = "Incorrect dependent and independent variable specification."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r surveydata_quiz3, echo=FALSE}
+question("Q3. From the literature, you know that sex and race needs to be adjusted in the model, but you are not sure about income and diet. How could you run an AIC based backward selection process to figure out whether you
+want to add income and diet, or both in the final model?",
+  answer("i) Fit a model with treatment, sex and race; ii) Fit the second model with treatment, income and diet; iii) Compare models i and ii using the AIC() function and choose the model with the lowest AIC; iv) Report the odds ratio with 95% CI."),
+  answer("i) Fit a model with treatment, sex, race, income and diet; ii) Fit the second model with treatment, income and diet; iii) Compare models i and ii using the AIC() function and choose the model with the lowest AIC; iv) Report the odds ratio with 95% CI."),
+  answer("i) Fit a model with treatment, sex, race, income and diet; ii) Define the range of models examined in the stepwise search; iii) Use the step() function with the initial model, scope and direction arguments to automate the variable selection; iv) Report the odds ratio with 95% CI.", correct = TRUE, message = "The step() and stepAIC() both choose a model by AIC in a stepwise algorithm."),
+  answer("i) Fit a model with treatment, sex, race, income and diet; ii) Use stepAIC() function to automate the variable selection; iii) Report the odds ratio with 95% CI.", message = "The step() and stepAIC() both choose a model by AIC in a stepwise algorithm."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r surveydata_quiz4, echo=FALSE}
+question("How could you test for adding an interaction term between sex and race in the final model in Q3 (fit3)?",
+  answer("fit4 <- update(fit3, sex + race + income + diet + sex:race); anova(fit4, fit3)$p"),
+  answer("fit4 <- update(fit3, .~. + interaction(sex*race)); anova(fit4, fit3)$p"),
+  answer("fit4 <- update(fit3, .~. + sex:race); anova(fit4, fit3)$p", correct = TRUE),
+  answer("fit4 <- update(fit3, sex + race + income + diet + interaction(sex, race)); anova(fit4, fit3)$p"),
+  allow_retry = TRUE,
+  incorrect = "Note: the update() function helps update and refit a model. Ensure to set an appropriate formula.",
+  random_answer_order = TRUE
+)
+```
+
+```{r surveydata_quiz5, echo=FALSE}
+question("What is the appropriate way to fit a regression model on sub-population, e.g., only on females?",
+  answer("i) Subset the analytic dataset for females using the subset() function; ii) Set up the design using svydesign() function; iii) Fit the regression model using the glm() function"),
+  answer("i) Set up the design using svydesign() function on full dataset; ii) Subset the design for females using the subset() function; iii) Fit the regression model using the glm() function", correct = TRUE),
+  answer("Both are wrong"),
+  answer("Both are correct"),
+  allow_retry = TRUE,
+  incorrect = "To correctly estimate the variance, we must consider the full complex survey design structure.",
+  random_answer_order = FALSE
+)
+```

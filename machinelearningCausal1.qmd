@@ -1,0 +1,128 @@
+## PSM with ML {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+require(caret)
+require(SuperLearner)
+require(DataExplorer)
+```
+
+### Data
+
+```{r load, cache=TRUE}
+load("Data/machinelearningCausal/NHANES15to16chl.RData")
+ls()
+plot_missing(analytic3) # already imputed dataset for simplicity
+```
+
+### Propensity score (PS) modelling
+
+#### Super Learner (SL) to estimate PS
+
+```{r slw, cache=TRUE, warning=FALSE, message=FALSE}
+require(SuperLearner)
+listWrappers(what = 'SL')
+```
+
+```{r slfit, cache=TRUE, results = 'hide'}
+SL.library <- c("SL.glm", "SL.glmnet", "SL.rpart")
+Y <- analytic3$cholesterol.bin.num
+A <- as.numeric(I(analytic3$diabetes == "Yes"))
+X <- analytic3[c("gender", "age", "born", "race", "education", "married", 
+                 "income", "diastolicBP", "systolicBP", "bmi",  
+                 "triglycerides", "uric.acid", "protein", "bilirubin", 
+                 "phosphorus", "sodium", "potassium", "globulin", 
+                 "calcium", "physical.work","physical.recreational")
+]
+cv.fit <- CV.SuperLearner(Y = A, X = X, family="binomial",
+                          SL.library=SL.library, verbose=FALSE,
+                          V=5, method = "method.NNLS")
+```
+
+#### Extract all PS
+
+```{r sl, cache=TRUE}
+predictions <- cbind(cv.fit$SL.predict,cv.fit$library.predict)
+head(predictions)
+```
+
+#### Match with PS from SL
+
+```{r balance, cache=TRUE}
+ps<-predictions[,1]
+summary(ps)
+require(Matching)
+match<-Match(Y=Y, Tr=A, X=ps, caliper=0.2,
+               M=1,estimand="ATT",ties=TRUE,
+               version="standard",replace=FALSE)
+summary(match)
+matched <- rbind(analytic3[match$index.treated,],
+                 analytic3[match$index.control,])
+```
+
+#### Check PS balance for PS from SL
+
+```{r balancetab, cache=TRUE}
+require(tableone)
+varb <- c("gender", "age", "born", "race", "education", "married", 
+                 "income", "diastolicBP", "systolicBP", "bmi",  
+                 "triglycerides", "uric.acid", "protein", "bilirubin", 
+                 "phosphorus", "sodium", "potassium", "globulin", 
+                 "calcium", "physical.work","physical.recreational")
+tab0 <- CreateTableOne(data=analytic3, strata= "diabetes",
+                       var = varb)
+sdiff.before <- ExtractSmd(tab0)
+tab1 <- CreateTableOne(data=matched, strata= "diabetes",
+                       var = varb)
+sdiff.after<- ExtractSmd(tab1)
+cbind(sdiff.before, sdiff.after)
+```
+
+#### Compare SMDs
+
+```{r slplot, cache=TRUE}
+SL.library
+SL.lib <- c("SL", SL.library)
+plot(sdiff.before,1:length(varb),type="l", col = "gray",
+       xlab="Std.diff", main = SL.lib[1],
+       xlim=c(-1,1), ylab = "Parameters")
+lines(sdiff.after,1:length(varb),type="l", col = "blue")
+abline(v=0, col = "green", lty = 2)
+abline(v=.25, col = "green", lty = 2)
+abline(v=-.25, col = "green", lty = 2)
+mtext("blue = after matching, gray = before matching")
+```
+
+#### PS from each candidate learners
+
+```{r slplots, cache=TRUE}
+require(tableone)
+SL.library
+SL.lib <- c("SL", SL.library)
+for (k in 2:length(SL.lib)){
+  cat("Result from", SL.lib[k], "\n")
+  ps<-predictions[,k]
+  summary(ps)
+  require(Matching)
+  match<-Match(Y=Y, Tr=A, X=ps, caliper=0.2,
+               M=1,estimand="ATT",ties=TRUE,
+               version="standard",replace=FALSE)
+  matched <- rbind(analytic3[match$index.treated,],
+                 analytic3[match$index.control,])
+  tab0 <- CreateTableOne(data=analytic3, strata= "diabetes",
+                       var = varb)
+  sdiff.before <- ExtractSmd(tab0)
+  tab1 <- CreateTableOne(data=matched, strata= "diabetes",
+                       var = varb)
+  sdiff.after<- ExtractSmd(tab1)
+  sdiff.after
+  plot(sdiff.before,1:length(varb),type="l", col = "gray",
+       xlab="Std.diff", main = SL.lib[k],
+       xlim=c(-1,1), ylab = "Parameters")
+  lines(sdiff.after,1:length(varb),type="l", col = "blue")
+  abline(v=0, col = "green", lty = 2)
+  abline(v=.25, col = "green", lty = 2)
+  abline(v=-.25, col = "green", lty = 2)
+  mtext("blue = after matching, gray = before matching")
+}
+```

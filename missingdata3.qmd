@@ -1,0 +1,119 @@
+## MID {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(mice)
+library(DataExplorer)
+library(VIM)
+library(jtools)
+library(survey)
+library(mitools)
+```
+
+-   Often researchers are reluctant to impute values in the **dependent variable** (and exposure variable). Particularly, for dependent variable, imputation might not help too much.
+-   However, if you have a good **auxiliary variable** (e.g., strongly correlated predictor, that are not used in the main analysis), often multiple imputation method can help. Use of auxiliary variables is one of the greatest strengths of MI methods.
+-   MI algorithm generally do not have any special treatment for dependent variable in its original form, and hence **ignoring dependent variable completely** may not be a good idea in many scenarios.
+-   Multiple imputation followed by deletion of imputed outcomes is known as **MID**. This is very popular, especially when you have high percentage missing values in the outcome variable (e.g., 20%-50%). For low missing % in outcome, the advantage can be minimal.
+-   We are extending this idea to deletion of **imputed exposures** as well (researchers are often reluctant to impute primary exposure of interest).
+-   Original MI and MID may result in similar results when m (**number of imputed datasets**) is higher.
+
+### Data
+
+```{r load, cache=TRUE}
+load("Data/missingdata/NHANES17.RData")
+```
+
+```{r data1, warning=FALSE, message=FALSE, cache=TRUE}
+require(mice)
+nhanes2
+nhanes2$id <- 1:nrow(nhanes2)
+nhanes2
+```
+
+### Outcome and exposure has missing
+
+```{r miss0, warning=FALSE, message=FALSE, cache=TRUE}
+# assume outcome = bmi and exposure = chl 
+nhanes2.excludingYA <- subset(nhanes2, !is.na(bmi) & !is.na(chl) )
+nhanes2.excludingYA # data without missing A and Y
+# identify ids of subjects with missing A & Y 
+nhanes2.excludingYA$id
+```
+
+### Impute as usual
+
+Impute Y and A for now, as well as other covariates with missing values.
+
+```{r imp0, warning=FALSE, message=FALSE, cache=TRUE}
+# use full data to impute 
+ini <- mice(nhanes2, pri = FALSE)
+ini$method
+pred <- ini$predictorMatrix
+pred
+pred[,"id"] <- 0 # as this is not a predictor
+m <- 5
+imp <- mice(data=nhanes2, m=m, maxit=3, seed=504007)
+# list format in m data
+impdata <- mice::complete(imp, action = "all")
+impdata # all IDs are present
+```
+
+### Include a missing indicator (Y & A)
+
+```{r imp1, warning=FALSE, message=FALSE, cache=TRUE}
+# Define formula (making binary Y)
+formula <- as.formula("I(bmi>25) ~ chl + hyp")
+data.list <- vector("list", m)
+# subset the data without Y and A's that had missing values
+# and record those subset data
+for (i in 1:m) {
+  analytic.i <- impdata[[i]]
+  analytic.i$miss <- 1
+  analytic.i$miss[analytic.i$id %in% nhanes2.excludingYA$id] <- 0
+  data.list[[i]] <- analytic.i
+}
+data.list  # only relevant IDs are present
+# record the fits from each data
+```
+
+### Design, subset and fit
+
+```{r imp2, warning=FALSE, message=FALSE, cache=TRUE}
+require(survey)
+fit.list <- vector("list", 5)
+for (i in 1:m) {
+  analytic.i <- data.list[[i]]
+  # assigning survey features = 1
+  w.design0 <- svydesign(id=~1, weights=~1,
+                        data=analytic.i)
+  w.design <- subset(w.design0, miss == 0)
+  fit <- svyglm(formula, design=w.design, family=binomial)
+  fit.list[[i]] <-  fit
+}
+```
+
+### Pooled results
+
+```{r imp3, warning=FALSE, message=FALSE, cache=TRUE}
+require(mitools)
+pooled.estimates <- MIcombine(fit.list)
+pooled.estimates
+
+# or you can do it this way
+betas<-MIextract(fit.list,fun=coef)
+vars<-MIextract(fit.list, fun=vcov)
+summary(MIcombine(betas,vars))
+
+# report beta coef
+sum.pooled <- summary(pooled.estimates, digits = 2)
+sum.pooled
+```
+
+### Report OR
+
+```{r imp4, warning=FALSE, message=FALSE, cache=TRUE}
+sum.pooled.OR <- summary(pooled.estimates, logeffect=TRUE, digits = 2)
+sum.pooled.OR
+```
+
+Using publish package may be possible, but requires complicated process. Look for `publish.MIresult` (can be complicated).

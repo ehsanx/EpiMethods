@@ -1,0 +1,234 @@
+## Reproducing results {.unnumbered}
+
+### Example article
+
+Let us use the article by @flegal2016trends as our reference. [DOI:10.1001/jama.2016.6458](https://jamanetwork.com/journals/jama/fullarticle/2526639).
+
+::: column-margin 
+@flegal2016trends
+:::
+
+#### Task
+
+Our task here is to reproduce the numbers reported in Table 1 from this article.
+
+#### Eligibility criteria
+
+Methods section from this article says:
+
+-   "For adults aged 20 years or older, obesity was defined according to clinical guidelines."
+-   "Pregnant women were excluded from analysis."
+-   "Participant age was grouped into categories of 20 to 39 years, 40 to 59 years, and 60 years and older."
+-   Table 1 title says NHANES 2013-2014 was used.
+
+#### Variables of interest
+
+Variables of interest:
+
+-   `age` (eligibility and stratifying variable)
+-   `sex` (stratifying variable)
+-   `race` (stratifying variable)
+-   `pregnancy status` (eligibility)
+-   `obesity/BMI status` (main variable of interest for the paper)
+
+#### Searching for necessary variables
+
+Search these variables using the NHANES variable keyword search within the 2013-14 cycle: [cdc.gov/nchs/nhanes/search/](https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx)
+
+-   Below is an example for BMI variable search:
+
+```{r jamabmi, echo=FALSE, out.width = '95%'}
+knitr::include_graphics("Images/accessing/bmi.png")
+```
+
+-   Identifying the component: Note that H is the index for 2013-14 cycle as seen in the picture:
+
+```{r jamabmi2, echo=FALSE, out.width = '95%'}
+knitr::include_graphics("Images/accessing/bmi2.png")
+```
+
+-   Identifying the variable:
+
+```{r jamabmi3, echo=FALSE, out.width = '95%'}
+knitr::include_graphics("Images/accessing/bmi3.png")
+```
+
+-   Rest of the variables all coming from demographic component
+
+```{r jamademo, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("Images/accessing/demo.png")
+```
+
+### Downloading relevant variables
+
+#### Demographic data
+
+For the demographic data, we will use the `DEMO_H` file, where the index `H` represents the 2013-14 cycle. 
+
+::: column-margin 
+Index `H` represents NHANES 2013-14 cycle
+:::
+
+::: callout-tip
+We use the `nhanes` function to download a NHANES datafile and `nhanesTranslate` function to encode the categorical variables to match with the CDC website. 
+:::
+
+```{r search1, cache=TRUE}
+library(nhanesA)
+demo13 <- nhanes('DEMO_H')
+Demo13 <- nhanesTranslate('DEMO_H', names(demo13), data=demo13)
+```
+
+#### Examination data
+
+We are using same H index for BMI.
+
+```{r search2, cache=TRUE}
+exam13 <- nhanes('BMX_H')
+Exam13 <- nhanesTranslate('BMX_H', names(exam13), data=exam13)
+```
+
+See all the column names in the data
+
+```{r head, cache=TRUE}
+names(Demo13)
+names(Exam13)
+```
+
+### Retain only useful variables
+
+```{r subset, cache=TRUE}
+demo13select <- Demo13[c("SEQN", # Respondent sequence number
+                         "RIDEXPRG", # Pregnancy status at exam
+                         "RIAGENDR", # Gender
+                         "RIDAGEYR", # Age in years at screening
+                         "RIDRETH3")]  # Race/Hispanic origin w/ NH Asian
+exam13select <- Exam13[c("SEQN", # Respondent sequence number
+                         "BMXBMI")] # Body Mass Index (kg/m**2)
+```
+
+### Quick look at the data
+
+```{r head2, cache=TRUE}
+head(demo13select)
+head(exam13select)
+```
+
+### Merge data
+
+Use the ID variable `SEQN` to merge both data:
+
+::: column-margin 
+Within NHANES datasets in a given cycle, each person has an unique identifier number (variable name `SEQN`). We can use this `SEQN` variable to merge their data.
+:::
+
+```{r merge, cache=TRUE}
+merged.data <- merge(demo13select, exam13select, by = c("SEQN"), all=TRUE)
+head(merged.data)
+dim(merged.data)
+merged.data$SEQN <- NULL
+```
+
+### Investigate merged data
+
+Let's check whether any missing data available.
+
+```{r table, cache=TRUE}
+require(tableone)
+tab_nhanes <- CreateTableOne(data=merged.data, includeNA = TRUE)
+print(tab_nhanes, showAllLevels = TRUE)
+```
+As we can see, the `RIDEXPRG` variable contains a huge amount of missing information. 
+
+```{r table1, cache=TRUE}
+summary(merged.data$BMXBMI)
+```
+
+BMI also contains many missing values.
+
+### Applying eligibility criteria
+
+We subset the data using criteria similar to the JAMA paper by @flegal2016trends (see above)
+
+::: column-margin 
+@flegal2016trends
+:::
+
+```{r analytic0, cache=TRUE}
+# No missing BMI
+analytic.data1 <- subset(merged.data, !is.na(BMXBMI)) 
+dim(analytic.data1)
+
+# Age >= 20
+analytic.data2 <- subset(analytic.data1, RIDAGEYR >= 20) 
+dim(analytic.data2)
+
+
+table(analytic.data2$RIDEXPRG,useNA = "always")
+# Pregnant women excluded
+analytic.data3 <- subset(analytic.data2,  is.na(RIDEXPRG) | RIDEXPRG != 
+                           "Yes, positive lab pregnancy test")
+dim(analytic.data3)
+```
+
+### Recoding variables
+
+Recode similar to the JAMA paper by @flegal2016trends (see above)
+
+::: column-margin 
+@flegal2016trends
+:::
+
+```{r analytic1, cache=TRUE}
+analytic.data3$AgeCat<-cut(analytic.data3$RIDAGEYR, c(0,20,40,60,Inf), 
+                           right = FALSE)
+analytic.data3$Gender <- car::recode(analytic.data3$RIAGENDR, 
+                                "'1'='Male'; '2'='Female'")
+table(analytic.data3$Gender,useNA = "always")
+analytic.data3$Race <- car::recode(analytic.data3$RIDRETH3,
+                                "c('Mexican American',
+                                'Other Hispanic')='Hispanic';
+                                'Non-Hispanic White'='White';
+                                'Non-Hispanic Black'='Black';
+                                'Non-Hispanic Asian'='Asian';
+                                else=NA")
+analytic.data3$Race <- factor(analytic.data3$Race, levels = 
+                                c('White', 'Black', 'Asian', 'Hispanic'))
+```
+
+### Reproducing Table 1
+
+Let's now compare our table with with the Table 1 in the article:
+
+```{r analytic2, cache=TRUE}
+# Dataset for males
+analytic.data3m <- subset(analytic.data3, Gender == "Male")
+
+## Dataset for females
+analytic.data3f <- subset(analytic.data3,  Gender == "Female")
+
+# Frequency table by age and gender
+with(analytic.data3, table(AgeCat,Gender))
+apply(with(analytic.data3, table(AgeCat,Gender)),1,sum)
+
+# Frequency table by age and race
+with(analytic.data3, table(AgeCat,Race))
+
+# Frequency table by age and race for males
+with(analytic.data3m, table(AgeCat,Race))
+
+# Frequency table by age and race for females
+with(analytic.data3f, table(AgeCat,Race))
+```
+
+As we can see, our frequencies exactly match with Table 1 in the article.
+
+::: column-margin 
+Also see [@ds] for a tidyverse solution
+:::
+
+## YouTube Videos
+
+You could watch the videos describing [how to create an analytic dataset from NHANES](https://youtu.be/II5BxyzyLQw), and [working with NHANES](https://youtu.be/U5vGa6wF50M).
+
+## References

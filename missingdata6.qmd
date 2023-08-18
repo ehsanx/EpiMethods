@@ -1,0 +1,158 @@
+## MCAR tests {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+require(mice)
+require(mitools)
+require(survey)
+require(remotes)
+require(simcausal)
+```
+
+### MCAR data
+
+#### Data generating process
+
+We generate `L` as a function of `P` and `B`.
+
+```{r dgm0, warning=FALSE, message=FALSE, cache=TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("B", distr = "rnorm", mean = 0, sd = 1) +
+  node("P", distr = "rnorm", mean = 0, sd = .7) +
+  node("L", distr = "rnorm", mean = 2 + 2 * P + 3 * B, sd = 3) + 
+  node("A", distr = "rnorm", mean = 0.5 + L + 2 * P, sd = 1) + 
+  node("Y", distr = "rnorm", mean = 1.1 * L + 1.3 * A + B + 2 * P, sd = .5)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag0, warning=FALSE, message=FALSE, cache=TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+
+```
+
+#### Generate Data
+
+```{r data0, cache=TRUE, warning=FALSE, message=FALSE}
+Obs.Data <- sim(DAG = Dset, n = 10000, rndseed = 123)
+head(Obs.Data)
+Obs.Data.original <- Obs.Data
+```
+
+#### Randomly set some data to missing
+
+Randomly assign some L values to missing. This should follow MCAR definition.
+
+```{r data0a, cache=TRUE}
+set.seed(123)
+Obs.Data$L[sample(1:length(Obs.Data$L), size = 1000)] <- NA
+summary(Obs.Data$L)
+```
+
+Check out missing data patterns visually.
+
+```{r pattern0, warning=FALSE, message=FALSE}
+require(VIM)
+res <- aggr(Obs.Data, plot = FALSE)
+plot(res, numbers = TRUE, prop = FALSE)
+```
+
+#### Visualize via margin plots
+
+-   The red boxplot depicts the distribution of a variable in the data where **L has a missing value**.
+-   The blue boxplot depicts the distribution of the values of a variable in the data where **L has an observed value**.
+-   **Same median and spread (range) may mean no difference in the distribution**.
+
+```{r plot0, warning=FALSE, message=FALSE}
+marginplot(Obs.Data[,c("L", "P")])
+marginplot(Obs.Data[,c("L", "B")])
+marginplot(Obs.Data[,c("L", "A")])
+marginplot(Obs.Data[,c("L", "Y")])
+```
+
+#### Little's MCAR test
+
+Little's (1988) test statistic (chi-squared) to assess if data is MCAR [@little1988test]: whether significant difference exists between the `means` of different missing-value patterns. Given the statistic and p-value, we determine whether data is MCAR or not (null hypothesis: data is MCAR).
+
+-   This test is based on assessing equality of `means` between the missing data pattern groups (could be 2 or more) using a likelihood ratio test (assumes multivariate normality).
+-   Rejection of this test (low p-value or high statistic) indicates that missing data pattern may not be MCAR.
+
+However, this test is associated with limitations (taken from `rdrr` manual [@natest]; see quoted text below; bold format added):
+
+-   "First, the test **does not identify the specific variables** that violates MCAR, i.e., the test does not identify potential correlates of missingness (i.e., auxiliary variables).
+-   Second, the test is based on **multivariate normality**, i.e., under departure from the normality assumption the test might be unreliable unless the sample size is large and is not suitable for categorical variables.
+-   Third, the test investigates mean differences assuming that the missing data pattern share a **common covariance matrix**, i.e., the test **cannot detect covariance-based deviations** from MCAR stemming from a Missing at Random (MAR) or Missing Not at Random (MNAR) mechanism because MAR and MNAR mechanisms can also produce missing data subgroups with equal means.
+-   Fourth, simulation studies suggest that Little's MCAR test suffers from **low statistical power**, particularly when the **number of variables that violate MCAR is small**, the relationship between the data and missingness is weak, or the data are MNAR (Thoemmes & Enders, 2007).
+-   Fifth, the test **can only reject**, but cannot prove the MCAR assumption, i.e., a statistically not significant result and failing to reject the null hypothesis of the MCAR test does not prove the null hypothesis that the data is MCAR.
+-   Finally, under the null hypothesis the data are actually MCAR or MNAR, while a statistically significant result indicates that missing data are MAR or MNAR, i.e., **MNAR cannot be ruled out** regardless of the result of the test."
+
+```{r mcar, cache=TRUE, message=FALSE, warning=FALSE}
+require(naniar)
+mcar_test(Obs.Data)
+
+require(misty)
+na.test(Obs.Data)
+```
+
+#### MCAR and normality test
+
+-   Hawkins (1981) proposed a test of multivariate normality and homoscedasticity (testing homoscedasticity, on top of testing equality of means) [@hawkins1981new].
+-   Jamshidian and Jalal (2010) proposed testing equality of covariances between groups (for both normal and non-normal data) having identical missing data patterns. It is tested using Hawkins test (assuming normality) and a non-parametric test respectively [@jamshidian2010tests].
+
+The following package [@jamshidian2010tests] tests multivariate normality and homoscedasticity in the context of missing data.
+
+```{r normality, cache=TRUE, message=FALSE, warning=FALSE}
+#library(devtools)
+#install_github("cran/MissMech")
+library(MissMech)
+test.result <- TestMCARNormality(data = Obs.Data)
+test.result
+
+summary(test.result)
+boxplot(test.result)
+```
+
+### Non-MCAR data
+
+#### Set some data to missing based on a rule
+
+```{r data1, cache=TRUE}
+Obs.Data <- Obs.Data.original
+Obs.Data$L[Obs.Data$L > 7.79] <- NA
+summary(Obs.Data$L)
+```
+
+```{r plot1, cache=TRUE}
+res <- aggr(Obs.Data, plot = FALSE)
+plot(res, numbers = TRUE, prop = FALSE)
+```
+
+#### Visualize via margin plots
+
+```{r plot2, cache=TRUE}
+marginplot(Obs.Data[,c("L", "P")])
+marginplot(Obs.Data[,c("L", "B")])
+marginplot(Obs.Data[,c("L", "A")])
+marginplot(Obs.Data[,c("L", "Y")])
+```
+
+#### Little's MCAR test
+
+```{r mcar1, cache=TRUE}
+mcar_test(Obs.Data)
+na.test(Obs.Data)
+```
+
+#### MCAR and normality test
+
+```{r normality1, cache=TRUE}
+test.result <- TestMCARNormality(data = Obs.Data)
+test.result
+summary(test.result)
+boxplot(test.result)
+```

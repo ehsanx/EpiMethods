@@ -1,0 +1,310 @@
+## PSM with MI {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(MatchIt)
+require(tableone)
+require(survey)
+require(cobalt)
+require(Publish)
+require(optmatch)
+require(data.table)
+require(jtools)
+require(ggstance)
+require(DataExplorer)
+require(mitools)
+library(kableExtra)
+library(mice)
+```
+
+### Problem Statement
+
+#### Logistic regression
+
+-   Perform multiple imputation to deal with missing values; with 3 imputed datasets, 5 iterations,
+
+-   fit **survey featured logistic regression** in all of the 3 imputed datasets, and
+
+-   obtain the pooled OR (adjusted) and the corresponding 95% confidence intervals.
+
+-   Hints
+
+    -   Use the **covariates** (listed below) in the imputation model.
+    -   **Imputation model covariates** can be different than the original analysis covariates. You are encouraged to use variables in the imputation model that can be predictive of the variables with missing observations. In this example, we use the strata variable as an **auxiliary variable** in the imputation model, but not the survey weight or PSU variable.
+    -   Also the **imputation model specification** can be modified. For example, we use **pmm** method for bmi in the imputation model.
+    -   Remove any subject ID variable from the imputation model, if created in an intermediate step. Indeed ID variables should not be in the imputation model, if they are **not predictive** of the variables with missing observations.
+
+#### Propensity score matching (Zanutto, 2006)
+
+-   Use the **propensity score matching as per Zanutto E. L. (2006)**'s recommendation in all of the imputed datasets.
+-   Report the pooled OR estimates (adjusted) and corresponding 95% confidence intervals (adjusted OR).
+
+### Data and variables
+
+#### Analytic data
+
+The analytic dataset is saved as NHANES17.RData.
+
+#### Variables
+
+We are primarily interested in outcome **diabetes** and exposure **whether born in the US (born)**.
+
+Variables under consideration:
+
+-   survey features
+    -   PSU
+    -   strata
+    -   survey weight
+-   Covariates
+    -   race
+    -   age
+    -   marriage
+    -   education
+    -   gender
+    -   BMI
+    -   systolic blood pressure
+
+#### Pre-processing
+
+```{r data, cache=TRUE}
+load(file="Data/propensityscore/NHANES17.RData") # read data
+ls()
+dim(analytic.with.miss)
+vars <- c("ID", # ID
+          "psu", "strata", "weight", # Survey features 
+          "race", "age", "married","education","gender","bmi","systolicBP", # Covariates
+          "born", # Exposure
+          "diabetes") # Outcome
+```
+
+#### Subset the dataset
+
+Only keep the variables of interest
+
+```{r subset, cache=TRUE}
+dat.with.miss <- analytic.with.miss[,vars]
+dim(analytic.with.miss)
+```
+
+#### Inspect weights
+
+```{r weight, cache=TRUE}
+summary(dat.with.miss$weight)
+# weight = 0 would create problem in the analysis
+# ad-hoc solution to 0 weight problem
+dat.with.miss$weight[dat.with.miss$weight == 0] <- 0.00000001
+```
+
+#### Recode the exposure variable
+
+```{r recode, cache=TRUE}
+dat.with.miss$born <- car::recode(dat.with.miss$born, 
+recodes = " 'Born in 50 US states or Washingt' = 
+'Born in US'; 'Others' = 'Others'; else = NA " )
+dat.with.miss$born <- factor(dat.with.miss$born, levels = c("Born in US", "Others"))
+```
+
+#### variable types
+
+```{r vartype, cache=TRUE}
+factor.names <- c("race", "married", "education", "gender", "diabetes")
+dat.with.miss[,factor.names] <- lapply(dat.with.miss[,factor.names], factor)
+```
+
+#### Inspect extent of missing data problem
+
+```{r plot, cache=TRUE}
+require(DataExplorer)
+plot_missing(dat.with.miss)
+```
+
+Note that, **multiple imputation then delete** (MID) approach can be applied if the outcome had some missing values. Due to the small number of missingness, MICE may not impute the outcomes BTW.
+
+### Logistic regression
+
+#### Initialization
+
+```{r imp0, cache=TRUE}
+imputation <- mice(data = dat.with.miss, maxit = 0, print = FALSE)
+```
+
+#### Setting imputation model covariates
+
+Setting strata as auxiliary variable
+
+```{r imp1, cache=TRUE}
+pred <- imputation$pred
+pred
+pred[,"ID"] <- pred["ID",] <- 0
+pred[,"psu"] <- pred["psu",] <- 0
+pred[,"weight"] <- pred["weight",] <- 0
+pred["strata",] <- 0
+pred
+```
+
+#### Setting imputation model specification
+
+Add `pmm` for bmi
+
+```{r imp2, cache=TRUE}
+meth <- imputation$meth
+meth["bmi"] <- "pmm"
+```
+
+#### Impute incomplete data
+
+We are imputing m = 3 times
+
+```{r imp3, cache=TRUE, warning=FALSE}
+imputation <- mice(data = dat.with.miss, 
+                   seed = 123, 
+                   predictorMatrix = pred,
+                   method = meth, 
+                   m = 3, 
+                   maxit = 5, 
+                   print = FALSE)
+impdata <- mice::complete(imputation, action="long")
+impdata$.id <- NULL
+m <- 3
+set.seed(123)
+allImputations <-  imputationList(lapply(1:m, 
+                                         function(n)
+                                           subset(impdata, 
+                                                  subset=.imp==n)))
+str(allImputations)
+```
+
+#### Design
+
+```{r imp4, cache=TRUE}
+w.design <- svydesign(ids = ~psu, weights = ~weight, strata = ~strata,
+                      data = allImputations, nest = TRUE)
+```
+
+#### Survey data analysis
+
+```{r imp5, cache=TRUE}
+model.formula <- as.formula(I(diabetes == 'Yes') ~ 
+                              born + race + age + married + 
+                              education + gender + bmi + systolicBP)
+fit.from.logistic <- with(w.design, svyglm(model.formula, family = binomial("logit")))
+```
+
+#### Pooled estimates
+
+```{r imp6, cache=TRUE}
+pooled.estimates <- MIcombine(fit.from.logistic)
+summary(pooled.estimates, digits = 2, logeffect=TRUE)
+OR <- round(exp(pooled.estimates$coefficients), 2) 
+OR <- as.data.frame(OR)
+CI <- round(exp(confint(pooled.estimates)), 2)
+OR <- cbind(OR, CI)
+OR[2,]
+```
+
+### Propensity score matching analysis
+
+#### Initialization
+
+```{r imp7, cache=TRUE}
+imputation <- mice(data = dat.with.miss, maxit = 0, print = FALSE)
+impdata <- mice::complete(imputation, action="long")
+m <- 3
+allImputations <- imputationList(lapply(1:m, 
+                                        function(n) 
+                                          subset(impdata, 
+                                                 subset=.imp==n)))
+```
+
+#### Zanutto E. L. (2006) under multiple imputation
+
+Notice that we are performing multi-step process within MI
+
+```{r imp8, cache=TRUE}
+match.statm <- SMDm <- tab1m <- vector("list", m) 
+fit.from.PS <- vector("list", m)
+
+for (i in 1:m) {
+  analytic.i <- allImputations$imputations[[i]]
+  # Rename the weight variable into survey.weight
+  names(analytic.i)[names(analytic.i) == "weight"] <- "survey.weight"
+  
+  # Specify the PS model to estimate propensity scores
+  ps.formula <- as.formula(I(born=="Others") ~ 
+                             race + age + married + education + 
+                             gender + bmi + systolicBP)
+
+  # Propensity scores
+  ps.fit <- glm(ps.formula, data = analytic.i, family = binomial("logit"))
+  analytic.i$PS <- fitted(ps.fit)
+  
+  # Match exposed and unexposed subjects 
+  set.seed(123)
+  match.obj <- matchit(ps.formula, data = analytic.i, 
+                       distance = analytic.i$PS, 
+                       method = "nearest", 
+                       replace = FALSE,
+                       caliper = 0.2, 
+                       ratio = 1)
+  match.statm[[i]] <- match.obj
+  analytic.i$PS <- match.obj$distance
+  
+  # Extract matched data
+  matched.data <- match.data(match.obj) 
+  
+  # Balance checking
+  cov <- c("race", "age", "married", "education", "gender", "bmi", "systolicBP")
+  
+  tab1m[[i]] <- CreateTableOne(strata = "born", 
+                               vars = cov, data = matched.data, 
+                               test = FALSE, smd = TRUE)
+  SMDm[[i]] <- ExtractSmd(tab1m[[i]])
+  
+  # Setup the design with survey features
+  analytic.i$matched <- 0
+  analytic.i$matched[analytic.i$ID %in% matched.data$ID] <- 1
+  
+  # Survey setup for full data
+  w.design0 <- svydesign(strata = ~strata, id = ~psu, weights = ~survey.weight, 
+                         data = analytic.i, nest = TRUE)
+  
+  # Subset matched data
+  w.design.m <- subset(w.design0, matched == 1)
+  
+  # Outcome model (double adjustment)
+  out.formula <- as.formula(I(diabetes == "Yes") ~ 
+                              born + race + age + married + 
+                              education + gender + bmi + systolicBP)
+  fit.from.PS[[i]] <- svyglm(out.formula, design = w.design.m, 
+                     family = quasibinomial("logit"))
+}
+```
+
+#### Check matched data
+
+```{r imp9, cache=TRUE}
+match.statm
+```
+
+#### Check balance in matched data
+
+```{r imp10, cache=TRUE}
+SMDm
+```
+
+### Pooled estimate
+
+```{r imp11, cache=TRUE}
+pooled.estimates <- MIcombine(fit.from.PS)
+summary(pooled.estimates, digits = 2, logeffect=TRUE)
+OR <- round(exp(pooled.estimates$coefficients), 2) 
+OR <- as.data.frame(OR)
+CI <- round(exp(confint(pooled.estimates)), 2)
+OR <- cbind(OR, CI)
+OR[2,]
+```
+
+## YouTube Videos
+
+You could watch the videos describing [exact matching](https://youtu.be/jC8g_n6RqK0), [propensity score matching](https://youtu.be/ONaKFZCTRfw), [propensity score matching by Zanutto (2006)](https://youtu.be/bIzek3FumW0), [propensity score matching by DuGoff et al. (2014)](https://youtu.be/FPx5gF8gy9M), [propensity score matching by Austin et al. (2018)](https://youtu.be/UBp38smBtFA).
+

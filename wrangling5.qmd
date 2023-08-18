@@ -1,0 +1,48 @@
+## Summary tables {.unnumbered}
+
+Medical research and epidemiology often involve large, complex datasets. Data summarization is a vital step that transforms these vast datasets into concise, understandable insights. In medical contexts, these summaries can highlight patterns, indicate data inconsistencies, and guide further research. This tutorial will teach you how to use R to efficiently summarize medical data.
+
+In epidemiology and medical research, "Table 1" typically refers to the first table in a research paper or report that provides descriptive statistics of the study population. It offers a snapshot of the baseline characteristics of the study groups, whether in a cohort study, clinical trial, or any other study design.
+
+```{r tab1a, cache=TRUE}
+mpg <- read.csv("Data/wrangling/mpg.csv", header = TRUE)
+## Ex create a summary table between manufacturer and drv
+table(mpg$drv, mpg$manufacturer)
+```
+
+The first line reads a CSV file. It uses the table() function to generate a contingency table (cross-tabulation) between two categorical variables: `drv` (drive) and `manufacturer`. It essentially counts how many times each combination of drv and manufacturer appears in the dataset.
+
+```{r tab1b, cache=TRUE}
+## Get the percentage summary using prop.table
+prop.table(table(mpg$drv, mpg$manufacturer), margin = 2)
+## margin = 1 sum across row, 2 across col
+```
+
+This code calculates the column-wise proportion (as percentages) for each combination of `drv` and `manufacturer`. The prop.table() function is used to compute the proportions. The `margin = 2` argument indicates that the proportions are to be computed across columns (`margin = 1` would compute them across rows).
+
+### tableone package
+
+::: callout-tip
+CreateTableOne function from tableone package could be a very useful function to see the summary table. Type `?tableone::CreateTableOne` to see for more details.
+:::
+
+This section introduces the tableone package, which offers the `CreateTableOne` function. This function helps in creating "Table 1" type summary tables, commonly used in epidemiological studies.
+
+```{r tab2, cache=TRUE, warning=FALSE}
+require(tableone)
+CreateTableOne(vars = c("cyl", "drv", "hwy", "cty"), data = mpg, 
+               strata = "trans", includeNA = TRUE, test = FALSE)
+```
+
+The CreateTableOne function is used to create a summary table for the variables `cyl, drv, hwy, and cty` from the `mpg` dataset. The `strata = trans` argument means that the summary is stratified by the trans variable. The `includeNA = TRUE` argument means that missing values (NAs) are included in the summary. The `test = FALSE` argument indicates that no statistical tests should be applied to the data (often tests are used to compare groups in the table).
+
+### table1 package
+
+This section introduces another package, `table1`, which can also be used to create "Table 1" type summary tables.
+
+```{r tab3, cache=TRUE, warning=FALSE}
+require(table1)
+table1(~ cyl + drv + hwy + cty | trans, data=mpg)
+```
+
+The `table1()` function is used to generate a summary table for the specified variables. The formula-like syntax `(~ cyl + drv + hwy + cty | trans)` indicates that the summary should be stratified by the `trans` variable.

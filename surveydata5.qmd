@@ -1,0 +1,160 @@
+## Model performance {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(survey)
+library(ROCR)
+library(WeightedROC)
+```
+
+### Load data
+
+```{r load, cache=FALSE}
+load("Data/surveydata/cchs123w.RData")
+load("Data/surveydata/cchs123w2.RData")
+ls()
+dim(analytic.miss)
+dim(analytic2)
+```
+
+```{r fit0, cache=TRUE}
+library(survey)
+simple.model <- as.formula(I(CVD=="event") ~ OA)
+fit0 <- svyglm(simple.model,
+              design = w.design,
+              family = binomial(logit))
+
+basic.model
+fit5 <- svyglm(basic.model,
+              design = w.design,
+              family = binomial(logit))
+
+aic.int.model
+fit9 <- svyglm(aic.int.model,
+              design = w.design,
+              family = binomial(logit))
+```
+
+### Model performance
+
+#### ROC curve
+
+-   The appropriateness of the fitted logistic regression model needs to be examined before it is accepted for use.
+-   Plotting the pairs of - sensitivities vs - 1-specificities on a scatter plot provides a Receiver Operating Characteristic (ROC) curve.
+-   The area under the ROC curve = AUC / C-statistic.
+-   ROC/AUC should consider weights for complex surveys.
+
+Grading Guidelines for AUC values:
+
+-   0.90-1.0 excellent discrimination (unusual)
+-   0.80-0.90 good discrimination
+-   0.70-0.80 fair discrimination
+-   0.60-0.70 poor discrimination
+-   0.50-0.60 failed discrimination
+
+```{r auc, cache=TRUE}
+require(ROCR)
+# WeightedROC may not be on cran for all R versions
+# devtools::install_github("tdhock/WeightedROC")
+
+library(WeightedROC)
+svyROCw <- function(fit=fit,outcome=analytic2$CVD=="event", weight = NULL){
+  # ROC curve for
+  # Survey Data with Logistic Regression
+  if (is.null(weight)){ # require(ROCR)
+    prob <- predict(fit, type = "response")
+  pred <- prediction(as.vector(prob), outcome)
+  perf <- performance(pred, "tpr", "fpr")
+  auc <- performance(pred, measure = "auc")
+  auc <- auc@y.values[[1]]
+  roc.data <- data.frame(fpr = unlist(perf@x.values), tpr = unlist(perf@y.values), 
+      model = "Logistic")
+  with(data = roc.data,plot(fpr, tpr, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,
+     xlab="1 - specificity", ylab="Sensitivity",
+     main = paste("AUC = ", round(auc,3))))
+  mtext("Unweighted ROC")
+  abline(0,1, lty=2)
+  } else { # library(WeightedROC)
+    outcome <- as.numeric(outcome)
+  pred <- predict(fit, type = "response")
+  tp.fp <- WeightedROC(pred, outcome, weight)
+  auc <- WeightedAUC(tp.fp)
+  with(data = tp.fp,plot(FPR, TPR, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,
+     xlab="1 - specificity", ylab="Sensitivity",
+     main = paste("AUC = ", round(auc,3))))
+  abline(0,1, lty=2)
+  mtext("Weighted ROC")
+  }
+}
+```
+
+```{r auc2, cache=TRUE}
+summary(analytic2$weight)
+analytic2$corrected.weight <- weights(w.design)
+summary(analytic2$corrected.weight)
+svyROCw(fit=fit0,outcome=analytic2$CVD=="event", weight = analytic2$corrected.weight)
+svyROCw(fit=fit5,outcome=analytic2$CVD=="event", weight = analytic2$corrected.weight)
+svyROCw(fit=fit9,outcome=analytic2$CVD=="event", weight = analytic2$corrected.weight)
+# This function does not take in to account of strata/cluster
+```
+
+#### Archer and Lemeshow test
+
+-   Hosmer Lemeshow-type tests are most useful as a very crude way to screen for fit problems, and should not be taken as a definitive diagnostic of a 'good' fit.
+    -   problem in small sample size
+    -   Dependent on G (group)
+-   Archer and Lemeshow (2006) extended the standard Hosmer and Lemeshow GOF test for complex surveys.
+-   After fitting the survey weighted logistic regression, the F-adjusted mean residual goodness-of-fit test could suggest
+    -   no evidence of lack of fit (if P-value \> a reasonable cut-point, e.g., 0.05)
+    -   evidence of lack of fit (if P-value \< a reasonable cut-point, e.g., 0.05)
+
+```{r al1, cache=TRUE}
+AL.gof <- function(fit=fit, data = analytic2, 
+                   weight = "corrected.weight"){
+  # Archer-Lemeshow Goodness of Fit Test for
+  # Survey Data with Logistic Regression
+  r <- residuals(fit, type="response") 
+  f<-fitted(fit) 
+  breaks.g <- c(-Inf, quantile(f,  (1:9)/10), Inf)
+  breaks.g <- breaks.g + seq_along(breaks.g) * .Machine$double.eps
+  g<- cut(f, breaks.g)
+  data2g <- cbind(data,r,g)
+  newdesign <- svydesign(id=~1, 
+                         weights=as.formula(paste0("~",weight)), 
+                        data=data2g)
+  decilemodel<- svyglm(r~g, design=newdesign) 
+  res <- regTermTest(decilemodel, ~g)
+  return(res) 
+}
+```
+
+```{r al2, cache=TRUE}
+AL.gof(fit0, analytic2, weight ="corrected.weight")
+AL.gof(fit5, analytic2, weight ="corrected.weight")
+AL.gof(fit9, analytic2, weight = "corrected.weight")
+```
+
+#### Additional function
+
+If the survey data contains strata and cluster, then the following function will be useful:
+
+```{r gof2, cache=TRUE}
+AL.gof2 <- function(fit=fit7, data = analytic, 
+                   weight = "corrected.weight", psu = "psu", strata= "strata"){
+  # Archer-Lemeshow Goodness of Fit Test for
+  # Survey Data with Logistic Regression
+  r <- residuals(fit, type="response") 
+  f<-fitted(fit) 
+  breaks.g <- c(-Inf, quantile(f,  (1:9)/10), Inf)
+  breaks.g <- breaks.g + seq_along(breaks.g) * .Machine$double.eps
+  g<- cut(f, breaks.g)
+  data2g <- cbind(data,r,g)
+  newdesign <- svydesign(id=as.formula(paste0("~",psu)),
+                         strata=as.formula(paste0("~",strata)),
+                         weights=as.formula(paste0("~",weight)), 
+                        data=data2g, nest = TRUE)
+  decilemodel<- svyglm(r~g, design=newdesign) 
+  res <- regTermTest(decilemodel, ~g)
+  return(res) 
+}
+```

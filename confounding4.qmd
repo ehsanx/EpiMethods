@@ -1,0 +1,129 @@
+## Z-bias {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(simcausal)
+```
+
+You could watch the video describing [Z-bias and Bias amplification](https://www.youtube.com/watch?v=EcX7ILtp9aQ).
+
+### Continuous Y
+
+-   U is unmeasured continuous variable
+-   Z is an instrumental variable
+-   A is binary treatment
+-   Y is continuous outcome
+
+#### Non-null effect
+
+-   True treatment effect = 1.3
+
+##### Data generating process
+
+```{r dgm10, cache = TRUE, warning=FALSE, message=FALSE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("age", distr = "rnorm", mean = 2, sd = 1) + 
+  node("gender", distr = "rbern", prob = plogis(0.25)) +
+  node("education", distr = "rbern", prob = plogis(3 + 5* age)) +
+  node("diet", distr = "rbern", prob = plogis(13 + 7 * education)) +
+  node("income", distr = "rbern", prob = plogis(2 + 1.4 * education + 2 * age)) +
+  node("smoking", distr = "rbern", prob = plogis(1 + 1.2 * gender + 2 * age)) +
+  node("hypertension", distr = "rnorm", mean = 3 * diet + 1.3 * age + 2 * smoking + 0.5 * gender, sd = .1)
+Dset <- set.DAG(D)
+```
+
+##### Generate DAG
+
+```{r dag10, cache = TRUE, warning=FALSE, message=FALSE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+
+```
+
+##### Generate Data
+
+```{r data10, cache = FALSE, warning=FALSE, message=FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+##### Estimate effect
+
+```{r est10, cache = TRUE, warning=FALSE, message=FALSE}
+Obs.Data$income <- as.factor(Obs.Data$income)
+# True data generating mechanism 
+# (unattainable as U is unmeasured)
+fit0 <- glm(hypertension ~ diet + age + smoking + gender, family="gaussian", data=Obs.Data)
+round(coef(fit0),2)
+
+require(Publish)
+fit1 <- glm(hypertension ~ diet + age + smoking*income + gender, family="gaussian", data=Obs.Data)
+publish(fit1)
+```
+
+### Binary Y
+
+-   U is unmeasured continuous variable
+-   Z is an instrumental variable
+-   A is binary treatment
+-   Y is binary outcome
+
+#### Non-null effect
+
+-   True treatment effect = 1.3
+
+##### Data generating process
+
+```{r dgm11, cache = TRUE, warning=FALSE, message=FALSE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("U", distr = "rnorm", mean = 2, sd = 1) + 
+  node("Z", distr = "rnorm", mean = 2, sd = 1) + 
+  node("A", distr = "rbern", prob = plogis(-1 + 2*U + 2*Z)) +
+  node("Y", distr = "rbern", prob = plogis(-1 + 3 * U + 1.3 * A))
+Dset <- set.DAG(D)
+```
+
+##### Generate DAG
+
+```{r dag11, cache = TRUE, warning=FALSE, message=FALSE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+
+```
+
+##### Generate Data
+
+```{r dat11, cache = FALSE, warning=FALSE, message=FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+##### Estimate effect
+
+```{r est11, cache = TRUE, warning=FALSE, message=FALSE}
+# True data generating mechanism (unattainable as U is unmeasured)
+fit0 <- glm(Y ~ A + U, family="binomial", data=Obs.Data)
+round(coef(fit0),2)
+
+# Unadjusted effect (Z not controlled)
+fit1 <- glm(Y ~ A, family="binomial", data=Obs.Data)
+round(coef(fit1),2)
+
+# Bias fit 1
+coef(fit1)["A"] - 1.3
+
+# Adjusted effect (Z  controlled)
+fit2 <- glm(Y ~ A + Z, family="binomial", data=Obs.Data)
+round(coef(fit2),2)
+
+# Bias from fit 2
+coef(fit2)["A"] - 1.3
+```

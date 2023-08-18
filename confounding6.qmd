@@ -1,0 +1,290 @@
+## Change-in-estimate {.unnumbered}
+
+Use of Change-in-estimate for various measures of effects (RD and OR, and impact of collapsibility vs non-collapsibility in absence of confounding).
+
+```{r setup, warning=FALSE, message=FALSE,cache=TRUE}
+# Load required packages
+library(simcausal)
+```
+
+## Adjusting for a variable that is a confounder
+
+### Continuous Outcome
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm20, warning=FALSE, message=FALSE, cache = TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("L", distr = "rnorm", mean = 0, sd = 1) + 
+  node("A", distr = "rnorm", mean = 0 + L, sd = 1) + 
+  node("P", distr = "rbern", prob = plogis(-10)) + 
+  node("Y", distr = "rnorm", mean = 1.1 * L + 1.3 * A, sd = .1)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag20, warning=FALSE, message=FALSE, cache = TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data20, warning=FALSE, message=FALSE, cache = FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect (beta-coef)
+
+```{r est20, cache= TRUE}
+fit <- glm(Y ~ A, family="gaussian", data=Obs.Data)
+round(coef(fit),2)
+
+fit2 <- glm(Y ~ A + L, family="gaussian", data=Obs.Data)
+round(coef(fit2),2)
+```
+
+Including a variable that is a confounder (L) in the model changes effect estimate (1.3).
+
+### Binary Outcome
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm21, cache= TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("L", distr = "rnorm", mean = 0, sd = 1) + 
+  node("A", distr = "rnorm", mean = 0 + L, sd = 1) + 
+  node("P", distr = "rbern", prob = plogis(-10)) + 
+  # node("M", distr = "rnorm", mean = P + 0.5 * A, sd = 1) + 
+  node("Y", distr = "rbern", prob = plogis( 1.1 * L + 1.3 * A)) 
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag21, cache= TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data21, warning=FALSE, message=FALSE, cache = FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect (OR)
+
+```{r est21, cache= TRUE}
+fit <- glm(Y ~ A, family=binomial(link = "logit"), data=Obs.Data)
+round(coef(fit),2)
+
+fit2 <- glm(Y ~ A + L, family=binomial(link = "logit"), data=Obs.Data)
+round(coef(fit2),2)
+```
+
+Including a variable that is a confounder (L) in the model changes effect estimate (1.3).
+
+## Adjusting for a variable that is not a confounder (simplified)
+
+### Continuous Outcome
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm22, cache= TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+    node("A", distr = "rnorm", mean = 0, sd = 1) + 
+  node("P", distr = "rbern", prob = plogis(-10)) + 
+  # node("M", distr = "rnorm", mean = P + 0.5 * A, sd = 1) + 
+  node("R", distr = "rnorm", mean = 0, sd = 1) + 
+  node("Y", distr = "rnorm", mean = 1.1 * R + 1.3 * A, sd = .1)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag22, cache= TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data22, warning=FALSE, message=FALSE, cache = FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect (beta-coef)
+
+```{r est22, cache= TRUE}
+fit <- glm(Y ~ A, family="gaussian", data=Obs.Data)
+round(coef(fit),2)
+
+fit2 <- glm(Y ~ A + R, family="gaussian", data=Obs.Data)
+round(coef(fit2),2)
+```
+
+Including a variable that is not a confounder (R is a pure risk factor for the outcome Y) in the model does not change effect estimate (1.3).
+
+### Binary Outcome
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm23, cache= TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("A", distr = "rnorm", mean = 0, sd = 1) + 
+  node("P", distr = "rbern", prob = plogis(-10)) + 
+  # node("M", distr = "rnorm", mean = P + 0.5 * A, sd = 1) + 
+  node("R", distr = "rnorm", mean = 0, sd = 1) + 
+  node("Y", distr = "rbern", prob = plogis(1.1 * R + 1.3 * A)) 
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag23, cache= TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data23, warning=FALSE, message=FALSE, cache = FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect (OR)
+
+```{r est23, cache= TRUE}
+fit <- glm(Y ~ A, family=binomial(link = "logit"), data=Obs.Data)
+round(coef(fit),2)
+
+fit2 <- glm(Y ~ A + R, family=binomial(link = "logit"), data=Obs.Data)
+round(coef(fit2),2)
+```
+
+Including a variable that is not a confounder (R is a pure risk factor for the outcome Y) in the model changes effect estimate (1.3).
+
+## Adjusting for a variable that is not a confounder (Complex)
+
+### Continuous Outcome
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm24, cache= TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+    node("A", distr = "rnorm", mean = 0, sd = 1) + 
+  node("P", distr = "rbern", prob = plogis(-10)) + 
+  node("M", distr = "rnorm", mean = P + 0.5 * A, sd = 1) + 
+  node("R", distr = "rnorm", mean = 0, sd = 1) + 
+  node("Y", distr = "rnorm", mean = 0.5 * M + 1.1 * R + 1.3 * A, sd = .1)
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag24, cache= TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data24, warning=FALSE, message=FALSE, cache = FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect (beta-coef)
+
+```{r est24, cache= TRUE}
+fit <- glm(Y ~ A + M, family="gaussian", data=Obs.Data)
+round(coef(fit),2)
+
+fit2 <- glm(Y ~ A + M + R, family="gaussian", data=Obs.Data)
+round(coef(fit2),2)
+```
+
+Including a variable that is not a confounder (R is a pure risk factor for the outcome Y) in the model does not change effect estimate (1.3).
+
+### Binary Outcome
+
+-   True treatment effect = 1.3
+
+#### Data generating process
+
+```{r dgm25, cache= TRUE}
+require(simcausal)
+D <- DAG.empty()
+D <- D + 
+  node("A", distr = "rnorm", mean = 0, sd = 1) + 
+  node("P", distr = "rbern", prob = plogis(-10)) + 
+  node("M", distr = "rnorm", mean = P + 0.5 * A, sd = 1) + 
+  node("R", distr = "rnorm", mean = 0, sd = 1) + 
+  node("Y", distr = "rbern", prob = plogis(0.5 * M + 1.1 * R + 1.3 * A)) 
+Dset <- set.DAG(D)
+```
+
+#### Generate DAG
+
+```{r dag25, cache= TRUE}
+plotDAG(Dset, xjitter = 0.1, yjitter = .9,
+        edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
+        vertex_attrs = list(size = 12, label.cex = 0.8))
+```
+
+#### Generate Data
+
+```{r data25, warning=FALSE, message=FALSE, cache = FALSE}
+require(simcausal)
+Obs.Data <- sim(DAG = Dset, n = 1000000, rndseed = 123)
+head(Obs.Data)
+```
+
+#### Estimate effect (OR)
+
+```{r est25, cache= TRUE}
+fit <- glm(Y ~ A + M, family=binomial(link = "logit"), data=Obs.Data)
+round(coef(fit),2)
+
+fit2 <- glm(Y ~ A + M + R, family=binomial(link = "logit"), data=Obs.Data)
+round(coef(fit2),2)
+```
+
+Including a variable that is not a confounder (R is a pure risk factor for the outcome Y) in the model changes effect estimate (1.3).
+

@@ -1,0 +1,156 @@
+## Binary outcome {.unnumbered}
+
+In this chapter, we will talk about Regression that deals with prediction of binary outcomes. We will use logistic regression to build the first prediction model.
+
+-   Watch the video describing this chapter [![video](https://img.youtube.com/vi/YPOP82Wxfy8/maxresdefault.jpg)](https://youtu.be/YPOP82Wxfy8)
+
+```{r setup05, include=FALSE}
+require(Publish)
+```
+
+### Read previously saved data
+
+```{r load, cache=TRUE}
+ObsData <- readRDS(file = "Data/machinelearning/rhcAnalytic.RDS")
+```
+
+### Outcome levels (factor)
+
+-   Label
+    -   Possible values of outcome
+
+```{r levels, cache=TRUE}
+levels(ObsData$Death)=c("No","Yes") # this is useful for caret
+# ref: https://tinyurl.com/caretbin
+class(ObsData$Death)
+table(ObsData$Death)
+```
+
+### Measuring prediction error
+
+-   Brier score
+    -   Brier score 0 means perfect prediction, and
+    -   close to zero means better prediction,
+    -   1 being the worst prediction.
+    -   Less accurate forecasts get higher score in Brier score.
+-   AUC
+    -   The area under a ROC curve is called as a c statistics.
+    -   c being 0.5 means random prediction and
+    -   1 indicates perfect prediction
+
+### Prediction for death
+
+In this section, we show the regression fitting when outcome is binary (death).
+
+#### Variables
+
+```{r vars, cache=TRUE, echo = TRUE}
+baselinevars <- names(dplyr::select(ObsData, 
+                         !c(Length.of.Stay,Death)))
+baselinevars
+```
+
+#### Model
+
+```{r reg3, cache=TRUE, echo = TRUE, results='hide', warning=FALSE}
+# adjust covariates
+out.formula2 <- as.formula(paste("Death~ ", paste(baselinevars, collapse = "+")))
+saveRDS(out.formula2, file = "Data/machinelearning/form2.RDS")
+fit2 <- glm(out.formula2, data = ObsData, 
+            family = binomial(link = "logit"))
+require(Publish)
+adj.fit2 <- publish(fit2, digits=1)$regressionTable
+```
+
+```{r reg3a, cache=TRUE, echo = TRUE}
+out.formula2
+adj.fit2
+```
+
+#### Measuring prediction error
+
+##### AUC
+
+```{r auc1, cache=TRUE, warning=FALSE}
+require(pROC)
+obs.y2<-ObsData$Death
+pred.y2 <- predict(fit2, type = "response")
+rocobj <- roc(obs.y2, pred.y2)
+rocobj
+plot(rocobj)
+auc(rocobj)
+```
+
+##### Brier Score
+
+```{r brier, cache=TRUE, warning=FALSE}
+require(DescTools)
+BrierScore(fit2)
+```
+
+### Cross-validation using caret
+
+### Basic setup
+
+```{r cvbin, cache= TRUE, warning=FALSE}
+# Using Caret package
+set.seed(504)
+
+# make a 5-fold CV
+require(caret)
+ctrl<-trainControl(method = "cv", number = 5, 
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+
+# fit the model with formula = out.formula2
+# use training method glm (have to specify family)
+fit.cv.bin<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "glm",
+              family = binomial(),
+              metric="ROC")
+fit.cv.bin
+```
+
+#### Extract results from each test data
+
+```{r cvbin2, cache= TRUE}
+summary.res <- fit.cv.bin$resample
+summary.res
+mean(fit.cv.bin$resample$ROC)
+sd(fit.cv.bin$resample$ROC)
+```
+
+#### More options
+
+```{r cvbincs, cache= TRUE}
+ctrl<-trainControl(method = "cv", number = 5, 
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+fit.cv.bin<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "glm",
+              family = binomial(),
+              metric="ROC",
+              preProc = c("center", "scale"))
+fit.cv.bin
+```
+
+### Variable selection
+
+We can also use stepwise regression that uses AIC as a criterion.
+
+```{r cvbinaic, cache= TRUE, results = 'hide', warning=FALSE, message=FALSE, error=FALSE}
+set.seed(504)
+ctrl<-trainControl(method = "cv", number = 5, 
+                   classProbs = TRUE,
+                   summaryFunction = twoClassSummary)
+fit.cv.bin.aic<-train(out.formula2, trControl = ctrl,
+               data = ObsData, method = "glmStepAIC",
+               direction ="backward",
+              family = binomial(),
+              metric="ROC")
+```
+
+```{r cvbinaic2, cache= TRUE}
+fit.cv.bin.aic
+summary(fit.cv.bin.aic)
+```
