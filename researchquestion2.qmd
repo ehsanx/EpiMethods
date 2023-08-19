@@ -12,9 +12,10 @@ We are interested in exploring the relationship between diabetes (binary exposur
 | O             | Total cholesterol \> 200 mg/dL |
 | T             | 2017--2018                     |
 
-First, we will prepare the analytic dataset from NHANES 2017--2018. 
+First, we will prepare the analytic dataset from NHANES 2017--2018.
 
-Second, we will work with subset of data to assess the association between diabetes and cholesterol, and to get proper SE and 95% CI for the estimate.
+Second, we will work with subset of data to assess the association between diabetes and cholesterol, and to get proper SE and 95% CI for the estimate. We emphasize the correct usage of the survey's design features (correct handling of survey design elements, such as stratification, clustering, and weighting) to obtain accurate population-level estimates.
+
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -32,12 +33,12 @@ require(jtools)
 ```
 
 ### Steps for creating analytic dataset
-We will combine multiple components (e.g., demographic, blood pressure) using the unique identifier to create our analytic dataset. 
 
-::: column-margin 
-Within NHANES datasets in a given cycle, each sampled person has an unique identifier sequence number (variable SEQN). 
+We will combine multiple components (e.g., demographic, blood pressure) using the unique identifier to create our analytic dataset.
+
+::: column-margin
+Within NHANES datasets in a given cycle, each sampled person has an unique identifier sequence number (variable SEQN).
 :::
-
 
 ```{r graph1ttt, echo=FALSE, cache=TRUE}
 g2 <- grViz("
@@ -122,9 +123,10 @@ knitr::include_graphics("Images/accessing/overallnhanesplan.png")
 ```
 
 #### Download and Subsetting to retain only the useful variables
+
 Search literature for the relevant variables, e.g., @peters2014combined, and then see if some of them are available in the NHANES data.
 
-::: column-margin 
+::: column-margin
 @peters2014combined
 :::
 
@@ -233,6 +235,7 @@ diq1 <- nhanesTranslate('DIQ_J', diq_vars, data=diq)
 ```
 
 #### Merging all the datasets
+
 ::: callout-tip
 We can use the `merge` or `Reduce` function to combine the datasets
 :::
@@ -359,6 +362,7 @@ table(analytic.data15$PAQ650,useNA = "always")
 ```
 
 #### Recode values
+
 Let us recode the variables using the `recode` function:
 
 ```{r subset4, eval=TRUE, cache=TRUE, warning=FALSE}
@@ -472,7 +476,8 @@ CreateTableOne(data = analytic, includeNA = TRUE)
 ### Regression
 
 #### Wrong way to define design
-::: column-margin 
+
+::: column-margin
 To get population-level estimate, we must appropriately utilize the survey features.
 :::
 
@@ -592,12 +597,11 @@ round(exp(confint(fit1, ddf = Inf)),2)
 -   See section 3.1 of @lumley2017fitting
 -   See NHANES Linked Data Tutorial [@varest]
 
-::: column-margin 
+::: column-margin
 @lumley2017fitting
 :::
 
-
-::: column-margin 
+::: column-margin
 @varest
 :::
 

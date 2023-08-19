@@ -9,9 +9,9 @@ require(cobalt)
 require(ggplot2)
 ```
 
-In this chapter, we will describe the RHC dataset as our example dataset. We will see how to work with a research question. 
+This tutorial delves into processing and understanding the RHC dataset, which pertains to patients in the intensive care unit. The dataset is particularly centered around the implications of using right heart catheterization (RHC) in the early phases of care, with a focus on comparing two patient groups: those who received the RHC procedure and those who did not. The key outcome being analyzed is the 30-day survival rate. We will use this as an example to explain how to work with a predictive research question to build the analytic data.
 
-::: column-margin 
+::: column-margin
 [Link for the RHC dataset](https://search.r-project.org/CRAN/refmans/ATbounds/html/RHC.html)
 :::
 
@@ -20,10 +20,19 @@ In this chapter, we will describe the RHC dataset as our example dataset. We wil
 -   *length of stay* (hospital stay; measured continuously)
 -   *death* within certain period (death at any time up to 180 Days; measured as a binary variable)
 
-The original article was concerned about the association of right heart catheterization *(RHC)* use during the first 24 hours of care in the intensive care unit and the health-outcomes mentioned above, but we will use this data as a case study for our **prediction modelling**. 
+The original article was concerned about the association of right heart catheterization *(RHC)* use during the first 24 hours of care in the intensive care unit and the health-outcomes mentioned above, but we will use this data as a case study for our **prediction modelling**. Traditional PICOT framework is designed primarily for clinical questions related to interventions, so when applying it to other areas like predictive modeling, some creative adaptation is needed.
+
+| Aspect     | Description                                          |
+|------------|------------------------------------------------------|
+| **P**      | Patients who are critically ill                      |
+| **I**      | Not applicable, as we are dealing with a prediction model here        |
+| **C**      |  Not applicable, as we are dealing with a prediction model here   |
+| **O**      | in-hospital mortality                          |
+| **T**      | Between 1989 to 1994 (see the JAMA paper)                           |
+
 
 ::: column-margin
-We are interested in developing a prediction model for the length of stay. 
+We are interested in developing a prediction model for the length of stay.
 :::
 
 You could watch the video describing this chapter [![video](https://img.youtube.com/vi/P37_A7sFTVY/maxresdefault.jpg)](https://youtu.be/P37_A7sFTVY)
@@ -33,7 +42,7 @@ You could watch the video describing this chapter [![video](https://img.youtube.
 Data is freely available from [Vanderbilt Biostatistics](https://hbiostat.org/data/), variable list is available [here](https://hbiostat.org/data/repo/rhc.html), and the article is freely available from [researchgate](https://www.researchgate.net/profile/Neal-Dawson/publication/236311165_The_Effectiveness_of_Right_Heart_Catheterization_in_the_Initial_Care_of_Critically_III_Patients/links/00b4951fbfa1e051c1000000/The-Effectiveness-of-Right-Heart-Catheterization-in-the-Initial-Care-of-Critically-III-Patients.pdf?_sg%5B0%5D=w-YI1LtI2m34BhMjYD0VGHX5aKtQK5GC0LPU6kGK-_DtVUlZEYOa7_3mMfXk4kxuk0kkbv17Az5L_wNnXBrLnA.cxps1WB76ZpE9eh5Jec453LXKtQ43wuYJ387_IkhN7ZyqQpnMH19d5QsQjdkAz0unUi-vBbjV9HVdx0kvP9K_Q.roLHhvXmlNj_o0ZyC9Ka5c1zj3W4kOJkxuthqWjtSIbB7feq5Am4P47RlHjT0ukvWHAWFaPol2f58a_0v9azaw&_sg%5B1%5D=BjoiK5iqNKf-0ZsH38KwJJ4oUxNRQdVgxfyBeVp_c5Y1WEEspsEwnD1MXeDteXf4y5gsDvAKL-fwqzhoYP1OsiKWDDlX3ccFYn6yASd9oKKq.cxps1WB76ZpE9eh5Jec453LXKtQ43wuYJ387_IkhN7ZyqQpnMH19d5QsQjdkAz0unUi-vBbjV9HVdx0kvP9K_Q.roLHhvXmlNj_o0ZyC9Ka5c1zj3W4kOJkxuthqWjtSIbB7feq5Am4P47RlHjT0ukvWHAWFaPol2f58a_0v9azaw&_iepl=).
 
 ::: column-margin
-[RHC Data](https://hbiostat.org/data/) 
+[RHC Data](https://hbiostat.org/data/)
 :::
 
 ::: column-margin
@@ -71,8 +80,9 @@ ObsData$Length.of.Stay[is.na(ObsData$Length.of.Stay)] <-
 ```
 
 #### Recoding column for outcome: death
+
 ::: callout-tip
-Here we use the `ifelse` function to create a categorical variable. Other related functions are `cut`, `car`. 
+Here we use the `ifelse` function to create a categorical variable. Other related functions are `cut`, `car`.
 :::
 
 Let us recode our outcome variable as a binary variable:
@@ -82,12 +92,12 @@ ObsData$death <- ifelse(ObsData$death == "Yes", 1, 0)
 ```
 
 #### Remove unnecessary outcomes
+
 Our next task is to remove unnecessary outcomes:
 
 ::: callout-tip
 There are multiple ways to drop variables from a dataset. E.g., without using any package and using the `select` function from the dplyr package.
 :::
-
 
 ```{r remove, cache=TRUE}
 ObsData <- dplyr::select(ObsData, !c(dthdte, lstctdte, dschdte, 
@@ -95,6 +105,7 @@ ObsData <- dplyr::select(ObsData, !c(dthdte, lstctdte, dschdte,
 ```
 
 #### Remove unnecessary and problematic variables
+
 Now we will drop unnecessary and problematic variables:
 
 ```{r remove2, cache=TRUE}
@@ -163,6 +174,7 @@ saveRDS(ObsData, file = "Data/researchquestion/rhcAnalytic.RDS")
 ```
 
 ### Notations
+
 let us introduce with some notations:
 
 | Notations               | Example in RHC study  |
@@ -173,13 +185,16 @@ let us introduce with some notations:
 
 ### Basic data exploration
 
-#### Dimension 
+#### Dimension
+
 Let us the how many rows and columns we have:
+
 ```{r dim, cache=TRUE}
 dim(ObsData)
 ```
 
 #### Comprehensive summary
+
 Let us see the summary statistics of the variables:
 
 ::: callout-tip
@@ -201,7 +216,7 @@ knitr::include_graphics("Images/researchquestion/dagpred.png")
 
 The original article by @connors1996effectiveness focused on the association of
 
-::: column-margin 
+::: column-margin
 @connors1996effectiveness
 :::
 
@@ -212,14 +227,25 @@ The original article by @connors1996effectiveness focused on the association of
 knitr::include_graphics("Images/researchquestion/dagci.png")
 ```
 
+Then the PICOT table changes as follows:
+
+| Aspect     | Description                                          |
+|------------|------------------------------------------------------|
+| **P**      | Patients who are critically ill                      |
+| **I**      | Receiving a right heart catheterization (RHC)        |
+| **C**      | Not receiving a right heart catheterization (RHC)    |
+| **O**      | length of stay                          |
+| **T**      | Between 1989 to 1994 (see the JAMA paper)                           |
+
+
 -   If the readers are interested about the **causal models** used in that article, they can refer to [this tutorial](https://ehsanx.github.io/psw/).
 -   This data has been used in other articles in the literature within the **advanced causal modelling** context; for example @keele2021comparing and @keele2018pre. Readers can further consult [this tutorial](https://ehsanx.github.io/TMLEworkshop/) to understand those methods.
 
-::: column-margin 
+::: column-margin
 @keele2018pre
 :::
 
-::: column-margin 
+::: column-margin
 @keele2021comparing
 :::
 

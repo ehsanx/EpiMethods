@@ -1,6 +1,17 @@
 ## Importing NHANES to R {.unnumbered}
 
-This is a short instruction document of how to get NHANES dataset from the US CDC site to your RStudio environment. Once we bring the dataset into RStudio, the next step is to think about creating analytic dataset.
+This tutorial provides comprehensive instructions on accessing the National Health and Nutrition Examination Survey (NHANES) dataset from the US Centers for Disease Control and Prevention (CDC) website and importing it into the RStudio environment. It covers:
+
+1. Introduction to the NHANES dataset, highlighting its significance in evaluating the health and nutritional status of U.S. adults and children.
+2. Sampling Procedure details, explaining the multi-stage sampling strategy and emphasizing the importance of using survey features like weights, strata, and primary sampling units for population-level estimates.
+3. Survey History with a visualization representing different NHANES survey cycles.
+4. NHANES Data Files and Documents:
+- Explains the data's file format, mostly in SAS transport file format (.xpt).
+- Breaks down the NHANES components, which include demographics, dietary, examination, laboratory, and questionnaire data.
+- Provides guidelines on combining data from different cycles and handling missing data or outliers.
+5. Accessing NHANES Data:
+- Directly from the CDC website: A step-by-step guide with accompanying images, illustrating how to navigate the CDC website, download the data, and interpret the accompanying codebook.
+- Using R packages, specifically the nhanesA package: A concise guide on how to download and get summaries of the NHANES data using this R package.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -31,23 +42,23 @@ National Center for Health Statistics (NCHS) conducts National Health and Nutrit
 :::
 
 ### Sampling Procedure:
+
 It is a probabilistic sample (we know probability of getting selected for all individuals). This sample is unlikely to be representative of the entire population, as some under/oversampling occurs (unlike SRS), and samples may be dependent (due to proximity of some samples). For example, household with the following characteristics may be oversampled in NHANES, e.g., African Americans, Mexican Americans, Low income White Americans, Persons age 60+ years.
 
 ::: column-margin
 Sampling Procedure:
 
-- not obtained via simple random sample
-- multistage sample designs
-- A sample weight is assigned to each sample person where weight = the number of people in the target population represented
-by that sample person in NHANES
+-   not obtained via simple random sample
+-   multistage sample designs
+-   A sample weight is assigned to each sample person where weight = the number of people in the target population represented by that sample person in NHANES
 :::
 
 NHANES used multistage sample designs:
 
-- Stage 1: PSU/clusters = geographically contiguous counties. 50 states - divided into ~3100 counties. Each PSU is assigned to a strata (e.g., urban/rural or PSU size etc.). The counties are randomly/PPS selected using a 2-per-stratum design.  Complex sample variance estimation requires PSU + strata (masking involved).
-- Stage 2: each selected county is broken into segments (with at least ~50-100 housing units). Segments are randomly/PPS selected.
-- Stage 3: each selected segment is divided into households. Households are randomly selected. 
-- Stage 4: Within each sampled household, an individual is randomly selected.
+-   Stage 1: PSU/clusters = geographically contiguous counties. 50 states - divided into \~3100 counties. Each PSU is assigned to a strata (e.g., urban/rural or PSU size etc.). The counties are randomly/PPS selected using a 2-per-stratum design. Complex sample variance estimation requires PSU + strata (masking involved).
+-   Stage 2: each selected county is broken into segments (with at least \~50-100 housing units). Segments are randomly/PPS selected.
+-   Stage 3: each selected segment is divided into households. Households are randomly selected.
+-   Stage 4: Within each sampled household, an individual is randomly selected.
 
 ::: column-margin
 To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster)

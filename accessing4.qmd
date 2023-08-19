@@ -1,10 +1,12 @@
 ## Reproducing results {.unnumbered}
 
+The section instructs on reproducing the results from a specific article, detailing the eligibility criteria and variables of interest, guiding the user through accessing, merging, and filtering relevant NHANES data, and then recoding and comparing the results to ensure they match with the original article's findings, all supported with visual aids and R code examples.
+
 ### Example article
 
 Let us use the article by @flegal2016trends as our reference. [DOI:10.1001/jama.2016.6458](https://jamanetwork.com/journals/jama/fullarticle/2526639).
 
-::: column-margin 
+::: column-margin
 @flegal2016trends
 :::
 
@@ -63,14 +65,14 @@ knitr::include_graphics("Images/accessing/demo.png")
 
 #### Demographic data
 
-For the demographic data, we will use the `DEMO_H` file, where the index `H` represents the 2013-14 cycle. 
+For the demographic data, we will use the `DEMO_H` file, where the index `H` represents the 2013-14 cycle.
 
-::: column-margin 
+::: column-margin
 Index `H` represents NHANES 2013-14 cycle
 :::
 
 ::: callout-tip
-We use the `nhanes` function to download a NHANES datafile and `nhanesTranslate` function to encode the categorical variables to match with the CDC website. 
+We use the `nhanes` function to download a NHANES datafile and `nhanesTranslate` function to encode the categorical variables to match with the CDC website.
 :::
 
 ```{r search1, cache=TRUE}
@@ -118,7 +120,7 @@ head(exam13select)
 
 Use the ID variable `SEQN` to merge both data:
 
-::: column-margin 
+::: column-margin
 Within NHANES datasets in a given cycle, each person has an unique identifier number (variable name `SEQN`). We can use this `SEQN` variable to merge their data.
 :::
 
@@ -138,7 +140,8 @@ require(tableone)
 tab_nhanes <- CreateTableOne(data=merged.data, includeNA = TRUE)
 print(tab_nhanes, showAllLevels = TRUE)
 ```
-As we can see, the `RIDEXPRG` variable contains a huge amount of missing information. 
+
+As we can see, the `RIDEXPRG` variable contains a huge amount of missing information.
 
 ```{r table1, cache=TRUE}
 summary(merged.data$BMXBMI)
@@ -150,7 +153,7 @@ BMI also contains many missing values.
 
 We subset the data using criteria similar to the JAMA paper by @flegal2016trends (see above)
 
-::: column-margin 
+::: column-margin
 @flegal2016trends
 :::
 
@@ -175,7 +178,7 @@ dim(analytic.data3)
 
 Recode similar to the JAMA paper by @flegal2016trends (see above)
 
-::: column-margin 
+::: column-margin
 @flegal2016trends
 :::
 
@@ -223,7 +226,7 @@ with(analytic.data3f, table(AgeCat,Race))
 
 As we can see, our frequencies exactly match with Table 1 in the article.
 
-::: column-margin 
+::: column-margin
 Also see [@ds] for a tidyverse solution
 :::
 
