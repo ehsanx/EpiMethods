@@ -1,6 +1,6 @@
-## NHANES data {.unnumbered}
+## Causal question {.unnumbered}
 
-### Working with a causal question
+### Working with a causal question using NHANES
 
 We are interested in exploring the relationship between diabetes (binary exposure variable defined as whether the doctor ever told the participant has diabetes) and cholesterol (binary outcome variable defined as whether total cholesterol is more than 200 mg/dL). Below is the PICOT:
 
@@ -118,17 +118,39 @@ g2 <- grViz("
 g2 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("Images/accessing/overallnhanesplan.png")
 ```
 
-```{r graph1xttt, echo=FALSE, out.width = '75%'}
-knitr::include_graphics("Images/accessing/overallnhanesplan.png")  
-```
-
 #### Download and Subsetting to retain only the useful variables
 
-Search literature for the relevant variables, e.g., @peters2014combined, and then see if some of them are available in the NHANES data.
+Search literature for the relevant variables, and then see if some of them are available in the NHANES data. 
 
 ::: column-margin
 @peters2014combined
 :::
+
+An an example, let us assume that variables listed in the following figures are known to be useful. Then we will try to indentify, in which NHANES component we have these variables.
+
+::: column-margin
+Refer to the upcoming [chapter](accessing3.html) to get a more detailed understanding of how we search for variables within NHANES.
+:::
+
+```{r graph1xttt, echo=FALSE, out.width = '75%'}
+knitr::include_graphics("Images/accessing/overallnhanesplan.png")  
+```
+
+::: column-margin
+NHANES Data Components:
+
+- Demographic (variables like age, gender, income, etc.)
+- Blood Pressure (Diastolic and Systolic pressure)
+- Body Measures (BMI, Waist Circumference, etc.)
+- Smoking Status (Current smoker or not)
+- Cholesterol (Total cholesterol in different units)
+- Biochemistry Profile (Triglycerides, Uric acid, etc.)
+- Physical Activity (Vigorous work and recreational activities)
+- Diabetes (Whether the respondent has been told by a doctor that they have diabetes)
+:::
+
+
+**Demographic component**:
 
 ```{r search4, eval=TRUE, cache=TRUE, warning=FALSE}
 demo <- nhanes('DEMO_J') # Both males and females 0 YEARS - 150 YEARS
@@ -146,6 +168,8 @@ demo_vars <- names(demo) # nhanesTableVars('DEMO', 'DEMO_J', namesonly=TRUE)
 demo1 <- nhanesTranslate('DEMO_J', demo_vars, data=demo)
 ```
 
+**Blood pressure component**:
+
 ```{r search5, eval=TRUE, cache=TRUE}
 bpx <- nhanes('BPX_J')
 bpx <- bpx[c("SEQN", # Respondent sequence number
@@ -155,6 +179,8 @@ bpx <- bpx[c("SEQN", # Respondent sequence number
 bpx_vars <- names(bpx) 
 bpx1 <- nhanesTranslate('BPX_J', bpx_vars, data=bpx)
 ```
+
+**Body measure component**:
 
 ```{r search5a, eval=TRUE, cache=TRUE}
 bmi <- nhanes('BMX_J')
@@ -168,6 +194,8 @@ bmi <- bmi[c("SEQN", # Respondent sequence number
 bmi_vars <- names(bmi) 
 bmi1 <- nhanesTranslate('BMX_J', bmi_vars, data=bmi)
 ```
+
+**Smoking component**:
 
 ```{r search5b, eval=TRUE, cache=TRUE}
 smq <- nhanes('SMQ_J')
@@ -188,6 +216,8 @@ smq1 <- nhanesTranslate('SMQ_J', smq_vars, data=smq)
 # alq1 <- nhanesTranslate('ALQ_J', alq_vars, data=alq)
 ```
 
+**Cholesterol component**:
+
 ```{r search5d, eval=TRUE, cache=TRUE}
 chl <- nhanes('TCHOL_J') # 6 YEARS - 150 YEARS
 chl <- chl[c("SEQN", # Respondent sequence number
@@ -197,6 +227,8 @@ chl <- chl[c("SEQN", # Respondent sequence number
 chl_vars <- names(chl) 
 chl1 <- nhanesTranslate('TCHOL_J', chl_vars, data=chl)
 ```
+
+**Biochemistry Profile component**:
 
 ```{r search5e, eval=TRUE, cache=TRUE}
 tri <- nhanes('BIOPRO_J') # 12 YEARS - 150 YEARS
@@ -215,6 +247,8 @@ tri_vars <- names(tri)
 tri1 <- nhanesTranslate('BIOPRO_J', tri_vars, data=tri)
 ```
 
+**Physical activity component**:
+
 ```{r search5f, eval=TRUE, cache=TRUE}
 paq <- nhanes('PAQ_J')
 paq <- paq[c("SEQN", # Respondent sequence number
@@ -224,6 +258,8 @@ paq <- paq[c("SEQN", # Respondent sequence number
 paq_vars <- names(paq) 
 paq1 <- nhanesTranslate('PAQ_J', paq_vars, data=paq)
 ```
+
+**Diabetes component**:
 
 ```{r search5g, eval=TRUE, cache=TRUE}
 diq <- nhanes('DIQ_J')
@@ -246,6 +282,10 @@ analytic.data7 <- Reduce(function(x,y) merge(x,y,by="SEQN",all=TRUE) ,
 dim(analytic.data7)
 ```
 
+::: column-margin
+All these datasets are merged into one analytic dataset using the SEQN as the key. This can be done either all at once using the `Reduce` function or one by one (using `merge` once at a time).
+::: 
+
 ```{r search8b4g, eval=TRUE, cache=TRUE}
 # Merging one by one
 # analytic.data0 <- merge(demo1, bpx1, by = c("SEQN"), all=TRUE)
@@ -260,6 +300,10 @@ dim(analytic.data7)
 ```
 
 #### Check Target population and avoid zero-cell cross-tabulation
+
+::: column-margin
+The dataset is then filtered to only include adults (20 years and older) and avoid zero-cell cross-tabulation.
+::: 
 
 See that marital status variable was restricted to 20 YEARS - 150 YEARS.
 
@@ -285,6 +329,10 @@ analytic.data8$DMDEDUC3 <- NULL # not relevant for adults
 ```
 
 #### Get rid of invalid responses
+
+::: column-margin
+Variables that have "Don't Know" or "Refused" as responses are set to NA, effectively getting rid of invalid responses.
+::: 
 
 ```{r subset3, eval=TRUE, cache=TRUE}
 factor.names <- c("RIAGENDR","DMDBORN4","RIDRETH3",
@@ -410,6 +458,10 @@ analytic.data15$DIQ010 <- recode(analytic.data15$DIQ010,
 	                           else=NA")
 ```
 
+::: column-margin
+Data types for various variables are set correctly; for instance, factor variables are converted to factor data types, and numeric variables to numeric data types.
+::: 
+
 #### Check missingness
 
 ::: callout-tip
@@ -420,6 +472,10 @@ We can use the `plot_missing` function to plot the profile of missing values, e.
 require(DataExplorer)
 plot_missing(analytic.data15)
 ```
+
+::: column-margin
+A subsequent [chapter](missingdata.html) will delve into the additional factors that impact how we handle missing data.
+:::
 
 #### Check data summaries
 
@@ -436,19 +492,6 @@ require("tableone")
 CreateTableOne(data = analytic.data15, includeNA = TRUE)
 ```
 
-#### Create fictitious data (missing = 'No')
-
-```{r analytic191, eval=TRUE, cache=TRUE}
-fictitious.data <- analytic.data15
-# the following is the worst possible solution!
-fictitious.data$smoke[is.na(fictitious.data$smoke)] <- "Not.at.all"
-#fictitious.data$alcohol[is.na(fictitious.data$alcohol)] <- 0
-table(fictitious.data$smoke)
-#summary(fictitious.data$alcohol)
-fictitious.data <- as.data.frame(na.omit(fictitious.data))
-dim(fictitious.data)
-```
-
 #### Create complete case data (for now)
 
 ```{r analytic1, eval=TRUE, cache=TRUE}
@@ -458,167 +501,16 @@ analytic <- as.data.frame(na.omit(analytic.with.miss))
 dim(analytic)
 ```
 
-```{r analytic2, eval=TRUE}
-# removing values with excessive missing values
-# analytic.data15$ALQ130 <- NULL
-# analytic1 <- as.data.frame(na.omit(analytic.data15))
-# dim(analytic1)
-# analytic.data15$smoke <- NULL
-# analytic2 <- as.data.frame(na.omit(analytic.data15))
-# dim(analytic2)
-```
+#### Creating Table 1 from the complete case data
 
 ```{r analytic3, eval=TRUE, cache=TRUE}
 require("tableone")
 CreateTableOne(data = analytic, includeNA = TRUE)
 ```
 
-### Regression
-
-#### Wrong way to define design
-
 ::: column-margin
-To get population-level estimate, we must appropriately utilize the survey features.
+Additional factors come into play when dealing with complex survey datasets; these will be explored in a subsequent [chapter](surveydata.html). 
 :::
-
-See the section on [Analyzing Subgroups in NHANES](https://wwwn.cdc.gov/nchs/nhanes/tutorials/module4.aspx)
-
-```{r reg0, cache=TRUE}
-w.design.wrong <- svydesign(id=~psu, 
-                       strata=~strata, 
-                       weights=~weight, 
-                      data=analytic, # already subsetted data
-                      nest = TRUE)
-summary(weights(w.design.wrong))
-```
-
-#### Wrong analysis
-
-```{r reg1, cache=TRUE}
-out.formula <- as.formula(cholesterol.bin ~ diabetes + 
-                            gender + race + education + 
-                            married + income + age + 
-                            diastolicBP + systolicBP + bmi)
-fit.wrong <- svyglm(out.formula,
-               design = w.design.wrong, 
-               family = binomial(logit))
-publish(fit.wrong)
-```
-
-#### Define design and subset
-
--   See the section on [How to Request Taylor Series Linearization to Calculate Variance in NHANES using R](https://wwwn.cdc.gov/nchs/nhanes/tutorials/module4.aspx)
-
-```{r design, cache=TRUE}
-analytic.data <- analytic
-analytic.with.miss$miss <- 1
-analytic.with.miss$ID[1:10] # full data
-analytic.data$ID[1:10] # complete case
-analytic.with.miss$ID[analytic.with.miss$ID %in% analytic.data$ID][1:10]
-analytic.with.miss$miss[analytic.with.miss$ID %in% analytic.data$ID] <- 0
-table(analytic.with.miss$miss)
-```
-
-```{r subdesign, cache=TRUE}
-analytic.with.miss$strata<- as.factor(analytic.with.miss$strata)
-analytic.with.miss$psu<- as.factor(analytic.with.miss$psu)
-w.design0 <- svydesign(id=~psu, 
-                       strata=~strata, 
-                       weights=~weight, 
-                      data=analytic.with.miss,
-                      nest = TRUE)
-summary(weights(w.design0))
-w.designX <- subset(w.design0, miss == 0)
-summary(weights(w.designX))
-w.designX$df.residual
-names(w.designX)
-```
-
-#### Regression analysis
-
-```{r reganalysis, cache=TRUE, warning=FALSE}
-out.formula <- as.formula(cholesterol.bin ~ diabetes + 
-                            gender + race + education + 
-                            married + income + age)
-fit1 <- svyglm(out.formula,
-               design = w.designX, 
-               family = binomial(logit))
-# default = denominator degrees of freedom for Wald tests?
-```
-
-```{r regres, cache=TRUE}
-require(Publish)
-# notice that the conclusion from CI.95  p-value are contradictory
-# For example: gender/Male OR 1.51 [95% CI: 1.10;2.07] but p-value is 0.1233
-publish(fit1)
-```
-
-#### Regression analysis with more covariates
-
-```{r regformula, cache=TRUE, warning=FALSE}
-out.formula <- as.formula(cholesterol.bin ~ diabetes + 
-                            gender + race + education + 
-                            married + income + age + 
-                            diastolicBP + systolicBP + bmi)
-fit1 <- svyglm(out.formula,
-               design = w.designX, 
-               family = binomial(logit))
-# default = denominator degrees of freedom for Wald tests?
-```
-
-```{r se, cache=TRUE}
-summary(fit1)$coefficients
-require(Publish)
-publish(fit1)
-```
-
-### SE calculation
-
-#### Current default option
-
-```{r se1, cache=TRUE}
-summary(fit1)$coefficients
-```
-
-As we can see no p-values for the coefficients. Let us estimate the p-values based on the Normal distribution.
-
-#### Tests based on a Normal distribution
-
-```{r se2, cache=TRUE}
-# p-value
-summary(fit1, df.resid = Inf)
-round(summary(fit1, df.resid = Inf)$coefficients[,4] ,3)  
-# CI
-round(exp(confint(fit1, ddf = Inf)),2)
-```
-
-### Residual df = PSUs count - strata count
-
--   See section 3.1 of @lumley2017fitting
--   See NHANES Linked Data Tutorial [@varest]
-
-::: column-margin
-@lumley2017fitting
-:::
-
-::: column-margin
-@varest
-:::
-
-```{r se3, cache=TRUE}
-ns <- length(unique(analytic.with.miss$strata)) # number of strata
-length(unique(analytic.with.miss$psu)) # number of clusters per strata
-nc <- length(unique(analytic.with.miss$strata))*
-  length(unique(analytic.with.miss$psu)) # number of clusters in total
-nc - ns
-degf(w.designX)
-# p-value
-summary(fit1, df.resid = degf(w.designX))
-round(summary(fit1, 
-              df.resid = degf(w.designX))$coefficients[,4] ,3)  
-# CI
-round(exp(confint(fit1, ddf = degf(w.designX))),2)
-```
 
 ### Saving data
 

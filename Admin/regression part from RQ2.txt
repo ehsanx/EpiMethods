@@ -1,0 +1,146 @@
+### Regression
+
+#### Wrong way to define design
+
+::: column-margin
+To get population-level estimate, we must appropriately utilize the survey features.
+:::
+
+See the section on [Analyzing Subgroups in NHANES](https://wwwn.cdc.gov/nchs/nhanes/tutorials/module4.aspx)
+
+```{r reg0, cache=TRUE}
+w.design.wrong <- svydesign(id=~psu, 
+                       strata=~strata, 
+                       weights=~weight, 
+                      data=analytic, # already subsetted data
+                      nest = TRUE)
+summary(weights(w.design.wrong))
+```
+
+#### Wrong analysis
+
+```{r reg1, cache=TRUE}
+out.formula <- as.formula(cholesterol.bin ~ diabetes + 
+                            gender + race + education + 
+                            married + income + age + 
+                            diastolicBP + systolicBP + bmi)
+fit.wrong <- svyglm(out.formula,
+               design = w.design.wrong, 
+               family = binomial(logit))
+publish(fit.wrong)
+```
+
+#### Define design and subset
+
+-   See the section on [How to Request Taylor Series Linearization to Calculate Variance in NHANES using R](https://wwwn.cdc.gov/nchs/nhanes/tutorials/module4.aspx)
+
+```{r design, cache=TRUE}
+analytic.data <- analytic
+analytic.with.miss$miss <- 1
+analytic.with.miss$ID[1:10] # full data
+analytic.data$ID[1:10] # complete case
+analytic.with.miss$ID[analytic.with.miss$ID %in% analytic.data$ID][1:10]
+analytic.with.miss$miss[analytic.with.miss$ID %in% analytic.data$ID] <- 0
+table(analytic.with.miss$miss)
+```
+
+```{r subdesign, cache=TRUE}
+analytic.with.miss$strata<- as.factor(analytic.with.miss$strata)
+analytic.with.miss$psu<- as.factor(analytic.with.miss$psu)
+w.design0 <- svydesign(id=~psu, 
+                       strata=~strata, 
+                       weights=~weight, 
+                      data=analytic.with.miss,
+                      nest = TRUE)
+summary(weights(w.design0))
+w.designX <- subset(w.design0, miss == 0)
+summary(weights(w.designX))
+w.designX$df.residual
+names(w.designX)
+```
+
+#### Regression analysis
+
+```{r reganalysis, cache=TRUE, warning=FALSE}
+out.formula <- as.formula(cholesterol.bin ~ diabetes + 
+                            gender + race + education + 
+                            married + income + age)
+fit1 <- svyglm(out.formula,
+               design = w.designX, 
+               family = binomial(logit))
+# default = denominator degrees of freedom for Wald tests?
+```
+
+```{r regres, cache=TRUE}
+require(Publish)
+# notice that the conclusion from CI.95  p-value are contradictory
+# For example: gender/Male OR 1.51 [95% CI: 1.10;2.07] but p-value is 0.1233
+publish(fit1)
+```
+
+#### Regression analysis with more covariates
+
+```{r regformula, cache=TRUE, warning=FALSE}
+out.formula <- as.formula(cholesterol.bin ~ diabetes + 
+                            gender + race + education + 
+                            married + income + age + 
+                            diastolicBP + systolicBP + bmi)
+fit1 <- svyglm(out.formula,
+               design = w.designX, 
+               family = binomial(logit))
+# default = denominator degrees of freedom for Wald tests?
+```
+
+```{r se, cache=TRUE}
+summary(fit1)$coefficients
+require(Publish)
+publish(fit1)
+```
+
+### SE calculation
+
+#### Current default option
+
+```{r se1, cache=TRUE}
+summary(fit1)$coefficients
+```
+
+As we can see no p-values for the coefficients. Let us estimate the p-values based on the Normal distribution.
+
+#### Tests based on a Normal distribution
+
+```{r se2, cache=TRUE}
+# p-value
+summary(fit1, df.resid = Inf)
+round(summary(fit1, df.resid = Inf)$coefficients[,4] ,3)  
+# CI
+round(exp(confint(fit1, ddf = Inf)),2)
+```
+
+### Residual df = PSUs count - strata count
+
+-   See section 3.1 of @lumley2017fitting
+-   See NHANES Linked Data Tutorial [@varest]
+
+::: column-margin
+@lumley2017fitting
+:::
+
+::: column-margin
+@varest
+:::
+
+```{r se3, cache=TRUE}
+ns <- length(unique(analytic.with.miss$strata)) # number of strata
+length(unique(analytic.with.miss$psu)) # number of clusters per strata
+nc <- length(unique(analytic.with.miss$strata))*
+  length(unique(analytic.with.miss$psu)) # number of clusters in total
+nc - ns
+degf(w.designX)
+# p-value
+summary(fit1, df.resid = degf(w.designX))
+round(summary(fit1, 
+              df.resid = degf(w.designX))$coefficients[,4] ,3)  
+# CI
+round(exp(confint(fit1, ddf = degf(w.designX))),2)
+```
