@@ -1,0 +1,141 @@
+## Exercise on wrangling {.unnumbered}
+
+::: callout-tip
+You can download all of the related files in a zip file from [Github](https://github.com/ehsanx/EpiMethods/tree/main/LabExercises/wranglingEx.zip)
+:::
+
+
+## Problem
+
+Use the functions we learned in Lab 1 to complete Lab 1 Exercise. We will use Right Heart Catheterization Dataset saved in the folder named 'Data/wrangling/'. The variable list and description can be accessed from [Vanderbilt Biostatistics website](https://biostat.app.vumc.org/wiki/pub/Main/DataSets/rhc.html).
+
+A paper you can access the original table from [this paper](https://jamanetwork-com.ezproxy.library.ubc.ca/journals/jama/fullarticle/407990) ([doi: 10.1001/jama.1996.03540110043030](https://pubmed.ncbi.nlm.nih.gov/8782638/)). We have modified the table and corrected some mistakes. Please knit your file once you finished and submit the knitted file **ONLY**.
+
+```{r setup, message=F, warning=F}
+# Load required packages
+library(dplyr)
+library(tableone)
+```
+
+```{r}
+# Data import: name it rhc
+#rhc <- ...("Data/wrangling/rhc.csv", ...)
+```
+
+### Part (a) Basic Manipulation \[60%\]
+
+(I) Continuous to Categories: Change the Age variable into categories below 50, 50 to below 60, 60 to below 70, 70 to below 80, 80 and above \[Hint: the `cut` function could be helpful\]
+
+```{r a1}
+
+```
+
+(II) Re-order: Re-order the levels of race to white, black and other
+
+```{r a2}
+
+```
+
+(III) Set reference: Change the reference category for gender to Male
+
+```{r a3}
+
+```
+
+(IV) Count levels: Check how many levels does the variable "cat1" (Primary disease category) have? Regroup the levels for disease categories to "ARF","CHF","MOSF","Other". \[Hint: the `nlevels` and `list` functions could be helpful\]
+
+```{r a4}
+
+```
+
+(V) Rename levels: Rename the levels of "ca" (Cancer) to "Metastatic","None" and "Localized (Yes)", then re-order the levels to "None","Localized (Yes)" and "Metastatic"
+
+```{r a5}
+
+```
+
+(VI) comorbidities:
+
+-   create a new variable called "numcom" to count number of comorbidities illness for each person (12 categories) \[Hint: the `rowSums` command could be helpful\],
+-   report maximim and minimum values of numcom:
+
+```{r a6}
+
+```
+
+(VII) Anlaytic data: Create a dataset that has only the following variables
+
+-   "age", "sex", "race","cat1", "ca", "dnr1", "aps1", "surv2md1", "numcom", "adld3p", "das2d3pc", "temp1", "hrt1", "meanbp1", "resp1", "wblc1", "pafi1", "paco21", "ph1", "crea1", "alb1", "scoma1", "swang1", and
+-   name it rhc2.
+
+```{r a7}
+
+```
+
+### Part (b) Table 1 \[20%\]
+
+(i) Re-produce the sample table from the rhc2 data (see the Table that was provided with this assignment). In your table, the variables should be ordered as the same as the sample. Please re-level or re-order the levels if needed. \[Hint: the `tableone` package might be useful\]
+
+```{r b1}
+
+```
+
+(ii) Table 1 for subset
+
+Produce a similar table as part (b) but with only male sex and ARF primary disease category (cat1). Add the overall column in the same table. \[Hint: `filter` command could be useful\]
+
+```{r b2}
+
+```
+
+### Part (c) Considering eligibility criteria \[20%\]
+
+Produce a similar table as part (b.i) but only for the subjects who meet all of the following eligibility criteria: (i) age is equal to or above 50, (ii) age is below 80 (iii) Glasgow Coma Score is below 61 and (iv) Primary disease categories are either ARF or MOSF. \[Hint: `droplevels.data.frame` can be a useful function\]
+
+```{r c1}
+
+```
+
+### Optional 1: Missing values
+
+(I) Any variables included in rhc2 data had missing values? Name that variable. \[Hint: `apply` function could be helpful\]
+
+```{r o11}
+
+```
+
+(II) Count how many NAs does that variable have?
+
+```{r o12}
+
+```
+
+(III) Produce a table 1 for a complete case data (no missing observations) stratified by `swang1`.
+
+```{r o13}
+
+```
+
+### Optional 2: Calculating variance of a sample
+
+Write a `function` for Bessel's correction to calculate an unbiased estimate of the population variance from a finite sample (a vector of 100 observations, consisting of numbers from 1 to 100).
+
+```{r o21}
+Vector <- 1:100
+
+#variance.est <- function(?){?}
+
+#variance.est(Vector)
+```
+
+Hint: Take a closer look at the functions, loops and algorithms shown in lab materials. Use a `for loop`, utilizing the following pseudocode of the [algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance):
+
+```{r o22, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("Images/wrangling/algorithm.png")
+```
+
+Verify that estimated variance with the following variance function output in R:
+
+```{r o23}
+var(Vector)
+```

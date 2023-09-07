@@ -1,0 +1,172 @@
+## Exercise {.unnumbered}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MatchIt)
+library(tableone)
+library(survey)
+library(Publish)
+```
+
+We will use the following article by [Moon et al. (2021)](https://doi.org/10.1002/nau.24711):
+
+```{r article, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("Images/propensityscore/articlePSM.png")
+```
+
+We will reproduce some results from the article. The authors aggregated 4 NHANES cycles 2005-12 to create their analytic dataset. The full dataset contains 40,790 subjects with the following relevant variables for this exercise:
+
+**Survey information**
+
+* SEQN: Respondent sequence number
+* strata: Masked pseudo strata (strata is nested within PSU)
+* psu: Masked pseudo PSU
+* survey.weight: Full sample 8 year interview weight divided by 4
+* survey.cycle: NHANES cycle
+
+**Outcome variable**
+
+* cvd: Cardiovascular disease
+
+**Exposure**
+
+* nocturia: Binary nocturia
+
+**Confounders and other variables**
+
+* age: Age in years at screening
+* gender: Gender
+* race: Race/Ethnicity
+* smoking: 100+ cigarettes in life
+* alcohol: Alcohol consumption (12+ drinks in 1 year)
+* sleep: Sleep duration, h
+* bmi: Body Mass Index in kg/m$^2$
+* systolic: Systolic blood pressure, mmHg
+* diastolic: Diastolic blood pressure, mmHg
+* tcholesterol: Total cholesterol, mg/dl
+* triglycerides: Triglycerides, mg/dl
+* hdl: HDL‐cholesterol, mg/dl
+* diabetes: Diabetes mellitus
+* hypertension: Hypertension
+
+Two important **warnings** before we start:
+
+ - In this paper, there is insufficient information to create the analytic dataset. This is mainly because of not sufficiently defining the covariates and not explicitly explaining the inclusion/exclusion criteria. 
+ 
+ - The authors did incorrect analyses. For example, they didn't consider survey features. Since we will utilize survey features in our analysis, our results will likely be different than the results shown by the authors in Table 2. 
+
+## Question 1: [0% grade]
+
+### 1(a) Importing dataset
+```{r}
+load(file = "Data/propensityscore/Moon2021.RData")
+```
+
+### 1(b) Subsetting according to eligibility
+```{r}
+# Age 20+
+dat.analytic <- dat.full[complete.cases(dat.full$age),]
+
+# Complete outcome and exposure information
+dat.analytic <- dat.analytic[complete.cases(dat.analytic$cvd),] 
+dat.analytic <- dat.analytic[complete.cases(dat.analytic$nocturia),] 
+
+# Keep important variables only
+vars <- c(
+  # Survey features
+  "SEQN", "strata", "psu", "survey.weight", 
+  
+  # Survey cycle
+  "survey.cycle", 
+  
+  # Binary exposure
+  "nocturia",
+  
+  # Outcome
+  "cvd",
+  
+  # Covariates
+  "age", "gender", "race" , "smoking", "alcohol", "sleep", "bmi", "diabetes", 
+  "hypertension", "tcholesterol", "triglycerides", "hdl", "systolic", "diastolic")
+
+dat.analytic <- dat.analytic[,vars]
+
+# Complete case
+dat.analytic <- na.omit(dat.analytic) #  N = 15,404 (numbers do not match with Fig 1)
+dim(dat.analytic)
+```
+
+### 1(c) Run the design-adjusted logistic regression
+Create the first column of Table 2 of the article, i.e., explore the relationship between binary nocturia and CVD among adults aged 20 years and more. Adjust the model for age, gender, race, body mass index, smoking status, alcohol consumption, sleep duration, hypertension, diabetes mellitus, and survey cycles.
+
+ - Hint 1: the authors did not utilize the survey features (e.g., strata, psu, survey weights). But you should utilize the survey features to answer this question. 
+ 
+ - Hint 2: Adjust the model for age, gender, race, bmi, smoking, alcohol, sleep, tcholesterol, triglycerides, hdl, hypertension, diabetes, and survey cycle. 
+ 
+ - Hint 3: Use Publish package to report the odds ratio with the 95% CI and p-value.
+
+```{r, message=F, warning=F}
+# Create an indicator variable in the full data
+dat.full$miss <- 1
+dat.full$miss[dat.full$SEQN %in% dat.analytic$SEQN] <- 0
+
+# Design setup
+svy.design0 <- svydesign(strata = ~strata, id = ~psu, weights = ~survey.weight,
+                         data = dat.full, nest = TRUE)
+
+# Subset the design
+svy.design <- subset(svy.design0, miss == 0)
+
+# Design-adjusted logistic
+fit.logit <- svyglm(I(cvd == "Yes") ~ nocturia + age + gender + race + bmi + 
+                      smoking + alcohol + sleep + tcholesterol + triglycerides + 
+                      hdl + hypertension + diabetes + survey.cycle, 
+                    family = binomial, design = svy.design)
+publish(fit.logit)
+```
+
+## Question 2: Propensity score matching by DuGoff et al. (2014) [50% grade] 
+Create the second column of Table 2 (exploring the relationship between binary nocturia and CVD; the same exposure and outcome used in Question 1) using the propensity score **1:1 matching** analysis as per [DuGoff et al. (2014)](https://pubmed.ncbi.nlm.nih.gov/23855598/) recommendations.
+
+Please read the hints carefully:
+
+ - Hint 1: You should consider all four steps in the propensity score (PS) analysis:
+ 
+     + Step 1: Fit the PS model by considering survey features as covariates. Other covariates for the PS model are: age, gender, race, bmi, smoking, alcohol, sleep, tcholesterol, triglycerides, hdl, hypertension, diabetes, systolic, diastolic, and survey cycle.
+  
+    + Step 2: Match an exposed subject (nocturia $\ge2$ times) with a control subject (nocturia <2 times) without replacement within the caliper of 0.2 times the standard deviation of the logit of PS. Set your seed to 123.
+  
+    + Step 3: Balance checking using SMD. Consider SMD <0.1 as a good covariate balancing. 
+  
+    + Step 4: Fit the outcome model on the matched data. If needed, adjust for imbalanced covariates in the outcome model. Report the odds ratio with a 95% CI. For step 4, you should utilize the survey feature as the design (NOT covariates).
+  
+ - Hint 2: Compare your results with the results reported by the authors. [Expected answer: 2-3 sentences]
+
+```{r, message=F, warning=F}
+# your codes here
+
+```
+
+
+## Question 3: Propensity score matching by Austin et al. (2018) [50% grade] 
+
+Create the second column of Table 2 (exploring the relationship between binary nocturia and CVD; the same exposure and outcome used in Questions 1 and 2) using the propensity score **1:4 matching** analysis as per [Austin et al. (2018)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5843030/) recommendations.
+
+Please read the hints carefully:
+
+ - Hint 1: You should consider all four steps in the propensity score (PS) analysis:
+ 
+    + Step 1: Fit the PS model by considering survey features as design, i.e., fit the design-adjusted PS model. Other covariates for the PS model are: age, gender, race, bmi, smoking, alcohol, sleep, tcholesterol, triglycerides, hdl, hypertension, diabetes, systolic, diastolic, and survey cycle. 
+  
+    + Step 2: Match an exposed subject (nocturia $\ge2$ times) with 4 control subjects (nocturia <2 times) with replacement within the caliper of 0.2 times the standard deviation of the logit of PS. Set your seed to 123. 
+  
+    + Step 3: Balance checking using SMD. Consider SMD <0.1 as a good covariate balancing. Remember, you need to multiply matching weights and survey weights to get survey-based estimates. 
+  
+    + Step 4: Fit the outcome model on the matched data. If needed, adjust for imbalanced covariates in the outcome model. Report the odds ratio with a 95% CI. For step 4, you should utilize the survey feature as the design (NOT covariates).
+  
+ - Hint 2: Compare the results with Question 2. What's the overall conclusion? [Expected answer: 2-3 sentences]
+
+```{r, message=F, warning=F}
+# your codes here
+
+```

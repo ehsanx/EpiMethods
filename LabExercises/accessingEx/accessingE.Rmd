@@ -1,0 +1,214 @@
+---
+title: "SPPH 604 001 Lab Excerise: Data accessing (CCHS)"
+author:
+- affiliation: School of Population and Public Health, UBC
+  name: Belal Hossain and Ehsan Karim
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: 2
+  word_document:
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+  html_notebook:
+    toc: yes
+    toc_depth: 2
+---
+
+```{r chunkSetup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We will use the following article
+
+Palis, Marchand & Oviedo-Joekes. (2018). The relationship between sense of community belonging and self-rated mental health among Canadians with mental or substance use disorders. Journal of Mental Health, 1-8. DOI: [10.1080/09638237.2018.1437602](https://www.tandfonline.com/doi/abs/10.1080/09638237.2018.1437602?journalCode=ijmh20) (available in the "Library Online Course Reserves": [open link](https://www.researchgate.net/profile/Heather_Palis/publication/323136807_The_relationship_between_sense_of_community_belonging_and_self-rated_mental_health_among_Canadians_with_mental_or_substance_use_disorders/links/5a96ff210f7e9ba42974c0dd/The-relationship-between-sense-of-community-belonging-and-self-rated-mental-health-among-Canadians-with-mental-or-substance-use-disorders.pdf).
+
+- Download the [CCHS MH topical index](https://gsg.uottawa.ca/data/teaching/escc-cchs/fmgd_pumf/2012/cchs_mh_topical_index.pdf)
+- Download the [CCHS MH Data Dictionary](https://gsg.uottawa.ca/data/teaching/escc-cchs/fmgd_pumf/2012/cchs_mh_datadictionary.pdf)
+
+# Question I: [60% grade]
+
+## 1(a) Importing dataset
+```{r}
+# Importing dataset
+load("Data/accessing/cchsMH.RData")
+```
+ 
+## 1(b) Subsetting according to eligibility
+
+Subset the dataset according to the eligibility criteria / restriction specified in the paper
+
+- Identify the variable needed for eligibility criteria 
+- Identify the outcome variable
+- Identify the explanatory variable
+- Identify the potential confounders
+- Identify the survey weight variable
+
+- **Hint**
+  1. Read 
+    - the first paragraph of **Analytic sample** (page 2) for the eligibility criteria, and 
+    - first and second paragraphs of **Study variables** for rest of the variables,
+    - third paragraph of the **Statistical analyses** for the survey weights variable.
+  2. eligibility criteria was determined based on **one** variable. Only work with 'YES' category.
+  3. Outcome variable has a category 'NOT STATED', but for our analysis, we will omit anyone associated with this category.
+  4. For explanatory variable, we have categories such as DON'T KNOW, REFUSAL and NOT STATED. We will not use these categories (omit anyone with these categories).
+  5. There were **five** potential confounders.
+  6. Potentially useful functions: 
+    - [%in%](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/match)
+    - [levels](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/levels)
+    - [recode](https://rdrr.io/cran/car/man/recode.html)
+    - [subset](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/subset)
+    - [as.factor](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/factor)
+    - [relevel](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/relevel)
+    - or [dplyr ways](https://ehsanx.github.io/intro2R/data-analysis-with-dplyr.html):  [filter](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/filter), [select](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/select)
+
+```{r}
+# your code here
+
+```
+
+## 1(c) Retaining necessary variables
+
+In the dataset, retain only the variables associated with outcome measure, explanatory variable, potential confounders and survey weight
+
+```{r}
+# your code here
+
+```
+
+## 1(d) Creating analytic dataset
+
+  - Assign missing values for categories such as DON'T KNOW, REFUSAL and NOT STATED.
+  - 'recode' the variables as shown in Table 1 (choose any function of your choice). Here is an example (but feel free to use other functions. In R there are many other ways to do this same task):
+
+```{r}
+## your code here
+# levels(your.data.frame$your.age.variable) <- 
+#   list("15 to 24 years" = c("15 TO 19 YEARS", "20 TO 24 YEARS"),
+#        "25 to 34 years" = c("25 TO 29 YEARS", "30 TO 34 YEARS"),
+#        "35 to 44 years" = c("35 TO 39 YEARS", "40 TO 44 YEARS"),
+#        "45 to 54 years" = c("45 TO 49 YEARS", "50 TO 54 YEARS"),
+#        "55 to 64 years" = c("55 TO 59 YEARS", "60 TO 64 YEARS"),
+#        "65 years or older" = c("65 TO 69 YEARS", "70 TO 74 YEARS", 
+#        "75 TO 79 YEARS", "80 YEARS OR MORE"))
+```
+
+## 1(e) Number of columns and variable names
+
+report the number of columns in your analytic dataset, and the variable names.
+
+```{r}
+# your code here
+
+```
+
+# Question II: [20% grade]
+
+## 2(a) Table 1 
+
+Reproduce Table 1 presented in the above paper (omit the 'Main source of income' variable). If necessary, drop other variables from the analytic dataset that are not presented in Table 1. 
+
+The table you produce should report numbers as follows:
+
+
+| Self-rated Mental Health Variable | Total n(%) | Poor or Fair n(%) | Good n(%) | Very good or excellent n(%) |
+|-----------------------------------|------------|-------------------|-----------|----------------------------|
+| **Study sample**                  | 2628 (100) | 1002 (38.1)       | 885 (33.7)| 741 (28.2)                  |
+| **Community belonging**           |            |                   |           |                            |
+| - Very weak                       | 480 (18.3) | 282 (28.1)        | 118 (13.3)a| 80 (10.8)a                 |
+| - Somewhat weak                   | 857 (32.6) | 358 (35.7)        | 309 (34.9)| 190 (25.6)                  |
+| - Somewhat strong                 | 1005 (38.2)| 288 (28.7)        | 362 (40.9)| 355 (47.9)                  |
+| - Very strong                     | 286 (10.9) | 74 (7.4)a         | 96 (10.8)a| 116 (15.7)a                 |
+| **Sex**                           |            |                   |           |                            |
+| - Females                         | 1407 (53.5)| 616 (61.5)        | 487 (55.0)| 304 (41.0)                  |
+| - Males                           | 1221 (46.5)| 386 (38.5)        | 398 (45.0)| 437 (59.0)                  |
+| **Age group**                     |            |                   |           |                            |
+| - 15 to 24 years                  | 740 (28.2) | 191 (19.1)        | 264 (29.8)| 285 (38.5)                  |
+| - 25 to 34 years                  | 475 (18.1) | 141 (14.1)        | 167 (18.9)| 167 (22.5)                  |
+| - 35 to 44 years                  | 393 (15.0) | 185 (18.5)        | 119 (13.4)a| 89 (12.0)a                 |
+| - 45 to 54 years                  | 438 (16.6) | 220 (22.0)        | 139 (15.7)| 79 (10.7)a                  |
+| - 55 to 64 years                  | 379 (14.4) | 198 (19.7)        | 113 (12.8)a| 68 (9.2)a                  |
+| - 65 years or older               | 203 (7.7)  | 67 (6.6)a         | 83 (8.4)a | 53 (7.1)b                   |
+| **Race/Ethnicity**                |            |                   |           |                            |
+| - Non-white                       | 458 (17.4) | 184 (18.4)        | 140 (15.8)| 134 (18.1)                  |
+| - White                           | 2170 (82.6)| 818 (81.6)        | 745 (84.2)| 607 (81.9)                  |
+| **Main source of income**         |            |                   |           |                            |
+| - Employment Income^d             | 1054 (40.1)| 289 (28.8)        | 386 (43.6)| 379 (51.1)                  |
+| - Worker’s Compensation^e         | 160 (6.1)  | 91 (9.1)a         | 44 (5.0)b | 25 (3.4)c                   |
+| - Senior Benefits^f               | 134 (5.1)  | 57 (5.7)a         | 42 (4.7)b | 35 (4.7)                    |
+| - Other^g                         | 184 (7.0)  | 82 (8.2)a         | 60 (6.8)a | 42 (5.7)b                   |
+| - Not applicable^h                | 851 (32.4) | 402 (40.1)        | 263 (29.7)| 186 (25.1)                  |
+| - Not Stated^i                    | 245 (9.3)  | 81 (8.1)a         | 90 (10.2)a| 74 (10.0)                   |
+
+$^a$ Coefficient of variation between 16.6 and 25.0%.
+$^b$ Coefficient of variation between 25.1 and 33.3%.
+$^c$ Coefficient of variation > 33.3%.
+$^d$ Employment Income: Wages/salaries or self-employment.
+$^e$ Worker’s compensation: Employment insurance or worker’s compensation or social assistance/welfare.
+$^f$ Senior Benefits: Benefits from Canada or Quebec Pension Plan or job related retirement pensions, superannuation and annuities or RRSP/RRIF of Old Age Security and Guaranteed Income Supplement.
+$^g$ Other: Dividends/interest or child tax benefit or child support or alimony or other or no income.
+$^h$ Not applicable: Respondents who live in a household with only one person. The income variable "main source of personal income" is applicable only to those that live in a household of more than one person.
+$^i$ Not Stated: Question was not answered (don't know, refusal, not stated).
+
+
+- **Hint**
+  -  You can produce 1 table with total, and another table stratified by the necessary variable.
+
+```{r,warning=FALSE,message=FALSE}
+# your code here
+require(tableone)
+
+```
+
+# Question III: [20% grade]
+
+## 3(a) Subset
+
+Subset the dataset excluding 'Very good or excellent' responses from the self-rated mental health variable
+
+```{r}
+# your code here
+
+```
+
+## 3(b) Recode 
+
+Recode self-rated mental health variable and make it a binary variable: 'Good' vs. 'Poor' (simplifying category labels only). Convert that variable to a factor variable with 'Poor' being the reference level.
+
+```{r}
+# your code here
+
+```
+
+## 3(c) Regression
+Run a logistic regression model for finding the relationship between community belonging (Reference: Very weak) and self-rated mental health (Reference: Poor) among respondents with mental or substance use disorders. Adjust the model for three confounders: sex, age, and race/ethnicity. 
+
+```{r}
+# your code here
+
+```
+
+## 3(d) Reporting odds ratio
+Report the odds ratios and associated confidence intervals (use Publish package).
+
+```{r,warning=FALSE,message=FALSE}
+require(Publish)
+# your code here
+
+```
+
+# Knit your file
+
+Please knit your file once you finished and submit the knitted PDF or doc file. Please also fill-up the following table:
+
+**Group name**: ** xyz **
+
+| Student initial | % contribution  |
+|:------|:-----|
+| Student 1 initial | x% |  
+| Student 2 initial | x% |
+| Student 3 initial | x% |
