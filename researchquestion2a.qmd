@@ -1,0 +1,284 @@
+## Predictive question (2a) {.unnumbered}
+
+### Working with a Predictive question using NHANES
+
+**Part 1: Identify, download and merge necessary data**:
+
+The tutorial focuses on building a predictive model for Diastolic blood pressure in the U.S. population for the years 2013-14. It provides a step-by-step guide on how to use R for data manipulation and analysis, covering the initial setup of the R environment, identification of relevant covariates like age, sex, and lifestyle factors, and methods to search and import these variables from the NHANES dataset. Following data importation, subsets of relevant variables are merged into a single analytic dataset, which is then saved for future research. The tutorial also includes an exercise.
+
+```{r chunkSetup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(nhanesA)
+require(knitr)
+require(SASxport)
+```
+
+### Example article
+
+Let us use the article by @li2020association as our reference. [DOI:10.1038/s41371-019-0224-9](https://www.nature.com/articles/s41371-019-0224-9.pdf).
+
+::: column-margin
+[@li2020association]
+:::
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/II5BxyzyLQw" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+### Research question
+
+Building a predictive model for `Diastolic blood pressure` from 2013-14 NHANES data. Here we are only interested about explaining the outcome (`Diastolic blood pressure`).
+
+| PICOT element | Description              |
+|---------------|--------------------------|
+| P             | US                       |
+| I             | \-                       |
+| C             | \-                       |
+| O             | Diastolic blood pressure |
+| T             | 2013-14                  |
+| \-            | \-                       |
+
+Covariates under consideration (that are known to influence this outcome) based on the literature (e.g., try [this paper](https://www.nature.com/articles/s41371-019-0224-9.pdf); see Table 1):
+
+-   sex
+-   age
+-   race
+-   marital status
+-   Systolic blood pressure
+-   smoking
+-   alcohol
+
+We will also extract additional survey features: - weights, - strata, - cluster
+
+But how do we know where to search these variables?
+
+### Searching for useful variables and datasets
+
+R can do some preliminary searches:
+
+#### Find suffix for the year
+
+First, we need to identify the correct suffix for the data year.
+
+`nhanesTables` function enables quick display of all available tables in survey groups:
+
+-   DEMOGRAPHICS: `DEMO`
+-   DIETARY: `DIET`
+-   EXAMINATION: `EXAM`
+-   LABORATORY: `LAB`
+-   QUESTIONNAIRE: `Q`
+
+```{r, cache=TRUE}
+# ?nhanesTables
+nhanesTables(data_group='DEMO', year=2013)
+# nicer tables
+kable(nhanesTables(data_group='DEMO', year=2013))
+```
+
+`H` is assigned for 2013-2014.
+
+```{r, cache=TRUE}
+kable(nhanesTables(data_group='EXAM', year=2013))
+```
+
+```{r, cache=TRUE}
+# Also try other datasets
+# nhanesTables(data_group='DIET', year=2013)
+```
+
+```{r, cache=TRUE}
+# nhanesTables(data_group='LAB', year=2013)
+```
+
+```{r, cache=TRUE}
+# nhanesTables(data_group='Q', year=2013)
+# what happens when you change year to 2014 or 2015. 
+# Try both and compare the outcome.
+```
+
+#### Look up variable names
+
+Once we have the table names, we need to find out which variables in those tables are useful for us.
+
+NHANES [Variable Keyword Search](https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx)
+
+`nhanesTableVars` enables quick display of table variables and their definitions:
+
+```{r, cache=TRUE}
+# ?nhanesTableVars
+nhanesTableVars(data_group='DEMO', nh_table='DEMO_H', namesonly = TRUE)
+kable(nhanesTableVars(data_group='DEMO', nh_table='DEMO_H', namesonly = FALSE))
+# https://wwwn.cdc.gov/nchs/nhanes/2013-2014/DEMO_H.htm
+```
+
+[NHANES 2013-2014 Demographics Data](https://wwwn.cdc.gov/nchs/nhanes/Search/DataPage.aspx?Component=Demographics&CycleBeginYear=2013)
+
+Displays a list of variables in the specified NHANES table:
+
+```{r, cache=TRUE}
+nhanesTableVars(data_group='EXAM', nh_table='BPX_H')
+# https://wwwn.cdc.gov/nchs/nhanes/2013-2014/BPX_H.htm
+```
+
+[NHANES 2013-2014 Examination Data](https://wwwn.cdc.gov/nchs/nhanes/Search/DataPage.aspx?Component=Examination&CycleBeginYear=2013)
+
+### Importing and Subsetting the dataset
+
+Objective is to retain only the useful variables. We will start by importing only the demographic variables that we need.
+
+#### Demographics
+
+[NHANES 2013-2014 Demographic Variables and Sample Weights (DEMO_H)](https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/DEMO_H.htm)
+
+Take a look at `Target` for each variables.
+
+What is the difference between
+
+-   `WTINT2YR`: 0 missing
+-   `WTMEC2YR`: Missing 0, Not MEC Examined 362
+
+```{r download2013demo, cache=TRUE}
+demo <- nhanes('DEMO_H') # Both males and females 0 YEARS - 150 YEARS
+names(demo)
+demo1 <- demo[c("SEQN", # Respondent sequence number
+                "RIAGENDR", # gender
+                "RIDAGEYR", # Age in years at screening
+                "RIDRETH3", # Race/Hispanic origin w/ NH Asian
+                "DMDMARTL", # Marital status: 20 YEARS - 150 YEARS
+                "WTINT2YR", "WTMEC2YR", #  Full sample 2 year weights
+                "SDMVPSU", # Masked variance pseudo-PSU
+                "SDMVSTRA")] # Masked variance pseudo-stratum
+demo_vars <- names(demo1) 
+demo2 <- nhanesTranslate('DEMO_H', demo_vars, data=demo1)
+```
+
+```{r}
+head(demo2$SEQN)
+head(demo2)
+```
+
+#### Blood pressure
+
+Next, we focus on the blood pressure readings.
+
+[NHANES 2013-2014 Blood Pressure (BPX_H)](https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/BPX_H.htm)
+
+Take a look at `Target` and missing for each variables. For example,
+
+`BPXDI1` - Diastolic: Blood pres (1st rdg) mm Hg - Target:Both males and females 8 YEARS - 150 YEARS - Missing 2641
+
+`BPXSY1` - Systolic: Blood pres (1st rdg) mm Hg - Target:Both males and females 8 YEARS - 150 YEARS - Missing 2641
+
+```{r download2013bp, cache=TRUE}
+bpx <- nhanes('BPX_H')
+names(bpx)
+bpx1 <- bpx[c("SEQN", # Respondent sequence number
+             "BPXDI1", # Diastolic: Blood pres (1st rdg) mm Hg
+             "BPXSY1")] # Systolic: Blood pres (1st rdg) mm Hg
+bpx_vars <- names(bpx1)
+bpx2 <- nhanesTranslate('BPX_H', bpx_vars, data=bpx1)
+head(bpx2)
+```
+
+#### Smoking
+
+Now, let's consider smoking data.
+
+[NHANES 2013-2014 Smoking - Cigarette Use (SMQ_H)](https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/SMQ_H.htm)
+
+`SMQ040` - Do you now smoke cigarettes - Target:Both males and females 18 YEARS - 150 YEARS - Missing 4589
+
+```{r download2013sm, cache=TRUE}
+smq <- nhanes('SMQ_H')
+smq1 <- smq[c("SEQN", # Respondent sequence number
+             "SMQ040")] # Do you now smoke cigarettes?: 18 YEARS - 150 YEARS
+smq_vars <- names(smq1)
+smq2 <- nhanesTranslate('SMQ_I', smq_vars, data=smq1)
+head(smq2)
+```
+
+Other options for `smoking` variable candidates could be
+
+-   `SMD641` - \# days smoked cigs during past 30 days
+-   `SMD650` - Avg \# cigarettes/day during past 30 days
+-   `SMQ621` - Cigarettes smoked in entire life
+
+Which of these variables are more towards describing what you are thinking as a smoking variable?
+
+#### Alcohol
+
+Finally, we will import data about alcohol consumption.
+
+[NHANES 2013-2014 Alcohol Use (ALQ_H)](https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/ALQ_H.htm)
+
+`ALQ130` - Avg no alcoholic drinks/day - past 12 mos - Target:Both males and females 18 YEARS - 150 YEARS - Missing 2328
+
+```{r download2013al, cache=TRUE}
+alq <- nhanes('ALQ_H')
+alq1 <- alq[c("SEQN", # Respondent sequence number
+              "ALQ130")] # Avg # alcoholic drinks/day - past 12 mos 
+              # 18 YEARS - 150 YEARS
+alq_vars <- names(alq1)
+alq2 <- nhanesTranslate('ALQ_H', alq_vars, data=alq1)
+head(alq2)
+```
+
+### Merging all the datasets
+
+#### one-by-one
+
+Now, we need to combine all these individual datasets into one for our analysis.
+
+```{r, cache=TRUE}
+analytic.data0 <- merge(demo2, bpx2, by = c("SEQN"), all=TRUE)
+head(analytic.data0)
+dim(analytic.data0)
+analytic.data1 <- merge(analytic.data0, smq2, by = c("SEQN"), all=TRUE)
+head(analytic.data1)
+dim(analytic.data1)
+analytic.data2 <- merge(analytic.data1, alq2, by = c("SEQN"), all=TRUE)
+head(analytic.data2)
+dim(analytic.data2)
+```
+
+#### All at once
+
+Alternatively, you can merge all datasets at once.
+
+```{r, cache=TRUE}
+require(plyr)
+analytic.data <- join_all(list(demo2, bpx2, smq2, alq2), by = "SEQN", type='full')
+head(analytic.data)
+dim(analytic.data)
+```
+
+## Saving data for later use
+
+It's a good practice to save your data for future reference.
+
+```{r, cache=TRUE}
+save(analytic.data, file="Data/researchquestion/Analytic2013.RData")
+```
+
+## Exercise (try yourself)
+
+Follow the steps in the exercise section to deepen your understanding and broaden the analysis.
+
+1.  The following variables were not included in the above analysis, that were included in [this paper](https://www.nature.com/articles/s41371-019-0224-9.pdf): try including them and then create the new analytic data:
+
+-   education level
+-   poverty income ratio
+-   Sodium intake (mg)
+-   Potassium intake (mg)
+
+2.  Download the NHANES 2015-2016 and append with the NHANES 2013-2014 analytic data with same variables.
+
+## References

@@ -1,0 +1,446 @@
+## Predictive question (2b) {.unnumbered}
+
+### Working with a Predictive question using NHANES
+
+**Part 2: Analysis of downloaded data**:
+
+This tutorial provides a comprehensive guide to NHANES data preparation and initial analysis using R. The tutorial covers topics such as loading dataset, variable recoding, data summary statistics, and various types of regression analyses, including bivariate and multivariate models. It also delves into dealing with missing data, first by omitting NA values for a complete case analysis and then using a simple imputation method. The guide is designed to walk the reader through each step of data manipulation and analysis, with a focus on avoiding common pitfalls in statistical analysis.
+
+```{r chunkSetup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(car)
+require(DataExplorer)
+require("tableone")
+require(Publish)
+require(mice)
+require(jtools)
+require(ggstance)
+require(broom.mixed)
+require(huxtable)
+```
+
+### Example article
+
+We are continuing to use the article by @li2020association as our reference. [DOI:10.1038/s41371-019-0224-9](https://www.nature.com/articles/s41371-019-0224-9.pdf).
+
+::: column-margin
+[@li2020association]
+:::
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/U5vGa6wF50M" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+### Loading saved data
+
+The following code chunk loads an RData file named that was saved in the previous step. The RData file typically contains saved R objects like data frames, lists, etc.
+
+```{r, cache=TRUE}
+load("Data/researchquestion/Analytic2013.RData")
+```
+
+The following code lists all the objects in the current workspace.
+
+```{r, cache=TRUE}
+ls()
+```
+
+The following shows the column names of the `analytic.data` data frame.
+
+```{r, cache=TRUE}
+names(analytic.data)
+```
+
+The following provides summary statistics for the column `BPXDI1` in the `analytic.data` data frame.
+
+```{r, cache=TRUE}
+summary(analytic.data$BPXDI1)
+```
+
+### Target
+
+First, we need to understand the data well. What is the common support in all of the population?
+
+| Variable | Target                                      |
+|----------|---------------------------------------------|
+| SEQN     | Both males and females 0 YEARS - 150 YEARS  |
+| RIAGENDR | Both males and females 0 YEARS - 150 YEARS  |
+| RIDAGEYR | Both males and females 0 YEARS - 150 YEARS  |
+| RIDRETH3 | Both males and females 0 YEARS - 150 YEARS  |
+| DMDMARTL | Both males and females 20 YEARS - 150 YEARS |
+| WTINT2YR | Both males and females 0 YEARS - 150 YEARS  |
+| WTMEC2YR | Both males and females 0 YEARS - 150 YEARS  |
+| SDMVPSU  | Both males and females 0 YEARS - 150 YEARS  |
+| SDMVSTRA | Both males and females 0 YEARS - 150 YEARS  |
+| BPXDI1   | Both males and females 8 YEARS - 150 YEARS  |
+| BPXSY1   | Both males and females 8 YEARS - 150 YEARS  |
+| SMQ040   | Both males and females 18 YEARS - 150 YEARS |
+| ALQ130   | Both males and females 18 YEARS - 150 YEARS |
+| \-       | \-                                          |
+
+Both males and females 20 YEARS - 150 YEARS. The study should be restricted to age 20 and +.
+
+### Recode and Univariate summary
+
+#### Blood pressure
+
+```{r, cache=TRUE}
+require(car)
+summary(analytic.data$BPXSY1)
+summary(analytic.data$BPXDI1)
+# what is 0 blood pressure?
+# change all 0 to NA
+analytic.data$BPXDI1 <- recode(analytic.data$BPXDI1, "0=NA") 
+```
+
+```{r, cache=TRUE}
+#create a new variable
+analytic.data$blood.pressure <- analytic.data$BPXDI1 
+```
+
+```{r, cache=TRUE}
+# delete old variable
+analytic.data$BPXDI1 <- NULL
+```
+
+```{r, cache=TRUE}
+# check summary
+summary(analytic.data$blood.pressure)
+```
+
+#### Race
+
+The `RIDRETH3` column is recoded to simplify racial categories.
+
+```{r, cache=TRUE}
+analytic.data$RIDRETH3 <- recode(analytic.data$RIDRETH3, 
+                                 "c('Non-Hispanic Asian','Other Race - Including Multi-Rac')='Other race'")
+analytic.data$race <- analytic.data$RIDRETH3
+analytic.data$RIDRETH3 <- NULL
+table(analytic.data$race,useNA="always")
+```
+
+#### Age (centering)
+
+Age values are centered around the mean age for those who are 20 years or older.
+
+```{r, cache=TRUE}
+summary(analytic.data$RIDAGEYR)
+centre.adult <- mean(analytic.data$RIDAGEYR[analytic.data$RIDAGEYR >= 20], na.rm = TRUE)
+centre.adult
+# This is actually not the correct mean age. Guess why?
+# Hint: see the NHANES data dictionary for age variable.
+analytic.data$RIDAGEYRc <- analytic.data$RIDAGEYR - centre.adult
+analytic.data$age.centred <- analytic.data$RIDAGEYRc
+analytic.data$RIDAGEYRc <- NULL
+summary(analytic.data$age.centred)
+```
+
+#### Gender
+
+A new column `gender` is created for gender details.
+
+```{r, cache=TRUE}
+analytic.data$gender <- analytic.data$RIAGENDR
+analytic.data$RIAGENDR <- NULL
+table(analytic.data$gender, useNA = "always")
+```
+
+#### Marital status
+
+The marital status is simplified.
+
+```{r, cache=TRUE}
+summary(analytic.data$DMDMARTL)
+analytic.data$DMDMARTL <- recode(analytic.data$DMDMARTL, 
+                                 "c('Widowed','Divorced','Separated')='Previously married';
+                                 c('Living with partner','Married')='Married'; 
+                                 'Never married' = 'Never married';
+                                 else=NA")
+# what happened to 77 and 99? Hint: else
+analytic.data$marital <- analytic.data$DMDMARTL 
+analytic.data$DMDMARTL <- NULL
+table(analytic.data$marital, useNA = "always")
+```
+
+#### Alcohol
+
+For Alcohol, codes like 777 and 999 are converted to `NA`.
+
+```{r, cache=TRUE}
+summary(analytic.data$ALQ130)
+# what is  777 and 999? See NHANES data dictionary.
+# Refused and Don't know
+analytic.data$ALQ130[analytic.data$ALQ130 == 999] <- NA
+analytic.data$ALQ130[analytic.data$ALQ130 == 777] <- NA
+analytic.data$alcohol <- analytic.data$ALQ130
+analytic.data$ALQ130 <- NULL
+table(analytic.data$alcohol, useNA = "always")
+```
+
+#### Smoking
+
+Similar to alcohol, unusual codes are converted to `NA`.
+
+```{r, cache=TRUE}
+summary(analytic.data$SMQ040)
+# what is  7 and 9? See NHANES data dictionary.
+# Refused and Don't know
+analytic.data$SMQ040[analytic.data$SMQ040 == 9] <- NA
+analytic.data$SMQ040[analytic.data$SMQ040 == 7] <- NA
+analytic.data$smoke <- analytic.data$SMQ040
+analytic.data$SMQ040 <- NULL
+table(analytic.data$smoke, useNA = "always")
+```
+
+### Renaming
+
+Columns in the data frame are renamed for better readability.
+
+```{r, cache=TRUE}
+names(analytic.data)
+```
+
+Order is important.
+
+```{r, cache=TRUE}
+names(analytic.data) <- c("id", "age", "w.all", "w.MEC", "PSU", "STRATA", 
+                          "systolic", "diastolic", "race", "age.centred", 
+                          "gender", "marital", "alcohol", "smoke")
+```
+
+```{r, cache=TRUE}
+names(analytic.data)
+```
+
+### Subsetting to avoid zero-cells
+
+A new age category (`age.cat`) is created to segregate the data. Remember that, the target for marital status component was `20 YEARS - 150 YEARS`.
+
+```{r, cache=TRUE}
+summary(analytic.data$age)
+```
+
+```{r, cache=TRUE}
+analytic.data$age.cat <- cut(analytic.data$age, breaks = c(-Inf, 20,50,+Inf), right = FALSE)
+```
+
+```{r, cache=TRUE}
+table(analytic.data$age.cat)
+```
+
+```{r, cache=TRUE}
+summary(analytic.data$alcohol)
+```
+
+```{r, cache=TRUE}
+table(analytic.data$age.cat, analytic.data$marital)
+```
+
+```{r, cache=TRUE}
+dim(analytic.data)
+analytic.data1 <- subset(analytic.data , !is.na(age) & age >= 20)
+dim(analytic.data1)
+```
+
+**Note**: This subsetting is problematic for further survey data analysis. We will learn to work with this subsetting correctly later.
+
+```{r, cache=TRUE}
+analytic.data1$age <-NULL
+```
+
+### Summary
+
+This part provides various summary statistics for the processed data.
+
+#### Univariate summary for the complete case
+
+```{r, cache=TRUE}
+summary(analytic.data1$diastolic)
+```
+
+```{r, cache=TRUE}
+table(analytic.data1$race,useNA = "always")
+```
+
+```{r, cache=TRUE}
+summary(analytic.data1$age.centred)
+```
+
+```{r, cache=TRUE}
+table(analytic.data1$gender,useNA = "always")
+```
+
+```{r, cache=TRUE}
+table(analytic.data1$marital,useNA = "always")
+```
+
+## Saving for further use
+
+```{r, cache=TRUE}
+save(analytic.data1, file = "NHANESanalytic.Rdata")
+```
+
+## Regression summary (Optional)
+
+::: column-margin
+This is optional content for this chapter. Later in [confounding](confounding.html) and [predictive factor](predictivefactors.html) chapters, we will learn more about adjustment.
+:::
+
+Different General Linear Models (GLMs) are fit for diastolic blood pressure using variables like gender, marital status, etc.
+
+### Bivariate Regression summary (missing values included)
+
+```{r, cache=TRUE}
+fit1g <- glm(diastolic ~ gender, data=analytic.data1)
+summary(fit1g)
+```
+
+```{r, cache=TRUE}
+fit1m <- glm(diastolic ~ marital, data=analytic.data1)
+summary(fit1m)
+```
+
+```{r, cache=TRUE}
+str(analytic.data1)
+fit13 <- glm(diastolic ~ gender+age.centred+race+marital+systolic+smoke+alcohol, data=analytic.data1)
+summary(fit13)
+```
+
+## Check missingness (optional)
+
+::: column-margin
+A subsequent [chapter](missingdata.html) will delve into the additional factors that impact how we handle missing data.
+:::
+
+The `plot_missing()` function from the `DataExplorer` package is used to plot missing data.
+
+```{r, cache=TRUE}
+require(DataExplorer)
+plot_missing(analytic.data1)
+```
+
+```{r, cache=TRUE}
+require("tableone")
+vars = c("systolic", "smoke", "diastolic", "race", 
+                       "age.centred", "gender", "marital", "alcohol")
+CreateTableOne(data = analytic.data1, includeNA = TRUE, 
+               vars = vars)
+```
+
+### Setting correct variable types
+
+The variables are explicitly set to either numeric or factor types.
+
+**Note**: In case any of the variables types are wrong, your table 1 output will be wrong. Better to be sure about what type of variable you want them to be (numeric or factor). For example, `systolic` should be numeric. Is it defined that way?
+
+```{r, cache=TRUE}
+mode(analytic.data1$systolic)
+```
+
+In case it wasn't (often they can get converted to character), then here is the solution:
+
+```{r, cache=TRUE}
+# solution 1: one-by-one
+analytic.data1$systolic <- as.numeric(as.character(analytic.data1$systolic))
+summary(analytic.data1$systolic)
+```
+
+```{r, cache=TRUE}
+# solution 2: fixing all variable types at once
+numeric.names <- c("systolic", "diastolic", "age.centred", "alcohol")
+factor.names <- vars[!vars %in% numeric.names]
+factor.names
+analytic.data1[,factor.names] <- lapply(analytic.data1[,factor.names] , factor)
+analytic.data1[numeric.names] <- apply(X = analytic.data1[numeric.names],
+                                       MARGIN = 2, FUN =function (x) 
+                                         as.numeric(as.character(x)))
+levels(analytic.data1$marital)
+CreateTableOne(data = analytic.data1, includeNA = TRUE, 
+               vars = vars)
+```
+
+### Complete case analysis
+
+Removes all rows containing `NA`.
+
+```{r, cache=TRUE}
+dim(analytic.data1)
+analytic.data2 <- as.data.frame(na.omit(analytic.data1))
+dim(analytic.data2)
+plot_missing(analytic.data2)
+```
+
+```{r, cache=TRUE}
+CreateTableOne(data = analytic.data2, includeNA = TRUE, 
+               vars = vars)
+# For categorical variables, try to see if 
+# any categories have 0% or 100% frequency.
+# If yes, those may create problem in further analysis.
+```
+
+```{r, cache=TRUE}
+fit23 <- glm(diastolic ~ gender+age.centred+race+marital+systolic+smoke+alcohol, data=analytic.data2)
+require(Publish)
+publish(fit23)
+```
+
+### Imputed data
+
+We will learn about proper missing data analysis at a latter class. Currently, we will do a simple (but rather controversial) single imputation. In here we are simply using a random sampling to impute (probably the worst method, but we are just filling in some gaps for now).
+
+```{r, cache=TRUE}
+require(mice)
+imputation1 <- mice(analytic.data1,
+                   method = "sample",  
+                   m = 1, # Number of multiple imputations. 
+                   maxit = 1 # Number of iteration; mostly useful for convergence
+                   )
+analytic.data.imputation1 <- complete(imputation1)
+dim(analytic.data.imputation1)
+str(analytic.data.imputation1)
+plot_missing(analytic.data.imputation1)
+```
+
+```{r, cache=TRUE}
+CreateTableOne(data = analytic.data.imputation1, includeNA = TRUE,
+               vars = vars)
+# For categorical variables, try to see if 
+# any categories have 0% or 100% frequency.
+# If yes, those may create problem in further analysis.
+```
+
+```{r, cache=TRUE}
+fit23i <- glm(diastolic ~ gender+age.centred+race+marital+systolic+smoke+alcohol, data=analytic.data.imputation1)
+publish(fit23i)
+```
+
+We see some changes in the estimates. After imputing compared to complete case analysis, any changes dramatic (e.g., changing conclusion)?
+
+::: column-margin
+Additional factors come into play when dealing with complex survey datasets; these will be explored in a subsequent [chapter](surveydata.html).
+:::
+
+```{r, cache=TRUE}
+require(jtools)
+require(ggstance)
+require(broom.mixed)
+require(huxtable)
+export_summs(fit23, fit23i)
+plot_summs(fit23, fit23i)
+# plot_summs(fit23, fit23i, plot.distributions = TRUE)
+```
+
+## Exercise (try yourself)
+
+In this lab, we have done multiple steps that could be improved. One of them was single imputation by random sampling. What other ad hoc method you could use to impute the factor variables?
+
+## References

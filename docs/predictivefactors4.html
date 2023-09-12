@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>OER: Advanced Epidemiological Methods - Overfitting and performance</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./predictivefactors5.html" rel="next">
+<link href="./predictivefactors3.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Overfitting and performance">
+<meta name="twitter:description" content="Load the data saved at the end of previous part of the lab.">
+<meta name="twitter:card" content="summary">
+</head>
+<body class="nav-sidebar docked slimcontent">
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Overfitting and performance</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">OER: Advanced Epidemiological Methods</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">Functions for wrangling</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz on wrangling</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise on wrangling</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Data accessing</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing results</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">Functions for data accessing</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz on accessing</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research question</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question (1)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question (2a)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question (2b)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">Functions for research question</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz on research question</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Confounding and bias</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R for confounding</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Predictive factors</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link active">Overfitting and performance</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R for predictive factors</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R for survey data analysis</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R for missing data</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R for propensity score</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Reporting guidelines</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">R for reporting</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R for machine learning</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R for ML in causal inference</a>
+  </div>
+</li>
+      </ul>
+</li>
+    </ul>
+</div>
+</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#load-data" id="toc-load-data" class="nav-link active" data-scroll-target="#load-data">Load data</a></li>
+  <li><a href="#design-matrix" id="toc-design-matrix" class="nav-link" data-scroll-target="#design-matrix">Design Matrix</a></li>
+  <li><a href="#check-prediction" id="toc-check-prediction" class="nav-link" data-scroll-target="#check-prediction">Check prediction</a></li>
+  <li><a href="#measuring-prediction-error" id="toc-measuring-prediction-error" class="nav-link" data-scroll-target="#measuring-prediction-error">Measuring prediction error</a></li>
+  <li><a href="#writing-function" id="toc-writing-function" class="nav-link" data-scroll-target="#writing-function">Writing function</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Overfitting and performance</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header><div class="cell" data-hash="predictivefactors4_cache/html/setup_9abadbfe52120dd7659ff1a6a348b0c0">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">Publish</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-forge.r-project.org/projects/car/">car</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
+<p>Load the data saved at the end of previous part of the lab.</p>
+<div class="cell" data-hash="predictivefactors4_cache/html/load_414bb884a8e550c7cee46fa7be627e1f">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now we will fit the final model that we decided at the end of previous part of the lab.</p>
+<div class="cell" data-hash="predictivefactors4_cache/html/lm_729f97fe0a22b541142d0b9dc10c749e">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol~gender + age + born + </span></span>
+<span><span class="st">             race + education + married + </span></span>
+<span><span class="st">             income + diastolicBP + systolicBP + </span></span>
+<span><span class="st">             bmi +</span></span>
+<span><span class="st">             triglycerides + uric.acid + </span></span>
+<span><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
+<span><span class="st">             diabetes"</span><span class="op">)</span></span>
+<span><span class="va">formula4</span></span>
+<span><span class="co">#&gt; cholesterol ~ gender + age + born + race + education + married + </span></span>
+<span><span class="co">#&gt;     income + diastolicBP + systolicBP + bmi + triglycerides + </span></span>
+<span><span class="co">#&gt;     uric.acid + protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span><span class="co">#&gt;     globulin + calcium + physical.work + physical.recreational + </span></span>
+<span><span class="co">#&gt;     diabetes</span></span>
+<span><span class="va">fit4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">formula4</span>, data <span class="op">=</span> <span class="va">analytic3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = formula4, data = analytic3)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -115.465  -23.695   -2.598   20.017  177.264 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;                             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)               136.871606  51.998527   2.632  0.00853 ** </span></span>
+<span><span class="co">#&gt; genderMale                -13.064857   1.802099  -7.250 5.48e-13 ***</span></span>
+<span><span class="co">#&gt; age                         0.351838   0.056116   6.270 4.22e-10 ***</span></span>
+<span><span class="co">#&gt; bornOthers                  7.877420   1.947498   4.045 5.39e-05 ***</span></span>
+<span><span class="co">#&gt; raceHispanic               -5.790547   2.323010  -2.493  0.01274 *  </span></span>
+<span><span class="co">#&gt; raceOther                  -4.879882   2.781673  -1.754  0.07950 .  </span></span>
+<span><span class="co">#&gt; raceWhite                  -0.847635   2.130149  -0.398  0.69072    </span></span>
+<span><span class="co">#&gt; educationHigh.School        2.851633   1.617435   1.763  0.07801 .  </span></span>
+<span><span class="co">#&gt; educationSchool            -2.446765   3.084409  -0.793  0.42769    </span></span>
+<span><span class="co">#&gt; marriedNever.married       -5.739509   1.997152  -2.874  0.00409 ** </span></span>
+<span><span class="co">#&gt; marriedPreviously.married   0.342206   1.968165   0.174  0.86198    </span></span>
+<span><span class="co">#&gt; incomeBetween.25kto54k     -0.867063   1.990253  -0.436  0.66312    </span></span>
+<span><span class="co">#&gt; incomeBetween.55kto99k      2.462130   2.169757   1.135  0.25658    </span></span>
+<span><span class="co">#&gt; incomeOver100k              2.626046   2.394560   1.097  0.27289    </span></span>
+<span><span class="co">#&gt; diastolicBP                 0.374971   0.062238   6.025 1.93e-09 ***</span></span>
+<span><span class="co">#&gt; systolicBP                  0.029976   0.049515   0.605  0.54497    </span></span>
+<span><span class="co">#&gt; bmi                        -0.309530   0.118927  -2.603  0.00930 ** </span></span>
+<span><span class="co">#&gt; triglycerides               0.124806   0.006427  19.419  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; uric.acid                   1.357242   0.609012   2.229  0.02593 *  </span></span>
+<span><span class="co">#&gt; protein                     4.767008   2.931636   1.626  0.10406    </span></span>
+<span><span class="co">#&gt; bilirubin                  -6.060791   2.593508  -2.337  0.01952 *  </span></span>
+<span><span class="co">#&gt; phosphorus                 -0.076472   1.341957  -0.057  0.95456    </span></span>
+<span><span class="co">#&gt; sodium                     -1.026686   0.347679  -2.953  0.00318 ** </span></span>
+<span><span class="co">#&gt; potassium                   0.893507   2.283488   0.391  0.69561    </span></span>
+<span><span class="co">#&gt; globulin                   -2.198037   3.036091  -0.724  0.46915    </span></span>
+<span><span class="co">#&gt; calcium                    12.202366   2.574400   4.740 2.25e-06 ***</span></span>
+<span><span class="co">#&gt; physical.workYes           -0.439108   1.651078  -0.266  0.79030    </span></span>
+<span><span class="co">#&gt; physical.recreationalYes    1.238756   1.667670   0.743  0.45767    </span></span>
+<span><span class="co">#&gt; diabetesYes               -19.032748   2.158825  -8.816  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 35.22 on 2603 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.2415, Adjusted R-squared:  0.2334 </span></span>
+<span><span class="co">#&gt; F-statistic: 29.61 on 28 and 2603 DF,  p-value: &lt; 2.2e-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="design-matrix" class="level3"><h3 class="anchored" data-anchor-id="design-matrix">Design Matrix</h3>
+<p>Expands factors to a set of dummy variables.</p>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We can use the <code>model.matrix</code> function to construct a design/model matrix, such as expand factor variables to a matrix of dummy variable</p>
+</div>
+</div>
+<div class="cell" data-hash="predictivefactors4_cache/html/dim_4f6d64134f3a2a6060d91fb03b922206">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    (Intercept) genderMale age bornOthers raceHispanic raceOther raceWhite</span></span>
+<span><span class="co">#&gt; 1            1          1  62          0            0         0         1</span></span>
+<span><span class="co">#&gt; 2            1          1  53          1            0         0         1</span></span>
+<span><span class="co">#&gt; 4            1          0  56          0            0         0         1</span></span>
+<span><span class="co">#&gt; 5            1          0  42          0            0         0         0</span></span>
+<span><span class="co">#&gt; 10           1          1  22          0            0         0         0</span></span>
+<span><span class="co">#&gt; 11           1          0  32          1            1         0         0</span></span>
+<span><span class="co">#&gt;    educationHigh.School educationSchool marriedNever.married</span></span>
+<span><span class="co">#&gt; 1                     0               0                    0</span></span>
+<span><span class="co">#&gt; 2                     1               0                    0</span></span>
+<span><span class="co">#&gt; 4                     0               0                    0</span></span>
+<span><span class="co">#&gt; 5                     0               0                    0</span></span>
+<span><span class="co">#&gt; 10                    0               0                    1</span></span>
+<span><span class="co">#&gt; 11                    0               0                    0</span></span>
+<span><span class="co">#&gt;    marriedPreviously.married incomeBetween.25kto54k incomeBetween.55kto99k</span></span>
+<span><span class="co">#&gt; 1                          0                      0                      1</span></span>
+<span><span class="co">#&gt; 2                          1                      0                      0</span></span>
+<span><span class="co">#&gt; 4                          0                      0                      1</span></span>
+<span><span class="co">#&gt; 5                          1                      1                      0</span></span>
+<span><span class="co">#&gt; 10                         0                      1                      0</span></span>
+<span><span class="co">#&gt; 11                         0                      1                      0</span></span>
+<span><span class="co">#&gt;    incomeOver100k diastolicBP systolicBP  bmi triglycerides uric.acid protein</span></span>
+<span><span class="co">#&gt; 1               0          70        128 27.8           158       4.2     7.5</span></span>
+<span><span class="co">#&gt; 2               0          88        146 30.8           170       7.0     7.4</span></span>
+<span><span class="co">#&gt; 4               0          72        132 42.4            93       5.4     6.1</span></span>
+<span><span class="co">#&gt; 5               0          70        100 20.3            52       3.3     7.7</span></span>
+<span><span class="co">#&gt; 10              0          70        110 28.0            77       6.0     7.4</span></span>
+<span><span class="co">#&gt; 11              0          70        120 28.2           295       5.2     7.4</span></span>
+<span><span class="co">#&gt;    bilirubin phosphorus sodium potassium globulin calcium physical.workYes</span></span>
+<span><span class="co">#&gt; 1        0.5        4.7    136      4.30      2.9     9.8                0</span></span>
+<span><span class="co">#&gt; 2        0.6        4.4    140      4.55      2.9     9.8                0</span></span>
+<span><span class="co">#&gt; 4        0.3        3.8    141      4.08      2.3     8.9                0</span></span>
+<span><span class="co">#&gt; 5        0.3        3.2    136      3.50      3.4     9.3                0</span></span>
+<span><span class="co">#&gt; 10       0.2        5.3    139      4.16      3.0     9.3                0</span></span>
+<span><span class="co">#&gt; 11       0.4        3.1    138      4.31      2.9    10.3                0</span></span>
+<span><span class="co">#&gt;    physical.recreationalYes diabetesYes</span></span>
+<span><span class="co">#&gt; 1                         0           1</span></span>
+<span><span class="co">#&gt; 2                         0           0</span></span>
+<span><span class="co">#&gt; 4                         0           0</span></span>
+<span><span class="co">#&gt; 5                         0           0</span></span>
+<span><span class="co">#&gt; 10                        1           0</span></span>
+<span><span class="co">#&gt; 11                        0           0</span></span>
+<span></span>
+<span><span class="co"># Dimension of the model matrix</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2632   29</span></span>
+<span></span>
+<span><span class="co"># Number of parameters = intercept + slopes</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> </span>
+<span><span class="va">p</span></span>
+<span><span class="co">#&gt; [1] 29</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="check-prediction" class="level3"><h3 class="anchored" data-anchor-id="check-prediction">Check prediction</h3>
+<div class="cell" data-hash="predictivefactors4_cache/html/pred_e7bc0d224e0c4272bc85f7b619ee86a3">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obs.y</span> <span class="op">&lt;-</span> <span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">obs.y</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;    81.0   163.0   189.0   191.5   216.0   362.0</span></span>
+<span></span>
+<span><span class="co"># Predict the above fit on analytic3 data</span></span>
+<span><span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit4</span>, <span class="va">analytic3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">pred.y</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   136.3   178.2   189.4   191.5   202.4   337.6</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">pred.y</span><span class="op">)</span></span>
+<span><span class="va">n</span></span>
+<span><span class="co">#&gt; [1] 2632</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">obs.y</span>,<span class="va">pred.y</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lowess.html">lowess</a></span><span class="op">(</span><span class="va">obs.y</span>,<span class="va">pred.y</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="predictivefactors4_files/figure-html/pred-1.png" class="img-fluid" width="672"></p>
+</div>
+<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span></span>
+<span><span class="co"># Prediction on a new data: fictitious.data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">fictitious.data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 'data.frame':    4121 obs. of  33 variables:</span></span>
+<span><span class="co">#&gt;  $ ID                   : num  83732 83733 83734 83735 83736 ...</span></span>
+<span><span class="co">#&gt;  $ gender               : chr  "Male" "Male" "Male" "Female" ...</span></span>
+<span><span class="co">#&gt;  $ age                  : num  62 53 78 56 42 72 22 32 56 46 ...</span></span>
+<span><span class="co">#&gt;  $ born                 : chr  "Born in 50 US states or Washingt" "Others" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;  $ race                 : chr  "White" "White" "White" "White" ...</span></span>
+<span><span class="co">#&gt;  $ education            : chr  "College" "High.School" "High.School" "College" ...</span></span>
+<span><span class="co">#&gt;  $ married              : chr  "Married" "Previously.married" "Married" "Married" ...</span></span>
+<span><span class="co">#&gt;  $ income               : chr  "Between.55kto99k" "&lt;25k" "&lt;25k" "Between.55kto99k" ...</span></span>
+<span><span class="co">#&gt;  $ weight               : num  135630 25282 12576 102079 18235 ...</span></span>
+<span><span class="co">#&gt;  $ psu                  : num  1 1 1 1 2 1 2 1 2 1 ...</span></span>
+<span><span class="co">#&gt;  $ strata               : num  125 125 131 131 126 128 128 125 126 121 ...</span></span>
+<span><span class="co">#&gt;  $ diastolicBP          : num  70 88 46 72 70 58 70 70 116 94 ...</span></span>
+<span><span class="co">#&gt;  $ systolicBP           : num  128 146 138 132 100 116 110 120 178 144 ...</span></span>
+<span><span class="co">#&gt;  $ bodyweight           : num  94.8 90.4 83.4 109.8 55.2 ...</span></span>
+<span><span class="co">#&gt;  $ bodyheight           : num  184 171 170 161 165 ...</span></span>
+<span><span class="co">#&gt;  $ bmi                  : num  27.8 30.8 28.8 42.4 20.3 28.6 28 28.2 33.6 27.6 ...</span></span>
+<span><span class="co">#&gt;  $ waist                : num  101.1 107.9 116.5 110.1 80.4 ...</span></span>
+<span><span class="co">#&gt;  $ smoke                : chr  "Not.at.all" "Every.day" "Not.at.all" "Not.at.all" ...</span></span>
+<span><span class="co">#&gt;  $ alcohol              : num  1 6 0 1 1 0 8 1 0 1 ...</span></span>
+<span><span class="co">#&gt;  $ cholesterol          : num  173 265 229 174 204 190 164 190 145 242 ...</span></span>
+<span><span class="co">#&gt;  $ cholesterolM2        : num  4.47 6.85 5.92 4.5 5.28 4.91 4.24 4.91 3.75 6.26 ...</span></span>
+<span><span class="co">#&gt;  $ triglycerides        : num  158 170 299 93 52 52 77 295 121 497 ...</span></span>
+<span><span class="co">#&gt;  $ uric.acid            : num  4.2 7 7.3 5.4 3.3 4.9 6 5.2 4.8 6.5 ...</span></span>
+<span><span class="co">#&gt;  $ protein              : num  7.5 7.4 7.3 6.1 7.7 7.1 7.4 7.4 6.9 6.8 ...</span></span>
+<span><span class="co">#&gt;  $ bilirubin            : num  0.5 0.6 0.5 0.3 0.3 0.5 0.2 0.4 0.4 0.5 ...</span></span>
+<span><span class="co">#&gt;  $ phosphorus           : num  4.7 4.4 3.6 3.8 3.2 3.7 5.3 3.1 4.1 3.6 ...</span></span>
+<span><span class="co">#&gt;  $ sodium               : num  136 140 140 141 136 140 139 138 140 138 ...</span></span>
+<span><span class="co">#&gt;  $ potassium            : num  4.3 4.55 4.7 4.08 3.5 4.2 4.16 4.31 4.5 4.27 ...</span></span>
+<span><span class="co">#&gt;  $ globulin             : num  2.9 2.9 2.8 2.3 3.4 3 3 2.9 2.9 2.6 ...</span></span>
+<span><span class="co">#&gt;  $ calcium              : num  9.8 9.8 9.7 8.9 9.3 9.3 9.3 10.3 9.5 9.3 ...</span></span>
+<span><span class="co">#&gt;  $ physical.work        : chr  "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;  $ physical.recreational: chr  "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;  $ diabetes             : chr  "Yes" "No" "Yes" "No" ...</span></span>
+<span><span class="co">#&gt;  - attr(*, "na.action")= 'omit' Named int [1:885] 16 30 39 48 50 58 61 65 67 68 ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:885] "27" "68" "90" "112" ...</span></span>
+<span><span class="va">pred.y.new1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit4</span>, <span class="va">fictitious.data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">pred.y.new1</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   128.7   178.9   190.6   192.5   203.3   557.4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="measuring-prediction-error" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="measuring-prediction-error">Measuring prediction error</h3>
+<p>Continuous outcomes</p>
+<section id="r2" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="r2">R2</h4>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>See <span class="citation" data-cites="coefd">Wikipedia (<a href="#ref-coefd" role="doc-biblioref">2023a</a>)</span></p>
+</div></div><div class="cell" data-hash="predictivefactors4_cache/html/pe_31d84b2f7b0c6fc358d7df2830b18848">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Find SSE</span></span>
+<span><span class="va">SSE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span> <span class="op">(</span><span class="va">obs.y</span> <span class="op">-</span> <span class="va">pred.y</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">)</span></span>
+<span><span class="va">SSE</span></span>
+<span><span class="co">#&gt; [1] 3228460</span></span>
+<span></span>
+<span><span class="co"># Find SST</span></span>
+<span><span class="va">mean.obs.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">obs.y</span><span class="op">)</span></span>
+<span><span class="va">SST</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span> <span class="op">(</span><span class="va">obs.y</span> <span class="op">-</span> <span class="va">mean.obs.y</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">)</span></span>
+<span><span class="va">SST</span></span>
+<span><span class="co">#&gt; [1] 4256586</span></span>
+<span></span>
+<span><span class="co"># Find R2</span></span>
+<span><span class="va">R.2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">-</span> <span class="va">SSE</span><span class="op">/</span><span class="va">SST</span></span>
+<span><span class="va">R.2</span></span>
+<span><span class="co">#&gt; [1] 0.2415378</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">R2</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">obs.y</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.2415378</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="rmse" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="rmse">RMSE</h4>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>See <span class="citation" data-cites="anova">Wikipedia (<a href="#ref-anova" role="doc-biblioref">2023b</a>)</span></p>
+</div></div><div class="cell" data-hash="predictivefactors4_cache/html/rmse_5c2dd8879299a1281da189f133af40a3">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Find RMSE</span></span>
+<span><span class="va">Rmse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">SSE</span><span class="op">/</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="va">p</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="va">Rmse</span></span>
+<span><span class="co">#&gt; [1] 35.21767</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">RMSE</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">obs.y</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 35.02311</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="adj-r2" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="adj-r2">Adj R2</h4>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>See <span class="citation" data-cites="coefd">Wikipedia (<a href="#ref-coefd" role="doc-biblioref">2023a</a>)</span></p>
+</div></div><div class="cell" data-hash="predictivefactors4_cache/html/adjr2_112e8bc13f52da62b43d4fdf6f362494">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Find adj R2</span></span>
+<span><span class="va">adjR2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">R.2</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">adjR2</span></span>
+<span><span class="co">#&gt; [1] 0.2333791</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section></section><section id="writing-function" class="level3"><h3 class="anchored" data-anchor-id="writing-function">Writing function</h3>
+<section id="syntax-for-writing-functions" class="level4"><h4 class="anchored" data-anchor-id="syntax-for-writing-functions">Syntax for Writing Functions</h4>
+<div class="cell">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>func_name <span class="ot">&lt;-</span> <span class="cf">function</span> (argument) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  A statement or multiple lines of statements</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="example-of-a-simple-function" class="level4"><h4 class="anchored" data-anchor-id="example-of-a-simple-function">Example of a simple function</h4>
+<div class="cell" data-hash="predictivefactors4_cache/html/simfunc_1e62e4fb6555cbd4f364595d1d8b34c4">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">f1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>,<span class="va">b</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">f1</span><span class="op">(</span>a<span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 4</span></span>
+<span><span class="fu">f1</span><span class="op">(</span>a<span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">6</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 7</span></span>
+<span><span class="co"># setting default values</span></span>
+<span><span class="va">f1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span><span class="op">=</span><span class="fl">1</span>,<span class="va">b</span><span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">f1</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="fu">f1</span><span class="op">(</span>b <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 11</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="a-bit-more-complicated" class="level4"><h4 class="anchored" data-anchor-id="a-bit-more-complicated">A bit more complicated</h4>
+<div class="cell" data-hash="predictivefactors4_cache/html/compfunc_d831403f2e78e676402262830a5ed239">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># one argument</span></span>
+<span><span class="va">model.fit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data.for.fitting</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">formulax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol~gender + age + born"</span><span class="op">)</span></span>
+<span>  <span class="va">fitx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">formulax</span>, data <span class="op">=</span> <span class="va">data.for.fitting</span><span class="op">)</span></span>
+<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fitx</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span><span class="co">#&gt; 184.3131838  -7.8095595   0.2225745  11.1557140</span></span>
+<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span><span class="co">#&gt; 176.1286576  -4.8256829   0.3375009   7.7186190</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-hash="predictivefactors4_cache/html/compfunc2_380d4b2ee3d480dc2e599aaf2885a794">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># adding one more argument: digits</span></span>
+<span><span class="va">model.fit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data.for.fitting</span>, <span class="va">digits</span><span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">formulax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol~gender + age + born"</span><span class="op">)</span></span>
+<span>  <span class="va">fitx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">formulax</span>, data <span class="op">=</span> <span class="va">data.for.fitting</span><span class="op">)</span></span>
+<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fitx</span><span class="op">)</span></span>
+<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">result</span>,<span class="va">digits</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span><span class="co">#&gt;      184.31       -7.81        0.22       11.16</span></span>
+<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span><span class="co">#&gt;      176.13       -4.83        0.34        7.72</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="function-that-gives-performance-measures" class="level4"><h4 class="anchored" data-anchor-id="function-that-gives-performance-measures">Function that gives performance measures</h4>
+<p>let us create a function that will give us the performance measures:</p>
+<div class="cell" data-hash="predictivefactors4_cache/html/perfom_73429ab358bd9ae1792420255f774200">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">perform</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">new.data</span>,</span>
+<span>                    <span class="va">model.fit</span>,<span class="va">model.formula</span><span class="op">=</span><span class="cn">NULL</span>, </span>
+<span>                    <span class="va">y.name</span> <span class="op">=</span> <span class="st">"Y"</span>,</span>
+<span>                    <span class="va">digits</span><span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="co"># data dimension</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">model.fit</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="co"># predicted value</span></span>
+<span>  <span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">model.fit</span>, <span class="va">new.data</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># sample size</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">pred.y</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># outcome</span></span>
+<span>  <span class="va">new.data.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">new.data</span><span class="op">[</span>,<span class="va">y.name</span><span class="op">]</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># R2</span></span>
+<span>  <span class="va">R2</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">R2</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">new.data.y</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># adj R2 using alternate formula</span></span>
+<span>  <span class="va">df.residual</span> <span class="op">&lt;-</span> <span class="va">n</span><span class="op">-</span><span class="va">p</span></span>
+<span>  <span class="va">adjR2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">R2</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">df.residual</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># RMSE</span></span>
+<span>  <span class="va">RMSE</span> <span class="op">&lt;-</span>  <span class="fu">caret</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">RMSE</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">new.data.y</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># combine all of the results</span></span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">n</span>,<span class="va">p</span>,<span class="va">R2</span>,<span class="va">adjR2</span>,<span class="va">RMSE</span><span class="op">)</span>,<span class="va">digits</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># returning object</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">perform</span><span class="op">(</span>new.data <span class="op">=</span> <span class="va">analytic3</span>, y.name <span class="op">=</span> <span class="st">"cholesterol"</span>, model.fit <span class="op">=</span> <span class="va">fit4</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
+<span><span class="co">#&gt; [1,] 2632 29 0.242 0.233 35.023</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section></section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-coefd" class="csl-entry" role="doc-biblioentry">
+Wikipedia. 2023a. <span>“Coefficient of Determination.”</span> <a href="https://en.wikipedia.org/wiki/Coefficient_of_determination">https://en.wikipedia.org/wiki/Coefficient_of_determination</a>.
+</div>
+<div id="ref-anova" class="csl-entry" role="doc-biblioentry">
+———. 2023b. <span>“One-Way Analysis of Variance.”</span> <a href="https://en.wikipedia.org/wiki/One-way_analysis_of_variance">https://en.wikipedia.org/wiki/One-way_analysis_of_variance</a>.
+</div>
+</div>
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./predictivefactors3.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Binary outcome</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./predictivefactors5.html" class="pagination-link">
+        <span class="nav-page-text">Data spliting</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
