@@ -1,520 +1,546 @@
-## Causal question {.unnumbered}
+## Causal question (1) {.unnumbered}
 
-### Working with a causal question using NHANES
+### Working with a Predictive question using CCHS
 
-We are interested in exploring the relationship between diabetes (binary exposure variable defined as whether the doctor ever told the participant has diabetes) and cholesterol (binary outcome variable defined as whether total cholesterol is more than 200 mg/dL). Below is the PICOT:
 
-| PICOT element | Description                    |
-|---------------|--------------------------------|
-| P             | US adults                      |
-| I             | Diabetes                       |
-| C             | No diabetes                    |
-| O             | Total cholesterol \> 200 mg/dL |
-| T             | 2017--2018                     |
-
-First, we will prepare the analytic dataset from NHANES 2017--2018.
-
-Second, we will work with subset of data to assess the association between diabetes and cholesterol, and to get proper SE and 95% CI for the estimate. We emphasize the correct usage of the survey's design features (correct handling of survey design elements, such as stratification, clustering, and weighting) to obtain accurate population-level estimates.
-
-```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
-# Load required packages
-require(SASxport)
-require(DiagrammeR)
-require(DiagrammeRsvg)
-require(rsvg)
-library(magrittr)
-library(svglite)
-library(png)
-require(nhanesA)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 require(survey)
-require(Publish)
-require(jtools)
+use.saved.chche <- TRUE
 ```
 
-### Steps for creating analytic dataset
+### Load data 
 
-We will combine multiple components (e.g., demographic, blood pressure) using the unique identifier to create our analytic dataset.
+We download and process the data in the same was as shown [earlier](accessing2.html), and reuse the data for the following tutorial.
+
+```{r loading, eval=TRUE, cache=use.saved.chche }
+load(file = "Data/researchquestion/cchsc1.RData")
+load(file = "Data/researchquestion/cchsc2.RData")
+load(file = "Data/researchquestion/cchsc3.RData")
+ls() # see list of objects available
+dim(c1) # Dimensions of CCHS 1.1
+dim(c2) # Dimensions of CCHS 2.1
+dim(c3) # Dimensions of CCHS 3.1
+```
+
+
+### Aim
+
+Rheumatic diseases may cause acute or chronic inflammation. Such systemic inflammation could increase the risk of cardiovascular diseases (CVD). However, Osteoarthritis (OA) is not so well explored in association with CVD. The aim of the current study is to examine the association between OA and CVD among Canadian adults.
+
+### Example article
+We are going to use the article by @rahman2013relationship as our reference. [DOI:10.1136/bmjopen-2013-002624](https://bmjopen.bmj.com/content/3/5/e002624).
 
 ::: column-margin
-Within NHANES datasets in a given cycle, each sampled person has an unique identifier sequence number (variable SEQN).
+[@rahman2013relationship]
 :::
 
-```{r graph1ttt, echo=FALSE, cache=TRUE}
-g2 <- grViz("
-	digraph causal {
-	
-	  # Nodes
-    node [shape = box]
-    # node [shape = circle]
-    d [label = 'Demographics']
-    b [label = 'Blood pressure']
-    bm [label = 'Body Measures'] 
-    s [label = 'Smoking']
-    c [label = 'Cholesterol']
-    t [label = 'Standard Biochemistry Profile']
-    p [label = 'Physical Activity']
-    dd [label = 'Diabetes']
+#### PICOT
 
-    node [shape = egg]
-    ad [label = 'Analytic Data']
+  - Target population: Canadian adults
+  - Outcome ($Y$): CVD (Heart disease)
+  - Exposure group ($A$): OA
+  - Control group: People without OA
+  - Time line: From 2001 - 2005
+  - From the literature, we have identified some factors to be useful in exploring this $A-Y$ relationship:
+  
+        - age, 
+        - sex, 
+        - income, 
+        - ethnicity,
+        - obesity,
+        - exercise,
+        - smoking,
+        - diets (Proxied by fruit and vegetable consumption),
+        - pain medication use,
+        - hypertension,
+        - cholesterol (Proxied by Diabetes and Chronic obstructive pulmonary disease /COPD),
+        - Additionally we have considered education level. 
+        
 
-    node [shape = plaintext]
-    d0 [label = 'ID']
-    d1 [label = 'gender']
-    d2 [label = 'age']
-    d3 [label = 'bornCountry']
-    d4 [label = 'race']
-    d5 [label = 'education']
-    d6 [label = 'marital status']
-    d7 [label = 'weights/psu/strata']
+#### Why this time frame? 
 
-    b1 [label = 'diastolic']
-    b2 [label = 'systolic']
+In CCHS cycle 1.1-3.1, there was a question 'What type of arthritis?' - which resulted in responses such as 
+
+  - Rheumatoid arthritis, 
+  - OA, 
+  - other,
+  - unknown.
+
+This question was crucial in identifying OA patients. However, in later years, that question was omitted. Hence, for this practical reason, we restricted out analysis in CCHS cycle 1.1-3.1 (2001-2005).
+
+### Creating Analytic Data
+
+
+#### Identify Relevant factors
+
+From the literature, we identify variables that are associated with either the outcome and/or the exposure. We have to be cautious about the variables that are only related to exposures only (a topic for later). 
+
+Generally try to include basic demographics (e.g., age, sex, education etc. are the usual suspects) at this stage even if we do not have a strong indication from the literature that those variables are highly associated with the outcome or the exposure.
+
+| Variable name 	| Variable 	| Type 	| Categories 	|
+|-----------------------------------------------	|--------------------	|-------------	|---------------------------------------------------------------------------------------------------	|
+| OA 	| Exposure 	| Binary 	|  	|
+| CVD 	| Outcome 	| Binary 	|  	|
+| Age 	| Covariate 	| Category 	| 20-39; 40-49; 50-59; 60-64 	|
+| Sex 	| Covariate 	| Binary 	| Men; Women 	|
+| Income 	| Covariate 	| Category 	| <30k; 30k-49k; 50k-79k; 80k+ 	|
+| Cultural/racial origin 	| Covariate 	| Binary 	| White; Visible minority 	|
+| BMI 	| Covariate 	| Category 	| Underweight; Normal; Overweight; Obese 	|
+| Physical activity 	| Covariate 	| Category 	| Active; Moderate; Inactive 	|
+| Smoking 	| Covariate 	| Category 	| Non-smoker; Currently; Former 	|
+| Fruit/vegetable consumption 	| Covariate 	| Category 	| 0-3; 4-6 ; 6+ servings daily 	|
+| Pain medication use 	| Covariate 	| Binary 	|  	|
+| Hypertension 	| Covariate 	| Binary 	|  	|
+| COPD 	| Covariate 	| Binary 	|  	|
+| Diabetes 	| Covariate 	| Binary 	|  	|
+| Education 	| Covariate 	| Category 	| <2ndary; 2ndary graduate; Post2ndary+; Post2ndary grad 	|
+| Weight 	| Sampling weights 	| Continuous 	|  	|
+
+#### Variables under consideration
+
+Find out whether we have the variables collected / measured / asked in the surveys. If not asked, try to find out whether there is a proxy variable that was collected / measured / asked in the surveys. 
+
+For example, we did not have a question / variable related to a particular topic (e.g., say, cholesterol, which is known to be associated with our outcome), try to collect some variables that could be used as proxies (e.g., COPD, Diabetes).
+
+Note that the variable names are generally different in different cycles.
+
+| Variable name 	| CCHS 1.1 	| CCHS 2.1 	| CCHS 3.1 	|
+|---------------------------------------------------	|----------	|----------	|----------	|
+| Arthritis 	| CCCA_051 	| CCCC_051 	| CCCE_051 	|
+| Kind of arthritis (for OA) 	| CCCA_05A 	| CCCC_05A 	| CCCE_05A 	|
+| Heart disease (CVD) 	| CCCA_121 	| CCCC_121 	| CCCE_121 	|
+| Age 	| DHHAGAGE 	| DHHCGAGE 	| DHHEGAGE 	|
+| Sex 	| DHHA_SEX 	| DHHC_SEX 	| DHHE_SEX 	|
+| Household income 	| INCAGHH 	| INCCGHH 	| INCEGHH 	|
+| Cultural/racial origin 	| SDCAGRAC 	| SDCCGRAC 	| SDCEGCGT 	|
+| BMI (Score) 	| HWTAGBMI 	| HWTCGBMI 	| HWTEGBMI 	|
+| BMI (Category) 	| HWTAGSW 	| HWTCGISW 	| HWTEGISW 	|
+| Physical activity 	| PACADPAI 	| PACCDPAI 	| PACEDPAI 	|
+| Smoking status (Type of smoker) 	| SMKADSTY 	| SMKCDSTY 	| SMKEDSTY 	|
+| Fruits/vegetables consumption	| FVCADTOT 	| FVCCDTOT 	| FVCEDTOT 	|
+| Pain med use	| DRGA_1A 	| MEDC_1A 	| MEDE_1A 	|
+| Hypertension 	| CCCA_071 	| CCCC_071 	| CCCE_071 	|
+| Has emphysema or COPD 	| CCCA_91B 	| CCCC_91B 	| CCCE_91F 	|
+| Diabetes 	| CCCA_101 	| CCCC_101 	| CCCE_101 	|
+| Education 	| EDUADR04 	| EDUCDR04 	| EDUEDR04 	|
+| Survey weights 	| WTSAM 	| WTSC_M 	| WTSE_M 	|
+
+#### Subset the data
+
+```{r subset, eval=TRUE, cache=use.saved.chche }
+# Restrict the dataset with variables of interest only
+var.names1 <- c("CCCA_051", "CCCA_05A", "CCCA_121", "DHHAGAGE", 
+               "DHHA_SEX", "INCAGHH", "SDCAGRAC", "HWTAGBMI", 
+               "HWTAGSW", "PACADPAI", "SMKADSTY", "FVCADTOT", 
+               "DRGA_1A", "CCCA_071", "CCCA_91B", "CCCA_101",  
+               "EDUADR04", "WTSAM")
+cc11 <- c1[var.names1]
+dim(cc11)
+table(cc11$CCCA_051)
+var.names2 <- c("CCCC_051", "CCCC_05A", "CCCC_121", "DHHCGAGE", 
+               "DHHC_SEX", "INCCGHH", "SDCCGRAC", "HWTCGBMI", 
+               "HWTCGISW", "PACCDPAI", "SMKCDSTY", "FVCCDTOT", 
+               "MEDC_1A", "CCCC_071", "CCCC_91B", "CCCC_101", 
+               "EDUCDR04", "WTSC_M")
+cc21 <- c2[var.names2]
+dim(cc21)
+table(cc21$CCCC_051)
+var.names3 <- c("CCCE_051", "CCCE_05A", "CCCE_121", "DHHEGAGE", 
+               "DHHE_SEX", "INCEGHH", "SDCEGCGT", "HWTEGBMI", 
+               "HWTEGISW", "PACEDPAI", "SMKEDSTY", "FVCEDTOT", 
+               "MEDE_1A", "CCCE_071", "CCCE_91F", "CCCE_101",  
+               "EDUEDR04", "WTSE_M")
+cc31 <- c3[var.names3]
+dim(cc31)
+table(cc31$CCCE_051)
+```
+
+#### Combine 3 cycle datasets
+
+We want to combine data from three different cycles in order to get more subjects in our data. For that, we will have to stack/append data from three different cycles. In order to do so, we need to make the names exarctly the same. E.g., for BMI category, we will rename all 3 variables: `HWTAGSW` (from cycle 1), `HWTCGISW` (from cycle 2) and `HWTEGISW` (from cycle 3) to `bmicat`.
+
+Generally I prefer smaller cases for names, but that's just my coding preference.
+
+
+##### Making variable names the same
+
+```{r namesx, eval=TRUE, cache=use.saved.chche }
+new.var.names <- c("arthritis", "arthritis.kind", "CVD", "age", 
+               "sex", "income", "race", "bmi", 
+               "bmicat", "phyact", "smoke", "fruit", 
+               "painmed", "ht", "copd", "diab",  
+               "edu", "weight")
+names(cc11) <- names(cc21) <- names(cc31) <- new.var.names
+
+table(cc11$arthritis)
+table(cc21$arthritis)
+table(cc31$arthritis)
+```
+
+##### Notice the difference in categorization
+
+Note that, not only the names of the variables are different, sometimes, the categorization labels are also different. Note the BMI (Category) in the three cycles: `HWTAGSW` from cycle 1:
+
+```{r bmicat1, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/bmicat1.png")
+```
+
+`HWTCGISW` from cycle 2:
+
+```{r bmicat2, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/bmicat2.png")
+```
+
+`HWTEGISW` from cycle 3:
+
+```{r bmicat3, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/bmicat3.png")
+```
+
+```{r names2x, eval=TRUE, cache=use.saved.chche }
+table(cc11$bmicat)
+table(cc21$bmicat)
+table(cc31$bmicat)
+```
+
+In cycle 1.1, the second response (code 2) label was named as "Acceptable weight" where as in cycles 2.1 and 3.1 it was named as "Normal weight". Also "obese" category was not present in cycle 1.1.
+
+Similarly look for age categories:
+
+```{r age1, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/age1.png")
+```
+
+```{r age2, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/age2.png")
+```
+
+```{r age3, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/age3.png")
+```
+
+Similarly look for income categories:
+
+```{r income1, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/income1.png")
+```
+
+```{r income2, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/income2.png")
+```
+
+```{r income3, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/income3.png")
+```
+
+Therefore, we need to recode the variable value labels carefully. 
+
+##### Appending
+
+Below we append all the three cycles of data:
+
+```{r recode0all, eval=TRUE, cache=use.saved.chche }
+cc123a <- rbind(cc11,cc21,cc31)
+```
+
+### Subsetting according to eligibility criteria
+
+#### Criteria 1: control group
+
+Exposure group is people with osteoarthritis. The control group is people who do not have osteoarthritis.
+
+In cycle 1, there were 2 related questions:
+    - Do you have arthritis or rheumatism excluding fibromyalgia? (variable `arthritis`)
+    - What kind of arthritis do you have? (variable `arthritis.kind`)
+
     
-    bm1 [label = 'bodyweight']
-    bm2 [label = 'heignt']
-    bm3 [label = 'BMI']
-    bm4 [label = 'BMIcat']
-    bm5 [label = 'weist']
-
-    s1 [label = 'smoking']
-
-    c1 [label = 'cholesterol']
-
-    t1 [label = 'triglycerides']
-    t2 [label = 'uric acid']
-    t3 [label = 'protein']
-    t4 [label = 'bilirubin']
-    t5 [label = 'phosphorus']
-    t6 [label = 'sodium']
-    t7 [label = 'potassium']
-    t8 [label = 'globulin']
-    t9 [label = 'calcium']
-
-    dd1 [label = 'Have diabetes']
-
-    p1 [label = 'Work acticity']
-    p2 [label = 'Recreational activity']
-	  
-	  # Edges
-	  edge [color = black,
-	        arrowhead = vee]
-	  rankdir = LR
-    d -> {d1 d2 d3 d4 d5 d6 d7}
-    b -> {b1 b2}
-    bm -> {bm1 bm2 bm3 bm4 bm4 bm5}
-    dd -> dd1
-    p -> {p1 p2}
-    s -> {s1}
-    c -> {c1}
-    t -> {t1 t2 t3 t4 t5 t6 t7 t8 t9}
-    {d b bm s c t dd p} -> d0
-    d0 -> ad
-
-	  # Graph
-	  graph [overlap = true, fontsize = 10]
-	}")
-g2 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("Images/accessing/overallnhanesplan.png")
+```{r recode0, eval=TRUE, cache=use.saved.chche }
+table(cc123a$arthritis)
+table(cc123a$arthritis.kind)
+dim(cc123a)
 ```
 
-#### Download and Subsetting to retain only the useful variables
+In the control group, we do not want to put people with other types of arthritis.
 
-Search literature for the relevant variables, and then see if some of them are available in the NHANES data.
-
-::: column-margin
-@peters2014combined
-:::
-
-An an example, let us assume that variables listed in the following figures are known to be useful. Then we will try to indentify, in which NHANES component we have these variables.
-
-::: column-margin
-Refer to the earlier [chapter](accessing3.html) to get a more detailed understanding of how we search for variables within NHANES.
-:::
-
-```{r graph1xttt, echo=FALSE, out.width = '75%'}
-knitr::include_graphics("Images/accessing/overallnhanesplan.png")  
-```
-
-::: column-margin
-NHANES Data Components:
-
--   Demographic (variables like age, gender, income, etc.)
--   Blood Pressure (Diastolic and Systolic pressure)
--   Body Measures (BMI, Waist Circumference, etc.)
--   Smoking Status (Current smoker or not)
--   Cholesterol (Total cholesterol in different units)
--   Biochemistry Profile (Triglycerides, Uric acid, etc.)
--   Physical Activity (Vigorous work and recreational activities)
--   Diabetes (Whether the respondent has been told by a doctor that they have diabetes)
-:::
-
-**Demographic component**:
-
-```{r search4, eval=TRUE, cache=TRUE, warning=FALSE}
-demo <- nhanes('DEMO_J') # Both males and females 0 YEARS - 150 YEARS
-demo <- demo[c("SEQN", # Respondent sequence number
-                 "RIAGENDR", # gender
-                 "RIDAGEYR", # Age in years at screening
-                 "DMDBORN4", # Country of birth
-                 "RIDRETH3", # Race/Hispanic origin w/ NH Asian
-                 "DMDEDUC3", # Education level - Children/Youth 6-19
-                 "DMDEDUC2", # Education level - Adults 20+
-                 "DMDMARTL", # Marital status: 20 YEARS - 150 YEARS
-                 "INDHHIN2", # Total household income
-                 "WTMEC2YR", "SDMVPSU", "SDMVSTRA")]
-demo_vars <- names(demo) # nhanesTableVars('DEMO', 'DEMO_J', namesonly=TRUE)
-demo1 <- nhanesTranslate('DEMO_J', demo_vars, data=demo)
-```
-
-**Blood pressure component**:
-
-```{r search5, eval=TRUE, cache=TRUE}
-bpx <- nhanes('BPX_J')
-bpx <- bpx[c("SEQN", # Respondent sequence number
-             "BPXDI1", #Diastolic: Blood pres (1st rdg) mm Hg
-             "BPXSY1" # Systolic: Blood pres (1st rdg) mm Hg
-             )]
-bpx_vars <- names(bpx) 
-bpx1 <- nhanesTranslate('BPX_J', bpx_vars, data=bpx)
-```
-
-**Body measure component**:
-
-```{r search5a, eval=TRUE, cache=TRUE}
-bmi <- nhanes('BMX_J')
-bmi <- bmi[c("SEQN", # Respondent sequence number
-               "BMXWT", # Weight (kg) 
-               "BMXHT", # Standing Height (cm)
-               "BMXBMI", # Body Mass Index (kg/m**2): 2 YEARS - 150 YEARS
-               #"BMDBMIC", # BMI Category - Children/Youth # 2 YEARS - 19 YEARS
-               "BMXWAIST" # Waist Circumference (cm): 2 YEARS - 150 YEARS
-               )]
-bmi_vars <- names(bmi) 
-bmi1 <- nhanesTranslate('BMX_J', bmi_vars, data=bmi)
-```
-
-**Smoking component**:
-
-```{r search5b, eval=TRUE, cache=TRUE}
-smq <- nhanes('SMQ_J')
-smq <- smq[c("SEQN", # Respondent sequence number
-               "SMQ040" # Do you now smoke cigarettes?: 18 YEARS - 150 YEARS
-               )]
-smq_vars <- names(smq) 
-smq1 <- nhanesTranslate('SMQ_J', smq_vars, data=smq)
-```
-
-```{r search5c, eval=TRUE, cache=TRUE}
-# alq <- nhanes('ALQ_J')
-# alq <- alq[c("SEQN", # Respondent sequence number
-#                "ALQ130" # Avg # alcoholic drinks/day - past 12 mos
-#                # 18 YEARS - 150 YEARS
-#                )]
-# alq_vars <- names(alq) 
-# alq1 <- nhanesTranslate('ALQ_J', alq_vars, data=alq)
-```
-
-**Cholesterol component**:
-
-```{r search5d, eval=TRUE, cache=TRUE}
-chl <- nhanes('TCHOL_J') # 6 YEARS - 150 YEARS
-chl <- chl[c("SEQN", # Respondent sequence number
-               "LBXTC", # Total Cholesterol (mg/dL)
-               "LBDTCSI" # Total Cholesterol (mmol/L)
-               )]
-chl_vars <- names(chl) 
-chl1 <- nhanesTranslate('TCHOL_J', chl_vars, data=chl)
-```
-
-**Biochemistry Profile component**:
-
-```{r search5e, eval=TRUE, cache=TRUE}
-tri <- nhanes('BIOPRO_J') # 12 YEARS - 150 YEARS
-tri <- tri[c("SEQN", # Respondent sequence number
-               "LBXSTR", # Triglycerides, refrig serum (mg/dL)
-               "LBXSUA", # Uric acid
-               "LBXSTP", # total Protein (g/dL)
-               "LBXSTB", # Total Bilirubin (mg/dL)
-               "LBXSPH", # Phosphorus (mg/dL)
-               "LBXSNASI", # Sodium (mmol/L)
-               "LBXSKSI", # Potassium (mmol/L)
-               "LBXSGB", # Globulin (g/dL)
-               "LBXSCA" # Total Calcium (mg/dL)
-               )]
-tri_vars <- names(tri) 
-tri1 <- nhanesTranslate('BIOPRO_J', tri_vars, data=tri)
-```
-
-**Physical activity component**:
-
-```{r search5f, eval=TRUE, cache=TRUE}
-paq <- nhanes('PAQ_J')
-paq <- paq[c("SEQN", # Respondent sequence number
-               "PAQ605", # Vigorous work activity 
-               "PAQ650" # Vigorous recreational activities
-               )]
-paq_vars <- names(paq) 
-paq1 <- nhanesTranslate('PAQ_J', paq_vars, data=paq)
-```
-
-**Diabetes component**:
-
-```{r search5g, eval=TRUE, cache=TRUE}
-diq <- nhanes('DIQ_J')
-diq <- diq[c("SEQN", # Respondent sequence number
-               "DIQ010" # Doctor told you have diabetes
-               )]
-diq_vars <- names(diq) 
-diq1 <- nhanesTranslate('DIQ_J', diq_vars, data=diq)
-```
-
-#### Merging all the datasets
-
-::: callout-tip
-We can use the `merge` or `Reduce` function to combine the datasets
-:::
-
-```{r search8, eval=TRUE, cache=TRUE}
-analytic.data7 <- Reduce(function(x,y) merge(x,y,by="SEQN",all=TRUE) ,
-       list(demo1,bpx1,bmi1,smq1,chl1,tri1,paq1,diq1))
-dim(analytic.data7)
-```
-
-::: column-margin
-All these datasets are merged into one analytic dataset using the SEQN as the key. This can be done either all at once using the `Reduce` function or one by one (using `merge` once at a time).
-:::
-
-```{r search8b4g, eval=TRUE, cache=TRUE}
-# Merging one by one
-# analytic.data0 <- merge(demo1, bpx1, by = c("SEQN"), all=TRUE)
-# analytic.data1 <- merge(analytic.data0, bmi1, by = c("SEQN"), all=TRUE)
-# analytic.data2 <- merge(analytic.data1, smq1, by = c("SEQN"), all=TRUE)
-# analytic.data3 <- merge(analytic.data2, alq1, by = c("SEQN"), all=TRUE)
-# analytic.data4 <- merge(analytic.data3, chl1, by = c("SEQN"), all=TRUE)
-# analytic.data5 <- merge(analytic.data4, tri1, by = c("SEQN"), all=TRUE)
-# analytic.data6 <- merge(analytic.data5, paq1, by = c("SEQN"), all=TRUE)
-# analytic.data7 <- merge(analytic.data6, diq1, by = c("SEQN"), all=TRUE)
-# dim(analytic.data7)
-```
-
-#### Check Target population and avoid zero-cell cross-tabulation
-
-::: column-margin
-The dataset is then filtered to only include adults (20 years and older) and avoid zero-cell cross-tabulation.
-:::
-
-See that marital status variable was restricted to 20 YEARS - 150 YEARS.
-
-```{r see1, eval=TRUE, cache=TRUE}
-str(analytic.data7)
-head(analytic.data7)
-summary(analytic.data7$RIDAGEYR)
-```
-
-```{r subset1, eval=TRUE, cache=TRUE}
-dim(analytic.data7)
-analytic.data8 <- analytic.data7
-analytic.data8$RIDAGEYR[analytic.data8$RIDAGEYR < 20] <- NA
-#analytic.data8 <- subset(analytic.data7, RIDAGEYR >= 20)
-dim(analytic.data8)
-```
-
-Get rid of variables where target was less than 20 years of age accordingly.
-
-```{r subset2, eval=TRUE, cache=TRUE}
-analytic.data8$DMDEDUC3 <- NULL # not relevant for adults
-#analytic.data8$BMDBMIC <- NULL # not relevant for adults
-```
-
-#### Get rid of invalid responses
-
-::: column-margin
-Variables that have "Don't Know" or "Refused" as responses are set to NA, effectively getting rid of invalid responses.
-:::
-
-```{r subset3, eval=TRUE, cache=TRUE}
-factor.names <- c("RIAGENDR","DMDBORN4","RIDRETH3",
-                  "DMDEDUC2","DMDMARTL","INDHHIN2", 
-                  "SMQ040", "PAQ605", "PAQ650", "DIQ010")
-numeric.names <- c("SEQN","RIDAGEYR","WTMEC2YR",
-                   "SDMVPSU", "SDMVSTRA",
-                   "BPXDI1", "BPXSY1", "BMXWT", "BMXHT",
-                   "BMXBMI", "BMXWAIST",
-                   "ALQ130", "LBXTC", "LBDTCSI", 
-                   "LBXSTR", "LBXSUA", "LBXSTP", "LBXSTB", 
-                   "LBXSPH", "LBXSNASI", "LBXSKSI",
-                   "LBXSGB","LBXSCA")
-analytic.data8[factor.names] <- apply(X = analytic.data8[factor.names], 
-                                      MARGIN = 2, FUN = as.factor)
-# analytic.data8[numeric.names] <- apply(X = analytic.data8[numeric.names], 
-#                                        MARGIN = 2, FUN = 
-#                                          function (x) as.numeric(as.character(x)))
-```
-
-```{r subset3x, eval=TRUE, cache=TRUE}
-analytic.data9 <- analytic.data8
-analytic.data9$DMDBORN4[analytic.data9$DMDBORN4 == "Don't Know"] <- NA
-#analytic.data9 <- subset(analytic.data8, DMDBORN4 != "Don't Know")
-dim(analytic.data9)
-
-analytic.data10 <- analytic.data9
-analytic.data10$DMDEDUC2[analytic.data10$DMDEDUC2 == "Don't Know"] <- NA
-#analytic.data10 <- subset(analytic.data9, DMDEDUC2 != "Don't Know")
-dim(analytic.data10)
-
-analytic.data11 <- analytic.data10
-analytic.data11$DMDMARTL[analytic.data11$DMDMARTL == "Don't Know"] <- NA
-analytic.data11$DMDMARTL[analytic.data11$DMDMARTL == "Refused"] <- NA
-# analytic.data11 <- subset(analytic.data10, DMDMARTL != "Don't Know" & DMDMARTL != "Refused")
-dim(analytic.data11)
-
-
-analytic.data12 <- analytic.data11
-analytic.data12$INDHHIN2[analytic.data12$INDHHIN2 == "Don't Know"] <- NA
-analytic.data12$INDHHIN2[analytic.data12$INDHHIN2 == "Refused"] <- NA
-analytic.data12$INDHHIN2[analytic.data12$INDHHIN2 == "Under $20,000"] <- NA
-analytic.data12$INDHHIN2[analytic.data12$INDHHIN2 == "$20,000 and Over"] <- NA
-# analytic.data12 <- subset(analytic.data11, INDHHIN2 != "Don't know" & INDHHIN2 !=  "Refused" & INDHHIN2 != "Under $20,000" & INDHHIN2 != "$20,000 and Over" )
-dim(analytic.data12)
-
-#analytic.data11 <- subset(analytic.data10, ALQ130 != 777 & ALQ130 != 999 )
-#dim(analytic.data11) # this are listed as NA anyway
-
-analytic.data13 <- analytic.data12
-analytic.data13$PAQ605[analytic.data13$PAQ605 == "Don't know"] <- NA
-analytic.data13$PAQ605[analytic.data13$PAQ605 == "Refused"] <- NA
-# analytic.data13 <- subset(analytic.data12, PAQ605 != "Don't know" & PAQ605 != "Refused")
-dim(analytic.data13)
-
-analytic.data14 <- analytic.data13
-analytic.data14$PAQ650[analytic.data14$PAQ650 == "Don't know"] <- NA
-analytic.data14$PAQ650[analytic.data14$PAQ650 == "Refused"] <- NA
-# analytic.data14 <- subset(analytic.data13, PAQ650 != "Don't Know" & PAQ650 != "Refused")
-dim(analytic.data14)
-
-analytic.data15 <- analytic.data14
-analytic.data15$DIQ010[analytic.data15$DIQ010 == "Don't know"] <- NA
-analytic.data15$DIQ010[analytic.data15$DIQ010 == "Refused"] <- NA
-# analytic.data15 <- subset(analytic.data14, DIQ010 != "Don't Know" & DIQ010 != "Refused")
-dim(analytic.data15)
-
-
-# analytic.data15$ALQ130[analytic.data15$ALQ130 > 100] <- NA
-# summary(analytic.data15$ALQ130)
-table(analytic.data15$SMQ040,useNA = "always")
-table(analytic.data15$PAQ605,useNA = "always")
-table(analytic.data15$PAQ650,useNA = "always")
-table(analytic.data15$PAQ650,useNA = "always")
-```
-
-#### Recode values
-
-Let us recode the variables using the `recode` function:
-
-```{r subset4, eval=TRUE, cache=TRUE, warning=FALSE}
+```{r recode0a, eval=TRUE, cache=use.saved.chche }
+c123sub1 <- subset(cc123a, arthritis.kind == "OSTEOARTHRITIS" | 
+                    arthritis.kind == "NOT APPLICABLE" )
+dim(c123sub1)
+table(c123sub1$arthritis.kind)
+table(c123sub1$arthritis)
 require(car)
-analytic.data15$RIDRETH3 <- recode(analytic.data15$RIDRETH3, 
-                            "c('Mexican American','Other Hispanic')='Hispanic'; 
-                            'Non-Hispanic White'='White'; 
-                            'Non-Hispanic Black'='Black';
-                            c('Non-Hispanic Asian',
-                               'Other Race - Including Multi-Rac')='Other';
-	                           else=NA")
-analytic.data15$DMDEDUC2 <- recode(analytic.data15$DMDEDUC2, 
-                            "c('Some college or AA degree',
-                             'College graduate or above')='College'; 
-                            c('9-11th grade (Includes 12th grad', 
-                              'High school graduate/GED or equi')
-                               ='High.School'; 
-                            'Less than 9th grade'='School';
-	                           else=NA")
-analytic.data15$DMDMARTL <- recode(analytic.data15$DMDMARTL, 
-                            "c('Divorced','Separated','Widowed')
-                                ='Previously.married'; 
-                            c('Living with partner', 'Married')
-                                ='Married'; 
-                            'Never married'='Never.married';
-	                           else=NA")
-analytic.data15$INDHHIN2 <- recode(analytic.data15$INDHHIN2, 
-                            "c('$ 0 to $ 4,999', '$ 5,000 to $ 9,999', 
-                                 '$10,000 to $14,999', '$15,000 to $19,999', 
-                                 '$20,000 to $24,999')='<25k';
-                            c('$25,000 to $34,999', '$35,000 to $44,999', 
-                                 '$45,000 to $54,999') = 'Between.25kto54k';
-                            c('$55,000 to $64,999', '$65,000 to $74,999',
-                                 '$75,000 to $99,999')='Between.55kto99k';
-                            '$100,000 and Over'= 'Over100k';
-	                           else=NA")
-analytic.data15$SMQ040 <- recode(analytic.data15$SMQ040, 
-                            "'Every day'='Every.day';
-                            'Not at all'='Not.at.all';
-                            'Some days'='Some.days';
-	                           else=NA")
-analytic.data15$DIQ010 <- recode(analytic.data15$DIQ010, 
-                            "'No'='No';
-                            c('Yes', 'Borderline')='Yes';
-	                           else=NA")
+c123sub1$arthritis.kind <- recode(c123sub1$arthritis.kind, 
+                        "'OSTEOARTHRITIS'='OA';
+                         'NOT APPLICABLE'='Control';
+                         else=NA",
+                         as.factor = FALSE)
+table(c123sub1$arthritis.kind, useNA = "always")
+c123sub1$OA <- c123sub1$arthritis.kind
+c123sub1$arthritis.kind <- NULL
+c123sub1$arthritis <- NULL
 ```
 
-::: column-margin
-Data types for various variables are set correctly; for instance, factor variables are converted to factor data types, and numeric variables to numeric data types.
-:::
 
-#### Check missingness
 
-::: callout-tip
-We can use the `plot_missing` function to plot the profile of missing values, e.g., the percentage of missing per variable
-:::
+#### Criteria 2: retain valid responses for outcome
 
-```{r missing1, eval=TRUE, cache=TRUE}
-require(DataExplorer)
-plot_missing(analytic.data15)
+```{r recode0b, eval=TRUE, cache=use.saved.chche }
+table(c123sub1$CVD)
+c123sub2 <- subset(c123sub1, CVD == "YES" | CVD == "NO")
+table(c123sub2$CVD)
+dim(c123sub2)
+c123sub2$CVD <- recode(c123sub2$CVD, 
+                        "'YES'='event';
+                         'NO'='0 event';
+                         else=NA",
+                         as.factor = FALSE)
+table(c123sub2$CVD, useNA = "always")
 ```
 
-::: column-margin
-A subsequent [chapter](missingdata.html) will delve into the additional factors that impact how we handle missing data.
-:::
 
-#### Check data summaries
+#### Criteria 3: Is there a zero cell?
 
-```{r analytic0, eval=TRUE, cache=TRUE}
-names(analytic.data15)
-names(analytic.data15) <- c("ID", "gender", "age", "born", "race", "education", 
-"married", "income", "weight", "psu", "strata", "diastolicBP", 
-"systolicBP", "bodyweight", "bodyheight", "bmi", "waist", "smoke", 
-"cholesterol", "cholesterolM2", "triglycerides", 
-"uric.acid", "protein", "bilirubin", "phosphorus", "sodium", 
-"potassium", "globulin", "calcium", "physical.work", 
-"physical.recreational","diabetes")
-require("tableone")
-CreateTableOne(data = analytic.data15, includeNA = TRUE)
+Check out 'Universe' for all the variables under consideration. Is there a possibility that cross-tabulation of some of the categories will produce zero? 
+
+For example, the 'Universe' for BMI or BMI category includes 'Respondents aged 20 to 64'.
+
+```{r bmi1, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/researchquestion/bmi1.png")
 ```
 
-#### Create complete case data (for now)
+Therefore, we will not have BMI from anyone aged less than 20 or over 64. 
 
-```{r analytic1, eval=TRUE, cache=TRUE}
-analytic.with.miss <- analytic.data15
-analytic.with.miss$cholesterol.bin <- ifelse(analytic.with.miss$cholesterol <200, 1,0)
-analytic <- as.data.frame(na.omit(analytic.with.miss))
+```{r recode0c, eval=TRUE, cache=use.saved.chche }
+table(c123sub2$bmicat, c123sub2$age)[,1:2]
+# Note the categories of bmicat (duplicate categories) 
+```
+
+Also, we check the prevalence of OA and CVD for subjects less than 20 years of age: not a lot of people (still potential for a sensitivity analysis).
+
+```{r recode0d, eval=TRUE, cache=use.saved.chche }
+table(c123sub2$OA, c123sub2$age)
+table(c123sub2$CVD, c123sub2$age)
+```
+
+Accordingly, we will restrict our analysis (and aim) to adult target population only (age 20 and +). For that, first, recode the age variable, and then exclude the `teen` category.
+
+```{r recode1, eval=TRUE, cache=use.saved.chche }
+# CCHS cycle 1.1 has: '15 TO 19 YEARS'
+# Other cycles have: '15 TO 17 YEARS', '18 TO 19 YEARS'
+c123sub2$age <- recode(c123sub2$age, 
+                        "c('12 TO 14 YEARS','15 TO 19 YEARS',
+                         '15 TO 17 YEARS', '18 TO 19 YEARS')='teen';
+                         c('20 TO 24 YEARS','25 TO 29 YEARS',
+                           '30 TO 34 YEARS','35 TO 39 YEARS')='20-39 years';
+                         c('40 TO 44 YEARS','45 TO 49 YEARS')='40-49 years';
+                         c('50 TO 54 YEARS','55 TO 59 YEARS')='50-59 years';
+                         c('60 TO 64 YEARS')='60-64 years';   
+                         else='65 years and over'",
+                         as.factor = FALSE)
+table(c123sub2$age)
+dim(c123sub2)
+c123sub3 <- subset(c123sub2, age != 'teen' & age != '65 years and over')
+table(c123sub3$age, useNA = "always")
+dim(c123sub3)
+```
+
+#### Criteria 4: Assign missing to the invalid covariate responses
+
+```{r recode2, eval=TRUE, cache=use.saved.chche }
+# sex
+table(c123sub3$sex)
+c123sub3$sex <- car::recode(c123sub3$sex, 
+                        "'MALE'='Male';
+                         'FEMALE' = 'Female';
+                         else = NA",  
+                         as.factor = FALSE)
+table(c123sub3$sex, useNA = "always")
+# Race
+table(c123sub3$race)
+c123sub3$race <- car::recode(c123sub3$race, 
+                        "'WHITE'='White';
+                         'VISIBLE MINORITY' = 'Non-white';
+                         else = NA",  
+                         as.factor = FALSE)
+table(c123sub3$race, useNA = "always")
+
+# income
+table(c123sub3$income)
+# cycle 1.1 has: 'NO INCOME','LESS THAN 15,000'
+# Other cycles have: 'NO OR <$15,000'
+c123sub3$income <- car::recode(c123sub3$income, 
+                        "c('NO OR <$15,000', 'NO INCOME','LESS THAN 15,000',
+                           '$15,000-$29,999')='$29,999 or less';
+                           '$30,000-$49,999' = '$30,000-$49,999';
+                           '$50,000-$79,999' = '$50,000-$79,999';
+                           '$80,000 OR MORE' = '$80,000 or more';
+                           else = NA",  
+                          as.factor = FALSE)
+table(c123sub3$income, useNA = "always")
+# BMI
+table(c123sub3$bmicat)
+c123sub3$bmicat <- car::recode(c123sub3$bmicat, 
+                        "'UNDERWEIGHT'='Underweight';
+                         c('ACCEPT. WEIGHT','NORMAL WEIGHT')='Normal';
+                         c('OVERWEIGHT','OBESE') = 'Overweight';
+                         else = NA",  
+                         as.factor = FALSE)
+table(c123sub3$bmicat, useNA = "always")
+c123sub3$bmi <- NULL # no need of the original BMI values
+# physical activity
+table(c123sub3$phyact)
+c123sub3$phyact <- car::recode(c123sub3$phyact,
+                        "'ACTIVE'='Active';
+                         'MODERATE' = 'Moderate';
+                         'INACTIVE' = 'Inactive';
+                         else = NA",
+                         as.factor = FALSE)
+table(c123sub3$phyact, useNA = "always")
+# smoking
+table(c123sub3$smoke)
+c123sub3$smoke <- car::recode(c123sub3$smoke,
+                        "c('DAILY','OCCASIONAL',
+                           'ALWAYS OCCASION.')='Current smoker';
+                         c('FORMER DAILY','FORMER OCCASION.',
+                           'ALWAYS OCCASION.') = 'Former smoker';
+                         'NEVER SMOKED' = 'Never smoker';
+                         else = NA",
+                         as.factor = FALSE)
+table(c123sub3$smoke, useNA = "always")
+# fruit and vegetable consumption
+str(c123sub3$fruit)
+c123sub3$fruit.cont <- c123sub3$fruit
+c123sub3$fruit2 <- as.numeric(as.character(c123sub3$fruit))
+# Note: do not use as.numeric(c123sub3$fruit)
+summary(c123sub3$fruit2)
+c123sub3$fruit2 <- cut(c123sub3$fruit2,
+                      breaks = c(0,3,6,Inf),
+                      right = TRUE,
+                      labels = c("0-3 daily serving", 
+                                 "4-6 daily serving", 
+                                 "6+ daily serving"))
+table(c123sub3$fruit2, useNA = "always")
+c123sub3$fruit <- c123sub3$fruit2
+c123sub3$fruit2 <- NULL
+# pain medication
+table(c123sub3$painmed)
+c123sub3$painmed <- car::recode(c123sub3$painmed,
+                        "'YES'='Yes';
+                         'NO' = 'No';
+                         else = NA",
+                         as.factor = FALSE)
+table(c123sub3$painmed, useNA = "always")
+# hypertension
+table(c123sub3$ht)
+c123sub3$ht <- car::recode(c123sub3$ht,
+                        "'YES'='Yes';
+                         'NO' = 'No';
+                         else = NA",
+                         as.factor = FALSE)
+table(c123sub3$ht, useNA = "always")
+# COPD
+table(c123sub3$copd)
+c123sub3$copd <- car::recode(c123sub3$copd,
+                        "'YES'='Yes';
+                         'NO' = 'No';
+                         else = NA",
+                         as.factor = FALSE)
+table(c123sub3$copd, useNA = "always")
+# Diabetes
+table(c123sub3$diab)
+c123sub3$diab <- car::recode(c123sub3$diab,
+                        "'YES'='Yes';
+                         'NO' = 'No';
+                         else = NA",
+                         as.factor = FALSE)
+table(c123sub3$diab, useNA = "always")
+# Education
+table(c123sub3$edu)
+c123sub3$edu <- car::recode(c123sub3$edu,
+                        "'< THAN SECONDARY'='< 2ndary';
+                         'SECONDARY GRAD.' = '2nd grad.';
+                         'POST-SEC. GRAD.' = 'Post-2nd grad.';
+                         'OTHER POST-SEC.' = 'Other 2nd grad.';
+                         else = NA",
+                         as.factor = FALSE)
+table(c123sub3$edu, useNA = "always")
+```
+
+## Naive Analysis of combined 3 cycles
+
+In the current analysis, we will simply consider all of the variables under consideration as 'confounders', and include in our analysis. Later we will perform a refined analysis.
+
+### Summary of the analytic data
+
+#### Including missing values
+
+```{r analytic0, eval=TRUE, cache=use.saved.chche }
+dim(c123sub3)
+analytic <- c123sub3
 dim(analytic)
-```
 
-#### Creating Table 1 from the complete case data
-
-```{r analytic3, eval=TRUE, cache=TRUE}
 require("tableone")
-CreateTableOne(data = analytic, includeNA = TRUE)
+CreateTableOne(vars = c("CVD", "age", 
+               "sex", "income", "race", 
+               "bmicat", "phyact", "smoke", "fruit", 
+               "painmed", "ht", "copd", "diab", "edu"),
+               data = analytic, includeNA = TRUE)
+CreateTableOne(vars = c("CVD", "age", 
+               "sex", "income", "race",
+               "bmicat", "phyact", "smoke", "fruit", 
+               "painmed", "ht", "copd", "diab", "edu"),
+               data = analytic, strata = "OA", includeNA = TRUE)
+require(DataExplorer)
+plot_missing(analytic)
 ```
 
-::: column-margin
-Additional factors come into play when dealing with complex survey datasets; these will be explored in a subsequent [chapter](surveydata.html).
-:::
+Let us investigate why pain medication has so much missing
 
-### Saving data
-
-```{r search8save, eval=TRUE, cache=TRUE}
-# getwd()
-save(analytic.with.miss, analytic, file="Data/researchquestion/NHANES17.RData")
+```{r pain1, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("Images/researchquestion/pain1.png")
 ```
 
-### References
+```{r pain2, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("Images/researchquestion/pain2.png")
+```
+
+```{r pain3, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("Images/researchquestion/pain3.png")
+```
+
+Optional content respondent (cycle 3.1):
+
+```{r optional3, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("Images/researchquestion/optional3.png")
+```
+
+In cycle 2.1, only  21,755 out of 134,072 responded to optional medication component.
+
+#### Complete case analysis
+
+```{r analytic1, eval=TRUE, cache=use.saved.chche }
+dim(c123sub3)
+analytic2 <- as.data.frame(na.omit(c123sub3))
+dim(analytic2)
+
+
+tab1 <- CreateTableOne(vars = c("CVD", "age", 
+               "sex", "income", "race", 
+               "bmicat", "phyact", "smoke", "fruit", 
+               "painmed", "ht", "copd", "diab", "edu"),
+               data = analytic2, includeNA = TRUE)
+print(tab1, showAllLevels = TRUE)
+tab1b <- CreateTableOne(vars = c("CVD", "age", 
+               "sex", "income", "race",
+               "bmicat", "phyact", "smoke", "fruit", 
+               "painmed", "ht", "copd", "diab", "edu"),
+               data = analytic2, strata = "OA", includeNA = TRUE)
+print(tab1b, showAllLevels = TRUE)
+```
+
+## Save data for later
+
+```{r analytic4, eval=TRUE, cache=use.saved.chche }
+save(analytic, analytic2, cc123a, file = "Data/researchquestion/OA123CVD.RData")
+```
