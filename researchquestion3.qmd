@@ -1,7 +1,6 @@
-## Causal question (1) {.unnumbered}
+## Causal question-1 {.unnumbered}
 
 ### Working with a Predictive question using CCHS
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -9,7 +8,7 @@ require(survey)
 use.saved.chche <- TRUE
 ```
 
-### Load data 
+### Load data
 
 We download and process the data in the same was as shown [earlier](accessing2.html), and reuse the data for the following tutorial.
 
@@ -23,12 +22,12 @@ dim(c2) # Dimensions of CCHS 2.1
 dim(c3) # Dimensions of CCHS 3.1
 ```
 
-
 ### Aim
 
 Rheumatic diseases may cause acute or chronic inflammation. Such systemic inflammation could increase the risk of cardiovascular diseases (CVD). However, Osteoarthritis (OA) is not so well explored in association with CVD. The aim of the current study is to examine the association between OA and CVD among Canadian adults.
 
 ### Example article
+
 We are going to use the article by @rahman2013relationship as our reference. [DOI:10.1136/bmjopen-2013-002624](https://bmjopen.bmj.com/content/3/5/e002624).
 
 ::: column-margin
@@ -37,94 +36,99 @@ We are going to use the article by @rahman2013relationship as our reference. [DO
 
 #### PICOT
 
-  - Target population: Canadian adults
-  - Outcome ($Y$): CVD (Heart disease)
-  - Exposure group ($A$): OA
-  - Control group: People without OA
-  - Time line: From 2001 - 2005
-  - From the literature, we have identified some factors to be useful in exploring this $A-Y$ relationship:
-  
-        - age, 
-        - sex, 
-        - income, 
-        - ethnicity,
-        - obesity,
-        - exercise,
-        - smoking,
-        - diets (Proxied by fruit and vegetable consumption),
-        - pain medication use,
-        - hypertension,
-        - cholesterol (Proxied by Diabetes and Chronic obstructive pulmonary disease /COPD),
-        - Additionally we have considered education level. 
-        
+-   Target population: Canadian adults
 
-#### Why this time frame? 
+-   Outcome ($Y$): CVD (Heart disease)
 
-In CCHS cycle 1.1-3.1, there was a question 'What type of arthritis?' - which resulted in responses such as 
+-   Exposure group ($A$): OA
 
-  - Rheumatoid arthritis, 
-  - OA, 
-  - other,
-  - unknown.
+-   Control group: People without OA
+
+-   Time line: From 2001 - 2005
+
+-   From the literature, we have identified some factors to be useful in exploring this $A-Y$ relationship:
+
+    ```         
+    - age, 
+    - sex, 
+    - income, 
+    - ethnicity,
+    - obesity,
+    - exercise,
+    - smoking,
+    - diets (Proxied by fruit and vegetable consumption),
+    - pain medication use,
+    - hypertension,
+    - cholesterol (Proxied by Diabetes and Chronic obstructive pulmonary disease /COPD),
+    - Additionally we have considered education level. 
+    ```
+
+#### Why this time frame?
+
+In CCHS cycle 1.1-3.1, there was a question 'What type of arthritis?' - which resulted in responses such as
+
+-   Rheumatoid arthritis,
+-   OA,
+-   other,
+-   unknown.
 
 This question was crucial in identifying OA patients. However, in later years, that question was omitted. Hence, for this practical reason, we restricted out analysis in CCHS cycle 1.1-3.1 (2001-2005).
 
 ### Creating Analytic Data
 
-
 #### Identify Relevant factors
 
-From the literature, we identify variables that are associated with either the outcome and/or the exposure. We have to be cautious about the variables that are only related to exposures only (a topic for later). 
+From the literature, we identify variables that are associated with either the outcome and/or the exposure. We have to be cautious about the variables that are only related to exposures only (a topic for later).
 
 Generally try to include basic demographics (e.g., age, sex, education etc. are the usual suspects) at this stage even if we do not have a strong indication from the literature that those variables are highly associated with the outcome or the exposure.
 
-| Variable name 	| Variable 	| Type 	| Categories 	|
-|-----------------------------------------------	|--------------------	|-------------	|---------------------------------------------------------------------------------------------------	|
-| OA 	| Exposure 	| Binary 	|  	|
-| CVD 	| Outcome 	| Binary 	|  	|
-| Age 	| Covariate 	| Category 	| 20-39; 40-49; 50-59; 60-64 	|
-| Sex 	| Covariate 	| Binary 	| Men; Women 	|
-| Income 	| Covariate 	| Category 	| <30k; 30k-49k; 50k-79k; 80k+ 	|
-| Cultural/racial origin 	| Covariate 	| Binary 	| White; Visible minority 	|
-| BMI 	| Covariate 	| Category 	| Underweight; Normal; Overweight; Obese 	|
-| Physical activity 	| Covariate 	| Category 	| Active; Moderate; Inactive 	|
-| Smoking 	| Covariate 	| Category 	| Non-smoker; Currently; Former 	|
-| Fruit/vegetable consumption 	| Covariate 	| Category 	| 0-3; 4-6 ; 6+ servings daily 	|
-| Pain medication use 	| Covariate 	| Binary 	|  	|
-| Hypertension 	| Covariate 	| Binary 	|  	|
-| COPD 	| Covariate 	| Binary 	|  	|
-| Diabetes 	| Covariate 	| Binary 	|  	|
-| Education 	| Covariate 	| Category 	| <2ndary; 2ndary graduate; Post2ndary+; Post2ndary grad 	|
-| Weight 	| Sampling weights 	| Continuous 	|  	|
+| Variable name               | Variable         | Type       | Categories                                              |
+|--------------|-------------|-------------|---------------------------------|
+| OA                          | Exposure         | Binary     |                                                         |
+| CVD                         | Outcome          | Binary     |                                                         |
+| Age                         | Covariate        | Category   | 20-39; 40-49; 50-59; 60-64                              |
+| Sex                         | Covariate        | Binary     | Men; Women                                              |
+| Income                      | Covariate        | Category   | \<30k; 30k-49k; 50k-79k; 80k+                           |
+| Cultural/racial origin      | Covariate        | Binary     | White; Visible minority                                 |
+| BMI                         | Covariate        | Category   | Underweight; Normal; Overweight; Obese                  |
+| Physical activity           | Covariate        | Category   | Active; Moderate; Inactive                              |
+| Smoking                     | Covariate        | Category   | Non-smoker; Currently; Former                           |
+| Fruit/vegetable consumption | Covariate        | Category   | 0-3; 4-6 ; 6+ servings daily                            |
+| Pain medication use         | Covariate        | Binary     |                                                         |
+| Hypertension                | Covariate        | Binary     |                                                         |
+| COPD                        | Covariate        | Binary     |                                                         |
+| Diabetes                    | Covariate        | Binary     |                                                         |
+| Education                   | Covariate        | Category   | \<2ndary; 2ndary graduate; Post2ndary+; Post2ndary grad |
+| Weight                      | Sampling weights | Continuous |                                                         |
 
 #### Variables under consideration
 
-Find out whether we have the variables collected / measured / asked in the surveys. If not asked, try to find out whether there is a proxy variable that was collected / measured / asked in the surveys. 
+Find out whether we have the variables collected / measured / asked in the surveys. If not asked, try to find out whether there is a proxy variable that was collected / measured / asked in the surveys.
 
 For example, we did not have a question / variable related to a particular topic (e.g., say, cholesterol, which is known to be associated with our outcome), try to collect some variables that could be used as proxies (e.g., COPD, Diabetes).
 
 Note that the variable names are generally different in different cycles.
 
-| Variable name 	| CCHS 1.1 	| CCHS 2.1 	| CCHS 3.1 	|
-|---------------------------------------------------	|----------	|----------	|----------	|
-| Arthritis 	| CCCA_051 	| CCCC_051 	| CCCE_051 	|
-| Kind of arthritis (for OA) 	| CCCA_05A 	| CCCC_05A 	| CCCE_05A 	|
-| Heart disease (CVD) 	| CCCA_121 	| CCCC_121 	| CCCE_121 	|
-| Age 	| DHHAGAGE 	| DHHCGAGE 	| DHHEGAGE 	|
-| Sex 	| DHHA_SEX 	| DHHC_SEX 	| DHHE_SEX 	|
-| Household income 	| INCAGHH 	| INCCGHH 	| INCEGHH 	|
-| Cultural/racial origin 	| SDCAGRAC 	| SDCCGRAC 	| SDCEGCGT 	|
-| BMI (Score) 	| HWTAGBMI 	| HWTCGBMI 	| HWTEGBMI 	|
-| BMI (Category) 	| HWTAGSW 	| HWTCGISW 	| HWTEGISW 	|
-| Physical activity 	| PACADPAI 	| PACCDPAI 	| PACEDPAI 	|
-| Smoking status (Type of smoker) 	| SMKADSTY 	| SMKCDSTY 	| SMKEDSTY 	|
-| Fruits/vegetables consumption	| FVCADTOT 	| FVCCDTOT 	| FVCEDTOT 	|
-| Pain med use	| DRGA_1A 	| MEDC_1A 	| MEDE_1A 	|
-| Hypertension 	| CCCA_071 	| CCCC_071 	| CCCE_071 	|
-| Has emphysema or COPD 	| CCCA_91B 	| CCCC_91B 	| CCCE_91F 	|
-| Diabetes 	| CCCA_101 	| CCCC_101 	| CCCE_101 	|
-| Education 	| EDUADR04 	| EDUCDR04 	| EDUEDR04 	|
-| Survey weights 	| WTSAM 	| WTSC_M 	| WTSE_M 	|
+| Variable name                   | CCHS 1.1 | CCHS 2.1 | CCHS 3.1 |
+|---------------------------------|----------|----------|----------|
+| Arthritis                       | CCCA_051 | CCCC_051 | CCCE_051 |
+| Kind of arthritis (for OA)      | CCCA_05A | CCCC_05A | CCCE_05A |
+| Heart disease (CVD)             | CCCA_121 | CCCC_121 | CCCE_121 |
+| Age                             | DHHAGAGE | DHHCGAGE | DHHEGAGE |
+| Sex                             | DHHA_SEX | DHHC_SEX | DHHE_SEX |
+| Household income                | INCAGHH  | INCCGHH  | INCEGHH  |
+| Cultural/racial origin          | SDCAGRAC | SDCCGRAC | SDCEGCGT |
+| BMI (Score)                     | HWTAGBMI | HWTCGBMI | HWTEGBMI |
+| BMI (Category)                  | HWTAGSW  | HWTCGISW | HWTEGISW |
+| Physical activity               | PACADPAI | PACCDPAI | PACEDPAI |
+| Smoking status (Type of smoker) | SMKADSTY | SMKCDSTY | SMKEDSTY |
+| Fruits/vegetables consumption   | FVCADTOT | FVCCDTOT | FVCEDTOT |
+| Pain med use                    | DRGA_1A  | MEDC_1A  | MEDE_1A  |
+| Hypertension                    | CCCA_071 | CCCC_071 | CCCE_071 |
+| Has emphysema or COPD           | CCCA_91B | CCCC_91B | CCCE_91F |
+| Diabetes                        | CCCA_101 | CCCC_101 | CCCE_101 |
+| Education                       | EDUADR04 | EDUCDR04 | EDUEDR04 |
+| Survey weights                  | WTSAM    | WTSC_M   | WTSE_M   |
 
 #### Subset the data
 
@@ -161,7 +165,6 @@ table(cc31$CCCE_051)
 We want to combine data from three different cycles in order to get more subjects in our data. For that, we will have to stack/append data from three different cycles. In order to do so, we need to make the names exarctly the same. E.g., for BMI category, we will rename all 3 variables: `HWTAGSW` (from cycle 1), `HWTCGISW` (from cycle 2) and `HWTEGISW` (from cycle 3) to `bmicat`.
 
 Generally I prefer smaller cases for names, but that's just my coding preference.
-
 
 ##### Making variable names the same
 
@@ -234,7 +237,7 @@ knitr::include_graphics("Images/researchquestion/income2.png")
 knitr::include_graphics("Images/researchquestion/income3.png")
 ```
 
-Therefore, we need to recode the variable value labels carefully. 
+Therefore, we need to recode the variable value labels carefully.
 
 ##### Appending
 
@@ -250,11 +253,8 @@ cc123a <- rbind(cc11,cc21,cc31)
 
 Exposure group is people with osteoarthritis. The control group is people who do not have osteoarthritis.
 
-In cycle 1, there were 2 related questions:
-    - Do you have arthritis or rheumatism excluding fibromyalgia? (variable `arthritis`)
-    - What kind of arthritis do you have? (variable `arthritis.kind`)
+In cycle 1, there were 2 related questions: - Do you have arthritis or rheumatism excluding fibromyalgia? (variable `arthritis`) - What kind of arthritis do you have? (variable `arthritis.kind`)
 
-    
 ```{r recode0, eval=TRUE, cache=use.saved.chche }
 table(cc123a$arthritis)
 table(cc123a$arthritis.kind)
@@ -281,8 +281,6 @@ c123sub1$arthritis.kind <- NULL
 c123sub1$arthritis <- NULL
 ```
 
-
-
 #### Criteria 2: retain valid responses for outcome
 
 ```{r recode0b, eval=TRUE, cache=use.saved.chche }
@@ -298,10 +296,9 @@ c123sub2$CVD <- recode(c123sub2$CVD,
 table(c123sub2$CVD, useNA = "always")
 ```
 
-
 #### Criteria 3: Is there a zero cell?
 
-Check out 'Universe' for all the variables under consideration. Is there a possibility that cross-tabulation of some of the categories will produce zero? 
+Check out 'Universe' for all the variables under consideration. Is there a possibility that cross-tabulation of some of the categories will produce zero?
 
 For example, the 'Universe' for BMI or BMI category includes 'Respondents aged 20 to 64'.
 
@@ -309,7 +306,7 @@ For example, the 'Universe' for BMI or BMI category includes 'Respondents aged 2
 knitr::include_graphics("Images/researchquestion/bmi1.png")
 ```
 
-Therefore, we will not have BMI from anyone aged less than 20 or over 64. 
+Therefore, we will not have BMI from anyone aged less than 20 or over 64.
 
 ```{r recode0c, eval=TRUE, cache=use.saved.chche }
 table(c123sub2$bmicat, c123sub2$age)[,1:2]
@@ -515,7 +512,7 @@ Optional content respondent (cycle 3.1):
 knitr::include_graphics("Images/researchquestion/optional3.png")
 ```
 
-In cycle 2.1, only  21,755 out of 134,072 responded to optional medication component.
+In cycle 2.1, only 21,755 out of 134,072 responded to optional medication component.
 
 #### Complete case analysis
 
