@@ -1,0 +1,71 @@
+---
+title: "Quiz on predictive factors"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+# Load required packages
+library(learnr)
+library(xfun)
+```
+
+```{r predictive_quiz1, echo=FALSE}
+question("One way to identify collinear predictors is hierarchical clustering approach. Which R function can be used to run a hierarchical cluster analysis?",
+  answer("plot function", message = "The plot function is a generic function for plotting R objects. You can also use the plot function to produce a nice dendrogram once you have done with your cluster analysis."),
+  answer("describe function from Hmisc package", message = "describe is especially useful for describing your data frames."),
+  answer("varclus function from Hmisc package", correct = TRUE, message = "We used the varclus function from the Hmisc package in the lab. There are many other ways to do the cluster analysis in R."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r predictive_quiz2, echo=FALSE}
+question("Which R function can be used to visualize a correlation matrix that shows the relationships between continuous variables?",
+  answer("table", message = "When we have categorical variables, we use the table function for creating contingency tables."),
+  answer("corrplot", correct = TRUE, message = "We first craete a correlation matrix of continuous variables and then use the corrplot function to depict that correlation matrix."),
+  answer("plot", message = "The plot function is a generic function for plotting R objects."),
+  answer("vif", message = "The vif fuction calculates the variance-inflation factor."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r predictive_quiz3, echo=FALSE}
+question("Say, we aim to develop a prediction model to predict diabetes (a binary variable) based on some sociodemographic and clinical risk factors. \n We fit logistic regression model as follows: mod <- glm(diabetes ~ age + sex + race + education + triglycerides + protein + bilirubin + phosphorus + sodium + potassium + globulin + calcium, data = dat.train, family = binomial). \n The predicted probability of diabetes is calculated as: pred.diabetes <- predict(mod, type = 'response', newdata = dat.test). How would you calculate the area under the curve (AUC) values on the test data (dat.test)?",
+  answer("pROC::roc(dat.train$diabetes, pred.diabetes)", message = "Check whether you are calculating the AUC on the training (dat.train) or the testing (dat.test) data."),
+  answer("pROC::roc(mod)", message = "You must provide valid data, such as the outcome variable and predicted probabilities."),
+  answer("pROC::roc(dat.test$diabetes, pred.diabetes)", correct = TRUE, message = "We use AUC to measure the accuracy for classification models."),
+  answer("pROC::roc(dat.test$diabetes)", message = "You must provide valid data, such as the outcome variable and predicted probabilities."),
+  answer("pROC::roc(dat.test$pred.diabetes)", message = "You must provide valid data, such as the outcome variable and predicted probabilities."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r predictive_quiz4, echo=FALSE}
+question("Which methods could be used to measure prediction error for continuous outcomes?",
+  answer("R-square, Adjusted R-square, RMSE, Coefficient of determination", correct = TRUE, message = "R-square measures the goodness of fit of a model. In contrast, adjusted R-square is often powerful than R-square since adjusted R-square adds penalties for the number of parameters in the model. Standard deviation of the residuals is also a popular method to measure the accuracy for regression models with continuous outcomes. Coefficient of determination is donated by R-square, i.e., Coefficient of determination and R-square is the same thing."),
+  answer("R-square, Adjusted R-square, RMSE", message = "R-square measures the goodness of fit of a model. In contrast, adjusted R-square is often powerful than R-square since adjusted R-square adds penalties for the number of parameters in the model. Standard deviation of the residuals is also a popular method to measure the accuracy for regression models with continuous outcomes. Coefficient of determination is donated by R-square, i.e., Coefficient of determination and R-square is the same thing."),
+  answer("R-square, Adjusted R-square, RMSE, AUC", message = "R-square measures the goodness of fit of a model. Adjusted R-square is often powerful than R-square since adjusted R-square adds penalties for the number of parameters in the model. In contrast, we use AUC to measure the accuracy for classification models."),
+  answer("R-square, Adjusted R-square, RMSE, C-statistic", message = "R-square measures the goodness of fit of a model. Adjusted R-square is often powerful than R-square since adjusted R-square adds penalties for the number of parameters in the model. In contrast, the concordance statistic (c-statistic) is the most commonly used statistic that measures discrimination for a time-to-event outcome."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+
+```{r predictive_quiz5, echo=FALSE}
+question("Say, you aim to build a prediction model to predict CVD among Canadian adults using logistic regression. Which methods could be used to deal with model overfitting? (select ALL that apply)",
+  answer("Model fitting on full dataset", message = "Model fitting on the full dataset actually creates the overfitting problem."),
+  answer("Selecting 20% of data", message = "Selecting a subset of data never be a solution to address model overfitting."),
+  answer("Spliting the dataset into training and testing sets", correct = TRUE),
+  answer("1-fold/leave-one-out cross-validation", correct = TRUE, message = "Data splitting is one of the techniques to get optimism-corrected predictions. But there are other methods as well that can be used to deal with model overfitting, such as cross-validation and bootstrapping. 1-fold/leave-one-out cross-validation is a type of k-fold cross-validation."),
+  answer("Increasing the number of predictors in the model", message = "Increasing the number of predictors or model complexity often overfits the model."),
+  answer("10-fold cross-validation", correct = TRUE),
+  answer("Bootstrapping", correct = TRUE),
+  incorrect = "Data splitting is one of the techniques to get optimism-corrected predictions. But there are other methods as well that can be used to deal with model overfitting, such as cross-validation and bootstrapping.",
+  allow_retry = TRUE,
+  random_answer_order = FALSE
+)
+```
