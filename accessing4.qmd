@@ -12,7 +12,13 @@ Let us use the article by @flegal2016trends as our reference. [DOI:10.1001/jama.
 
 #### Task
 
-Our task here is to reproduce the numbers reported in Table 1 from this article.
+Objectives are to
+
+(1) Learn how to download and select pertinent NHANES data
+(2) Understand the importance of cleaning and transforming the data
+(3) Reproduce findings from an existing research paper using NHANES data
+
+Our specific task in this tutorial is to **reproduce the numbers reported in Table 1** from this article.
 
 #### Eligibility criteria
 
@@ -24,6 +30,8 @@ Methods section from this article says:
 -   Table 1 title says NHANES 2013-2014 was used.
 
 #### Variables of interest
+
+Before diving into NHANES, take some time to comprehend its structure. Detailed documentation provides crucial information about variables, age categories, and other specifics. 
 
 Variables of interest:
 
@@ -62,6 +70,10 @@ knitr::include_graphics("Images/accessing/demo.png")
 ```
 
 ### Downloading relevant variables
+
+You can download NHANES data directly from their website or use a package that allows easy access to NHANES data sets. For this tutorial, we'll be downloading data specifically from the 2013-2014 cycle, focusing on demographics and BMI metrics.
+
+NHANES data often comes coded numerically for various categories, making it less straightforward to understand. Use the available translation functions to convert these codes into meaningful categories, easing the data interpretation process.
 
 #### Demographic data
 
@@ -118,6 +130,8 @@ head(exam13select)
 
 ### Merge data
 
+You might find that the demographic data and BMI data are in separate files. In that case, you'll need to combine them using a common ID variable. Make sure the data aligns correctly during this process.
+
 Use the ID variable `SEQN` to merge both data:
 
 ::: column-margin
@@ -156,6 +170,7 @@ We subset the data using criteria similar to the JAMA paper by @flegal2016trends
 ::: column-margin
 @flegal2016trends
 :::
+
 
 ```{r analytic0, cache=TRUE}
 # No missing BMI
@@ -201,6 +216,8 @@ analytic.data3$Race <- factor(analytic.data3$Race, levels =
 
 ### Reproducing Table 1
 
+Cross-reference the variable names with the NHANES data dictionary to ensure they align with your research questions. 
+
 Let's now compare our table with with the Table 1 in the article:
 
 ```{r analytic2, cache=TRUE}
@@ -229,5 +246,9 @@ As we can see, our frequencies exactly match with Table 1 in the article.
 ::: column-margin
 Also see [@ds] for a tidyverse solution
 :::
+
+::: callout-tip
+If your research aims to make population-level inferences, ensure that you also download sampling weights, stratum and cluster variables. These aren't mandatory for basic analysis but are crucial for population-level conclusions. We will explore more about this in the [survey data analysis](surveydata.html) chapter.
+::: 
 
 ## References
