@@ -1,4 +1,8 @@
-## Subsetting {.unnumbered}
+## NHANES: Subsetting {.unnumbered}
+
+The tutorial demonstrates how to work with subset of complex survey data, specifically focusing on an NHANES example.
+
+The required packages are loaded.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -9,12 +13,16 @@ library(DataExplorer)
 
 ### Load data
 
+Survey data is loaded into the R environment.
+
 ```{r load, cache=TRUE}
 load("Data/surveydata/NHANES17.RData")
 ls()
 ```
 
 ### Check missingness
+
+A subset of variables is selected, and the presence of missing data is visualized. 
 
 ```{r miss0, cache=TRUE}
 Vars <- c("ID", 
@@ -28,6 +36,11 @@ Vars <- c("ID",
           "cholesterol", 
           "diabetes")
 analytic.full.data <- analytic.with.miss[,Vars]
+```
+
+A new variable is also created to categorize cholesterol levels as "healthy" or "unhealthy."
+
+```{r miss02jkfh, cache=TRUE}
 analytic.full.data$cholesterol.bin <- ifelse(analytic.full.data$cholesterol <200, "healthy", "unhealthy")
 analytic.full.data$cholesterol <- NULL
 
@@ -37,7 +50,7 @@ plot_missing(analytic.full.data)
 
 ### Subsetting Complex Survey data
 
-We are subsetting based on whether the subjects have missing observation (e.g., only retaining those with complete information). This is aften an eligibility criteria in studies. In missing data analysis, we will learn more about more appropriate approaches.
+We are subsetting based on whether the subjects have missing observation (e.g., only retaining those with complete information). This is often an eligibility criteria in studies. In missing data analysis, we will learn more about more appropriate approaches.
 
 ```{r subset0, cache=TRUE}
 dim(analytic.full.data)
@@ -69,6 +82,8 @@ head(analytic.full.data$ID[analytic.full.data$miss==0])
 ```
 
 ### Logistic regression on sub-population
+
+A logistic regression model is run on the subset of data that has no missing values. Here, it distinguishes between correct and incorrect approaches to account for the complex survey design.
 
 ```{r logis, warning=FALSE, message=FALSE}
 require(survey)
@@ -110,7 +125,7 @@ publish(fit)
 
 ### Variable selection
 
-If unsure about usefulness of some (gender, born, race, bmi) variables in predicting the outcome, check via backward elimination while keeping important variable (diabetes, say, that has been established in the literature) in the model
+Finally, we discuss variable selection methods. We employ backward elimination to determine which variables are significant predictors while retaining an important variable in the model. If unsure about usefulness of some (gender, born, race, bmi) variables in predicting the outcome, check via backward elimination while keeping important variable (diabetes, say, that has been established in the literature) in the model
 
 ```{r varselect, cache=TRUE}
 model.formula <- as.formula("I(cholesterol.bin=='healthy')~
@@ -127,8 +142,16 @@ publish(fitstep) # final model
 
 Also see [@subpopulation] for further details.
 
-## YouTube Videos
+### Video content (optional)
 
-You could watch the videos describing [creating an analytic dataset](https://youtu.be/OWVV1O3iYmA), [checking](https://youtu.be/d5-dWdAhsZQ), [appropriate weight assignment](https://youtu.be/5q_GyL5FsVg), [logistic regression](https://youtu.be/ebFkdeHV6m8), [model performance](https://youtu.be/n9WSFJH8FcQ), [analyzing NHANES](https://youtu.be/6GfpPKPnLEE), [analyzing another NHANES dataset](https://youtu.be/78EHsUZDePc), and [subpopulation in complex survey data](https://youtu.be/A8p2zu-JlBU).
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/A8p2zu-JlBU" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
 
 ### References

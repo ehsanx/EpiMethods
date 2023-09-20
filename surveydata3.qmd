@@ -1,4 +1,8 @@
-## Bivariate analysis {.unnumbered}
+## CCHS: Bivariate analysis {.unnumbered}
+
+The following tutorial is performing bivariate analysis on our CCHS analytic dataset to examine relationships between two variables (association question). 
+
+We load several R packages required for bivariate analysis, statistical tests, and data visualization.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -15,6 +19,8 @@ library(jtools)
 
 ### Load data
 
+We load the dataset into the R environment and lists all available variables and objects. 
+
 ```{r load, warning=FALSE, message=FALSE, cache = TRUE}
 load("Data/surveydata/cchs123b.RData")
 ls()
@@ -24,11 +30,15 @@ ls()
 
 #### Weights
 
+Here, the weights of survey respondents are accumulated, to account for the combination of different cycles of the data.
+
 ```{r wgt, warning=FALSE, message=FALSE, cache = TRUE}
 analytic.miss$weight <- analytic.miss$weight/3 # 3 cycles combined
 ```
 
 #### Fixing variable types
+
+We convert several variables to categorical or "factor" types, which are better suited for some statistical analysis when variables have categories.
 
 ```{r vartype, warning=FALSE, message=FALSE, cache = TRUE}
 var.names <- c("CVD", "age", "sex", "married", "race", "edu", "income", "bmi", 
@@ -37,6 +47,8 @@ var.names <- c("CVD", "age", "sex", "married", "race", "edu", "income", "bmi",
 analytic.miss[var.names] <- lapply(analytic.miss[var.names] , factor)
 str(analytic.miss)
 ```
+
+The code identifies rows where data is missing and labels them for later analyses.
 
 ```{r vartype2, warning=FALSE, message=FALSE, cache = TRUE}
 analytic.miss$miss <- 1
@@ -49,6 +61,8 @@ table(analytic.miss$miss)
 
 ### Setting Design
 
+The code sets up the survey design, specifying weights (but no specific clustering and stratification, as they are unavailable for CCHS public access data), for use in survey-weighted analyses.
+
 ```{r desgin0, warning=FALSE, message=FALSE, cache = TRUE}
 require(survey)
 summary(analytic.miss$weight)
@@ -57,6 +71,8 @@ w.design0 <- svydesign(id=~1, weights=~weight,
 summary(weights(w.design0))
 sd(weights(w.design0))
 ```
+
+This creates a subset of the data where there are no missing values. Note that subset was done to the design object `w.design0`, not the data `analytic.miss`.
 
 ```{r desgin1, warning=FALSE, message=FALSE, cache = TRUE}
 w.design <- subset(w.design0, miss == 0)
@@ -70,7 +86,7 @@ sd(weights(w.design))
 
 ##### Stratified by exposure
 
-This table will be useful for propensity score analysis
+These tables contain descriptive statistics, stratified by different categories. They can be useful for understanding how variables relate to the exposure or outcome in the data.
 
 ```{r tab2, warning=FALSE, message=FALSE, cache = TRUE}
 require(tableone)
@@ -99,6 +115,8 @@ print(tab3)
 How did they calculate the p-values? Hint: `svychisq` (see below).
 
 #### Proportions and Design Effect
+
+This part computes proportions and design effects, which help understand the influence of the sampling design on the estimated statistics.
 
 ```{r fit0, warning=FALSE, message=FALSE, cache = TRUE}
 require(survey)
@@ -137,6 +155,8 @@ confint(fit0b)
 
 #### Testing association
 
+Here, Chi-square tests are conducted to test the association between different variables. Two variants of the test are used: Rao-Scott and Thomas-Rao modifications. These adaptations are used when the data come from a complex survey design.
+
 -   Tests for hypothesis
     -   Rao-Scott modifications (chi-sq)
     -   Thomas-Rao modifications (F)
@@ -157,6 +177,21 @@ svychisq(~CVD+province,design=w.design, statistic="Chisq")
 
 ### Saving data
 
+Finally, the dataset, along with any new variables or subsets created during the analysis, is saved for future use.
+
 ```{r save, cache = TRUE}
 save(w.design, analytic.miss, analytic2, file = "Data/surveydata/cchs123w.RData")
 ```
+
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/5q_GyL5FsVg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

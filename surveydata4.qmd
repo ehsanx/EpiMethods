@@ -1,4 +1,8 @@
-## Regression analysis {.unnumbered}
+## CCHS: Regression {.unnumbered}
+
+This tutorial is for a complex data analysis, specifically using regression techniques to analyze survey data.
+
+Loads necessary R packages for the analysis
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -16,6 +20,8 @@ library(MASS)
 
 ### Load data
 
+Loads a dataset and provides some quick data checks, like the dimensions and summary of weights.
+
 ```{r data, warning=FALSE, message=FALSE, cache = FALSE}
 load("Data/surveydata/cchs123w.RData")
 ls()
@@ -25,6 +31,8 @@ summary(weights(w.design))
 ```
 
 ### Logistic for complex survey
+
+Performs a simple logistic regression using the complex survey data, focusing on the relationship between cardiovascular disease and osteoarthritis.
 
 ```{r logistc, warning=FALSE, message=FALSE, cache = TRUE}
 formula0 <- as.formula(I(CVD=="event") ~ OA)
@@ -38,6 +46,8 @@ publish(fit2)
 ```
 
 ### Multivariable analysis
+
+Runs a more complex logistic regression model, adding multiple covariates to better understand the relationship.
 
 ```{r multivariable, warning=FALSE, message=FALSE, cache = TRUE}
 formula1 <- as.formula(I(CVD=="event") ~ OA + age + sex + married + race + 
@@ -65,6 +75,8 @@ Pseudo-R-square values indicate how much of the total variability in the outcome
 -   Survey weighted version of them are available.
 -   Not trivial to decide which statistic to use under complex surveys.
 
+Evaluates the model fit using Akaike Information Criterion (AIC) and pseudo R-squared metrics.
+
 ```{r fit, warning=FALSE, message=FALSE, cache = TRUE}
 fit3 <- svyglm(formula1, 
               design = w.design, 
@@ -85,6 +97,8 @@ psrsq(fit3, method = "Nagelkerke")
 
 #### Checking one by one
 
+Checks the significance of each variable one by one and removes those that are not statistically significant.
+
 ```{r be, warning=FALSE, message=FALSE, cache = TRUE}
 round(sort(summary(fit3)$coef[,"Pr(>|t|)"]),2)
 # bmiOverweight is associated with largest p-value
@@ -101,6 +115,8 @@ round(sort(summary(fit4)$coef[,"Pr(>|t|)"]),2)
 
 #### Using AIC to automate
 
+Uses stepwise regression guided by AIC to automatically select the most important variables.
+
 ```{r aic, warning=FALSE, message=FALSE, cache = TRUE}
 require(MASS)
 formula1b <- as.formula(I(CVD=="event") ~ OA + age + sex)
@@ -116,6 +132,8 @@ round(sort(summary(fit5)$coef[,"Pr(>|t|)"]),2)
 ```
 
 #### Using AIC, but keeping importants
+
+Similar to the previous step but ensures certain important variables remain in the model.
 
 ```{r aic2, warning=FALSE, message=FALSE, cache = TRUE}
 formula1c <- as.formula(I(CVD=="event") ~ OA + age + sex + married + race +
@@ -144,15 +162,21 @@ Check biologically interesting ones.
 
 ##### Check one by one
 
+Checks if there is a significant interaction effect between 'age' and 'sex'.
+
 ```{r interactions0, warning=FALSE, message=FALSE, cache = TRUE}
 fit8a <- update(fitstep, .~. + interaction(age,sex))
 anova(fitstep, fit8a) # keep interaction
 ```
 
+Checks if there is a significant interaction effect between 'sex' and 'diabetes'.
+
 ```{r interactions1, warning=FALSE, message=FALSE, cache = TRUE}
 fit8b <- update(fitstep, .~. + interaction(sex,diab))
 anova(fitstep, fit8b) # Do not keep this interaction
 ```
+
+Checks if there is a significant interaction effect between 'BMI' and 'diabetes'.
 
 ```{r interactions2, warning=FALSE, message=FALSE, cache = TRUE}
 fit8c <- update(fitstep, .~. + interaction(bmi,diab))
@@ -160,6 +184,8 @@ anova(fitstep, fit8c) # keep this interaction
 ```
 
 ##### Add all significant interactions in 1 model
+
+Updates the model to include significant interaction terms.
 
 Note that we have 0 effect modifier, 2 interactions
 
@@ -184,6 +210,21 @@ aic.int.model
 
 ### Saving data
 
+Saves the final regression models for future use.
+
 ```{r save, warning=FALSE, message=FALSE, cache = TRUE}
 save(basic.model, aic.int.model, file = "Data/surveydata/cchs123w2.RData")
 ```
+
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/ebFkdeHV6m8" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

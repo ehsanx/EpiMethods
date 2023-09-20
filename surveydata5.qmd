@@ -1,4 +1,8 @@
-## Model performance {.unnumbered}
+## CCHS: Performance {.unnumbered}
+
+The tutorial outlines the process for evaluating the performance of logistic regression models fitted to complex survey data using R. It focuses on two major aspects: creating Receiver Operating Characteristic (ROC) curves and conducting Archer and Lemeshow Goodness of Fit tests. Here AUC is a measure to evaluate the predictive accuracy of the model, and Archer and Lemeshow test is a statistical test to evaluate how well your model fits the observed data.
+
+We start by importing the required R packages. 
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -9,6 +13,8 @@ library(WeightedROC)
 
 ### Load data
 
+It loads two datasets from the specified paths.
+
 ```{r load, cache=FALSE}
 load("Data/surveydata/cchs123w.RData")
 load("Data/surveydata/cchs123w2.RData")
@@ -16,6 +22,8 @@ ls()
 dim(analytic.miss)
 dim(analytic2)
 ```
+
+Three different logistic regression models are fitted to the data:
 
 ```{r fit0, cache=TRUE}
 library(survey)
@@ -38,6 +46,8 @@ fit9 <- svyglm(aic.int.model,
 ### Model performance
 
 #### ROC curve
+
+This section defines a function, `svyROCw`, to plot the ROC curves and calculate the area under the curve (AUC). The function can handle both weighted and unweighted survey data.
 
 -   The appropriateness of the fitted logistic regression model needs to be examined before it is accepted for use.
 -   Plotting the pairs of - sensitivities vs - 1-specificities on a scatter plot provides a Receiver Operating Characteristic (ROC) curve.
@@ -100,6 +110,8 @@ svyROCw(fit=fit9,outcome=analytic2$CVD=="event", weight = analytic2$corrected.we
 
 #### Archer and Lemeshow test
 
+This test helps to evaluate how well the model fits the data. A Goodness of Fit (GOF) function `AL.gof` is defined. If the p-value from this test is greater than a certain threshold (e.g., 0.05), the model fit is considered acceptable.
+
 -   Hosmer Lemeshow-type tests are most useful as a very crude way to screen for fit problems, and should not be taken as a definitive diagnostic of a 'good' fit.
     -   problem in small sample size
     -   Dependent on G (group)
@@ -158,3 +170,15 @@ AL.gof2 <- function(fit=fit7, data = analytic,
   return(res) 
 }
 ```
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/n9WSFJH8FcQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

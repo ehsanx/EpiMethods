@@ -1,4 +1,8 @@
-## Analyzing NHANES data 1 {.unnumbered}
+## NHANES: Blood Pressure {.unnumbered}
+
+The tutorial aims to guide the user through the process of analyzing health survey data, focusing specifically on the relationship between various demographic factors and blood pressure levels.
+
+Required packages are imported for data manipulation and statistical analysis.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -6,6 +10,8 @@ library(survey)
 ```
 
 ### Load data
+
+NHANES survey data is loaded into the workspace.
 
 ```{r loading, eval=TRUE, cache=TRUE }
 load(file = "Data/surveydata/NHANESsample.Rdata")
@@ -15,6 +21,8 @@ ls()
 ### Regression summary
 
 #### Bivariate Regression
+
+Four separate models are constructed to explore the relationship between blood pressure and individual demographic variables like race, age, gender, and marital status.
 
 ```{r fit1, eval=TRUE}
 summary(fit1r <- glm(blood.pressure ~ race, data=analytic.data))
@@ -34,16 +42,22 @@ summary(fit1m <- glm(blood.pressure ~ marital, data=analytic.data))
 
 #### Multivariate Regression
 
+A more comprehensive model is built, combining all the aforementioned demographic factors to predict blood pressure.
+
 ```{r fitm1, eval=TRUE}
 summary(fit1 <- glm(blood.pressure ~ race + age.centred + gender + marital, data=analytic.data))
 ```
 
 ### Including survey features
 
+The tutorial takes into account the complex survey design by creating a new survey design object (based on survey features such as, sampling weight, strata and cluster).
+
 ```{r survey, eval=TRUE}
 require(survey)
 analytic.design <- svydesign(strata=~SDMVSTRA, id=~SDMVPSU, weights=~WTMEC2YR, data=analytic.data, nest=TRUE)
 ```
+
+Box plots and summary statistics are generated to visualize how blood pressure varies across different demographic groups, considering the survey weights and design.
 
 ```{r survey2, eval=TRUE}
 svyboxplot(blood.pressure~race, design = analytic.design, col="grey", 
@@ -61,6 +75,8 @@ svyby (~blood.pressure, by=~marital, design = analytic.design, na.rm=TRUE, ci=TR
 ```
 
 #### Bivariate Regression
+
+New regression models are constructed using the survey design object to understand how each demographic variable impacts blood pressure while taking survey features into consideration.
 
 ```{r fit1s, eval=TRUE}
 require(survey)
@@ -81,7 +97,29 @@ summary(fit1m <- svyglm(blood.pressure ~ marital, design=analytic.design))
 
 #### Multivariate Regression
 
+A final, more complex model is fitted, which includes multiple demographic variables and also considers the survey design.
+
 ```{r fistm1, eval=TRUE}
 analytic.design2 <- svydesign(strata=~SDMVSTRA, id=~SDMVPSU, weights=~WTMEC2YR, data=analytic.data, nest=TRUE)
 summary(fit1 <- svyglm(blood.pressure ~ race + age.centred + gender + marital, design=analytic.design2))
 ```
+
+## A note about Predictive models
+
+In statistical analyses involving survey data, it's crucial to account for the survey's design features. These features can include sampling weights, stratification, and clustering, among others. Ignoring these could lead to biased estimates and incorrect conclusions. In the tutorial you mentioned, such survey design features are considered, making the analysis more robust and reliable in terms of inference.
+
+However, when the goal shifts from inference to prediction, additional challenges come into play. Specifically, the model may perform well on the data used to fit it (the "training" data) but not generalize well to new, unseen data. This discrepancy between training performance and generalization to new data is often referred to as "overfitting," and the optimism of the model refers to the extent to which it overestimates its predictive performance on new data based on its performance on the training data.
+
+Optimism-correction techniques are methodologies designed to address this issue. They allow you to evaluate how well your model is likely to perform on new data, not just the data you used to build it. Methods for optimism correction often involve techniques like cross-validation, bootstrapping, or specialized types of model validation that help in estimating the 'true' predictive performance of the model. Some of these techniques were discussed in the [predictive modelling](predictivefactors.html) chapter.
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/6GfpPKPnLEE" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

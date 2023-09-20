@@ -1,4 +1,30 @@
-## Creating dataset {.unnumbered}
+## CCHS: Revisiting PICOT {.unnumbered}
+
+Welcome to this tutorial where we will examine the same research question presented in the [Causal question-1](researchquestion3.html) tutorial. Our approach will be enriched this time by working with a more comprehensive set of covariates. We will follow the guidelines from the research article by @rahman2013relationship [DOI:10.1136/bmjopen-2013-002624](https://bmjopen.bmj.com/content/3/5/e002624). We will also will work properly with survey feature variables (e.g., sampling weights).
+
+::: column-margin
+[@rahman2013relationship]
+:::
+
+### Remembering PICOT
+
+Before diving into the data, let's clarify and remember the research parameters using the PICOT framework:
+
+(1) **Target population**: Canadian adults (CCHS data)
+
+(2) **Outcome** ($Y$): CVD (Heart disease/Cardiovascular Disease)
+
+(3) **Exposure group** ($A$): Osteoarthritis (OA)
+
+(4) **Control group**: People without OA
+
+(5) **Timeline**: Data collected from 2001 to 2005
+
+In addition, we'll identify potential confounders based on literature to better understand the relationship between exposure and outcome.
+
+### Creating dataset {.unnumbered}
+
+To start, we'll load the required R packages:
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -8,6 +34,8 @@ library(car)
 ```
 
 ### Load data
+
+We'll be using CCHS data from various cycles. Use the following code to load this data into your R environment:
 
 ```{r data, warning=FALSE, message=FALSE, cache = FALSE}
 # CCHS 1.1
@@ -23,6 +51,8 @@ load("Data/surveydata/cchsc3.RData")
 ls()
 ```
 
+To check the dimensions of each data set:
+
 ```{r dim, warning=FALSE, message=FALSE, cache = TRUE}
 # Dimensions
 dim(c1)
@@ -34,14 +64,16 @@ dim(c3)
 
 #### Understand variable coding
 
-Ref:
+Before subsetting the data, we need to comprehend the variables used in CCHS 3.1, which are described in detail in the official reference:
 
 -   page 60 in CCHS 3.1 guide [@statistics2005canadian]
 
 -   link for variable list: [@varlist]
 
+A table mapping variable concepts across different CCHS cycles can be found below.
+
 | **Variable Concept**                                              | **CCHS 1.1** | **CCHS 2.1** | **CCHS 3.1** |
-|------------------------|----------------|----------------|----------------|
+|---------------------|-----------------|-----------------|-----------------|
 | **Has heart disease**                                             | CCCA_121     | CCCC_121     | CCCE_121     |
 | **Has arthritis or rheumatism**                                   | CCCA_051     | CCCC_051     | CCCE_051     |
 | **Kind of arthritis**                                             | CCCA_05A     | CCCC_05A     | CCCE_05A     |
@@ -66,11 +98,7 @@ Ref:
 | **Province**                                                      | GEOAGPRV     | GEOCGPRV     | GEOEGPRV     |
 | **Sampling weight - master weight**                               | WTSAM        | WTSC_M       | WTSE_M       |
 
-We only focus on CCHS 3.1 content here, but need to check all other cycles as well.
-
-Most variables have: Universe \`All respondents'.
-
-Below are some exceptions:
+While most variables in CCHS 3.1 are universally applicable to 'All respondents,' there are some exceptions. For example:
 
 -   CCCE_05A universe: (Kind of arthritis / rheumatism)
 
@@ -124,6 +152,9 @@ We will make decisions about these variables later: for now, let's keep them.
 
 ##### Cycle 1.1
 
+-   We define a vector of variable names `var.names1` that are of interest for the first cycle of the Canadian Community Health Survey (CCHS 1.1). These variables cover a range of topics such as heart disease, age, sex, etc.
+-   Then we creates a new data frame `cc11` by subsetting the original data frame `c1` to include only the columns specified in `var.names1`.
+
 ```{r data1, warning=FALSE, message=FALSE, cache = TRUE}
 var.names1 <- c("CCCA_121", 
                 "CCCA_051", 
@@ -152,6 +183,8 @@ cc11 <- c1[var.names1]
 dim(cc11)
 table(cc11$CCCA_051)
 ```
+
+The subsequent two code chunks do the same for CCHS 2.1 and CCHS 3.1, respectively, resulting in new data frames `cc21` and `cc31`.
 
 ##### Cycle 2.1
 
@@ -217,6 +250,8 @@ table(cc31$CCCE_051)
 
 ### Making variable names the same
 
+We now create a new set of more readable and consistent variable names.
+
 ```{r data4, warning=FALSE, message=FALSE, cache = TRUE}
 new.var.names <- c("CVD", 
                    "arthritis", 
@@ -255,6 +290,8 @@ cc31$cycle <- 31
 
 ### Appending
 
+We now combine the data frames `cc11`, `cc21`, and `cc31` by stacking them on top of each other.
+
 ```{r append, warning=FALSE, message=FALSE, cache = TRUE}
 cc123a <- rbind(cc11,cc21,cc31)
 dim(cc123a)
@@ -266,11 +303,15 @@ cc123a$ID <- 1:nrow(cc123a)
 
 #### Sampling weight
 
+We use the `summary` function to provide basic statistics (like mean, median, min, max, etc.) for the `weight` column in the data frame `cc123a`.
+
 ```{r summ, warning=FALSE, message=FALSE, cache = TRUE}
 summary(cc123a$weight)
 ```
 
 #### Exposure
+
+This following chunk creates frequency tables for the 'arthritis' and 'arthritis.kind' columns.
 
 ```{r tab0, warning=FALSE, message=FALSE, cache = TRUE}
 table(cc123a$arthritis)
@@ -278,6 +319,8 @@ table(cc123a$arthritis.kind)
 sum(cc123a$arthritis=="NO")
 sum(cc123a$arthritis.kind=="NOT APPLICABLE")
 ```
+
+We create the exposure variable with exposure status vs controls.
 
 ```{r recodeOA, warning=FALSE, message=FALSE, cache = TRUE}
 c123sub1 <- cc123a
@@ -310,6 +353,8 @@ dim(c123sub1)[1]-dim(cc123a)[1]
 
 #### Outcome
 
+We create the outcome variable.
+
 ```{r recodecvd, warning=FALSE, message=FALSE, cache = TRUE}
 c123sub2 <- c123sub1
 table(c123sub2$CVD)
@@ -338,6 +383,8 @@ dim(c123sub2)[1]-dim(c123sub1)[1]
 #### Covariates
 
 ##### age
+
+Recodes the 'age' column into broader age categories.
 
 ```{r recode4, warning=FALSE, message=FALSE, cache = TRUE}
 c123sub2$age <- car::recode(c123sub2$age, 
@@ -368,6 +415,8 @@ dim(c123sub3)
 
 ##### sex
 
+Recodes 'sex' to 'Male' or 'Female'.
+
 ```{r recode6, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$sex)
 c123sub3$sex <- car::recode(c123sub3$sex, 
@@ -379,6 +428,8 @@ table(c123sub3$sex, useNA = "always")
 ```
 
 ##### marital status
+
+Recodes the 'married' column into two categories: 'not single' and 'single'.
 
 ```{r recode7, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$married)
@@ -392,6 +443,8 @@ table(c123sub3$married, useNA = "always")
 
 ##### race
 
+Recodes 'race' into 'White' and 'Non-white'.
+
 ```{r recode8, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$race)
 c123sub3$race <- car::recode(c123sub3$race, 
@@ -403,6 +456,8 @@ table(c123sub3$race, useNA = "always")
 ```
 
 ##### immigration
+
+Creates a new column for immigration status based on the 'recent.immigrant' column, then removes the original column.
 
 ```{r recode9, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$recent.immigrant)
@@ -419,6 +474,8 @@ c123sub3$immigration <- NULL
 
 ##### education
 
+Recodes educational status into specified categories.
+
 ```{r recode10, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$edu)
 c123sub3$edu <- car::recode(c123sub3$edu,
@@ -432,6 +489,8 @@ table(c123sub3$edu, useNA = "always")
 ```
 
 ##### income
+
+Recodes income levels into broader categories.
 
 ```{r recode11, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$income)
@@ -449,6 +508,8 @@ table(c123sub3$income, useNA = "always")
 ```
 
 ##### BMI
+
+Converts 'bmi' column values to numerical data and also categorizes it based on the BMI value.
 
 If you want to reuse the continuous variable later (usually a good idea in statistical sense), keep a second copy of the variable.
 
@@ -477,6 +538,8 @@ table(c123sub3$bmi, useNA = "always")
 
 ##### physical activity
 
+Recodes physical activity levels.
+
 ```{r recode13, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$phyact)
 c123sub3$phyact <- car::recode(c123sub3$phyact,
@@ -490,6 +553,8 @@ table(c123sub3$phyact, useNA = "always")
 
 ##### doctor
 
+Recodes whether someone has access to a doctor into 'Yes' or 'No'.
+
 ```{r recode14, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$doctor)
 c123sub3$doctor <- car::recode(c123sub3$doctor, 
@@ -502,6 +567,8 @@ table(c123sub3$doctor, useNA = "always")
 
 ##### stress
 
+Recodes stress levels into 'Not too stressed' or 'stressed'.
+
 ```{r recode16, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$stress)
 c123sub3$stress <- car::recode(c123sub3$stress,
@@ -513,6 +580,8 @@ table(c123sub3$stress, useNA = "always")
 ```
 
 ##### smoking
+
+Recodes smoking status into 'Current smoker', 'Former smoker', or 'Never smoker'.
 
 ```{r recode17, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$smoke)
@@ -529,6 +598,8 @@ table(c123sub3$smoke, useNA = "always")
 
 ##### alcohol
 
+Recodes drinking habits into 'Current drinker', 'Former driker', or 'Never drank'.
+
 ```{r recode18, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$drink)
 c123sub3$drink <- car::recode(c123sub3$drink,
@@ -542,6 +613,8 @@ table(c123sub3$drink, useNA = "always")
 ```
 
 ##### fruit and vegetable consumption
+
+Converts fruit and vegetable consumption to numerical values and then categorizes it.
 
 If you want to reuse the continuous variable later (usually a good idea in statistical sense), keep a second copy of the variable.
 
@@ -564,6 +637,8 @@ c123sub3$fruit2 <- NULL
 
 ##### hypertension
 
+The following chunk of code is concerned with recoding the blood pressure column. The code also shows the distribution of the values before and after recoding.
+
 ```{r recode20, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$bp)
 c123sub3$bp <- car::recode(c123sub3$bp,
@@ -575,6 +650,8 @@ table(c123sub3$bp, useNA = "always")
 ```
 
 ##### COPD
+
+The following chunk of code is concerned with recoding the COPD column.
 
 ```{r recode21, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$copd)
@@ -588,6 +665,8 @@ table(c123sub3$copd, useNA = "always")
 
 ##### Diabetes
 
+The following chunk of code is concerned with recoding the diabetes column.
+
 ```{r recode22, warning=FALSE, message=FALSE, cache = TRUE}
 table(c123sub3$diab)
 c123sub3$diab <- car::recode(c123sub3$diab,
@@ -599,6 +678,8 @@ table(c123sub3$diab, useNA = "always")
 ```
 
 ##### North
+
+This section is concerned with recoding the province column. It groups provinces into "North" and "South" based on their names.
 
 -   Note that the category names might not exactly match with the data dictionary:
     -   Particularly note two versions of `QUEBEC`
@@ -628,6 +709,8 @@ table(c123sub3$province, useNA = "always")
 
 ##### Dimension testing
 
+This chunk verifies the dimensions of the modified data frames and performs some other operations like setting factors.
+
 ```{r dims2, warning=FALSE, message=FALSE, cache = TRUE}
 save.c123sub3 <- c123sub3
 names(c123sub3)
@@ -646,6 +729,22 @@ names(analytic)
 
 ### Saving data
 
+We save the data for future use:
+
 ```{r save, warning=FALSE, message=FALSE, cache = TRUE}
 save(cc123a, analytic, file = "Data/surveydata/cchs123.RData")
 ```
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/OWVV1O3iYmA" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+## References

@@ -1,4 +1,6 @@
-## Checking dataset {.unnumbered}
+## CCHS: Assessing data {.unnumbered}
+
+Let us load all the necessary packages for data manipulation, statistical analysis, and plotting.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -11,6 +13,8 @@ library(DataExplorer)
 
 ### Load data
 
+Data loading that we saved earlier:
+
 ```{r load, warning=FALSE, message=FALSE, cache = TRUE}
 load("Data/surveydata/cchs123.RData")
 ls()
@@ -19,6 +23,8 @@ ls()
 ### Checking
 
 #### Check the data for missingness
+
+Checks the dimensions of the data and runs functions to explore missing data, stratifying by some variables. Additionally, it plots the missing data for visualization.
 
 ```{r miss0, warning=FALSE, message=FALSE, cache = TRUE}
 dim(analytic)
@@ -32,6 +38,8 @@ plot_missing(analytic)
 ```
 
 #### Look for zero-cells
+
+Creates two new variables based on age groups and generates summary tables. It also comments on the presence of 'zero cells' in one of the variables, which might require further handling.
 
 ```{r cells0, warning=FALSE, message=FALSE, cache = TRUE}
 analytic$age.65p <- analytic$age.teen <- 0
@@ -47,6 +55,8 @@ CreateTableOne(data = analytic, strata = "age.65p", includeNA = TRUE)
 analytic$age.65p <- analytic$age.teen <- NULL
 ```
 
+Produces frequency tables for multiple variable combinations to check the distribution of the data and identify issues. 
+
 ```{r tab1, warning=FALSE, message=FALSE, cache = TRUE}
 table(analytic$province.check,analytic$fruit)
 table(analytic$age)
@@ -56,7 +66,10 @@ table(analytic$stress, analytic$age)
 
 -   universe 15 + is not an issue for `stress` as age starts from 20
 -   `copd` is problematic!
--   But wasn't `fruit` variable measured in an optional component?
+
+Creates tables to look at the distribution of a specific variable across different cycles (time periods) of the survey. Notes differences and issues.
+
+-   `fruit` variable measured in an **optional component** (not available in all cycles)
 
 ```{r tab2, warning=FALSE, message=FALSE, cache = TRUE}
 table(analytic$province.check[analytic$cycle==11],
@@ -80,7 +93,7 @@ table(analytic$province.check[analytic$cycle==31],
     -   cycle 2.1 FVCCDTOT Universe: All respondents
     -   cycle 3.1 FVCEDTOT Universe: Respondents with FVCEFOPT = 1
 
-Need to make a decision about what to do about this. Delete or keep/impute later?
+Below we delete or modify problematic data, and removes unnecessary variables. Checks the dimensions before and after data cleanup.
 
 ```{r analytic0, warning=FALSE, message=FALSE, cache = TRUE}
 dim(analytic)
@@ -106,6 +119,8 @@ Save the original data (with missing values)!
 analytic.miss <- analytic1
 ```
 
+Relevels factors in the dataset so that a specific level is set as the reference level. This is often needed for statistical analysis.
+
 ```{r analytic3, warning=FALSE, message=FALSE, cache = TRUE}
 analytic.miss$smoke <- relevel(as.factor(analytic.miss$smoke), ref='Never smoker')
 analytic.miss$drink <- relevel(as.factor(analytic.miss$drink), ref='Never drank')
@@ -114,6 +129,8 @@ analytic.miss$immigrate <- relevel(as.factor(analytic.miss$immigrate), ref='not 
 ```
 
 #### Complete data options
+
+Creates a new dataset that omits all rows containing any missing values. This is generally not recommended for most data analysis, as it can introduce bias.
 
 ```{r analytic4, warning=FALSE, message=FALSE, cache = TRUE}
 # Wrong thing to do for survey data analysis!!
@@ -125,6 +142,8 @@ dim(analytic2)
 
 ### Saving dataset
 
+Let us check the dimensions of multiple data objects and then save them to a file for future use.
+
 ```{r saveall, warning=FALSE, message=FALSE, cache = TRUE}
 dim(cc123a)
 dim(analytic)
@@ -132,3 +151,16 @@ dim(analytic.miss)
 dim(analytic2)
 save(analytic.miss, analytic2, file = "Data/surveydata/cchs123b.RData")
 ```
+
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/d5-dWdAhsZQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
