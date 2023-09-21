@@ -120,7 +120,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 }</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Collinear predictors">
-<meta name="twitter:description" content="Let us load the dataset and see structure of the variables:">
+<meta name="twitter:description" content="In this tutorial, we’ll continue with the data analysis. We’ll focus on an analysis of an NHANES data. This data contains over 1200 observations and 33 variables.">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked slimcontent">
@@ -572,6 +572,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
 <li><a href="#load-data" id="toc-load-data" class="nav-link active" data-scroll-target="#load-data">Load data</a></li>
   <li><a href="#describe-the-data" id="toc-describe-the-data" class="nav-link" data-scroll-target="#describe-the-data">Describe the data</a></li>
+  <li><a href="#collinearity" id="toc-collinearity" class="nav-link" data-scroll-target="#collinearity">Collinearity</a></li>
   <li><a href="#identify-collinear-predictors" id="toc-identify-collinear-predictors" class="nav-link" data-scroll-target="#identify-collinear-predictors">Identify collinear predictors</a></li>
   <li><a href="#video-content-optional" id="toc-video-content-optional" class="nav-link" data-scroll-target="#video-content-optional">Video content (optional)</a></li>
   </ul></nav>
@@ -591,7 +592,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
   
 
-</header><div class="cell" data-hash="predictivefactors1_cache/html/setup_1e24782f1267b31ee9e8b54edd0b3c9b">
+</header><p>In this tutorial, we’ll continue with the data analysis. We’ll focus on an analysis of an NHANES data. This data contains over 1200 observations and 33 variables. These variables come in various types: numeric, categorical, and binary. Our primary goal is to fit a linear regression model to predict cholesterol levels.</p>
+<div class="cell" data-hash="predictivefactors1_cache/html/setup_1e24782f1267b31ee9e8b54edd0b3c9b">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://hbiostat.org/R/rms/">rms</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://hbiostat.org/R/Hmisc/">Hmisc</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -940,7 +942,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-</section><section id="identify-collinear-predictors" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="identify-collinear-predictors">Identify collinear predictors</h3>
+</section><section id="collinearity" class="level3"><h3 class="anchored" data-anchor-id="collinearity">Collinearity</h3>
+<p>Avoiding collinear variables can result in a more interpretable, stable, and efficient predictive model. Collinearity refers to a situation in which two or more predictor variables in a multiple regression model are highly correlated, meaning that one can be linearly predicted from the others with substantial accuracy. Collinearity poses several issues for predictive analysis:</p>
+<p><strong>Reduced Interpretability</strong>: When predictor variables are highly correlated, it becomes challenging to isolate the impact of individual predictors on the response variable. In other words, it is difficult to determine which predictor is genuinely influential in explaining variance in the response variable. This reduces the interpretability of the model.</p>
+<p><strong>Unstable Coefficients</strong>: Collinearity can lead to inflated standard errors of the regression coefficients. This means that the coefficients can be very sensitive to small changes in the data, making the model unstable and less generalizable to new, unseen data.</p>
+<p><strong>Overfitting</strong>: When predictors are collinear, the model is more likely to fit to the noise in the data rather than the actual signal. This is a manifestation of overfitting, where the model becomes too complex and captures random noise. Overfit models will perform poorly on new, unseen data.</p>
+<p><strong>Inefficiency</strong>: Including redundant variables (collinear variables) does not add additional information to the model. This could be inefficient, especially when dealing with large datasets, as it increases computational costs without improving model performance.</p>
+<section id="multicollinearity-diagnostics" class="level4"><h4 class="anchored" data-anchor-id="multicollinearity-diagnostics">Multicollinearity Diagnostics</h4>
+<p>Several techniques are available for diagnosing multicollinearity, including:</p>
+<ul>
+<li>Variance Inflation Factor (VIF)</li>
+<li>Eigenvalues and Eigenvectors of the correlation/covariance matrix</li>
+<li>Pairwise correlation matrices</li>
+</ul></section><section id="remedies" class="level4"><h4 class="anchored" data-anchor-id="remedies">Remedies</h4>
+<p>Some common ways to handle collinearity include:</p>
+<ul>
+<li>Removing one of the correlated predictors</li>
+<li>Combining correlated predictors into a single composite predictor</li>
+<li>Using regularization techniques like Ridge Regression, which can help handle collinearity by adding a penalty term</li>
+</ul></section></section><section id="identify-collinear-predictors" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="identify-collinear-predictors">Identify collinear predictors</h3>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -951,7 +971,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>We can use <code>hclust</code> and <code>varclus</code> or variable clustering, i.e., to identify collinear predictors</p>
+<p>We can also use <code>hclust</code> and <code>varclus</code> or variable clustering, i.e., to identify collinear predictors</p>
 </div>
 </div>
 

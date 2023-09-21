@@ -1,5 +1,7 @@
 ## Mediator {.unnumbered}
 
+Mediators play a crucial role in understanding how a treatment variable affects an outcome. A mediator variable lies in the pathway between the treatment and outcome, essentially transmitting or explaining the effect of the treatment variable. In this expanded tutorial, we'll delve into more details based on the lecture, specifically focusing on the true direct and indirect effects when a mediator is present.
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 library(simcausal)
@@ -14,6 +16,8 @@ Let us consider
 ### Non-null effect
 
 -   True treatment effect = 1.3
+
+Our true treatment effect is 1.3, and the mediator variable's effect on the outcome Y is 0.5. It's important to differentiate between these effects.
 
 #### Data generating process
 
@@ -54,6 +58,14 @@ round(coef(fit0),2)
 fit <- glm(Y ~ A + M, family="gaussian", data=Obs.Data)
 round(coef(fit),2)
 ```
+
+::: callout-important
+You might notice a total effect that could differ from the true effects. In the lecture example, a crude association showed an effect of 1.69, which is the total effect combining both direct and indirect pathways.
+
+Upon adjusting for M, the coefficients will show you the direct effect of A on Y and the indirect effect through M. These should align closely with our true effects: a direct effect of 1.3 and an indirect effect of 0.5.
+
+In this expanded tutorial, we've shown how essential it is to consider mediator variables when estimating treatment effects. We've also illustrated how adjusting for mediators allows you to differentiate between true direct and indirect effects, thereby reducing the risk of drawing incorrect conclusions from your data.
+::: 
 
 ### Null effect
 
@@ -98,3 +110,11 @@ round(coef(fit0),2)
 fit <- glm(Y ~ A + M, family="gaussian", data=Obs.Data)
 round(coef(fit),2)
 ```
+
+::: callout-important
+**Total Effect**: If you want to measure the "total effect" of a treatment on an outcome, then you typically don't adjust for the mediator. The reason is that the total effect captures both the direct effect of the treatment on the outcome and the indirect effect through the mediator.
+
+**Direct and Indirect Effects**: If you want to separate out the direct and indirect effects, then you would adjust for the mediator. In essence, when you control for the mediator, what remains is the direct effect of the treatment on the outcome.
+
+**Linearity and Decomposition**: In linear models with continuous outcomes, it is more straightforward to decompose total effects into direct and indirect effects. The mathematics get more complicated in non-linear models or when dealing with non-continuous outcomes.
+::: 

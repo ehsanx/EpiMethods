@@ -120,6 +120,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 }</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Binary outcome">
+<meta name="twitter:description" content="We focuse on statistical analysis and modeling of a binary outcome, cholesterol levels that are categorized as either “healthy” or “unhealthy.”">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked">
@@ -589,17 +590,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
   
 
-</header><div class="cell" data-hash="predictivefactors3_cache/html/setup_eea2fe1ba0e7c331782a49e142c5aa96">
+</header><p>We focuse on statistical analysis and modeling of a binary outcome, cholesterol levels that are categorized as either “healthy” or “unhealthy.”</p>
+<section id="explore-relationships-for-binary-outcome-variable" class="level3"><h3 class="anchored" data-anchor-id="explore-relationships-for-binary-outcome-variable">Explore relationships for binary outcome variable</h3>
+<div class="cell" data-hash="predictivefactors3_cache/html/setup_eea2fe1ba0e7c331782a49e142c5aa96">
 
 </div>
-<section id="explore-relationships-for-binary-outcome-variable" class="level3"><h3 class="anchored" data-anchor-id="explore-relationships-for-binary-outcome-variable">Explore relationships for binary outcome variable</h3>
 <section id="load-data" class="level4"><h4 class="anchored" data-anchor-id="load-data">Load data</h4>
 <div class="cell" data-hash="predictivefactors3_cache/html/load_e5fcadca6b3086b406f3fd8950b24a02">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part1.RData"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="creating-binary-variable" class="level4"><h4 class="anchored" data-anchor-id="creating-binary-variable">Creating binary variable</h4>
-<p>Let us create a binary variable using the <code>ifelse</code> function:</p>
+<p><strong>Binary categorization</strong>: The cholesterol variable is converted into a binary outcome (“healthy” or “unhealthy”) using the <code>ifelse</code> function based on a threshold value of 200.</p>
+<p><strong>Re-leveling</strong>: The reference category for the binary variable is changed to “unhealthy.”</p>
 <div class="cell" data-hash="predictivefactors3_cache/html/binary_f441bd4901779ec67b1677819004c21b">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Binary variable</span></span>
 <span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol</span> <span class="op">&lt;</span> <span class="fl">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span><span class="op">)</span></span>
@@ -618,6 +621,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </details>
 </div>
 </section><section id="modelling-data" class="level4"><h4 class="anchored" data-anchor-id="modelling-data">Modelling data</h4>
+<p>A logistic regression is fitted to predict the binary cholesterol outcome from multiple predictor variables.</p>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -718,7 +722,7 @@ Tip
 </details>
 </div>
 </section><section id="auc" class="level4"><h4 class="anchored" data-anchor-id="auc">AUC</h4>
-<p>Let us measure the accuracy for classification models fit5x.</p>
+<p>The Area Under the Receiver Operating Characteristic (ROC) Curve (AUC) is calculated to assess the model’s predictive performance. Let us measure the accuracy for classification models <code>fit5x</code>.</p>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -751,7 +755,7 @@ Tip
 </details>
 </div>
 </section><section id="re-modelling" class="level4"><h4 class="anchored" data-anchor-id="re-modelling">Re-modelling</h4>
-<p>Let us re-fit the model and measure the AUC:</p>
+<p>Let us re-fit the model and measure the AUC. VIF is calculated again for this new model.</p>
 <div class="cell" data-hash="predictivefactors3_cache/html/refit1_2db6b1cb635bb0ecc42223301566941c">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol.bin~gender + age + born + </span></span>
 <span><span class="st">             race + education + married + </span></span>
@@ -829,6 +833,7 @@ Tip
 <span><span class="co">#&gt; diabetes              1.200402  1        1.095629</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<p>The AUC for this new model is also calculated.</p>
 <div class="cell" data-hash="predictivefactors3_cache/html/auc2_92980eeca74734e218f0799160c02adb">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#### AUC</span></span>
 <span><span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit5</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>

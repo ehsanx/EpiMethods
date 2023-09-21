@@ -120,7 +120,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 }</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Confounding">
-<meta name="twitter:description" content="Big data: What if we had 1,000,000 (one million) observations? Would that give us true result? Let’s try to answer that using Directed acyclic graphs (DAGs).">
+<meta name="twitter:description" content="This tutorial aims to delve into the role of confounding variables in data analysis, especially in the context of big data.">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked">
@@ -590,12 +590,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
   
 
-</header><div class="cell" data-hash="confounding1_cache/html/setup_289c7c205d6a10e14ce878a31f6142a4">
+</header><p>This tutorial aims to delve into the role of confounding variables in data analysis, especially in the context of big data. We will examine each of these using simulations built on Directed Acyclic Graphs (DAGs). The objective is to understand whether a simple regression adjusting for the confounder variable can correctly estimate treatment effects in such a large sample.</p>
+<div class="cell" data-hash="confounding1_cache/html/setup_289c7c205d6a10e14ce878a31f6142a4">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># devtools::install_github('osofr/simcausal')</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/osofr/simcausal">simcausal</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Big data: <strong>What if we had 1,000,000 (one million) observations?</strong> Would that give us true result? Let’s try to answer that using Directed acyclic graphs (DAGs).</p>
+<p>Big data: <strong>What if we had 1,000,000 (one million) observations?</strong> Would that give us true result? Let’s try to answer that using DAGs.</p>
 <p>Let us consider</p>
 <ul>
 <li>L is continuous variable</li>
@@ -607,6 +608,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>True treatment effect = 1.3</li>
 </ul>
 <section id="data-generating-process" class="level4"><h4 class="anchored" data-anchor-id="data-generating-process">Data generating process</h4>
+<p>To perform the lab, we’ll need the <code>simcausal</code> R package. This package may not be available on CRAN but can be installed from the author’s GitHub page.</p>
 <div class="cell" data-hash="confounding1_cache/html/dgm1_51794aff5e4387535ce27ca31d30d579">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/osofr/simcausal">simcausal</a></span><span class="op">)</span></span>
 <span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/DAG.empty.html">DAG.empty</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -658,6 +660,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span><span class="co">#&gt; (Intercept)           A           L </span></span>
 <span><span class="co">#&gt;         0.0         1.3         0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In this case, our true treatment effect is 1.3. When we estimate the relationship between A and Y without adjusting for L, we obtain an estimated effect of 1.75. However, this is not the true effect. The true treatment effect of 1.3 is recovered when we adjust for L.</p>
+</div>
 </div>
 </section></section><section id="null-effect" class="level3"><h3 class="anchored" data-anchor-id="null-effect">Null effect</h3>
 <ul>
@@ -711,6 +726,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span><span class="co">#&gt; (Intercept)           A           L </span></span>
 <span><span class="co">#&gt;         0.0         0.0         0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In this second scenario, the true treatment effect is zero. There is no arrow from A to Y in the DAG, but L remains a common cause for both. Upon analyzing the data without adjusting for L, we observe an induced correlation between A and Y. This correlation disappears, confirming the true null effect, when we adjust for L.</p>
+</div>
 </div>
 </section></section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
 <div class="callout-tip callout callout-style-default callout-captioned">

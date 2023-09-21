@@ -1,5 +1,9 @@
 ## Binary outcome {.unnumbered}
 
+We focuse on statistical analysis and modeling of a binary outcome, cholesterol levels that are categorized as either "healthy" or "unhealthy." 
+
+### Explore relationships for binary outcome variable
+
 ```{r setup, warning=FALSE, echo=FALSE,cache=TRUE}
 # Load required packages
 library(rms)
@@ -9,8 +13,6 @@ library(car)
 library(pROC)
 ```
 
-### Explore relationships for binary outcome variable
-
 #### Load data
 
 ```{r load, warning=FALSE, cache=TRUE}
@@ -19,7 +21,9 @@ load(file = "Data/predictivefactors/cholesterolNHANES15part1.RData")
 
 #### Creating binary variable
 
-Let us create a binary variable using the `ifelse` function:
+**Binary categorization**: The cholesterol variable is converted into a binary outcome ("healthy" or "unhealthy") using the `ifelse` function based on a threshold value of 200. 
+
+**Re-leveling**: The reference category for the binary variable is changed to "unhealthy."
 
 ```{r binary, warning=FALSE, cache=TRUE}
 # Binary variable
@@ -33,6 +37,8 @@ table(analytic3$cholesterol.bin)
 ```
 
 #### Modelling data
+
+A logistic regression is fitted to predict the binary cholesterol outcome from multiple predictor variables.
 
 ::: callout-tip
 We use the `glm` function to run generalized linear models. The default family is gaussian with identity link. Setting binomial family with logit link (logit link is default for binomial family) means fitting logistic regression.
@@ -59,7 +65,7 @@ car::vif(fit5x)
 
 #### AUC
 
-Let us measure the accuracy for classification models fit5x.
+The Area Under the Receiver Operating Characteristic (ROC) Curve (AUC) is calculated to assess the model's predictive performance. Let us measure the accuracy for classification models `fit5x`.
 
 ::: callout-tip
 We can use the `roc` function to build a ROC curve and `auc` function to calculate the AUC (are under the ROC curve) value.
@@ -76,7 +82,7 @@ auc(rocobj)
 
 #### Re-modelling
 
-Let us re-fit the model and measure the AUC:
+Let us re-fit the model and measure the AUC. VIF is calculated again for this new model.
 
 ```{r refit1, warning=FALSE, cache=TRUE}
 formula5 <- as.formula("cholesterol.bin~gender + age + born + 
@@ -93,6 +99,8 @@ publish(fit5)
 # VIF
 car::vif(fit5)
 ```
+
+The AUC for this new model is also calculated.
 
 ```{r auc2, warning=FALSE, cache=TRUE}
 #### AUC

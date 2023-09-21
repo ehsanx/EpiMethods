@@ -1,5 +1,19 @@
 ## Continuous outcome {.unnumbered}
 
+Let us focus on issues related to predictive modeling for continuous outcomes in 4 steps:
+
+- Diagnosis Phase: Identifies outliers, leverage points, and residuals that could affect the model.
+
+- Cleaning Phase: Deletes problematic data based on predefined conditions.
+
+- Modeling Phase: Various models are fitted including polynomial models and a comprehensive model with multiple predictors.
+
+- Colinearity Check: A rule of thumb is used to check for multicollinearity in the comprehensive model, and problematic variables are flagged.
+
+### Explore relationships for continuous outcome variable
+
+First, load several R packages for statistical modeling, data manipulation, and visualization.
+
 ```{r setup, warning=FALSE, cache=TRUE, message=FALSE}
 # Load required packages
 library(rms)
@@ -11,9 +25,9 @@ library(corrplot)
 library(olsrr)
 ```
 
-### Explore relationships for continuous outcome variable
-
 #### Load data
+
+Here, a dataset is loaded into the R environment from an RData file.
 
 ```{r load, warning=FALSE, cache=TRUE}
 load(file = "Data/predictivefactors/cholesterolNHANES15.RData")
@@ -22,7 +36,7 @@ load(file = "Data/predictivefactors/cholesterolNHANES15.RData")
 #### Correlation plot
 
 ::: callout-tip
-We can use the `cor` function to see the correlation between numeric variables and then use the `corrplot` function to plot the `cor` object.
+We can use the `cor` function to see the correlation between numeric variables and then use the `corrplot` function to plot the `cor` object. The plot helps in understanding the linear or nonlinear relationships between different numerical variables.
 :::
 
 ```{r corr, warning=FALSE, cache=TRUE}
@@ -45,6 +59,8 @@ Let us examine the descriptive associations with the dependent variable by strat
 ::: callout-tip
 There are multiple ways to examine the descriptive associations by strata/groups, e.g., `summarize`, `aggregate`, `describeBy`, `tapply`, `summary`
 :::
+
+The code calculates and explores various ways to describe the cholesterol levels, stratified by key predictors such as gender.
 
 ```{r desc, warning=FALSE, cache=TRUE}
 mean(analytic$cholesterol)
@@ -91,7 +107,7 @@ plot(var.summ2)
 
 #### Regression: Linear regression
 
-We can also use regression analysis to examine the association:
+A linear regression model is fitted to explore the association between cholesterol levels and triglycerides. Various summary statistics are also generated for the model.
 
 ::: callout-tip
 We use `lm` function to fit the linear regression
@@ -122,6 +138,12 @@ plot(fit0, which = 1:6)
 
 ##### Identifying problematic data
 
+**Outliers**: We can begin by plotting cholesterol against triglycerides to visualize any potential outliers. We can then identify data points where triglycerides are high.
+
+**Leverage**: It calculates and plots leverage points. Leverage points that have values greater than 0.05 are isolated for inspection.
+
+**Residuals**: Studentized residuals are computed for each data point to identify potential outliers. Those with values less than -5 are identified.
+
 ```{r diag, warning=FALSE, cache=TRUE}
 require(olsrr)
 # Outlier
@@ -146,6 +168,8 @@ which(analytic2$rstudent.values < -5)
 
 ##### Deleting suspicious data
 
+We then delete observations based on two conditions: triglycerides > 1500 and leverage > 0.05.
+
 ```{r del, warning=FALSE, cache=TRUE}
 # condition 1: triglycerides above 1500 needs deleting
 analytic2b <- subset(analytic2, triglycerides < 1500)
@@ -160,6 +184,8 @@ nrow(analytic2)-nrow(analytic3)
 ```
 
 ##### Refitting in cleaned data
+
+We refit the linear model on this cleaned data, and diagnostic plots are generated.
 
 ```{r refit1, warning=FALSE, cache=TRUE}
 ### Re-fit in data analytic3 (without problematic data)
@@ -177,6 +203,8 @@ crPlots(fit0)
 ```
 
 ##### polynomial order 2
+
+We fit polynomial models of orders 2 and 3 to explore non-linear relationships between cholesterol and triglycerides.
 
 ```{r refit2, warning=FALSE, cache=TRUE}
 formula1 <- as.formula("cholesterol~poly(triglycerides,2)")
@@ -209,6 +237,8 @@ anova(fit1,fit2)
 
 ##### Multiple covariates
 
+We add more covariates.
+
 ```{r refit4, warning=FALSE, cache=TRUE}
 # include everything!
 formula3 <- as.formula("cholesterol~gender + age + born + 
@@ -224,6 +254,8 @@ publish(fit3)
 ```
 
 ##### Colinearity
+
+We finally check for multicollinearity among predictors using the Variance Inflation Factor (VIF). 
 
 ::: column-margin
 Rule of thumb: variables with VIF \> 4 needs further investigation

@@ -139,7 +139,7 @@ div.csl-indent {
 }</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Data spliting">
-<meta name="twitter:description" content="Load the data saved at the end of previous part of the lab.">
+<meta name="twitter:description" content="This section of the code is focused on a crucial aspect of model building: splitting your data into training and test sets to avoid overfitting.">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked slimcontent">
@@ -609,7 +609,10 @@ div.csl-indent {
   </div>
   
 
-</header><div class="cell" data-hash="predictivefactors5_cache/html/setup_06712d1ec447ea46ea85ad8a99e57376">
+</header><p>This section of the code is focused on a crucial aspect of model building: splitting your data into training and test sets to avoid overfitting. Overfitting occurs when your model learns the noise in the data, rather than the underlying trend. As a result, the model performs well on the training data but poorly on new, unseen data. To mitigate this, you often split your data.</p>
+<section id="load-data-anf-files" class="level3"><h3 class="anchored" data-anchor-id="load-data-anf-files">Load data anf files</h3>
+<p>Initially, several libraries are loaded to facilitate data manipulation and analysis.</p>
+<div class="cell" data-hash="predictivefactors5_cache/html/setup_06712d1ec447ea46ea85ad8a99e57376">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span></span>
@@ -618,13 +621,13 @@ div.csl-indent {
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://andrisignorell.github.io/DescTools/">DescTools</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<section id="load-data-anf-files" class="level3"><h3 class="anchored" data-anchor-id="load-data-anf-files">Load data anf files</h3>
-<p>Load the data saved at the end of previous part of the lab.</p>
+<p>Then, previously saved data related to cholesterol and other factors is loaded for further use.</p>
 <div class="cell" data-hash="predictivefactors5_cache/html/load_4818a058c8fa46d36f5f1acaff474bb1">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="data-spliting-to-avoid-model-overfitting" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="data-spliting-to-avoid-model-overfitting">Data spliting to avoid model overfitting</h3>
+<p>You start by setting a random seed to ensure that the random splitting of data is reproducible. A specified function is then used to partition the data, taking as arguments the outcome variable (cholesterol level in this case) and the percentage of data that you want to allocate to the training set (70% in this example).</p>
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p><span class="citation" data-cites="datasplit">KDnuggets (<a href="#ref-datasplit" role="doc-biblioref">2023</a>)</span></p>
@@ -641,7 +644,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>We can use the <code>createDataPartition</code> function to split a dataset into training and testing datasets</p>
+<p>We can use the <code>createDataPartition</code> function to split a dataset into training and testing datasets. The function will return the row indices that should go into the training set. These indices are stored in a variable, and its dimensions are displayed to provide an understanding of the size of the training set that will be created. Additionally, you can calculate what 70% of your entire dataset would look like to verify the approximation of the training data size, as well as what the remaining 30% (for the test set) would look like.</p>
 </div>
 </div>
 <div class="cell" data-hash="predictivefactors5_cache/html/split0_a0a863012ffce3cc1cd02cd77ae9441e">
@@ -666,7 +669,7 @@ Tip
 </details>
 </div>
 <section id="split-the-data" class="level4"><h4 class="anchored" data-anchor-id="split-the-data">Split the data</h4>
-<p>Now let us split the dataset into training and testing:</p>
+<p>After determining how to partition the data, the next step is to actually create the training and test datasets. The indices are used to subset the original dataset into these two new datasets. The dimensions of each dataset are displayed to confirm their sizes.</p>
 <div class="cell" data-hash="predictivefactors5_cache/html/split1_003555c25f95cde25fee0520e52eaf63">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create train data</span></span>
 <span><span class="va">train.data</span> <span class="op">&lt;-</span> <span class="va">analytic3</span><span class="op">[</span><span class="va">split</span>,<span class="op">]</span></span>
@@ -681,6 +684,7 @@ Tip
 </div>
 <p>Our next task is to fit the model (e.g., linear regression) on the training set and evaluate the performance on the test set.</p>
 </section><section id="train-the-model" class="level4"><h4 class="anchored" data-anchor-id="train-the-model">Train the model</h4>
+<p>Once the training dataset is created, you can proceed to train the model using the training data. A previously defined formula containing the predictor variables is used in a linear regression model. After fitting the model, a summary is generated to display key statistics that help in evaluating the model’s performance.</p>
 <div class="cell" data-hash="predictivefactors5_cache/html/split2_fdc34d0fa3130aa7382df06f24390322">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula4</span></span>
 <span><span class="co">#&gt; cholesterol ~ gender + age + born + race + education + married + </span></span>
@@ -738,6 +742,7 @@ Tip
 </details>
 </div>
 </section><section id="extract-performance-measures" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="extract-performance-measures">Extract performance measures</h4>
+<p>You can use a saved function to measure the performance of the trained model. The function will return performance metrics like R-squared, RMSE, etc. This function is applied not just on the training data but also on the test data, the full dataset, and a separate, fictitious dataset.</p>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -774,6 +779,7 @@ Tip
 <span><span class="co">#&gt; [1,] 41453.55</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<p>Evaluating the model’s performance on the test data provides insights into how well the model will generalize to new, unseen data. Comparing the performance metrics across different datasets can give you a robust view of your model’s predictive power and reliability.</p>
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>For more on model training and tuning, see <span class="citation" data-cites="tuning">Kuhn (<a href="#ref-tuning" role="doc-biblioref">2023b</a>)</span></p>

@@ -139,7 +139,7 @@ div.csl-indent {
 }</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Cross-vaildation">
-<meta name="twitter:description" content="Load the data saved at the end of previous part of the lab.">
+<meta name="twitter:description" content="Cross-validation is another important technique used to assess the performance of machine learning models and mitigate the risk of overfitting.">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked slimcontent">
@@ -609,7 +609,8 @@ div.csl-indent {
   </div>
   
 
-</header><div class="cell" data-hash="predictivefactors6_cache/html/setup_4b9b4893631f4691322de6d7dafdb8cd">
+</header><p>Cross-validation is another important technique used to assess the performance of machine learning models and mitigate the risk of overfitting. This tutorial focuses on k-fold cross-validation as a strategy to obtain a more generalized and robust assessment of the model’s performance. It shows both manual calculations for individual folds and an automated approach using the caret package. This ensures that you aren’t simply fitting your model well to a specific subset of your data but are achieving good performance in a general sense.</p>
+<div class="cell" data-hash="predictivefactors6_cache/html/setup_4b9b4893631f4691322de6d7dafdb8cd">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span></span>
@@ -628,7 +629,9 @@ div.csl-indent {
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="Cross-validation">Wikipedia (<a href="#ref-Cross-validation" role="doc-biblioref">2023</a>)</span></p>
-</div></div><div class="cell" data-hash="predictivefactors6_cache/html/kcv_17a8ae6fd6dce294c793fca27850422f">
+</div></div><p>We can set the number of folds to 5 (k = 5). A random seed is used for reproducibility. We use the function <code>createFolds</code> to create the folds. The data is divided based on the cholesterol levels, with each fold having approximately equal numbers of data points. The resulting structure contains training indices for each fold.</p>
+<p>We can also examine the approximate size of training and test sets for each fold. The dimensions are displayed to understand the partitioning, and you can examine the length of indices in each fold to confirm the size of the training sets.</p>
+<div class="cell" data-hash="predictivefactors6_cache/html/kcv_17a8ae6fd6dce294c793fca27850422f">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">k</span> <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2632   35</span></span>
@@ -672,6 +675,7 @@ div.csl-indent {
 </details>
 </div>
 <section id="calculation-for-fold-1" class="level4"><h4 class="anchored" data-anchor-id="calculation-for-fold-1">Calculation for Fold 1</h4>
+<p>The first fold is used as an example. The indices for the training data in the first fold are extracted and used to subset the main data set into training and test sets for that fold. Then a linear regression model is fitted using the training data, and predictions are made on the test set. The model’s performance is evaluated using the same performance function as before.</p>
 <div class="cell" data-hash="predictivefactors6_cache/html/fold1_7dc2a8acee962352a5e186fd98df5661">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fold.index</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">fold1.train.ids</span> <span class="op">&lt;-</span> <span class="va">folds</span><span class="op">[[</span><span class="va">fold.index</span><span class="op">]</span><span class="op">]</span></span>
@@ -698,6 +702,7 @@ div.csl-indent {
 </details>
 </div>
 </section><section id="calculation-for-fold-2" class="level4"><h4 class="anchored" data-anchor-id="calculation-for-fold-2">Calculation for Fold 2</h4>
+<p>The same process is repeated for the second fold. This way, you can manually evaluate how the model performs on different subsets of the data, making the performance assessment more robust.</p>
 <div class="cell" data-hash="predictivefactors6_cache/html/fold2_74a4288b48b0eaea3b24855d5b6b0444">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fold.index</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
 <span><span class="va">fold1.train.ids</span> <span class="op">&lt;-</span> <span class="va">folds</span><span class="op">[[</span><span class="va">fold.index</span><span class="op">]</span><span class="op">]</span></span>
@@ -721,7 +726,10 @@ div.csl-indent {
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="tuning">Kuhn (<a href="#ref-tuning" role="doc-biblioref">2023</a>)</span></p>
-</div></div><div class="cell" data-hash="predictivefactors6_cache/html/caret_dbf351776068f4ad6ae5db668fbd4e42">
+</div></div><p>Instead of manually running the process for each fold, the caret package can be used to automate k-fold cross-validation. A control object is set up specifying that 5-fold cross-validation should be used. Then, the train function from the caret package can be used to fit the linear regression model on each fold.</p>
+<p>After fitting, you can access summary results for each fold in the resampling results. This summary provides performance metrics such as R-squared for each fold. You can calculate the mean and standard deviation of these metrics to get an overall sense of the model’s performance.</p>
+<p>Additionally, an adjusted R-squared can be calculated to consider the number of predictors in the model, giving a more accurate sense of the model’s explanatory power when you have multiple predictors.</p>
+<div class="cell" data-hash="predictivefactors6_cache/html/caret_dbf351776068f4ad6ae5db668fbd4e42">
 <details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Using Caret package</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">567</span><span class="op">)</span></span>
 <span></span>

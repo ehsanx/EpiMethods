@@ -1,9 +1,14 @@
 ## Collider {.unnumbered}
 
+In causal inference, understanding the role of colliders is crucial. A collider is a variable that is a common effect of two or more variables. Adjusting for a collider can introduce bias into your estimates. 
+
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 library(simcausal)
 ```
+
+In a DAG, a collider is a variable influenced by two or more other variables. In our case, L is a collider because it is affected by both A (the treatment) and Y (the outcome). When you adjust for a collider like L, you could introduce bias into your estimates, as demonstrated in the examples below.
 
 Let us consider
 
@@ -54,6 +59,11 @@ fit <- glm(Y ~ A + L, family="gaussian", data=Obs.Data)
 round(coef(fit),2)
 ```
 
+::: callout-important
+When not adjusting for L, we recover the true effect close to 1.3. Adjusting for L introduces bias, making the estimate unreliable.
+::: 
+
+
 ### Null effect
 
 -   True treatment effect = 0
@@ -96,5 +106,10 @@ round(coef(fit0),2)
 fit <- glm(Y ~ A + L, family="gaussian", data=Obs.Data)
 round(coef(fit),2)
 ```
+
+::: callout-important
+When the true effect is null, not adjusting for L shows an estimate close to zero. Adjusting for L moves the estimate away from the null value, introducing bias.
+::: 
+
 
 Even 1,000,000 observations were not enough to recover true treatment effect! But we are close enough.

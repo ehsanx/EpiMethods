@@ -1,5 +1,7 @@
 ## Bootstrap {.unnumbered}
 
+The document appears to be a tutorial or lab exercise on bootstrapping methods, mainly using R for statistical computing.
+
 ```{r setup, warning=FALSE, message=FALSE,cache=TRUE}
 # Load required packages
 library(caret)
@@ -18,6 +20,8 @@ load(file="Data/predictivefactors/cholesterolNHANES15part2.RData")
 ```
 
 ### Resampling a vector
+
+Here, the document introduces basic resampling of a simple vector. The code creates a new sample using the `sample` function with replacement. It also discusses "out-of-bag" samples which are the samples not chosen during the resampling.
 
 ```{r vector, warning=FALSE, cache=TRUE}
 fake.data <- 1:5
@@ -45,6 +49,8 @@ for (i in 1:B){
 ```
 
 ### Calculating SD of a statistics
+
+We introduce the concept of calculating confidence intervals (CIs) using bootstrapping when the distribution of data is not known. It uses resampling to create multiple bootstrap samples, then calculates means and standard deviations (SD) for those samples.
 
 Idea:
 
@@ -91,6 +97,8 @@ hist(B.medians)
 
 ### Resampling a data or matrix
 
+We show how to resample a data frame or a matrix, and how to identify which rows have been selected and which haven't, introducing the concept of "out-of-bag samples" for matrices.
+
 ```{r mat, warning=FALSE, cache=TRUE}
 analytic.mini <- head(analytic)
 kable(analytic.mini[,1:3])
@@ -122,7 +130,7 @@ analytic.mini$ID[!(analytic.mini$ID %in% selected.subjects)]
 
 ### The caret package / boot
 
-Usually B = 200 or 500 is recommended, but we will do 50 for the lab (to save time).
+Usually B = 200 or 500 is recommended, but we will do 50 for the lab (to save time). We introduce the `trainControl` and `train` functions from the caret package. It sets up a linear model and demonstrates how bootstrapping can be done to estimate the variability in R-squared, a measure of goodness-of-fit for the model.
 
 ```{r b206, cache= TRUE}
 set.seed(234)
@@ -138,6 +146,8 @@ sd(fit4.boot2$resample$Rsquared)
 
 ### Method boot632
 
+A specific bootstrapping method called "boot632", which aims to reduce bias but can provide unstable results if the sample size is small.
+
 ```{r b2, cache= TRUE}
 ctrl<-trainControl(method = "boot632", number = 50)
 fit4.boot2b<-train(formula4, trControl = ctrl,
@@ -150,6 +160,8 @@ sd(fit4.boot2b$resample$Rsquared)
 ```
 
 ### Method boot632 for stepwise
+
+We discuss the use of stepwise regression models in conjunction with the "boot632" method. It highlights the trade-offs and explains that models could be unstable depending on the data.
 
 #### A stable model
 
@@ -188,6 +200,8 @@ sd(fit4.boot2b$resample$Rsquared)
 Note that SD should be higher for larger B.
 
 ### Optimism corrected bootstrap
+
+We discuss a specific type of bootstrap called the "Optimism corrected bootstrap". It's a way to adjust performance metrics for the optimism that is often present when a model is tested on the data used to create it.
 
 ::: column-margin
 See @Bootstrap
@@ -254,6 +268,8 @@ R2x
 
 ### Binary outcome
 
+Here, bootstrapping and cross-validation are used for a logistic regression model. It calculates the Area Under the Receiver Operating Characteristic Curve (AUC-ROC), a measure for the performance of classification models.
+
 AUC from Receiver Operating Characteristic (ROC) = Measure of accuracy for classification models.
 
 AUC = 1 (perfect classification) AUC = 0.5 (random classification)
@@ -295,6 +311,8 @@ fit5.cv$resample
 mean(fit5.cv$resample$ROC)
 sd(fit5.cv$resample$ROC)
 ```
+
+Brier Score is another metric for evaluating the performance of binary classification models.
 
 ```{r brier, warning=FALSE, cache=TRUE}
 require(DescTools)
