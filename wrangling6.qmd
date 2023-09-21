@@ -1,0 +1,215 @@
+## R Markdown {.unnumbered}
+
+::: callout-important
+**Exercises in RMD**:
+
+The exercises for this tutorial come in R Markdown format and are provided as zip files in the relevant chapters. This provides you the advantage of seamlessly integrating code, outputs, and narrative text into a single document. You can then easily "knit" (the process of converting your R Markdown file into a finalized document) this file into various formats like PDF or Word (DOC / DOCX), which are widely used for academic or professional submissions. This makes it simpler for you to submit your exercises in a neat, organized manner, without the hassle of copying code or outputs from one platform and pasting them into another.
+:::
+
+## Introduction
+
+Welcome to this tutorial on working with RMD files in RStudio! RStudio is an **IDE** that makes R programming easier and more efficient, while R Markdown (RMD) is a file format that enables you to create dynamic reports with R code and narrative text. Using R Markdown within RStudio allows you to compile your analyses and reports into a single, easily shareable document in multiple formats like HTML, PDF, or Word.
+
+::: {.column-margin}
+RStudio is an Integrated Development Environment (IDE), which is a software application that provides comprehensive facilities for software development. An IDE typically includes a text editor, tools for building and running code, and debugging utilities.
+:::
+
+## Prerequisites
+
+Before starting this tutorial, make sure you have both R and RStudio installed on your computer, as explaied in an [earlier tutorial](wrangling1a.html). 
+
+
+## Knitting RMD
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document shows how to work with an RMD file. We can create dynamic documents, e.g., a document with simple plain text combined with R code and its outputs. Note that RMD files are designed to be used with the R package `rmarkdown`. In RStudio IDE, the `rmarkdown` package could be already installed.
+
+```{r rmd0}
+# install.packages("rmarkdown")
+```
+
+### Open on RStudio
+
+Let us open an RMD file in RStudio. From the file menu (on the side), we can create a new RMD document. First, we need to click on the `+` symbol to create a new file, as follows:
+
+```{r rmd1, echo=FALSE, fig.align='center', out.width = '60%'}
+knitr::include_graphics("Images/wrangling/openrmd1.png")
+```
+
+Second, we need to click `R markdown...` to create a new RMD document as follows:
+
+```{r rmd2, echo=FALSE, fig.align='center', out.width = '60%'}
+knitr::include_graphics("Images/wrangling/openrmd2.png")
+```
+
+We will see a pop-up window as follows:
+
+```{r rmd3, echo=FALSE, fig.align='center', out.width = '70%'}
+knitr::include_graphics("Images/wrangling/openrmd3.png")
+```
+
+We can select whether we want to convert our RMD file to an `HTML`, `PDF`, or a `Word` document. These options can also be selected later. Let us select the default option (HTML) and press OK. We will see the markdown file as shown in the picture below:
+
+```{r rmd4, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/openrmd4.png")
+```
+
+### Knit
+
+We use the `knit` option to create a document (e.g., making a PDF, HTML, or Word document) from the RMD file. Before knitting, we need to save the file. Let us save the file as **working.RMD**. After saving the file, we can knit it by clicking on the `knit` option, as shown below:
+
+::: {.column-margin} 
+The term "knit" may sound a bit strange in the context of programming. However, it aptly describes the process of combining your R code and narrative text to produce a cohesive, final document. Think of it as "weaving" your code and text together into various output formats like HTML, PDF, or Word.
+:::
+
+
+```{r rmd5, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/knit1.png")
+```
+
+Once we knit the file, it will produce an `HTML` output, since our default option was HTML.
+
+```{r rmd6, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/knit2.png")
+```
+
+For formats other than `HTML` (e.g., `PDF` or `Word`), we can click on the dropdown menu:
+
+```{r rmd7, echo=FALSE, fig.align='center', out.width = '80%'}
+knitr::include_graphics("Images/wrangling/knit3.png")
+```
+
+Let us select `Knit to Word` and knit it. Once the file is rendered, RStudio will show us a preview of the output in a word file and save the file in our **working directory**. We can also see that `Word` is added as another output:
+
+::: {.column-margin} 
+When you're working in RStudio, all your files and outputs will be saved in a 'working directory.' This is simply the folder on your computer where RStudio will look for files and save outputs. To find out what your current working directory is, you can run the command `getwd()` in the R console.
+::: 
+
+```{r rmd8, echo=FALSE, fig.align='center', out.width = '80%'}
+knitr::include_graphics("Images/wrangling/knit4.png")
+```
+
+In the R terminal, we can see that a `Word` document is created, which is stored in our working directory:
+
+```{r rmd9, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/knit5.png")
+```
+
+Similarly, we can create a pdf by clicking `Knit to PDF` option from the `Knit` menu. However, we could see an error message as follows:
+
+```{r rmd10, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/knit6.png")
+```
+
+It is important to note that RStudio does not build PDF documents from scratch. If we want to create PDF documents using RMD, we must have a LaTeX distribution installed on our computer. There are several options for LaTeX distributions, including MiKTeX, MacTeX, TeX Live, and so on. However, the recommended option for R Markdown users is TinyTeX. We can install TinyTeX using the R package `tinytex`. To install the package, run the following command: `install.packages("tinytex")`.
+
+::: {.column-margin} 
+LaTeX is a typesetting system commonly used for technical and scientific documentation. It is required for converting R Markdown documents to PDF format because it provides the text formatting commands that the `rmarkdown` package uses behind the scenes.
+::: 
+
+
+```{r rmd11, echo=FALSE, fig.align='center', out.width = '80%'}
+knitr::include_graphics("Images/wrangling/knit7.png")
+```
+
+Once the `tinytex` package installation is complete, we can type `tinytex::install_tinytex()` to install the LaTeX distribution on our computer.
+
+```{r rmd12, echo=FALSE, fig.align='center', out.width = '80%'}
+knitr::include_graphics("Images/wrangling/knit8.png")
+```
+
+TinyTeX is a large package (\~123 MB). The installation time will vary depending on your machine. Once the installation is complete, we can click `Knit to PDF`. Similar to the Word file, RStudio will display a preview of the PDF output and save the PDF in our working directory. We will also see that a PDF file has been created:
+
+```{r rmd13, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/knit9.png")
+```
+
+### Working with RMD
+
+Now we are ready to start writing plain text intermixed with embedded R code. For plain text, we can use the whitespace:
+
+```{r rmd14, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/work1.png")
+```
+
+On the other hand, to embed a chunk of R code into our report, we use R code chunks. An R chunk surrounds the code with two lines that each contain three backticks. After the first set of backticks, we include `{r}`, which alerts `knitr` that we are going to include a chunk of R code:
+
+::: {.column-margin} 
+Code chunks are segments of code that are contained within an R Markdown document. They allow you to run R code within the document itself, making your report dynamic and reproducible. 
+:::
+
+```{r rmd15, echo=FALSE, fig.align='center', out.width = '80%'}
+knitr::include_graphics("Images/wrangling/work2.png")
+```
+
+Below are some codes:
+
+```{r rmd16, echo=FALSE, fig.align='center', out.width = '45%'}
+knitr::include_graphics("Images/wrangling/work3.png")
+```
+
+We can knit the file to see the document, which will include plain text, R code, and outputs from the R code. We can also see the output from a code chunk without knitting the entire file. For example, we can click the arrow on the right-hand side to execute the current code chunk:
+
+```{r rmd17, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/work4.png")
+```
+
+Now we can see the following outputs:
+
+```{r rmd18, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/work5.png")
+```
+
+Please also explore the drop down menu under `Run` to see the further options, including run the current code chunk, run all code chunk above, etc.
+
+```{r rmd19, echo=FALSE, fig.align='center', out.width = '70%'}
+knitr::include_graphics("Images/wrangling/work6.png")
+```
+
+To omit the code from the final report while still including the results, add the argument `echo = FALSE`. This will place a copy of the results into your report.
+
+::: {.column-margin} 
+Besides `echo = FALSE`, there are several other options you can include in your code chunks to control their behavior, like `eval = FALSE` if you don't want to evaluate the code, or `message = FALSE` to hide messages. Take a look at the author's page of comprehensive [list of chunk options](https://yihui.name/knitr/options/).
+:::
+
+In the final report (e.g., Word or PDF), we often want to omit the code and only show the outputs. To do this, we can add the argument `echo = FALSE` in the R code chunk:
+
+```{r rmd20, echo=FALSE, fig.align='center', out.width = '50%'}
+knitr::include_graphics("Images/wrangling/work7.png")
+```
+
+The resulting output will look as follows:
+
+```{r rmd21, echo=FALSE, fig.align='center', out.width = '90%'}
+knitr::include_graphics("Images/wrangling/work8.png")
+```
+
+## Tips and Troubleshooting
+
+- If the `knit` button is grayed out, make sure you have saved your RMD file first.
+- Encountering LaTeX errors? Make sure you've installed a LaTeX distribution like TinyTeX.
+
+
+::: callout-tip
+The following links could also be useful if you want to learn more:
+
+-   [R Markdown Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+-   [Introduction to R Markdown](https://rmarkdown.rstudio.com/articles_intro.html)
+-   [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+-   [Reports with R Markdown](https://epirhandbook.com/en/reports-with-r-markdown.html)
+::: 
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/DWxDWyqWnX0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
