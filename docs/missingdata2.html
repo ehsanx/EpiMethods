@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>OER: Advanced Epidemiological Methods - Imputation in NHANES</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./missingdata3.html" rel="next">
+<link href="./missingdata1.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
+</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Imputation in NHANES">
+<meta name="twitter:description" content="This tutorial provides a comprehensive guide on handling and analyzing complex survey data with missing values.">
+<meta name="twitter:card" content="summary">
+</head>
+<body class="nav-sidebar docked">
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Imputation in NHANES</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">OER: Advanced Epidemiological Methods</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Data accessing</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing results</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise (A)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link active">Imputation in NHANES</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">MCAR tests</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Reporting guidelines</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">R functions (G)</a>
+  </div>
+</li>
+      </ul>
+</li>
+    </ul>
+</div>
+</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#complex-survey-data" id="toc-complex-survey-data" class="nav-link active" data-scroll-target="#complex-survey-data">Complex Survey data</a></li>
+  <li><a href="#imputing" id="toc-imputing" class="nav-link" data-scroll-target="#imputing">Imputing</a></li>
+  <li><a href="#create-new-variable" id="toc-create-new-variable" class="nav-link" data-scroll-target="#create-new-variable">Create new variable</a></li>
+  <li><a href="#checking-the-data" id="toc-checking-the-data" class="nav-link" data-scroll-target="#checking-the-data">Checking the data</a></li>
+  <li><a href="#combining-data" id="toc-combining-data" class="nav-link" data-scroll-target="#combining-data">Combining data</a></li>
+  <li><a href="#combining-data-efficiently" id="toc-combining-data-efficiently" class="nav-link" data-scroll-target="#combining-data-efficiently">Combining data efficiently</a></li>
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link" data-scroll-target="#logistic-regression">Logistic regression</a></li>
+  <li><a href="#pooled-averaged-estimates" id="toc-pooled-averaged-estimates" class="nav-link" data-scroll-target="#pooled-averaged-estimates">Pooled / averaged estimates</a></li>
+  <li><a href="#step-by-step-example" id="toc-step-by-step-example" class="nav-link" data-scroll-target="#step-by-step-example">Step-by-step example</a></li>
+  <li><a href="#variable-selection" id="toc-variable-selection" class="nav-link" data-scroll-target="#variable-selection">Variable selection</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Imputation in NHANES</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header><p>This tutorial provides a comprehensive guide on handling and analyzing complex survey data with missing values. In analyzing complex survey data, a distinct approach is required compared to handling regular datasets. Specifically, the intricacies of survey design necessitate the consideration of primary sampling units/cluster, sampling weights, and stratification factors. These elements ensure that the analysis accurately reflects the survey’s design and the underlying population structure. Recognizing and incorporating these factors is crucial for obtaining valid and representative insights from the data. As we delve into this tutorial, we’ll explore how to effectively integrate these components into our missing data analysis process.</p>
+<section id="complex-survey-data" class="level3"><h3 class="anchored" data-anchor-id="complex-survey-data">Complex Survey data</h3>
+<p>In the initial chunk, we load all the necessary libraries that will be used throughout the tutorial. These libraries provide functions and tools for data exploration, visualization, imputation, and analysis.</p>
+<div class="cell" data-hash="missingdata2_cache/html/setup_20c901c565d73549aae622c68e177d34">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/amices/mice">mice</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://boxuancui.github.io/DataExplorer/">DataExplorer</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/statistikat/VIM">VIM</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://jtools.jacob-long.com">jtools</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://r-survey.r-forge.r-project.org/survey/">survey</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">mitools</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Next, we load a dataset that contains survey data with some missing values. We then select specific columns or variables from this dataset that we are interested in analyzing. To understand the extent and pattern of missingness in our data, we visualize it and display the missing data pattern.</p>
+<div class="cell" data-hash="missingdata2_cache/html/load_a303e5a5f842b53a8af3e689fcc914a6">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"Data/missingdata/NHANES17.RData"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">Vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"weight"</span>, <span class="st">"psu"</span>, <span class="st">"strata"</span>, </span>
+<span>          <span class="st">"gender"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, </span>
+<span>          <span class="st">"bmi"</span>, <span class="st">"cholesterol"</span>, <span class="st">"diabetes"</span><span class="op">)</span></span>
+<span><span class="va">analyticx</span> <span class="op">&lt;-</span> <span class="va">analytic.with.miss</span><span class="op">[</span>,<span class="va">Vars</span><span class="op">]</span></span>
+<span><span class="fu"><a href="http://boxuancui.github.io/DataExplorer/reference/plot_missing.html">plot_missing</a></span><span class="op">(</span><span class="va">analyticx</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="missingdata2_files/figure-html/load-1.png" class="img-fluid" width="672"></p>
+</div>
+<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://amices.org/mice/reference/md.pattern.html">md.pattern</a></span><span class="op">(</span><span class="va">analyticx</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="missingdata2_files/figure-html/load-2.png" class="img-fluid" width="672"></p>
+</div>
+<pre><code>#&gt;      ID weight psu strata gender race born diabetes  bmi cholesterol     
+#&gt; 6636  1      1   1      1      1    1    1        1    1           1    0
+#&gt; 1364  1      1   1      1      1    1    1        1    1           0    1
+#&gt; 97    1      1   1      1      1    1    1        1    0           1    1
+#&gt; 795   1      1   1      1      1    1    1        1    0           0    2
+#&gt; 4     1      1   1      1      1    1    1        0    1           1    1
+#&gt; 357   1      1   1      1      1    1    1        0    0           0    3
+#&gt; 1     1      1   1      1      1    1    0        1    1           1    1
+#&gt;       0      0   0      0      0    0    1      361 1249        2516 4127</code></pre>
+</div>
+</section><section id="imputing" class="level3"><h3 class="anchored" data-anchor-id="imputing">Imputing</h3>
+<p>In the following chunk, we address the missing data by performing multiple imputations. This means that instead of filling in each missing value with a single estimate, we create multiple versions (datasets) where each missing value is filled in differently based on a specified algorithm. This helps in capturing the uncertainty around the missing values. The chunk sets up the parameters for multiple imputations, ensuring reproducibility and efficiency, and then performs the imputations on the dataset with missing values.</p>
+<div class="cell" data-hash="missingdata2_cache/html/imp_f2fa5fee922be99ede575dbf32866e4b">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># imputation &lt;- mice(analyticx, m=5, maxit=5, seed = 504007)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">504</span><span class="op">)</span></span>
+<span><span class="va">imputation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://amices.org/mice/reference/parlmice.html">parlmice</a></span><span class="op">(</span><span class="va">analyticx</span>, m<span class="op">=</span><span class="fl">5</span>, maxit<span class="op">=</span><span class="fl">5</span>, cluster.seed<span class="op">=</span><span class="fl">504007</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ul>
+<li>
+<strong>Data Input</strong>: The primary input for the imputation function is the dataset with missing values. This dataset is what we aim to impute.</li>
+<li>
+<strong>Number of Imputations</strong>: The option <code>m=5</code> indicates that we want to create 5 different imputed datasets. Each of these datasets will have the missing values filled in slightly differently, based on the underlying imputation algorithm and the randomness introduced.</li>
+<li>
+<strong>Maximum Iterations</strong>: The imputation process is iterative, meaning it refines its estimates over several rounds. The option <code>maxit=5</code> specifies that the algorithm should run for a maximum of 5 iterations. This helps in achieving more accurate imputations, especially when the missing data mechanism is complex.</li>
+<li>
+<strong>Setting Seed</strong>: In computational processes that involve randomness, it’s often useful to set a “seed” value. This ensures that the random processes are reproducible. If you run the imputation multiple times with the same seed, you’ll get the same results each time. Two seed values are set in the chunk: one using the general <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> function and another specifically for the imputation function as <code>cluster.seed</code>.</li>
+<li>
+<strong>Parallel Processing</strong>: The function <code>parlmice</code> used for imputation indicates that the imputations are done in parallel. This means that instead of imputing one dataset after the other, the function tries to impute multiple datasets simultaneously (if the computational resources allow). This can speed up the process, especially when dealing with large datasets or when creating many imputed datasets.</li>
+</ul></section><section id="create-new-variable" class="level3"><h3 class="anchored" data-anchor-id="create-new-variable">Create new variable</h3>
+<p>After imputation, we might want to create new variables or modify existing ones to better suit our analysis. Here, we transform one of the variables into a binary category based on a threshold. This can help in simplifying the analysis or making the results more interpretable.</p>
+<div class="cell" data-hash="missingdata2_cache/html/newvar_fc78171edf1b171b2f6385b297ce4c6d">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">impdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html">complete</a></span><span class="op">(</span><span class="va">imputation</span>, action<span class="op">=</span><span class="st">"long"</span><span class="op">)</span> <span class="co">#stacked data</span></span>
+<span><span class="va">impdata</span><span class="op">$</span><span class="va">cholesterol.bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">impdata</span><span class="op">$</span><span class="va">cholesterol</span> <span class="op">&lt;</span> <span class="fl">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span><span class="op">)</span></span>
+<span><span class="va">impdata</span><span class="op">$</span><span class="va">cholesterol.bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">impdata</span><span class="op">$</span><span class="va">cholesterol.bin</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">impdata</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 46270    13</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">impdata</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":[".imp"],"name":[1],"type":["int"],"align":["right"]},{"label":[".id"],"name":[2],"type":["int"],"align":["right"]},{"label":["ID"],"name":[3],"type":["int"],"align":["right"]},{"label":["weight"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["psu"],"name":[5],"type":["fct"],"align":["left"]},{"label":["strata"],"name":[6],"type":["fct"],"align":["left"]},{"label":["gender"],"name":[7],"type":["chr"],"align":["left"]},{"label":["born"],"name":[8],"type":["chr"],"align":["left"]},{"label":["race"],"name":[9],"type":["chr"],"align":["left"]},{"label":["bmi"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["cholesterol"],"name":[11],"type":["int"],"align":["right"]},{"label":["diabetes"],"name":[12],"type":["chr"],"align":["left"]},{"label":["cholesterol.bin"],"name":[13],"type":["fct"],"align":["left"]}],"data":[{"1":"1","2":"1","3":"93703","4":"8539.731","5":"2","6":"145","7":"Female","8":"Born in 50 US states or Washingt","9":"Other","10":"17.5","11":"160","12":"No","13":"healthy","_rn_":"1"},{"1":"1","2":"2","3":"93704","4":"42566.615","5":"1","6":"143","7":"Male","8":"Born in 50 US states or Washingt","9":"White","10":"15.7","11":"186","12":"No","13":"healthy","_rn_":"2"},{"1":"1","2":"3","3":"93705","4":"8338.420","5":"2","6":"145","7":"Female","8":"Born in 50 US states or Washingt","9":"Black","10":"31.7","11":"157","12":"No","13":"healthy","_rn_":"3"},{"1":"1","2":"4","3":"93706","4":"8723.440","5":"2","6":"134","7":"Male","8":"Born in 50 US states or Washingt","9":"Other","10":"21.5","11":"148","12":"No","13":"healthy","_rn_":"4"},{"1":"1","2":"5","3":"93707","4":"7064.610","5":"1","6":"138","7":"Male","8":"Born in 50 US states or Washingt","9":"Other","10":"18.1","11":"189","12":"No","13":"healthy","_rn_":"5"},{"1":"1","2":"6","3":"93708","4":"14372.489","5":"2","6":"138","7":"Female","8":"Others","9":"Other","10":"23.7","11":"209","12":"Yes","13":"unhealthy","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section><section id="checking-the-data" class="level3"><h3 class="anchored" data-anchor-id="checking-the-data">Checking the data</h3>
+<p>After imputation, it’s crucial to ensure that the imputed data maintains the integrity and structure of the original dataset. The following chunks are designed to help you visually and programmatically inspect the imputed data.</p>
+<p><strong>Visual Inspection of Missing Data</strong>:</p>
+<p>In this chunk, we visually inspect the imputed datasets to see if there are any remaining missing values. We specifically look at the first two imputed datasets. Visualization tools like these can quickly show if the imputation process was successful in filling all missing values.</p>
+<div class="cell" data-hash="missingdata2_cache/html/check1_4e7e03743d06307610061ec3f66afbed">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="http://boxuancui.github.io/DataExplorer/reference/plot_missing.html">plot_missing</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="missingdata2_files/figure-html/check1-1.png" class="img-fluid" width="672"></p>
+</div>
+<details><summary>Show the code</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="http://boxuancui.github.io/DataExplorer/reference/plot_missing.html">plot_missing</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+<p><img src="missingdata2_files/figure-html/check1-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Comparing Original and Imputed Data (First Imputed Dataset)</strong>:</p>
+<ul>
+<li>In this chunk, we focus on the first imputed dataset. We extract this dataset and display the initial entries to get a sense of the data.</li>
+<li>We then remove any remaining missing values (if any) and display the initial entries of this complete dataset.</li>
+<li>Next, we compare the IDs (or unique identifiers) of the entries in the complete dataset with the original dataset to see which entries had missing values.</li>
+<li>We then create a new variable that indicates whether an entry had missing values or not and tabulate this information.</li>
+</ul>
+<div class="cell" data-hash="missingdata2_cache/html/check2_d1fe6babb850404b40d2ec1608f8e650">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">analytic.miss1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span> <span class="co"># full data</span></span>
+<span><span class="co">#&gt; [1] 93703 93704 93705 93706 93707 93708</span></span>
+<span></span>
+<span><span class="va">analytic1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic1</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span> <span class="co"># complete case</span></span>
+<span><span class="co">#&gt; [1] 93703 93704 93705 93706 93707 93708</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">analytic1</span><span class="op">$</span><span class="va">ID</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 93703 93704 93705 93706 93707 93708</span></span>
+<span></span>
+<span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">miss</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">miss</span><span class="op">[</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">analytic1</span><span class="op">$</span><span class="va">ID</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">miss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    0    1 </span></span>
+<span><span class="co">#&gt; 8892  362</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">miss</span><span class="op">==</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 93710 93748 93786 93854 93865 93934</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">miss</span><span class="op">==</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 102840 102862 102919 102927 102928 102942</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Comparing Original and Imputed Data (Second Imputed Dataset)</strong>:</p>
+<p>The this chunk is similar to the above but focuses on the second imputed dataset. We perform the same steps: extracting the dataset, removing missing values, comparing IDs, and creating a variable to indicate missingness.</p>
+<div class="cell" data-hash="missingdata2_cache/html/check3_8d84aee32a802f5f5ed02bfbfac74e04">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">analytic.miss2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic.miss2</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span> <span class="co"># full data</span></span>
+<span><span class="co">#&gt; [1] 93703 93704 93705 93706 93707 93708</span></span>
+<span></span>
+<span><span class="va">analytic2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span><span class="op">(</span><span class="va">analytic.miss2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic2</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span> <span class="co"># complete case</span></span>
+<span><span class="co">#&gt; [1] 93703 93704 93705 93706 93707 93708</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic.miss2</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="va">analytic.miss2</span><span class="op">$</span><span class="va">ID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">analytic2</span><span class="op">$</span><span class="va">ID</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 93703 93704 93705 93706 93707 93708</span></span>
+<span></span>
+<span><span class="va">analytic.miss2</span><span class="op">$</span><span class="va">miss</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">analytic.miss2</span><span class="op">$</span><span class="va">miss</span><span class="op">[</span><span class="va">analytic.miss2</span><span class="op">$</span><span class="va">ID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">analytic2</span><span class="op">$</span><span class="va">ID</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">analytic.miss2</span><span class="op">$</span><span class="va">miss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    0    1 </span></span>
+<span><span class="co">#&gt; 8892  362</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">miss</span><span class="op">==</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 93710 93748 93786 93854 93865 93934</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="va">analytic.miss1</span><span class="op">$</span><span class="va">miss</span><span class="op">==</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 102840 102862 102919 102927 102928 102942</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Aggregating Missingness Information Across All Imputed Datasets</strong>:</p>
+<ul>
+<li>In the fourth chunk, we aim to consolidate the missingness information across all imputed datasets. We initialize a variable in the main dataset to indicate missingness.</li>
+<li>We then loop through each of the imputed datasets and update the main dataset’s missingness variable based on the missingness information from each imputed dataset. This gives us a consolidated view of which entries had missing values across all imputed datasets.</li>
+</ul>
+<div class="cell" data-hash="missingdata2_cache/html/check4_a8004a8f02cce256ba9e8395a5ec645c">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">impdata</span><span class="op">$</span><span class="va">miss</span><span class="op">&lt;-</span><span class="fl">1</span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">m</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">impdata</span><span class="op">$</span><span class="va">miss</span><span class="op">[</span><span class="va">impdata</span><span class="op">$</span><span class="va">.imp</span> <span class="op">==</span> <span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">analytic.miss2</span><span class="op">$</span><span class="va">miss</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">impdata</span><span class="op">$</span><span class="va">miss</span><span class="op">[</span><span class="va">impdata</span><span class="op">$</span><span class="va">.imp</span> <span class="op">==</span> <span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    0    1 </span></span>
+<span><span class="co">#&gt; 8892  362 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    0    1 </span></span>
+<span><span class="co">#&gt; 8892  362 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    0    1 </span></span>
+<span><span class="co">#&gt; 8892  362 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    0    1 </span></span>
+<span><span class="co">#&gt; 8892  362 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    0    1 </span></span>
+<span><span class="co">#&gt; 8892  362</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="combining-data" class="level3"><h3 class="anchored" data-anchor-id="combining-data">Combining data</h3>
+<p>Since we have multiple versions of the imputed dataset, we need a way to combine them for analysis. In the next chunks, we use a method to merge these datasets into a single list, making it easier to apply subsequent analyses on all datasets simultaneously.</p>
+<div class="cell" data-hash="missingdata2_cache/html/combine1_e80114a00bea27e712ff2022292a3eb3">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">mitools</span><span class="op">)</span> </span>
+<span><span class="va">allImputations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mitools/man/imputationList.html">imputationList</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">3</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">4</span><span class="op">)</span>, </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">allImputations</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt;  $ imputations:List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 18.3 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 160 186 157 148 189 209 176 162 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 2 2 2 2 2 2 2 2 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 44.8 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 107 153 157 148 189 209 176 195 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 3 3 3 3 3 3 3 3 3 3 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 13.6 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 153 110 157 148 189 209 176 141 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 4 4 4 4 4 4 4 4 4 4 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 19.2 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 160 159 157 148 189 209 176 196 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 5 5 5 5 5 5 5 5 5 5 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 26 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 132 198 157 148 189 209 176 255 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 2 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;  $ call       : language imputationList(list(subset(impdata, subset = .imp == 1), subset(impdata,      subset = .imp == 2), subset(impdata| __truncated__ ...</span></span>
+<span><span class="co">#&gt;  - attr(*, "class")= chr "imputationList"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="combining-data-efficiently" class="level3"><h3 class="anchored" data-anchor-id="combining-data-efficiently">Combining data efficiently</h3>
+<div class="cell" data-hash="missingdata2_cache/html/combine2_3419f46d70a9462014b1bbbf193f7700">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">allImputations</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/pkg/mitools/man/imputationList.html">imputationList</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">m</span>, </span>
+<span>                                         <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span>  </span>
+<span>                                           <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">impdata</span>, subset<span class="op">=</span><span class="va">.imp</span><span class="op">==</span><span class="va">n</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                           <span class="co">#mice::complete(imputation, action = n)))</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">allImputations</span><span class="op">)</span></span>
+<span><span class="co">#&gt;             Length Class  Mode</span></span>
+<span><span class="co">#&gt; imputations 5      -none- list</span></span>
+<span><span class="co">#&gt; call        2      -none- call</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">allImputations</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt;  $ imputations:List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 18.3 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 160 186 157 148 189 209 176 162 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 2 2 2 2 2 2 2 2 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 44.8 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 107 153 157 148 189 209 176 195 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 3 3 3 3 3 3 3 3 3 3 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 13.6 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 153 110 157 148 189 209 176 141 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 4 4 4 4 4 4 4 4 4 4 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 19.2 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 160 159 157 148 189 209 176 196 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 1 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;   ..$ :'data.frame': 9254 obs. of  14 variables:</span></span>
+<span><span class="co">#&gt;   .. ..$ .imp           : int [1:9254] 5 5 5 5 5 5 5 5 5 5 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ .id            : int [1:9254] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ ID             : int [1:9254] 93703 93704 93705 93706 93707 93708 93709 93710 93711 93712 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ weight         : num [1:9254] 8540 42567 8338 8723 7065 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ psu            : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ strata         : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ gender         : chr [1:9254] "Female" "Male" "Female" "Male" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ born           : chr [1:9254] "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ race           : chr [1:9254] "Other" "White" "Black" "Other" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ bmi            : num [1:9254] 17.5 15.7 31.7 21.5 18.1 23.7 38.9 26 21.3 19.7 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol    : int [1:9254] 132 198 157 148 189 209 176 255 238 182 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ diabetes       : chr [1:9254] "No" "No" "No" "No" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ cholesterol.bin: Factor w/ 2 levels "healthy","unhealthy": 1 1 1 1 1 2 1 2 2 1 ...</span></span>
+<span><span class="co">#&gt;   .. ..$ miss           : num [1:9254] 0 0 0 0 0 0 0 1 0 0 ...</span></span>
+<span><span class="co">#&gt;  $ call       : language imputationList(lapply(1:m, function(n) subset(impdata, subset = .imp ==      n)))</span></span>
+<span><span class="co">#&gt;  - attr(*, "class")= chr "imputationList"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="logistic-regression" class="level3"><h3 class="anchored" data-anchor-id="logistic-regression">Logistic regression</h3>
+<p>With our imputed datasets ready, we proceed to fit a statistical model. Here, we use logistic regression as an example. We fit the model to each imputed dataset separately and then extract relevant statistics like odds ratios and confidence intervals.</p>
+<div class="cell" data-hash="missingdata2_cache/html/fit0_5536688bcbfecc5dd889a6f451195b27">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://jtools.jacob-long.com">jtools</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="http://r-survey.r-forge.r-project.org/survey/">survey</a></span><span class="op">)</span></span>
+<span><span class="va">data.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="va">m</span><span class="op">)</span></span>
+<span><span class="va">model.formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"I(cholesterol.bin=='healthy')~diabetes+gender+born+race+bmi"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-hash="missingdata2_cache/html/fit1_33bace3c035a57958f5d8d95d6a65031">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">allImputations</span><span class="op">$</span><span class="va">imputations</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;       0   12347   21060   34671   37562  419763</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">allImputations</span><span class="op">$</span><span class="va">imputations</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">weight</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 550</span></span>
+<span><span class="va">w.design0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html">svydesign</a></span><span class="op">(</span>ids<span class="op">=</span><span class="op">~</span><span class="va">psu</span>, weights<span class="op">=</span><span class="op">~</span><span class="va">weight</span>, strata<span class="op">=</span><span class="op">~</span><span class="va">strata</span>,</span>
+<span>                           data <span class="op">=</span> <span class="va">allImputations</span>, nest <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">w.design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">w.design0</span>, <span class="va">miss</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">fits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="va">w.design</span>, <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">model.formula</span>, family<span class="op">=</span><span class="va">quasibinomial</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co"># Estimate from first data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fits</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co">#&gt; diabetesYes </span></span>
+<span><span class="co">#&gt;    1.409246</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html">confint</a></span><span class="op">(</span><span class="va">fits</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt;    2.5 %   97.5 % </span></span>
+<span><span class="co">#&gt; 1.129997 1.757503</span></span>
+<span><span class="co"># Estimate from second data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fits</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co">#&gt; diabetesYes </span></span>
+<span><span class="co">#&gt;    1.437951</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html">confint</a></span><span class="op">(</span><span class="va">fits</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt;    2.5 %   97.5 % </span></span>
+<span><span class="co">#&gt; 1.171160 1.765518</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="pooled-averaged-estimates" class="level3"><h3 class="anchored" data-anchor-id="pooled-averaged-estimates">Pooled / averaged estimates</h3>
+<p>After analyzing each imputed dataset separately, we need to combine the results to get a single set of estimates. This is done using a method that pools the results, taking into account the variability between the different imputed datasets.</p>
+<div class="cell" data-hash="missingdata2_cache/html/fit2_77691af175359907d6f120cf329cf1d7">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pooled.estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mitools/man/MIcombine.html">MIcombine</a></span><span class="op">(</span><span class="va">fits</span><span class="op">)</span></span>
+<span><span class="va">sum.pooled</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">pooled.estimates</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Multiple imputation results:</span></span>
+<span><span class="co">#&gt;       with(w.design, svyglm(model.formula, family = quasibinomial))</span></span>
+<span><span class="co">#&gt;       MIcombine.default(fits)</span></span>
+<span><span class="co">#&gt;                   results          se        (lower       upper) missInfo</span></span>
+<span><span class="co">#&gt; (Intercept)    2.13514754 0.236310332   1.667691110   2.60260397     19 %</span></span>
+<span><span class="co">#&gt; diabetesYes    0.35209050 0.089197557   0.177261457   0.52691955      1 %</span></span>
+<span><span class="co">#&gt; genderMale     0.17677460 0.088502097   0.003168621   0.35038058      5 %</span></span>
+<span><span class="co">#&gt; bornOthers    -0.59642404 0.096782869  -0.786797572  -0.40605051     11 %</span></span>
+<span><span class="co">#&gt; bornRefused  -12.33262819 0.708505945 -13.721274703 -10.94398169      0 %</span></span>
+<span><span class="co">#&gt; raceHispanic   0.13913500 0.142910787  -0.141238429   0.41950842      6 %</span></span>
+<span><span class="co">#&gt; raceOther     -0.17347602 0.105412185  -0.380201753   0.03324971      5 %</span></span>
+<span><span class="co">#&gt; raceWhite     -0.35812104 0.134733737  -0.622240268  -0.09400181      2 %</span></span>
+<span><span class="co">#&gt; bmi           -0.04011243 0.006523474  -0.053037557  -0.02718730     20 %</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">sum.pooled</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 8.458294e+00 1.422037e+00 1.193362e+00 5.507777e-01 4.405626e-06</span></span>
+<span><span class="co">#&gt; [6] 1.149279e+00 8.407373e-01 6.989885e-01 9.606814e-01</span></span>
+<span><span class="va">OR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">pooled.estimates</span><span class="op">$</span><span class="va">coefficients</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span> </span>
+<span><span class="va">OR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">OR</span><span class="op">)</span></span>
+<span><span class="va">CI</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html">confint</a></span><span class="op">(</span><span class="va">pooled.estimates</span><span class="op">)</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">sig</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">CI</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">CI</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">sig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">sig</span><span class="op">==</span><span class="cn">FALSE</span>, <span class="st">"*"</span>, <span class="st">""</span><span class="op">)</span></span>
+<span><span class="va">OR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://amices.org/mice/reference/cbind.html">cbind</a></span><span class="op">(</span><span class="va">OR</span>,<span class="va">CI</span>,<span class="va">sig</span><span class="op">)</span></span>
+<span><span class="va">OR</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["OR"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["2.5 %"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["97.5 %"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sig"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"8.46","2":"5.32","3":"13.44","4":"*","_rn_":"(Intercept)"},{"1":"1.42","2":"1.19","3":"1.69","4":"*","_rn_":"diabetesYes"},{"1":"1.19","2":"1.00","3":"1.42","4":"*","_rn_":"genderMale"},{"1":"0.55","2":"0.46","3":"0.67","4":"*","_rn_":"bornOthers"},{"1":"0.00","2":"0.00","3":"0.00","4":"*","_rn_":"bornRefused"},{"1":"1.15","2":"0.87","3":"1.52","4":"","_rn_":"raceHispanic"},{"1":"0.84","2":"0.68","3":"1.03","4":"","_rn_":"raceOther"},{"1":"0.70","2":"0.54","3":"0.91","4":"*","_rn_":"raceWhite"},{"1":"0.96","2":"0.95","3":"0.97","4":"*","_rn_":"bmi"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section><section id="step-by-step-example" class="level3"><h3 class="anchored" data-anchor-id="step-by-step-example">Step-by-step example</h3>
+<p>This segment offers a hands-on approach to understanding the imputation process. Here’s a breakdown:</p>
+<ol type="1">
+<li>
+<strong>Fitting Models to Individual Imputed Datasets</strong>:
+<ul>
+<li>A list is initialized to store the results of models fitted to each imputed dataset.</li>
+<li>For every dataset, the specific imputed data is extracted.</li>
+<li>A survey design is established, considering factors like primary sampling units, stratification, and weights. This ensures the analysis aligns with the survey’s design.</li>
+<li>This design is then refined to only consider complete data entries.</li>
+<li>A logistic regression model is then applied to this refined data.</li>
+<li>The results of this modeling are stored and displayed for review.</li>
+</ul>
+</li>
+<li>
+<strong>Pooling Results from All Models</strong>:
+<ul>
+<li>After individual analysis, the next step is to combine or ‘pool’ these results.</li>
+<li>A special function is used to merge the results from all the models. This function accounts for variations between datasets and offers a combined estimate.</li>
+<li>A summary of this combined data is then displayed, offering insights like coefficients, standard errors, and more. Another version of this summary, focusing on log-effects, is also presented for deeper insights.</li>
+</ul>
+</li>
+</ol>
+<div class="cell" data-hash="missingdata2_cache/html/fit3_d155f4eac6fa7649d4e1e90c10679b56">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fits2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="va">m</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">analytic.i</span> <span class="op">&lt;-</span> <span class="va">allImputations</span><span class="op">$</span><span class="va">imputations</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="va">w.design0.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html">svydesign</a></span><span class="op">(</span>id<span class="op">=</span><span class="op">~</span><span class="va">psu</span>, strata<span class="op">=</span><span class="op">~</span><span class="va">strata</span>, weights<span class="op">=</span><span class="op">~</span><span class="va">weight</span>,</span>
+<span>                        data<span class="op">=</span><span class="va">analytic.i</span>, nest <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">w.design.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">w.design0.i</span>, <span class="va">miss</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">model.formula</span>, design<span class="op">=</span><span class="va">w.design.i</span>, </span>
+<span>                family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">quasibinomial</a></span><span class="op">(</span><span class="st">"logit"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://jtools.jacob-long.com/reference/summ.html">summ</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">fits2</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">fit</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; MODEL INFO:</span></span>
+<span><span class="co">#&gt; Observations: 8892</span></span>
+<span><span class="co">#&gt; Dependent Variable: I(cholesterol.bin == "healthy")</span></span>
+<span><span class="co">#&gt; Type: Analysis of complex survey design </span></span>
+<span><span class="co">#&gt;  Family: quasibinomial </span></span>
+<span><span class="co">#&gt;  Link function: logit </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; MODEL FIT:</span></span>
+<span><span class="co">#&gt; Pseudo-R² (Cragg-Uhler) = 0.05</span></span>
+<span><span class="co">#&gt; Pseudo-R² (McFadden) = 0.03</span></span>
+<span><span class="co">#&gt; AIC =  NA </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                        Est.   S.E.   t val.      p</span></span>
+<span><span class="co">#&gt; ------------------ -------- ------ -------- ------</span></span>
+<span><span class="co">#&gt; (Intercept)            2.26   0.20    11.32   0.00</span></span>
+<span><span class="co">#&gt; diabetesYes            0.34   0.09     3.67   0.01</span></span>
+<span><span class="co">#&gt; genderMale             0.17   0.09     1.88   0.10</span></span>
+<span><span class="co">#&gt; bornOthers            -0.62   0.10    -6.36   0.00</span></span>
+<span><span class="co">#&gt; bornRefused          -12.35   0.70   -17.63   0.00</span></span>
+<span><span class="co">#&gt; raceHispanic           0.18   0.14     1.27   0.25</span></span>
+<span><span class="co">#&gt; raceOther             -0.20   0.11    -1.77   0.12</span></span>
+<span><span class="co">#&gt; raceWhite             -0.38   0.13    -2.83   0.03</span></span>
+<span><span class="co">#&gt; bmi                   -0.04   0.01    -7.92   0.00</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated dispersion parameter = 0.99</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; MODEL INFO:</span></span>
+<span><span class="co">#&gt; Observations: 8892</span></span>
+<span><span class="co">#&gt; Dependent Variable: I(cholesterol.bin == "healthy")</span></span>
+<span><span class="co">#&gt; Type: Analysis of complex survey design </span></span>
+<span><span class="co">#&gt;  Family: quasibinomial </span></span>
+<span><span class="co">#&gt;  Link function: logit </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; MODEL FIT:</span></span>
+<span><span class="co">#&gt; Pseudo-R² (Cragg-Uhler) = 0.05</span></span>
+<span><span class="co">#&gt; Pseudo-R² (McFadden) = 0.03</span></span>
+<span><span class="co">#&gt; AIC =  NA </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                        Est.   S.E.   t val.      p</span></span>
+<span><span class="co">#&gt; ------------------ -------- ------ -------- ------</span></span>
+<span><span class="co">#&gt; (Intercept)            2.08   0.23     9.17   0.00</span></span>
+<span><span class="co">#&gt; diabetesYes            0.36   0.09     4.19   0.00</span></span>
+<span><span class="co">#&gt; genderMale             0.20   0.08     2.49   0.04</span></span>
+<span><span class="co">#&gt; bornOthers            -0.63   0.08    -7.41   0.00</span></span>
+<span><span class="co">#&gt; bornRefused          -12.33   0.71   -17.25   0.00</span></span>
+<span><span class="co">#&gt; raceHispanic           0.13   0.14     0.95   0.37</span></span>
+<span><span class="co">#&gt; raceOther             -0.16   0.10    -1.57   0.16</span></span>
+<span><span class="co">#&gt; raceWhite             -0.37   0.14    -2.71   0.03</span></span>
+<span><span class="co">#&gt; bmi                   -0.04   0.01    -6.05   0.00</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated dispersion parameter = 1</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; MODEL INFO:</span></span>
+<span><span class="co">#&gt; Observations: 8892</span></span>
+<span><span class="co">#&gt; Dependent Variable: I(cholesterol.bin == "healthy")</span></span>
+<span><span class="co">#&gt; Type: Analysis of complex survey design </span></span>
+<span><span class="co">#&gt;  Family: quasibinomial </span></span>
+<span><span class="co">#&gt;  Link function: logit </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; MODEL FIT:</span></span>
+<span><span class="co">#&gt; Pseudo-R² (Cragg-Uhler) = 0.04</span></span>
+<span><span class="co">#&gt; Pseudo-R² (McFadden) = 0.02</span></span>
+<span><span class="co">#&gt; AIC =  NA </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                        Est.   S.E.   t val.      p</span></span>
+<span><span class="co">#&gt; ------------------ -------- ------ -------- ------</span></span>
+<span><span class="co">#&gt; (Intercept)            2.03   0.22     9.22   0.00</span></span>
+<span><span class="co">#&gt; diabetesYes            0.35   0.08     4.30   0.00</span></span>
+<span><span class="co">#&gt; genderMale             0.17   0.09     1.88   0.10</span></span>
+<span><span class="co">#&gt; bornOthers            -0.56   0.08    -7.21   0.00</span></span>
+<span><span class="co">#&gt; bornRefused          -12.30   0.70   -17.49   0.00</span></span>
+<span><span class="co">#&gt; raceHispanic           0.10   0.13     0.76   0.47</span></span>
+<span><span class="co">#&gt; raceOther             -0.19   0.10    -1.81   0.11</span></span>
+<span><span class="co">#&gt; raceWhite             -0.34   0.13    -2.59   0.04</span></span>
+<span><span class="co">#&gt; bmi                   -0.04   0.01    -6.58   0.00</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated dispersion parameter = 0.99</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; MODEL INFO:</span></span>
+<span><span class="co">#&gt; Observations: 8892</span></span>
+<span><span class="co">#&gt; Dependent Variable: I(cholesterol.bin == "healthy")</span></span>
+<span><span class="co">#&gt; Type: Analysis of complex survey design </span></span>
+<span><span class="co">#&gt;  Family: quasibinomial </span></span>
+<span><span class="co">#&gt;  Link function: logit </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; MODEL FIT:</span></span>
+<span><span class="co">#&gt; Pseudo-R² (Cragg-Uhler) = 0.05</span></span>
+<span><span class="co">#&gt; Pseudo-R² (McFadden) = 0.03</span></span>
+<span><span class="co">#&gt; AIC =  NA </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                        Est.   S.E.   t val.      p</span></span>
+<span><span class="co">#&gt; ------------------ -------- ------ -------- ------</span></span>
+<span><span class="co">#&gt; (Intercept)            2.18   0.21    10.57   0.00</span></span>
+<span><span class="co">#&gt; diabetesYes            0.36   0.09     3.75   0.01</span></span>
+<span><span class="co">#&gt; genderMale             0.16   0.09     1.78   0.12</span></span>
+<span><span class="co">#&gt; bornOthers            -0.57   0.10    -5.98   0.00</span></span>
+<span><span class="co">#&gt; bornRefused          -12.35   0.71   -17.32   0.00</span></span>
+<span><span class="co">#&gt; raceHispanic           0.12   0.14     0.83   0.43</span></span>
+<span><span class="co">#&gt; raceOther             -0.16   0.10    -1.61   0.15</span></span>
+<span><span class="co">#&gt; raceWhite             -0.34   0.13    -2.55   0.04</span></span>
+<span><span class="co">#&gt; bmi                   -0.04   0.01    -7.11   0.00</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated dispersion parameter = 0.99</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; MODEL INFO:</span></span>
+<span><span class="co">#&gt; Observations: 8892</span></span>
+<span><span class="co">#&gt; Dependent Variable: I(cholesterol.bin == "healthy")</span></span>
+<span><span class="co">#&gt; Type: Analysis of complex survey design </span></span>
+<span><span class="co">#&gt;  Family: quasibinomial </span></span>
+<span><span class="co">#&gt;  Link function: logit </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; MODEL FIT:</span></span>
+<span><span class="co">#&gt; Pseudo-R² (Cragg-Uhler) = 0.05</span></span>
+<span><span class="co">#&gt; Pseudo-R² (McFadden) = 0.03</span></span>
+<span><span class="co">#&gt; AIC =  NA </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt;                        Est.   S.E.   t val.      p</span></span>
+<span><span class="co">#&gt; ------------------ -------- ------ -------- ------</span></span>
+<span><span class="co">#&gt; (Intercept)            2.12   0.22     9.67   0.00</span></span>
+<span><span class="co">#&gt; diabetesYes            0.35   0.09     4.02   0.01</span></span>
+<span><span class="co">#&gt; genderMale             0.19   0.08     2.30   0.06</span></span>
+<span><span class="co">#&gt; bornOthers            -0.60   0.10    -6.06   0.00</span></span>
+<span><span class="co">#&gt; bornRefused          -12.33   0.71   -17.40   0.00</span></span>
+<span><span class="co">#&gt; raceHispanic           0.17   0.14     1.20   0.27</span></span>
+<span><span class="co">#&gt; raceOther             -0.17   0.10    -1.64   0.14</span></span>
+<span><span class="co">#&gt; raceWhite             -0.36   0.13    -2.78   0.03</span></span>
+<span><span class="co">#&gt; bmi                   -0.04   0.01    -6.65   0.00</span></span>
+<span><span class="co">#&gt; --------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated dispersion parameter = 0.99</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-hash="missingdata2_cache/html/fit4_11ffa1f17ce850bfb4c592da1e8e105b">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pooled.estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mitools/man/MIcombine.html">MIcombine</a></span><span class="op">(</span><span class="va">fits2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">pooled.estimates</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Multiple imputation results:</span></span>
+<span><span class="co">#&gt;       MIcombine.default(fits2)</span></span>
+<span><span class="co">#&gt;                   results          se        (lower       upper) missInfo</span></span>
+<span><span class="co">#&gt; (Intercept)    2.13514754 0.236310332   1.667691110   2.60260397     19 %</span></span>
+<span><span class="co">#&gt; diabetesYes    0.35209050 0.089197557   0.177261457   0.52691955      1 %</span></span>
+<span><span class="co">#&gt; genderMale     0.17677460 0.088502097   0.003168621   0.35038058      5 %</span></span>
+<span><span class="co">#&gt; bornOthers    -0.59642404 0.096782869  -0.786797572  -0.40605051     11 %</span></span>
+<span><span class="co">#&gt; bornRefused  -12.33262819 0.708505945 -13.721274703 -10.94398169      0 %</span></span>
+<span><span class="co">#&gt; raceHispanic   0.13913500 0.142910787  -0.141238429   0.41950842      6 %</span></span>
+<span><span class="co">#&gt; raceOther     -0.17347602 0.105412185  -0.380201753   0.03324971      5 %</span></span>
+<span><span class="co">#&gt; raceWhite     -0.35812104 0.134733737  -0.622240268  -0.09400181      2 %</span></span>
+<span><span class="co">#&gt; bmi           -0.04011243 0.006523474  -0.053037557  -0.02718730     20 %</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">pooled.estimates</span>,logeffect<span class="op">=</span><span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Multiple imputation results:</span></span>
+<span><span class="co">#&gt;       MIcombine.default(fits2)</span></span>
+<span><span class="co">#&gt;              results      se  (lower  upper) missInfo</span></span>
+<span><span class="co">#&gt; (Intercept)  8.5e+00 2.0e+00 5.3e+00 1.3e+01     19 %</span></span>
+<span><span class="co">#&gt; diabetesYes  1.4e+00 1.3e-01 1.2e+00 1.7e+00      1 %</span></span>
+<span><span class="co">#&gt; genderMale   1.2e+00 1.1e-01 1.0e+00 1.4e+00      5 %</span></span>
+<span><span class="co">#&gt; bornOthers   5.5e-01 5.3e-02 4.6e-01 6.7e-01     11 %</span></span>
+<span><span class="co">#&gt; bornRefused  4.4e-06 3.1e-06 1.1e-06 1.8e-05      0 %</span></span>
+<span><span class="co">#&gt; raceHispanic 1.1e+00 1.6e-01 8.7e-01 1.5e+00      6 %</span></span>
+<span><span class="co">#&gt; raceOther    8.4e-01 8.9e-02 6.8e-01 1.0e+00      5 %</span></span>
+<span><span class="co">#&gt; raceWhite    7.0e-01 9.4e-02 5.4e-01 9.1e-01      2 %</span></span>
+<span><span class="co">#&gt; bmi          9.6e-01 6.3e-03 9.5e-01 9.7e-01     20 %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="variable-selection" class="level3"><h3 class="anchored" data-anchor-id="variable-selection">Variable selection</h3>
+<p>Sometimes, not all variables in the dataset are relevant for our analysis. In the final chunks, we apply a method to select the most relevant variables for our model. This can help in simplifying the model and improving its interpretability.</p>
+<div class="cell" data-hash="missingdata2_cache/html/fit5_3558bc4c28ee22ff3e1a5226b0e80914">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://jtools.jacob-long.com">jtools</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="http://r-survey.r-forge.r-project.org/survey/">survey</a></span><span class="op">)</span></span>
+<span><span class="va">data.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="va">m</span><span class="op">)</span></span>
+<span><span class="va">model.formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol~diabetes+gender+born+race+bmi"</span><span class="op">)</span></span>
+<span><span class="va">scope</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>upper <span class="op">=</span> <span class="op">~</span> <span class="va">diabetes</span><span class="op">+</span><span class="va">gender</span><span class="op">+</span><span class="va">born</span><span class="op">+</span><span class="va">race</span><span class="op">+</span><span class="va">bmi</span>,</span>
+<span>              lower <span class="op">=</span> <span class="op">~</span> <span class="va">diabetes</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">analytic.i</span> <span class="op">&lt;-</span> <span class="va">allImputations</span><span class="op">$</span><span class="va">imputations</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="va">w.design0.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html">svydesign</a></span><span class="op">(</span>id<span class="op">=</span><span class="op">~</span><span class="va">psu</span>, strata<span class="op">=</span><span class="op">~</span><span class="va">strata</span>, weights<span class="op">=</span><span class="op">~</span><span class="va">weight</span>,</span>
+<span>                        data<span class="op">=</span><span class="va">analytic.i</span>, nest <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">w.design.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">w.design0.i</span>, <span class="va">miss</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">model.formula</span>, design<span class="op">=</span><span class="va">w.design.i</span><span class="op">)</span></span>
+<span>  <span class="va">fitstep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/step.html">step</a></span><span class="op">(</span><span class="va">fit</span>, scope <span class="op">=</span> <span class="va">scope</span>, trace <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                              direction <span class="op">=</span> <span class="st">"backward"</span><span class="op">)</span></span>
+<span>  <span class="va">data.list</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">fitstep</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(g): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span>
+<span><span class="co">#&gt; Warning in summary.glm(glm.object): observations with zero weight not used for</span></span>
+<span><span class="co">#&gt; calculating dispersion</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Check out the variables selected</p>
+<div class="cell" data-hash="missingdata2_cache/html/stepTab_1732f85d03cc4e12e6048bb6e9bafcef">
+<details><summary>Show the code</summary><div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/allnames.html">all.vars</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html">formula</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">m</span><span class="op">)</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/allnames.html">all.vars</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html">formula</a></span><span class="op">(</span><span class="va">data.list</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span></span>
+<span><span class="co">#&gt; x</span></span>
+<span><span class="co">#&gt;         bmi        born cholesterol    diabetes      gender        race </span></span>
+<span><span class="co">#&gt;           5           5           5           5           5           5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="video-content-optional" class="level4"><h4 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h4>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</p>
+</div>
+</div>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+<iframe src="https://www.youtube.com/embed/Ndwplpu2lQk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
+</iframe>
+</div>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</p>
+</div>
+</div>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+<iframe src="https://www.youtube.com/embed/nFOL9fdJTY8" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
+</iframe>
+</div>
+
+
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./missingdata1.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Imputation</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./missingdata3.html" class="pagination-link">
+        <span class="nav-page-text">Missing in outcome</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -345,24 +345,9 @@ fit4
 
 ##### Step 3
 
-###### Pooled estimate
-
-```{r mi3, cache=TRUE}
-# Step 3 pool the analysis results
-est1 <- mice::pool(fit4)
-
-## pool all estimated together using Rubin's rule 
-est1
-```
-
-Here:
-
--   dfcom = df for complete data
--   df = df with Barnard-Rubin correction
-
 ###### Understanding the pooled results
 
-We are using `age` an an example
+We will show the result of entire pool later. First we want to show the pooled results for the `age` variable only an an example.
 
 ```{r mi3a, cache=TRUE, warning=FALSE, message=FALSE}
 require(dplyr)
@@ -371,7 +356,7 @@ m10 <- res10[res10$term == "age",]
 m10
 ```
 
-Let us describe the components of the `mice::pool(fit4)` output
+Let us describe the components of a pool for the `age` variable only:
 
 ```{r mi3b, cache=TRUE, warning=FALSE, message=FALSE}
 m.number <- 10
@@ -417,11 +402,37 @@ fmi = (riv + 2/(df.c +3)) / (1 + riv)
 fmi # Barnard-Rubin correction
 ```
 
-Compare above results with the pooled table from `mice::pool(fit4)` below. Note that `df` is based on Barnard-Rubin correction and `fmi` value is calculated based on that corrected `df`.
+###### Pooled estimate
 
-```{r}
+Compare above results with the pooled table from `mice` below. Note that `df` is based on Barnard-Rubin correction and `fmi` value is calculated based on that corrected `df`.
+
+```{r mi3x, eval=FALSE}
+# Step 3 pool the analysis results
+est1 <- mice::pool(fit4)
+## pool all estimated together using Rubin's rule 
 est1
 ```
+
+
+`Class: mipo    m = 10` (transposed version to accommodate space)
+
+| Term         | (Intercept)  | age        | bmi        | diastolicBP |
+|--------------|--------------|------------|------------|-------------|
+| m            | 10           | 10         | 10         | 10          |
+| Estimate     | 195.40679314 | 0.04699243 | -0.50032666| -0.08347279 |
+| $\bar{u}$    | 2313.6362339 | 0.1686837  | 0.8722547  | 0.2909291   |
+| b            | 237.04075365 | 0.07372796 | 0.01274940 | 0.02857675  |
+| t            | 2574.3810629 | 0.2497845  | 0.8862790  | 0.3223635   |
+| df_com       | 26           | 26         | 26         | 26          |
+| df           | 21.22870     | 13.72019   | 23.80807   | 21.35356    |
+| RIV          | 0.11269915   | 0.48078595 | 0.01607826 | 0.10804843  |
+| $\lambda$    | 0.10128447   | 0.32468295 | 0.01582384 | 0.09751237  |
+| FMI          | 0.17547051   | 0.40546159 | 0.08924771 | 0.17162783  |
+
+Here:
+
+-   dfcom = df for complete data
+-   df = df with Barnard-Rubin correction
 
 ##### Video content (optional)
 
