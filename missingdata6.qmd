@@ -1,5 +1,7 @@
 ## MCAR tests {.unnumbered}
 
+In the initial chunk, several packages are loaded. These packages provide functions and tools necessary for the subsequent analysis, including multiple imputation, statistical modeling, and data visualization.
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 require(mice)
@@ -13,7 +15,7 @@ require(simcausal)
 
 #### Data generating process
 
-We generate `L` as a function of `P` and `B`.
+A Directed Acyclic Graph (DAG) is defined, which represents a causal model of how different variables in the dataset relate to each other. This DAG is used to simulate data based on the relationships defined. We generate `L` as a function of `P` and `B`.
 
 ```{r dgm0, warning=FALSE, message=FALSE, cache=TRUE}
 require(simcausal)
@@ -29,6 +31,8 @@ Dset <- set.DAG(D)
 
 #### Generate DAG
 
+The previously defined DAG is visualized, providing a graphical representation of the relationships between variables.
+
 ```{r dag0, warning=FALSE, message=FALSE, cache=TRUE}
 plotDAG(Dset, xjitter = 0.1, yjitter = .9,
         edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
@@ -38,6 +42,8 @@ plotDAG(Dset, xjitter = 0.1, yjitter = .9,
 
 #### Generate Data
 
+Using the DAG, a dataset is simulated. This dataset will be used for subsequent analysis.
+
 ```{r data0, cache=TRUE, warning=FALSE, message=FALSE}
 Obs.Data <- sim(DAG = Dset, n = 10000, rndseed = 123)
 head(Obs.Data)
@@ -46,7 +52,7 @@ Obs.Data.original <- Obs.Data
 
 #### Randomly set some data to missing
 
-Randomly assign some L values to missing. This should follow MCAR definition.
+Some values in the dataset are randomly set to missing (i.e., randomly assign some L values to missing). This simulates a scenario where data might be missing completely at random (MCAR). 
 
 ```{r data0a, cache=TRUE}
 set.seed(123)
@@ -54,7 +60,7 @@ Obs.Data$L[sample(1:length(Obs.Data$L), size = 1000)] <- NA
 summary(Obs.Data$L)
 ```
 
-Check out missing data patterns visually.
+The missing data patterns in the dataset are visualized. This helps in understanding which variables have missing values and how they might be related.
 
 ```{r pattern0, warning=FALSE, message=FALSE}
 require(VIM)
@@ -63,6 +69,8 @@ plot(res, numbers = TRUE, prop = FALSE)
 ```
 
 #### Visualize via margin plots
+
+Margin plots are used to compare the distributions of variables when a particular variable is missing versus when it is observed. This provides insights into how missingness might be related to the values of other variables.
 
 -   The red boxplot depicts the distribution of a variable in the data where **L has a missing value**.
 -   The blue boxplot depicts the distribution of the values of a variable in the data where **L has an observed value**.
@@ -77,19 +85,25 @@ marginplot(Obs.Data[,c("L", "Y")])
 
 #### Little's MCAR test
 
-Little's (1988) test statistic (chi-squared) to assess if data is MCAR [@little1988test]: whether significant difference exists between the `means` of different missing-value patterns. Given the statistic and p-value, we determine whether data is MCAR or not (null hypothesis: data is MCAR).
+A statistical test is conducted to determine if data is missing entirely at random (MCAR). The outcome of this test offers a deeper understanding of the reasons behind the missing data.
 
--   This test is based on assessing equality of `means` between the missing data pattern groups (could be 2 or more) using a likelihood ratio test (assumes multivariate normality).
--   Rejection of this test (low p-value or high statistic) indicates that missing data pattern may not be MCAR.
+Little's 1988 chi-squared test evaluates if data is MCAR by checking for significant differences in the means of various missing-value patterns [@little1988test]. Based on the test's statistic and p-value, we can infer if the data is MCAR. The null hypothesis for this test is that the data is MCAR.
 
-However, this test is associated with limitations (taken from `rdrr` manual [@natest]; see quoted text below; bold format added):
+- The essence of this test is to compare means across groups with different missing data patterns. It uses a likelihood ratio test and assumes the data follows a multivariate normal distribution.
+- If this test is rejected (indicated by a low p-value or a high statistic), it suggests the data might not be MCAR.
 
--   "First, the test **does not identify the specific variables** that violates MCAR, i.e., the test does not identify potential correlates of missingness (i.e., auxiliary variables).
--   Second, the test is based on **multivariate normality**, i.e., under departure from the normality assumption the test might be unreliable unless the sample size is large and is not suitable for categorical variables.
--   Third, the test investigates mean differences assuming that the missing data pattern share a **common covariance matrix**, i.e., the test **cannot detect covariance-based deviations** from MCAR stemming from a Missing at Random (MAR) or Missing Not at Random (MNAR) mechanism because MAR and MNAR mechanisms can also produce missing data subgroups with equal means.
--   Fourth, simulation studies suggest that Little's MCAR test suffers from **low statistical power**, particularly when the **number of variables that violate MCAR is small**, the relationship between the data and missingness is weak, or the data are MNAR (Thoemmes & Enders, 2007).
--   Fifth, the test **can only reject**, but cannot prove the MCAR assumption, i.e., a statistically not significant result and failing to reject the null hypothesis of the MCAR test does not prove the null hypothesis that the data is MCAR.
--   Finally, under the null hypothesis the data are actually MCAR or MNAR, while a statistically significant result indicates that missing data are MAR or MNAR, i.e., **MNAR cannot be ruled out** regardless of the result of the test."
+However, this test has several limitations [@natest]:
+
+- The test doesn't pinpoint which specific variables don't adhere to MCAR, meaning it doesn't highlight potential variables associated with missingness.
+- It assumes multivariate normality. If this assumption isn't met, especially with non-normal or categorical variables, the test might not be reliable unless there's a large sample size.
+- The test assumes that all missing data patterns have the same covariance matrix. This means it can't detect deviations from MCAR that are based on covariance, especially if the data is Missing at Random (MAR) or Missing Not at Random (MNAR).
+- Research has shown that Little's MCAR test might have low power, especially when few variables don't follow MCAR, the association between the data and its missingness is weak, or if the data is MNAR.
+- The test can only reject the MCAR assumption but can't confirm it. A non-significant result doesn't necessarily confirm that the data is MCAR.
+- Even if the test result is significant, it doesn't rule out the possibility of the data being MNAR.
+
+
+
+
 
 ```{r mcar, cache=TRUE, message=FALSE, warning=FALSE}
 require(naniar)
@@ -101,8 +115,10 @@ na.test(Obs.Data)
 
 #### MCAR and normality test
 
--   Hawkins (1981) proposed a test of multivariate normality and homoscedasticity (testing homoscedasticity, on top of testing equality of means) [@hawkins1981new].
--   Jamshidian and Jalal (2010) proposed testing equality of covariances between groups (for both normal and non-normal data) having identical missing data patterns. It is tested using Hawkins test (assuming normality) and a non-parametric test respectively [@jamshidian2010tests].
+
+Hawkins, in 1981, introduced a method to assess both multivariate normality and the consistency in variances, known as homoscedasticity. This method not only checks for consistent variances but also for mean equality [@hawkins1981new].
+
+In 2010, Jamshidian and Jalal suggested a technique to compare covariances among groups with the same missing data patterns. They utilized the Hawkins test for data assumed to be normal and a non-parametric approach for other data types [@jamshidian2010tests].
 
 The following package [@jamshidian2010tests] tests multivariate normality and homoscedasticity in the context of missing data.
 
@@ -121,11 +137,15 @@ boxplot(test.result)
 
 #### Set some data to missing based on a rule
 
+In this section, the original dataset is restored. Then, for a specific column, any value greater than a certain threshold is set to 'missing'. A summary of this column is then provided to understand the distribution of missing values.
+
 ```{r data1, cache=TRUE}
 Obs.Data <- Obs.Data.original
 Obs.Data$L[Obs.Data$L > 7.79] <- NA
 summary(Obs.Data$L)
 ```
+
+The dataset's missing data patterns are visualized. This visualization helps in understanding which data points are missing and their distribution across the dataset.
 
 ```{r plot1, cache=TRUE}
 res <- aggr(Obs.Data, plot = FALSE)
@@ -133,6 +153,8 @@ plot(res, numbers = TRUE, prop = FALSE)
 ```
 
 #### Visualize via margin plots
+
+Margin plots are used to visualize the relationship between two variables, especially when one of them has missing values. Here, the relationship of a specific column with missing values is visualized against other columns in the dataset. This helps in understanding how the missingness in one variable might relate to other variables.
 
 ```{r plot2, cache=TRUE}
 marginplot(Obs.Data[,c("L", "P")])
@@ -143,12 +165,16 @@ marginplot(Obs.Data[,c("L", "Y")])
 
 #### Little's MCAR test
 
+Little's MCAR test is applied to the dataset to check if the data is missing completely at random. This test provides a statistic and a p-value to determine the nature of missingness in the data.
+
 ```{r mcar1, cache=TRUE}
 mcar_test(Obs.Data)
 na.test(Obs.Data)
 ```
 
 #### MCAR and normality test
+
+A test is conducted to check if the data follows a multivariate normal distribution and if the variances across different groups are consistent (homoscedasticity). The results of this test, along with a summary and a boxplot visualization, are provided to understand the distribution and characteristics of the data.
 
 ```{r normality1, cache=TRUE}
 test.result <- TestMCARNormality(data = Obs.Data)

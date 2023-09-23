@@ -1,5 +1,7 @@
 ## MI in complex survey {.unnumbered}
 
+In the initial chunk, we load all the necessary libraries that will be used throughout the tutorial. These libraries provide functions and tools for data exploration, visualization, imputation, and analysis.
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 library(mice)
@@ -11,6 +13,8 @@ library(mitools)
 ```
 
 ### Complex Survey data
+
+Next, we load a dataset that contains survey data with some missing values. We then select specific columns or variables from this dataset that we are interested in analyzing. To understand the extent and pattern of missingness in our data, we visualize it and display the missing data pattern.
 
 ```{r load, cache=TRUE}
 load("Data/missingdata/NHANES17.RData")
@@ -25,13 +29,23 @@ md.pattern(analyticx)
 
 ### Imputing
 
+In the following chunk, we address the missing data by performing multiple imputations. This means that instead of filling in each missing value with a single estimate, we create multiple versions (datasets) where each missing value is filled in differently based on a specified algorithm. This helps in capturing the uncertainty around the missing values. The chunk sets up the parameters for multiple imputations, ensuring reproducibility and efficiency, and then performs the imputations on the dataset with missing values. 
+
 ```{r imp, cache=TRUE}
 # imputation <- mice(analyticx, m=5, maxit=5, seed = 504007)
 set.seed(504)
 imputation <- parlmice(analyticx, m=5, maxit=5, cluster.seed=504007)
 ```
 
+- **Data Input**: The primary input for the imputation function is the dataset with missing values. This dataset is what we aim to impute.
+- **Number of Imputations**: The option `m=5` indicates that we want to create 5 different imputed datasets. Each of these datasets will have the missing values filled in slightly differently, based on the underlying imputation algorithm and the randomness introduced.
+- **Maximum Iterations**: The imputation process is iterative, meaning it refines its estimates over several rounds. The option `maxit=5` specifies that the algorithm should run for a maximum of 5 iterations. This helps in achieving more accurate imputations, especially when the missing data mechanism is complex.
+- **Setting Seed**: In computational processes that involve randomness, it's often useful to set a "seed" value. This ensures that the random processes are reproducible. If you run the imputation multiple times with the same seed, you'll get the same results each time. Two seed values are set in the chunk: one using the general `set.seed()` function and another specifically for the imputation function as `cluster.seed`.
+- **Parallel Processing**: The function `parlmice` used for imputation indicates that the imputations are done in parallel. This means that instead of imputing one dataset after the other, the function tries to impute multiple datasets simultaneously (if the computational resources allow). This can speed up the process, especially when dealing with large datasets or when creating many imputed datasets.
+
 ### Create new variable
+
+After imputation, we might want to create new variables or modify existing ones to better suit our analysis. Here, we transform one of the variables into a binary category based on a threshold. This can help in simplifying the analysis or making the results more interpretable.
 
 ```{r newvar, cache=TRUE}
 impdata <- complete(imputation, action="long") #stacked data
@@ -43,10 +57,23 @@ head(impdata)
 
 ### Checking the data
 
+After imputation, it's crucial to ensure that the imputed data maintains the integrity and structure of the original dataset. The following chunks are designed to help you visually and programmatically inspect the imputed data.
+
+**Visual Inspection of Missing Data**:
+
+In this chunk, we visually inspect the imputed datasets to see if there are any remaining missing values. We specifically look at the first two imputed datasets. Visualization tools like these can quickly show if the imputation process was successful in filling all missing values.
+
 ```{r check1, cache=TRUE }
 plot_missing(subset(impdata, subset=.imp==1))
 plot_missing(subset(impdata, subset=.imp==2))
 ```
+
+**Comparing Original and Imputed Data (First Imputed Dataset)**:
+
+- In this chunk, we focus on the first imputed dataset. We extract this dataset and display the initial entries to get a sense of the data.
+- We then remove any remaining missing values (if any) and display the initial entries of this complete dataset.
+- Next, we compare the IDs (or unique identifiers) of the entries in the complete dataset with the original dataset to see which entries had missing values. 
+- We then create a new variable that indicates whether an entry had missing values or not and tabulate this information.
 
 ```{r check2, cache=TRUE }
 analytic.miss1 <- subset(impdata, subset=.imp==1)
@@ -65,6 +92,10 @@ head(analytic.miss1$ID[analytic.miss1$miss==1])
 tail(analytic.miss1$ID[analytic.miss1$miss==1])
 ```
 
+**Comparing Original and Imputed Data (Second Imputed Dataset)**:
+
+The this chunk is similar to the above but focuses on the second imputed dataset. We perform the same steps: extracting the dataset, removing missing values, comparing IDs, and creating a variable to indicate missingness.
+
 ```{r check3, cache=TRUE }
 analytic.miss2 <- subset(impdata, subset=.imp==2)
 head(analytic.miss2$ID) # full data
@@ -82,6 +113,11 @@ head(analytic.miss1$ID[analytic.miss1$miss==1])
 tail(analytic.miss1$ID[analytic.miss1$miss==1])
 ```
 
+**Aggregating Missingness Information Across All Imputed Datasets**:
+
+- In the fourth chunk, we aim to consolidate the missingness information across all imputed datasets. We initialize a variable in the main dataset to indicate missingness.
+- We then loop through each of the imputed datasets and update the main dataset's missingness variable based on the missingness information from each imputed dataset. This gives us a consolidated view of which entries had missing values across all imputed datasets.
+
 ```{r check4, cache=TRUE }
 impdata$miss<-1
 m <- 5
@@ -92,6 +128,8 @@ for (i in 1:m){
 ```
 
 ### Combining data
+
+Since we have multiple versions of the imputed dataset, we need a way to combine them for analysis. In the next chunks, we use a method to merge these datasets into a single list, making it easier to apply subsequent analyses on all datasets simultaneously.
 
 ```{r combine1, cache=TRUE }
 library(mitools) 
@@ -119,6 +157,8 @@ str(allImputations)
 
 ### Logistic regression
 
+With our imputed datasets ready, we proceed to fit a statistical model. Here, we use logistic regression as an example. We fit the model to each imputed dataset separately and then extract relevant statistics like odds ratios and confidence intervals.
+
 ```{r fit0, cache=TRUE, warning=FALSE, message=FALSE}
 require(jtools)
 require(survey)
@@ -143,6 +183,8 @@ exp(confint(fits[[2]]))[2,]
 
 ### Pooled / averaged estimates
 
+After analyzing each imputed dataset separately, we need to combine the results to get a single set of estimates. This is done using a method that pools the results, taking into account the variability between the different imputed datasets.
+
 ```{r fit2, cache=TRUE}
 pooled.estimates <- MIcombine(fits)
 sum.pooled <- summary(pooled.estimates)
@@ -157,6 +199,21 @@ OR
 ```
 
 ### Step-by-step example
+
+This segment offers a hands-on approach to understanding the imputation process. Here's a breakdown:
+
+1. **Fitting Models to Individual Imputed Datasets**:
+   - A list is initialized to store the results of models fitted to each imputed dataset.
+   - For every dataset, the specific imputed data is extracted.
+   - A survey design is established, considering factors like primary sampling units, stratification, and weights. This ensures the analysis aligns with the survey's design.
+   - This design is then refined to only consider complete data entries.
+   - A logistic regression model is then applied to this refined data.
+   - The results of this modeling are stored and displayed for review.
+
+2. **Pooling Results from All Models**:
+   - After individual analysis, the next step is to combine or 'pool' these results.
+   - A special function is used to merge the results from all the models. This function accounts for variations between datasets and offers a combined estimate.
+   - A summary of this combined data is then displayed, offering insights like coefficients, standard errors, and more. Another version of this summary, focusing on log-effects, is also presented for deeper insights.
 
 ```{r fit3, cache=TRUE}
 fits2 <- vector("list", m)
@@ -180,6 +237,8 @@ summary(pooled.estimates,logeffect=TRUE, digits = 2)
 
 ### Variable selection
 
+Sometimes, not all variables in the dataset are relevant for our analysis. In the final chunks, we apply a method to select the most relevant variables for our model. This can help in simplifying the model and improving its interpretability.
+
 ```{r fit5, cache=TRUE}
 require(jtools)
 require(survey)
@@ -199,10 +258,33 @@ for (i in 1:m) {
 }
 ```
 
-Variables selected
+Check out the variables selected
 
 ```{r stepTab, cache=TRUE}
 x <- all.vars(formula(fit))
 for (i in 1:m) x <- c(x, all.vars(formula(data.list[[i]])))
 table(x)-1
 ```
+
+
+#### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/Ndwplpu2lQk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/nFOL9fdJTY8" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

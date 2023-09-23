@@ -1,5 +1,20 @@
 ## Imputation {.unnumbered}
 
+### What is imputation?
+
+Imputation is the process of replacing missing data with substituted values. In health research, it's common to have missing data. This tutorial teaches you how to handle and replace these missing values using the mice package in R.
+
+### Why is imputation important?
+
+Missing data can lead to biased or incorrect results. Imputation helps in making the dataset complete, which can lead to more accurate analyses.
+
+### Key reference
+
+In this discussion, our primary guide and source of information is the work titled "Flexible Imputation of Missing Data" by Stef van Buuren, denoted here as [@van2018flexible]. This book is an invaluable resource for anyone looking to delve deeper into the intricacies of handling missing data, especially in the context of statistical analyses. Below we also cited the relevant section numbers.
+
+
+First, you need to load the necessary libraries:
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 library(mice)
@@ -8,40 +23,57 @@ library(VIM)
 library(mitools)
 ```
 
-Missing data is common in health research. In this lab, we will learn different ways to impute the values for missing values using the package `mice`. In this lab discussion, our main reference is [@van2018flexible]. Below we also cited the relevant section numbers.
-
 ### Type of missing data
 
 -   Ref: [@van2018flexible], Section 1.2
 
 In this section, we are going to introduce three types of missing data that we will encounter in data analysis.
 
--   Missing completely at random (MCAR)
-    -   missing data is completely independent of the measured and unmeasured variables
-    -   if you could compare the individuals with the missing information with individuals with completed information, they do not differ substantially.
-    -   often unrealistic assumption
--   Missing at random (MAR)
-    -   the missing data is related to variables that are all measured
--   Missing not at random (MNAR)
-    -   If the missing data is related to unmeasured variables, we say the missing is not at random.
+1. **Missing Completely at Random (MCAR)**:
 
-**Analysis strategy depening on missingness**
+The reason data is missing is completely random and not related to any measured or unmeasured variables. It's often an unrealistic assumption.
 
--   If the data is MCAR, we may still use complete-case analysis which will not introduce any bias. However, the standard error of the estimate may go up, which results in a wider confidence interval as we have missed some information.
--   If the data is MNAR, we do not have a good way to address it in the analysis and the estimates, of course, will be biased.
--   If the data is MAR, we could use imputation to impute the missing values. The following parts of this lab are to introduce the methods of imputing missing values.
+2. **Missing at Random (MAR)**:
+
+The missing data is related to variables that are observed.
+
+3. **Missing Not at Random (MNAR)**:
+
+The missing data is related to variables that are not observed.
+
+### Why does missingness type matter?
+
+The type of missingness affects how you handle the missing data:
+
+- If data is MCAR, you can still analyze the complete cases without introducing bias.
+- If data is MAR, you can use imputation to replace the missing values.
+- If data is MNAR, it's challenging to address, and estimates will likely be biased. We could do some sensitivity analyses to check the impact.
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/KnBkYkHfGG0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+
 
 ### Data imputation
 
 #### Getting to know the data
 
-In this section, we are going to introduce a different method of imputing missing values. We will use the `analytic.with.miss` dataset NHANES.
+Before imputing, you should understand the data. The tutorial uses the `analytic.with.miss` dataset from NHANES. Various plots and functions are used to inspect the missing data pattern and relationships between variables.
 
-Note:
-
+::: callout-important
 1.  Take a look here for those who are interested in how the [analytic data](https://ehsanx.github.io/SurveyDataAnalysis/) was created.
 
 2.  For the purposes of this lab, we are just going to treat the data as SRS, and not going to deal with intricacies of survey data analysis.
+::: 
 
 ```{r load, cache=TRUE}
 require(VIM)
@@ -77,15 +109,9 @@ Impute NA only once. Below are some examples [@van2011mice]:
 
 ##### Mean imputation
 
--   Ref: [@van2018flexible], Section 1.3.3
+-   Ref: [@van2018flexible], Section 1.3.3, and [@buuren2010mice]
 
--   Ref: [@buuren2010mice]
-
--   This is the most straightforward method.
-
--   We replace the missing values by the mean of non-missing/observed values.
-
--   No variation. NA replaced by mean(complete case values)
+Mean imputation is a straightforward method where missing values in a dataset are replaced with the mean of the observed values. While it's simple and intuitive, this approach can reduce the overall variability of the data, leading to an underestimation of variance. This can be problematic in statistical analyses where understanding data spread is crucial.
 
 ```{r meanimp, cache=TRUE}
 # Replace missing values by mean 
@@ -103,9 +129,8 @@ complete(imputation1, action = 1) # this is a function from mice
 ##### Regression Imputation
 
 -   Ref: [@van2018flexible], Section 1.3.4
--   Mean imputation is straightforward and conceptually easy but tends to lower the variation of your variables.
--   If the variables are related, we could use a regression model to borrow information from other variables to make better imputations.
--   In this imputation, a regression model is fitted to predict the missing values
+
+Regression imputation offers a more nuanced approach, especially when dealing with interrelated variables. By building a regression model using observed data, missing values are predicted based on the relationships between variables. This method can provide more accurate estimates for missing values by leveraging the inherent correlations within the data, making it a preferred choice in many scenarios over mean imputation.
 
 $Y \sim X$
 
@@ -141,9 +166,9 @@ with(data = mice::complete(imputation2), cor(age, bmi))
 
 -   Ref: [@van2018flexible], Section 1.3.5
 
--   One disadvantage to regression imputation is that it used the fitted model without error terms. Therefore, the imputed results are too close to the regression line and biased the correlations, reduced the variance of the data.
+Regression imputation, while powerful, has an inherent limitation. When it employs the fitted model to predict missing values, it does so without incorporating the error terms. This means that the imputed values are precisely on the regression line, leading to an overly perfect fit. As a result, the natural variability present in real-world data is not captured, causing the imputed dataset to exhibit biased correlations and reduced variance. Essentially, the data becomes too "clean," and this lack of variability can mislead subsequent analyses, making them overly optimistic or even erroneous.
 
--   Stochastic regression corrected this problem by adding a error term when imputing the values, which potentially better reflect the correlations between variables
+Recognizing this limitation, stochastic regression imputation was introduced as an enhancement. Instead of merely using the fitted model, it adds a randomly drawn error term during the imputation process. This error term reintroduces the natural variability that the original regression imputation method missed. By doing so, the imputed values are scattered around the regression line, more accurately reflecting the true correlations and distributions in the dataset. This method, therefore, offers a more realistic representation of the data, ensuring that subsequent analyses are grounded in a dataset that mirrors genuine variability and relationships.
 
 $Y \sim X + e$
 
@@ -172,6 +197,11 @@ with(data = mice::complete(imputation3), cor(age, bmi))
 
 ##### Predictive mean matching
 
+Predictive Mean Matching (PMM) is an advanced imputation technique that aims to provide more realistic imputations for missing data. Let's break it down:
+
+In this context, we're trying to fill in missing values for the variable 'age'. To do this, we use other variables like 'bmi', 'cholesterol', and 'diastolicBP' to predict 'age'. First, a regression model is run using the available data to estimate the relationship between 'age' and the predictor variables. From this model, we get a coefficient, which is then adjusted slightly to introduce some randomness. Using this adjusted coefficient, we predict the missing 'age' values for all subjects. For example, if 'subject 19' has a missing age value, we might predict it to be 45.5 years. Instead of using this predicted value directly, we look for other subjects who have actual age values and whose predicted ages are close to 45.5 years. From these subjects, one is randomly chosen, and their real age is used as the imputed value for 'subject 19'. In this way, PMM ensures that the imputed values are based on real, observed data from the dataset.
+
+::: callout-tip
 -   Assume $Y$ = `age`, a variable with some missing values. $X$ (say, `bmi`, `cholesterol`, `diastolicBP`) are predictors of $Y$.
 -   Estimate beta coef $\beta$ from complete case running $Y \sim X + e$
 -   generate new $\beta* \sim Normal(b,se_b)$.
@@ -179,8 +209,9 @@ with(data = mice::complete(imputation3), cor(age, bmi))
     -   If `subject 19` (say) has missing values in `age` variable, find out his `predicted age` $\hat{Y}$ (say, 45.5).
     -   Find others subjects, `subjects 2, 15, 24` (say) who has their `age` measured and their predicted age $\hat{Y}$ (say, `predicted ages` 43.9,45.7,46.1 with real ages 43,45,46 respectively) are close to `subject 19` (predicted age 45.5).
     -   Randomly select `subject 2` with real/observed age 43, and impute 43 for `subject 19`'s missing age.
+::: 
 
-Why this is good? We are imputing something real, observed data; not some averaged out (possibly unrealistic) data (protection against extrapolation?).
+The strength of PMM lies in its approach. Instead of imputing a potentially artificial value based on a prediction, it imputes a real, observed value from the dataset. This ensures that the imputed data retains the original data's characteristics and doesn't introduce any unrealistic values. It offers a safeguard against extrapolation, ensuring that the imputed values are always within the plausible range of the dataset.
 
 ```{r imppmm, cache=TRUE}
 imputation3b <- mice(NHANES17s, method = "pmm", 
@@ -190,6 +221,19 @@ with(data=NHANES17s, cor(age, bmi, use = "pairwise.complete.obs"))
 with(data = mice::complete(imputation3b), cor(age, bmi))
 ```
 
+##### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/TO_HlHuHbgU" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+
 #### Multiple imputation and workflow
 
 -   Ref: [@van2018flexible], Sections 1.4 and 5.1
@@ -197,10 +241,10 @@ with(data = mice::complete(imputation3b), cor(age, bmi))
 
 We have learned different methods of imputation. In this section, we will introduce how to incorporate the data imputation into data analysis. In multiple imputation data analysis, three steps will be taken:
 
--   Step 0: Set imputation model
--   Step 1: The incomplete dataset will be imputed $m$ times;
--   Step 2: Each $m$ complete datasets will be analyzed separately by standard analysis (e.g., regression model);
--   Step 3: The analysis results will be pooled / aggregated together by Rubin's rules (1987).
+-   **Step 0: Set imputation model**: Before starting the imputation process, it's crucial to determine the appropriate imputation model based on the nature of the missing data and the relationships between variables. This model will guide how the missing values are estimated. For instance, if the data is missing at random, a linear regression model might be used for continuous data, while logistic regression might be used for binary data. The choice of model can significantly impact the quality of the imputed data, so it's essential to understand the underlying mechanisms causing the missingness and select a model accordingly.
+-   **Step 1: The incomplete dataset will be imputed $m$ times**: In this step, the incomplete dataset is imputed multiple times, resulting in $m$ different "complete" datasets. The reason for creating multiple datasets is to capture the uncertainty around the missing values. Each of these datasets will have slightly different imputed values, reflecting the variability and uncertainty in the imputation process. The number of imputations, $m$, is typically chosen based on the percentage of missing data and the desired level of accuracy. Common choices for $m$ range from 5 to 50, but more imputations provide more accurate results, especially when the percentage of missing data is high.
+-   **Step 2: Each $m$ complete datasets will be analyzed separately by standard analysis (e.g., regression model)**: Once the $m$ complete datasets are generated, each one is analyzed separately using standard statistical methods. For example, if the research question involves understanding the relationship between two variables, a regression model might be applied to each dataset. This step produces $m$ sets of analysis results, one for each imputed dataset.
+-   **Step 3: The analysis results will be pooled / aggregated together by Rubin's rules (1987)**: The final step involves combining the results from the $m$ separate analyses into a single set of results. This is done using Rubin's rules (1987), which provide a way to aggregate the estimates and adjust for the variability between the imputed datasets. The pooled results give a more accurate and robust estimate than analyzing a single imputed dataset. Rubin's rules ensure that the combined results reflect both the within-imputation variability (the variability in results from analyzing each dataset separately) and the between-imputation variability (the differences in results across the imputed datasets).
 
 ##### Step 0
 
@@ -379,6 +423,18 @@ Compare above results with the pooled table from `mice::pool(fit4)` below. Note 
 est1
 ```
 
+##### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/izQB-n-euro" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
 ### Special case: Variable selection
 
 #### Variable selection in analyzing missing data
@@ -493,9 +549,21 @@ stat$pvalue
 # which indicates that adding none of the variables into our model might be useful
 ```
 
+##### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/cOGP_dELgyo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
 #### Assess the impact of missing values in model fitting
 
--   Ref: [@van2018flexible], Section 5.4.3 In the presence of missing value, we imputed the missing data using observed information. Meanwhile, we bring in uncertainties to our data. The following two processes presented by Buuren can be used to assess the impact of missingness. Buuren has presented four methods, but the following two are most common.
+When working with datasets, missing values are a common challenge. These gaps in data can introduce biases and uncertainties, especially when we try to fit models to the data. To address this, researchers often use imputation methods to fill in the missing values based on the observed information. However, imputation itself can introduce uncertainties. Therefore, it's essential to assess the impact of these missing values on model fitting. Buuren, as referenced in [@van2018flexible] Section 5.4.3, provides methods to do this. Out of the four methods presented by Buuren, the following two are the most commonly used:
 
 1.  Multiple imputation with more number of imputations (i.e., 200). Perform variable selection on each imputed dataset. The differences are attributed to the missing values
 
@@ -528,14 +596,17 @@ for (i in 1:200){
  ## variables are attributed to sampling variation
 ```
 
+
+
 ### Convergence and diagnostics
 
 #### Convergence
 
 -   Ref: [@van2018flexible], Section 6.5.2
--   The MICE package implements a MCMC algorithm for imputation. The coefficients should be converged and irrelevant to the order which variable is imputed first
--   The ideal convergence is to check "the different streams should be freely intermingled with one another, without showing any definite trends."
--   We could plot the imputation object to see the streams.
+
+-   **MCMC Algorithm in MICE**: The MICE package implements a MCMC algorithm for imputation. The coefficients should be converged and irrelevant to the order which variable is imputed first.
+-   **Understanding pattern**: For convergence to be achieved, these chains should mix well with each other, meaning their paths should overlap and crisscross freely. If they show distinct, separate trends or paths, it indicates a lack of convergence, suggesting that the imputation may not be reliable.
+-   **Visualizing Convergence**: We could plot the imputation object to see the streams.
 
 ```{r convergence, cache=TRUE}
 ## Recall the imputation we have done before
@@ -557,7 +628,7 @@ plot(imputation5_2)
 
 -   Ref: [@van2018flexible], Section 6.6
 
-Model diagnostics is important in model fitting. In missing value imputations, we used observed information to impute missing values, so it is also important to do model diagnostics. The easiest way is to look at the distributions of observed and imputed data conditioning on variables with missing values:
+Model diagnostics plays a pivotal role in ensuring the robustness and accuracy of model fitting. Particularly in the realm of missing value imputations, where observed data serves as the foundation for estimating absent values, it becomes imperative to rigorously assess the imputation process. A straightforward diagnostic technique involves comparing the distributions of the observed data with the imputed values, especially when segmented or conditioned based on the variables that originally had missing entries. This comparison helps in discerning any discrepancies or biases introduced during the imputation, ensuring that the filled values align well with the inherent patterns of the observed data.
 
 ```{r diagnostics, cache=TRUE}
 ## We could compare the imputed and observed data using Density plots
@@ -572,5 +643,17 @@ bwplot(imputation5, age + bmi + cholesterol +diastolicBP ~ .imp, layout = c(2, 2
 bwplot(imputation5_3)
 ## Plot a box plot to compare the imputed and observed values
 ```
+
+#### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/umY1gmMhriA" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
 
 ### References

@@ -1,14 +1,6 @@
 ## MID {.unnumbered}
 
-```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
-# Load required packages
-library(mice)
-library(DataExplorer)
-library(VIM)
-library(jtools)
-library(survey)
-library(mitools)
-```
+This section provides a theoretical background on the concept of Multiple Imputation followed by Deletion (MID). It highlights the challenges of imputing dependent and exposure variables and introduces the idea of using auxiliary variables to aid imputation. The section also contrasts the results of traditional MI with MID, especially when the number of imputed datasets is high.
 
 -   Often researchers are reluctant to impute values in the **dependent variable** (and exposure variable). Particularly, for dependent variable, imputation might not help too much.
 -   However, if you have a good **auxiliary variable** (e.g., strongly correlated predictor, that are not used in the main analysis), often multiple imputation method can help. Use of auxiliary variables is one of the greatest strengths of MI methods.
@@ -19,9 +11,25 @@ library(mitools)
 
 ### Data
 
+In the initial chunk, we load several packages that provide functions and tools necessary for the subsequent analysis. These packages facilitate multiple imputation, data visualization, and statistical modeling among other tasks.
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(mice)
+library(DataExplorer)
+library(VIM)
+library(jtools)
+library(survey)
+library(mitools)
+```
+
+We load the necessary data:
+
 ```{r load, cache=TRUE}
 load("Data/missingdata/NHANES17.RData")
 ```
+
+The data is briefly inspected to understand its structure. An identifier column is added to uniquely identify each row or observation in the dataset.
 
 ```{r data1, warning=FALSE, message=FALSE, cache=TRUE}
 require(mice)
@@ -31,6 +39,8 @@ nhanes2
 ```
 
 ### Outcome and exposure has missing
+
+This chunk focuses on identifying which rows have missing values in both the outcome and exposure variables. The outcome and exposure variables are crucial for the analysis, so understanding where they are missing is essential.
 
 ```{r miss0, warning=FALSE, message=FALSE, cache=TRUE}
 # assume outcome = bmi and exposure = chl 
@@ -42,7 +52,7 @@ nhanes2.excludingYA$id
 
 ### Impute as usual
 
-Impute Y and A for now, as well as other covariates with missing values.
+Using the entire dataset, missing values are imputed. This is done by first initializing an imputation model and then performing the imputation to create multiple datasets where missing values are filled in. The result is a list of datasets with imputed values. That means, we impute Y and A for now, as well as other covariates with missing values.
 
 ```{r imp0, warning=FALSE, message=FALSE, cache=TRUE}
 # use full data to impute 
@@ -59,6 +69,8 @@ impdata # all IDs are present
 ```
 
 ### Include a missing indicator (Y & A)
+
+For each imputed dataset, a new column is added to indicate whether the outcome and exposure variables were originally missing. This "missing indicator" column will be used later to subset the data.
 
 ```{r imp1, warning=FALSE, message=FALSE, cache=TRUE}
 # Define formula (making binary Y)
@@ -78,6 +90,9 @@ data.list  # only relevant IDs are present
 
 ### Design, subset and fit
 
+For each imputed dataset, a statistical model is fitted. Before fitting, the data is structured to account for survey design features. Only rows without originally missing outcome and exposure values are used for model fitting. The results of the model fitting for each dataset are stored for later analysis.
+
+
 ```{r imp2, warning=FALSE, message=FALSE, cache=TRUE}
 require(survey)
 fit.list <- vector("list", 5)
@@ -93,6 +108,9 @@ for (i in 1:m) {
 ```
 
 ### Pooled results
+
+After fitting models to each imputed dataset, the results are combined or "pooled". This pooled result provides a more robust estimate by considering the variability across the imputed datasets.
+
 
 ```{r imp3, warning=FALSE, message=FALSE, cache=TRUE}
 require(mitools)
@@ -111,9 +129,11 @@ sum.pooled
 
 ### Report OR
 
+The pooled results are further processed to calculate and report odds ratios, which provide insights into the relationships between variables in the context of logistic regression.
+
 ```{r imp4, warning=FALSE, message=FALSE, cache=TRUE}
 sum.pooled.OR <- summary(pooled.estimates, logeffect=TRUE, digits = 2)
 sum.pooled.OR
 ```
 
-Using publish package may be possible, but requires complicated process. Look for `publish.MIresult` (can be complicated).
+Using publish package may be possible, but requires complicated process. Look for `publish.MIresult` (but this can be complicated).

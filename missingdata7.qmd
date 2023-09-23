@@ -1,5 +1,10 @@
 ## Effect modification {.unnumbered}
 
+In this tutorial, we delve into the concept of effect modification. Here's a breakdown of what we do:
+
+
+ We start by loading the necessary packages that will aid in the analysis. We also define a function `tidy.pool_mi` to streamline the pooling process for multiple imputation results.
+ 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 library(survey)
@@ -20,6 +25,8 @@ tidy.pool_mi <- function(x, ...) {
 
 ### Data
 
+We load a dataset named `smi`. This dataset is a list of multiple imputed datasets, which is evident from the structure and the way we access its elements.
+
 ```{r data, cache=TRUE}
 require(mitools)
 data(smi)
@@ -28,9 +35,9 @@ length(smi[[1]])
 head(smi[[1]][[1]])
 ```
 
-### Model with interaction and ORs
+### Model with interaction and ORs 
 
-Wave is exposure here.
+We're interested in understanding how the variable `wave` interacts with `sex` in predicting `drinkreg`. We fit two logistic regression models, one for each level of the `sex` variable, to understand this interaction. `wave` is exposure here.
 
 For effect modifier sex = 0
 
@@ -51,6 +58,8 @@ summary(pool(models2, rule = "rubin1987"),conf.int = TRUE, exponentiate = TRUE)[
 
 ### Simple slopes analyses
 
+We perform a simple slopes analysis for each imputed dataset. This analysis helps in understanding the relationship between the predictor and the outcome at specific levels of the moderator.
+
 ```{r em2, cache=TRUE}
 a1 <- sim_slopes(models[[1]], pred = wave, modx = sex)
 a2 <- sim_slopes(models[[2]], pred = wave, modx = sex)
@@ -58,6 +67,8 @@ a3 <- sim_slopes(models[[3]], pred = wave, modx = sex)
 a4 <- sim_slopes(models[[4]], pred = wave, modx = sex)
 a5 <- sim_slopes(models[[5]], pred = wave, modx = sex)
 ```
+
+After obtaining the results from each imputed dataset, we pool them to get a consolidated result. This is done separately for each level of the `sex` variable.
 
 ### Pooled results for sex = 0
 
@@ -109,9 +120,11 @@ tidy.pool_mi(mod_pooled)
 summary(MIcombine(as.list(OR), as.list(OR.v)))
 ```
 
+### Optional: Breakdown of results
+
+
 ```{r em5, include=FALSE, echo=FALSE, cache=TRUE}
 # (Optional) log-odds
-# Optional: Breakdown of results
 mod_pooled <- miceadds::pool_mi(qhat=est, u=se)
 tidy.pool_mi(mod_pooled)
 summary(pool(models2, rule = "rubin1987"),conf.int = TRUE)[2,]
@@ -149,9 +162,5 @@ den <- sqrt(1 + var(z))
 pnorm( num / den)
 median(pv) # Eekhout et al (2017) 
 ```
-
-## YouTube Videos
-
-You could watch the videos describing [missingness type](https://youtu.be/KnBkYkHfGG0), [single imputation](https://youtu.be/TO_HlHuHbgU), [multiple imputation](https://youtu.be/izQB-n-euro), [variable selection with multiple imputation](https://youtu.be/cOGP_dELgyo), [diagnostics and convergence](https://youtu.be/umY1gmMhriA), [multiple imputation in complex survey](https://youtu.be/nFOL9fdJTY8), []()
 
 
