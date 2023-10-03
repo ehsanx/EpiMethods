@@ -1,4 +1,6 @@
-## Matching using CCHS {.unnumbered}
+## Exact Matching (CCHS) {.unnumbered}
+
+In the following code chunk, we load the necessary R libraries for our analysis. `MatchIt` is used for matching methods to find comparable control units, `tableone` for creating Table 1 to describe baseline characteristics, `Publish` for generating readable output of regression analysis, and `survey` for analyzing complex survey samples.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -8,9 +10,9 @@ require(Publish)
 require(survey)
 ```
 
-This is the CCHS data, for the OA - CVD problem.
-
 ### Load data
+
+In the following code chunk, we load the CCHS dataset which is related to the Canadian Community Health Survey (CCHS). We then use `ls()` to list all objects in the workspace and `str` to display the structure of the data frame, providing a quick overview of the data and checking for any character variables.
 
 ```{r data, cache=TRUE}
 load("Data/propensityscore/cchs123b.RData")
@@ -19,6 +21,8 @@ str(analytic.miss) # is there any character variable?
 ```
 
 ### Data pre-pocessing
+
+In the following code chunk, we define a vector containing the names of variables of interest that needs to be converted to factor variables. We then convert these variables to factors, ensuring they are treated as categorical in subsequent analyses. We also `recode` the Osteoarthritis (OA) variable into a numeric binary format and display the frequency table of OA before and after the transformation.
 
 ```{r data2, cache=TRUE}
 var.names <- c("age", "sex", "stress", "married", "income", "race", 
@@ -31,6 +35,8 @@ table(analytic.miss$OA)
 ```
 
 ### Identify subjects with missing
+
+In the following code chunk, we create a new variable `miss` and initially assign all its values to 1 in the full dataset (that contains some missing observations). We then adjust this assignment by setting miss to 0 for observations that are also present in another complete case dataset. That means any row with `miss` equal to 0 means that row has no missing observations. Finally, we display the frequency table of the miss variable to check the number of missing and non-missing observations.
 
 ```{r miss, cache=TRUE}
 analytic.miss$miss <- 1
@@ -46,6 +52,8 @@ table(analytic.miss$miss)
 
 #### Unconditional design
 
+In the following code chunk, we explore the summary of the weight variable and establish an unconditional survey design object `w.design0` using the `svydesign` function, which will be used for subsequent survey-weighted analyses. We then explore the summary, standard deviation, and sum of the weights within our design object.
+
 ```{r design, cache=TRUE}
 summary(analytic.miss$weight)
 w.design0 <- svydesign(id=~1, weights=~weight, 
@@ -56,6 +64,8 @@ sum(weights(w.design0))
 ```
 
 #### Conditioning the design
+
+In the following code chunk, we create a new survey design object `w.design` by subsetting `w.design0` to only include observations without missing data `(miss == 0)`. We then explore the summary, standard deviation, and sum of the weights within this new design object.
 
 ```{r design2, cache=TRUE}
 w.design <- subset(w.design0, miss == 0)
@@ -77,7 +87,7 @@ sum(weights(w.design1))
 
 #### Table 1
 
-Is the data balanced? Check SMD.
+In the following code chunk, we define a new variable vector `var.names` and create a categorical table using `svyCreateCatTable` to explore the distribution of `age` and `sex` across strata of `OA` within our subsetted design object `w.design1`. We then print the table with standardized mean differences (SMD) to assess the balance of these variables across strata.
 
 ```{r tab, cache=TRUE}
 var.names <- c("age", "sex")
@@ -86,6 +96,8 @@ print(tab0, smd = TRUE)
 ```
 
 #### Treatment effect
+
+In the following code chunk, we fit a logistic regression model using `svyglm` to estimate the effect of `OA` and other covariates on the binary outcome `CVD` (cardiovascular disease). We then use `publish` to display the results in a readable format.
 
 ```{r tx, cache=TRUE}
 fit.outcome <- svyglm(I(CVD=="event") ~ OA + age + sex + stress + married + 
@@ -98,7 +110,9 @@ publish(fit.outcome)
 
 ### Matching: Estimating treatment effect
 
-Going back to the data (not working on design here while matching)
+Going back to the data (**not working on design here while matching**)
+
+In the following code chunk, we create a new dataset by omitting `NA` values from `analytic.miss` and converting it to a data frame. We then create a subset `analytic11n` which includes only observations from cycle 1.1 and the Northern provinces. We display the dimensions of this subset, as well as frequency tables of `OA` and a cross-tabulation of `OA` and `age` to understand the distribution of our target variable and a key covariate.
 
 ```{r effect, cache=TRUE}
 # Create the dataset without design features
@@ -111,7 +125,7 @@ table(analytic11n$OA,analytic11n$age)
 
 #### Matching by 1 matching variable
 
-First we are working with a few covariates:
+In the following code chunk, we perform exact matching using a single variable, `age`. We define the matching formula and apply the `matchit` function to create matched sets of treated and control units. The resulting `matching.obj` object is displayed to summarize the matching results.
 
 ```{r match1, cache=TRUE}
 match.formula <- as.formula("OA ~ age")
@@ -122,6 +136,8 @@ matching.obj
 ```
 
 #### Matching by 2 matching variables
+
+In the following code chunk, we extend the matching to include two variables, `age` and `sex`. We create a new variable `var.comb` that concatenates these two variables and display its frequency table and the number of unique combinations. We then perform exact matching using both variables and display the resulting object.
 
 ```{r match2, cache=TRUE}
 var.comb <- do.call('paste0', 
@@ -137,6 +153,8 @@ matching.obj
 
 #### Matching by 3 matching variables
 
+In the following code chunk, we further extend the matching to include three variables: `age`, `sex`, and `stress`. We explore the unique combinations of these variables and their distribution across levels of `OA`. We then perform exact matching using these three variables and display the resulting object.
+
 ```{r match3, cache=TRUE}
 var.comb <- do.call('paste0', 
                     analytic11n[, c('age', 'sex', 'stress')])
@@ -151,6 +169,8 @@ matching.obj
 ```
 
 #### Matching by 4 matching variables
+
+The process of matching by 4 variables involves creating combinations of the 4 variables, exploring their distributions, and performing exact matching.
 
 ```{r match4, cache=TRUE}
 var.comb <- do.call('paste0', 
@@ -201,6 +221,8 @@ print(tab1, smd = TRUE)
 
 #### Convert data to design
 
+In the following code chunk, we create a new variable matched in the `analytic.miss` dataset to indicate whether an observation was included in the matched dataset `OACVD.match.11n`. We then create a new survey design object `w.design.m` that includes only the matched observations for subsequent analyses.
+
 ```{r tx2, cache=TRUE}
 analytic.miss$matched <- 0
 length(analytic.miss$ID) # full data
@@ -214,6 +236,8 @@ w.design.m <- subset(w.design0, matched == 1)
 ```
 
 #### Outcome analysis
+
+The subsequent code chunks involve fitting logistic regression models to estimate the treatment effect, both in a crude and adjusted manner, respectively. The models are fitted using the matched survey design object and the results are displayed in a readable format.
 
 ##### Crude
 
@@ -241,6 +265,8 @@ publish(fit.outcome)
 -   Should we match matching variables in the regression?
 
 ### Matching by a lot of variables
+
+The code chunks involve performing matching using a large number of variables and estimating the treatment effect using the matched data. The process involves creating matched datasets, converting them to survey design objects, and fitting logistic regression models.
 
 #### Matching part in data
 
@@ -297,3 +323,15 @@ publish(fit.outcome)
 ```{r savedata, cache=TRUE}
 save(analytic11n, analytic2, analytic.miss, file="Data/propensityscore/cchs123c.RData")
 ```
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/jC8g_n6RqK0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

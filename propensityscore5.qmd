@@ -1,5 +1,10 @@
 ## PSM with MI {.unnumbered}
 
+The tutorial provides a detailed walkthrough of implementing Propensity Score Matching (PSM) combined with Multiple Imputation (MI) in a statistical analysis, focusing on handling missing data and mitigating bias in observational studies.
+
+
+The initial chunk is dedicated to loading various R packages that will be utilized throughout the tutorial. These libraries provide functions and tools that facilitate data manipulation, statistical modeling, visualization, and more.
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 library(MatchIt)
@@ -34,6 +39,13 @@ library(mice)
     -   Also the **imputation model specification** can be modified. For example, we use **pmm** method for bmi in the imputation model.
     -   Remove any subject ID variable from the imputation model, if created in an intermediate step. Indeed ID variables should not be in the imputation model, if they are **not predictive** of the variables with missing observations.
 
+::: callout-tip
+**Predictive Mean Matching**:
+
+The "Predictive Mean Matching" (PMM) method in Multiple Imputation (MI) is a widely used technique to handle missing data, particularly well-suited for continuous variables. PMM operates by first creating a predictive model for the variable with missing data, using observed values from other variables in the dataset. For each missing value, PMM identifies a set of observed values with predicted scores that are close to the predicted score for the missing value, derived from the predictive model. Then, instead of imputing a predicted score directly, PMM randomly selects one of the observed values from this set and assigns it as the imputed value. This method retains the original distribution of the imputed variable since it only uses observed values for imputation, and it also tends to preserve relationships between variables. PMM is particularly advantageous when the normality assumption of the imputed variable is questionable, providing a robust and practical approach to managing missing data in various research contexts.
+::: 
+
+
 #### Propensity score matching (Zanutto, 2006)
 
 -   Use the **propensity score matching as per Zanutto E. L. (2006)**'s recommendation in all of the imputed datasets.
@@ -66,6 +78,8 @@ Variables under consideration:
 
 #### Pre-processing
 
+The data is loaded and variables of interest are identified. 
+
 ```{r data, cache=TRUE}
 load(file="Data/propensityscore/NHANES17.RData") # read data
 ls()
@@ -79,7 +93,7 @@ vars <- c("ID", # ID
 
 #### Subset the dataset
 
-Only keep the variables of interest
+The dataset is then subsetted to retain only the relevant variables, ensuring that subsequent analyses are focused and computationally efficient. 
 
 ```{r subset, cache=TRUE}
 dat.with.miss <- analytic.with.miss[,vars]
@@ -87,6 +101,9 @@ dim(analytic.with.miss)
 ```
 
 #### Inspect weights
+
+
+The weights of the observations are inspected and adjusted to avoid issues in subsequent analyses.
 
 ```{r weight, cache=TRUE}
 summary(dat.with.miss$weight)
@@ -97,6 +114,8 @@ dat.with.miss$weight[dat.with.miss$weight == 0] <- 0.00000001
 
 #### Recode the exposure variable
 
+The exposure variable is recoded for clarity and ease of interpretation in results.
+
 ```{r recode, cache=TRUE}
 dat.with.miss$born <- car::recode(dat.with.miss$born, 
 recodes = " 'Born in 50 US states or Washingt' = 
@@ -106,12 +125,16 @@ dat.with.miss$born <- factor(dat.with.miss$born, levels = c("Born in US", "Other
 
 #### variable types
 
+Variable types are set, ensuring that each variable is treated appropriately in the analyses.
+
 ```{r vartype, cache=TRUE}
 factor.names <- c("race", "married", "education", "gender", "diabetes")
 dat.with.miss[,factor.names] <- lapply(dat.with.miss[,factor.names], factor)
 ```
 
 #### Inspect extent of missing data problem
+
+A visualization is generated to explore the extent and pattern of missing data in the dataset, which informs the strategy for handling them.
 
 ```{r plot, cache=TRUE}
 require(DataExplorer)
@@ -120,9 +143,17 @@ plot_missing(dat.with.miss)
 
 Note that, **multiple imputation then delete** (MID) approach can be applied if the outcome had some missing values. Due to the small number of missingness, MICE may not impute the outcomes BTW.
 
+::: callout-tip
+**Multiple imputation then delete (MID)**:
+
+MID is a specific approach used in the context of multiple imputation (MI) when dealing with missing outcome data. All missing values, including those in the outcome variable, are imputed to create several complete datasets. In subsequent analyses, the imputed values for the outcome variable are deleted, so that only observed outcome values are analyzed. Each dataset (with observed outcome values and imputed predictor values) is analyzed separately, and results are pooled to provide a single estimate.
+::: 
+
 ### Logistic regression
 
 #### Initialization
+
+The MI process is initialized, setting up the framework for subsequent imputations.
 
 ```{r imp0, cache=TRUE}
 imputation <- mice(data = dat.with.miss, maxit = 0, print = FALSE)
@@ -130,7 +161,7 @@ imputation <- mice(data = dat.with.miss, maxit = 0, print = FALSE)
 
 #### Setting imputation model covariates
 
-Setting strata as auxiliary variable
+The predictor matrix is adjusted to specify which variables will be used to predict missing values in the imputation model. Setting strata as auxiliary variable:
 
 ```{r imp1, cache=TRUE}
 pred <- imputation$pred
@@ -144,7 +175,7 @@ pred
 
 #### Setting imputation model specification
 
-Add `pmm` for bmi
+The method for imputing a particular variable is specified (e.g., using Predictive Mean Matching). Here, we add `pmm` for bmi:
 
 ```{r imp2, cache=TRUE}
 meth <- imputation$meth
@@ -153,7 +184,7 @@ meth["bmi"] <- "pmm"
 
 #### Impute incomplete data
 
-We are imputing m = 3 times
+Multiple datasets are imputed, each providing a different "guess" at the missing values, based on observed data. We are imputing m = 3 times.
 
 ```{r imp3, cache=TRUE, warning=FALSE}
 imputation <- mice(data = dat.with.miss, 
@@ -176,12 +207,16 @@ str(allImputations)
 
 #### Design
 
+A survey design object is created, ensuring that subsequent analyses appropriately account for the survey design.
+
 ```{r imp4, cache=TRUE}
 w.design <- svydesign(ids = ~psu, weights = ~weight, strata = ~strata,
                       data = allImputations, nest = TRUE)
 ```
 
 #### Survey data analysis
+
+A logistic regression model is fitted to each imputed dataset.
 
 ```{r imp5, cache=TRUE}
 model.formula <- as.formula(I(diabetes == 'Yes') ~ 
@@ -191,6 +226,8 @@ fit.from.logistic <- with(w.design, svyglm(model.formula, family = binomial("log
 ```
 
 #### Pooled estimates
+
+Results from models across all imputed datasets are pooled to provide a single estimate, accounting for the uncertainty due to missing data.
 
 ```{r imp6, cache=TRUE}
 pooled.estimates <- MIcombine(fit.from.logistic)
@@ -206,6 +243,8 @@ OR[2,]
 
 #### Initialization
 
+The MI process is re-initialized to facilitate PSM in the context of MI.
+
 ```{r imp7, cache=TRUE}
 imputation <- mice(data = dat.with.miss, maxit = 0, print = FALSE)
 impdata <- mice::complete(imputation, action="long")
@@ -217,6 +256,15 @@ allImputations <- imputationList(lapply(1:m,
 ```
 
 #### Zanutto E. L. (2006) under multiple imputation
+
+::: callout-tip
+An iterative process is performed within each imputed dataset, which involves:
+
+1. Estimating propensity scores.
+2. Matching treated and untreated subjects based on these scores.
+3. Extracting matched data and checking the balance of covariates across matched groups.
+4. Fitting outcome models to the survey weighted matched data and estimating treatment effects.
+::: 
 
 Notice that we are performing multi-step process within MI
 
@@ -282,17 +330,23 @@ for (i in 1:m) {
 
 #### Check matched data
 
+The matched data is inspected to ensure that matching was successful and appropriate.
+
 ```{r imp9, cache=TRUE}
 match.statm
 ```
 
 #### Check balance in matched data
 
+The balance of covariates across matched groups is assessed to ensure that matching has successfully reduced bias.
+
 ```{r imp10, cache=TRUE}
 SMDm
 ```
 
 ### Pooled estimate
+
+Finally, the treatment effect estimates from the matched analyses across all imputed datasets are pooled to provide a single, overall estimate, ensuring that the final result appropriately accounts for the uncertainty due to both the matching process and the imputation of missing data.
 
 ```{r imp11, cache=TRUE}
 pooled.estimates <- MIcombine(fit.from.PS)
@@ -303,8 +357,3 @@ CI <- round(exp(confint(pooled.estimates)), 2)
 OR <- cbind(OR, CI)
 OR[2,]
 ```
-
-## YouTube Videos
-
-You could watch the videos describing [exact matching](https://youtu.be/jC8g_n6RqK0), [propensity score matching](https://youtu.be/ONaKFZCTRfw), [propensity score matching by Zanutto (2006)](https://youtu.be/bIzek3FumW0), [propensity score matching by DuGoff et al. (2014)](https://youtu.be/FPx5gF8gy9M), [propensity score matching by Austin et al. (2018)](https://youtu.be/UBp38smBtFA).
-

@@ -1,4 +1,10 @@
-## PSM in CCHS {.unnumbered}
+## PSM in OA-CVD (CCHS) {.unnumbered}
+
+This tutorial is a comprehensive guide on implementing Propensity Score Matching (PSM) using R, particularly focusing on a OA - CVD health study from the Canadian Community Health Survey (CCHS). This PSM method is used to reduce bias due to confounding variables in observational studies by matching treated and control units with similar propensity scores. The tutorial illustrates that PSM is an iterative process, where researchers may need to refine their matching strategy to achieve satisfactory balance in the matched sample. Different strategies for estimating the treatment effect in the matched sample are explored, each with its own assumptions and implications.
+
+### Load packages
+
+At first, various R packages are loaded to utilize their functions for data manipulation, statistical analysis, and visualization.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -11,6 +17,8 @@ require(optmatch)
 ```
 
 ### Load data
+
+The dataset is loaded into the R environment. Variables are renamed to avoid conflicts in subsequent analyses.
 
 ```{r data, cache=TRUE}
 load(file="Data/propensityscore/cchs123c.RData")
@@ -32,6 +40,8 @@ We are going to apply propensity score analysis (Matching) in our OA - CVD probl
 
 #### Specify PS
 
+A logistic regression model formula is specified to calculate the propensity scores (PS), which is the probability of receiving the treatment given the observed covariates.
+
 ```{r step1, cache=TRUE}
 ps.formula <- as.formula("OA ~ age + sex + stress + married + 
                          income + race + bmi + phyact + smoke +
@@ -45,7 +55,7 @@ var.names <- c("age", "sex", "stress", "married",
 
 #### Fit model
 
-The software fits the PS model using a logistic regression by default. This package actually performs stap 1 and 2 with one command `matchit`.
+The software fits the PS model using a logistic regression by default. This package actually performs step 1 and 2 with one command `matchit`. 
 
 Look at the website for arguments of matchit [@Matchit]\]. It looks like this
 
@@ -55,11 +65,23 @@ matchit(formula, data, model="logit", discard=0, reestimate=FALSE, nearest=TRUE,
                  subclass=0, sub.by="treat", mahvars=NULL, exact=FALSE, counter=TRUE, full=FALSE, full.options=list(),...)
 ```
 
+::: callout-tip
+**Nearest-Neighbor Matching**:
+
+Nearest-neighbor matching is a widely used technique in PSM to pair treated and control units based on the proximity of their propensity scores. It is straightforward and computationally efficient, making it a popular choice in many applications of PSM. Nearest-neighbor matching is often termed a "greedy" algorithm because it matches units in order, without considering the global distribution of propensity scores. Once a match is made, it is not revisited, even if a later unit would have been a better match. The method seeks to minimize bias by creating closely matched pairs but can increase variance if the pool of potential matches is reduced too much (e.g., using a very narrow caliper). It is essential to ensure that there is a common support region where the distributions of propensity scores for treated and control units overlap, ensuring comparability.
+::: 
+
 ### Step 2
 
 #### Match subjects by PS
 
-We are going to match using a Nearest neighbor algorithm. This is a greedy matching algorithm. Note that we are not even defining any caliper
+We are going to match using a Nearest neighbor algorithm. This is a greedy matching algorithm. Note that we are not even defining any caliper.
+
+::: callout-tip
+**Caliper**:
+
+In the context of PSM, a caliper is a predefined maximum allowable difference between the propensity scores of matched units. Essentially, it sets a threshold for how dissimilar matched units can be in terms of their propensity scores. When a caliper is used, a treated unit is only matched with a control unit if the absolute difference in their propensity scores is less than or equal to the specified caliper width. The caliper is used to avoid bad matches and thereby minimize bias in the estimated treatment effect. The size of the caliper is crucial. Too wide a caliper may allow poor matches, while too narrow a caliper may result in many units going unmatched. Implementing a caliper involves a trade-off between bias and efficiency. Using a caliper reduces bias by avoiding poor matches but may increase variance by reducing the number of matched pairs available for analysis. Therefore, the use of a caliper in PSM is a strategic decision to enhance the quality of matches and thereby improve the validity of causal inferences drawn from observational data. It is a practical tool to ensure that matched units are sufficiently similar in terms of their propensity scores, reducing the likelihood of bias due to poor matches.
+:::
 
 ```{r step2, cache=TRUE}
 # set seed
@@ -146,7 +168,11 @@ na.omit(OACVD.match[OACVD.match$match.ID == 2,])
 
 ### Step 3
 
+Both graphical and numerical methods are used to assess the quality of the matches and the balance of covariates in the matched sample.
+
 #### Examining PS graphically
+
+Visually inspect the PS and assess the balance of covariates in the matched sample. Various plots are generated to visualize the distribution of PS across treatment groups and to check the balance of covariates before and after matching.
 
 #### matchit package
 
@@ -199,6 +225,18 @@ by(OACVD.match$distance, OACVD.match$OA, summary)
 
 #### Covariate balance in matched sample
 
+Covariate balance is assessed numerically using standardized mean differences (SMD).
+
+::: callout-tip
+**Standardized mean differences**:
+SMD is a versatile and widely used statistical measure that facilitates the comparison of groups in research by providing a scale-free metric of difference and balance. In the context of propensity score matching, achieving low SMD values for covariates after matching is crucial to ensuring the validity of causal inferences drawn from the matched sample.
+
+Benifits:
+
+- SMD is not influenced by the scale of the measured variable, making it suitable for comparing the balance of different variables measured on different scales.
+- Unlike hypothesis testing, SMD is not affected by sample size, making it a reliable measure for assessing balance in matched samples.
+::: 
+
 ```{r step3f, cache=TRUE}
 tab1 <- CreateTableOne(strata = "OA", data = OACVD.match, 
                        test = FALSE, vars = var.names)
@@ -241,7 +279,11 @@ love.plot(baltab, threshold = .2)
 
 ### Repeat of Step 1-3 again
 
+Covariate balance is reassessed in each step to ensure the quality of the match.
+
 #### Add caliper
+
+The matching process is repeated, this time introducing a caliper to ensure that matches are only made within a specified range of PS.
 
 ```{r step3i, cache=TRUE}
 logitPS <-  -log(1/OACVD.match$distance - 1) 
@@ -284,6 +326,8 @@ summary(OACVD.match$weights)
 
 #### Estimate treatment effect for matched data
 
+Different models (e.g., unconditional logistic regression, survey design) are fitted to estimate the treatment effect in the matched sample.
+
 #### Unconditional logistic
 
 ```{r step4, cache=TRUE}
@@ -295,6 +339,8 @@ publish(outcome.model)
 #### Survey design
 
 ##### Convert data to design
+
+The matched data is converted to a survey design object to account for the matched pairs in the analysis.
 
 ```{r step4b, cache=TRUE}
 analytic.miss$matched <- 0
@@ -326,6 +372,8 @@ publish(fit.design)
 
 ### Matched data with increase ratio
 
+The matching process is repeated with a different ratio (e.g., 1:5) to explore how changing the ratio affects the covariate balance and treatment effect estimation.
+
 ```{r ratio, cache=TRUE}
 # Step 1 and 2
 matching.obj <- matchit(ps.formula,
@@ -356,6 +404,8 @@ summary(OACVD.match$weights)
 ```
 
 #### Combining matching weights
+
+Different approaches to incorporating weights (e.g., matching weights, survey weights) are explored.
 
 #### Not incorporating matching weights
 
@@ -406,6 +456,8 @@ publish(fit.design)
 
 #### Matched with replacement
 
+Matching is performed with replacement, allowing control units to be used in more than one match.
+
 ```{r ratio6, cache=TRUE}
 # Step 1 and 2
 matching.obj <- matchit(ps.formula,
@@ -438,6 +490,8 @@ summary(OACVD.match$weights)
 
 #### Survey design
 
+The matched data is converted into a survey design object, and the treatment effect is estimated while accounting for the complex survey design.
+
 ```{r new0, cache=TRUE}
 analytic.miss$matched <- 0
 length(analytic.miss$ID) # full data
@@ -462,3 +516,16 @@ fit.design <- svyglm(I(CVD=="event") ~ OA, design = w.design.m,
        family = binomial(logit))
 publish(fit.design)
 ```
+
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/ONaKFZCTRfw" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

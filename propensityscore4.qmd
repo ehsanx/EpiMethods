@@ -1,4 +1,4 @@
-## PSM in NHANES {.unnumbered}
+## PSM in BMI-diabetes (US) {.unnumbered}
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
 # Load required packages
@@ -253,6 +253,15 @@ fit2.DA <- svyglm(I(diabetes == "Yes") ~ bmi + gender + age + race + income +
                design = w.design.m, family = binomial("logit"))
 summ(fit2.DA, exp = TRUE, confint = TRUE, digits = 3)
 ```
+
+::: callout-tip
+**Double adjustment**:
+
+Double adjustment in PSM can offer an additional layer of control for confounding and enhance the robustness of treatment effect estimates. The primary goal of double adjustment is to further minimize bias in the estimated treatment effect, especially when the propensity score model may not fully balance all covariates across treatment groups. in this approach, The propensity score is estimated, typically using logistic regression, where the treatment assignment is regressed on observed covariates. Units (e.g., individuals) in the treatment group are matched with units in the control group based on their propensity scores. This aims to create comparable groups and balance observed covariates across treatment and control groups. After matching, an *outcome model is fitted to estimate the treatment effect while additionally adjusting for the same covariates used in the propensity score model*. This second adjustment in the outcome model is what constitutes the "double" in "double adjustment."
+
+However, it should be applied thoughtfully, with careful consideration of model specification, covariate selection, and underlying assumptions to ensure valid and reliable results. Always consider the specific context of the study and consult statistical guidelines or experts when applying advanced methods like double adjustment in PSM.
+::: 
+
 
 ### Approach by Austin et al. (2018)
 

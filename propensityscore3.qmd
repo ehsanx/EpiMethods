@@ -1,4 +1,4 @@
-## PSM in NHANES {.unnumbered}
+## PSM in OA-CVD (US) {.unnumbered}
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
 # Load required packages
@@ -18,10 +18,14 @@ require(DataExplorer)
 
 #### Load data
 
+Load the dataset and inspect its structure and variables.
+
 ```{r data, cache=TRUE}
 load(file="Data/propensityscore/NHANES17.RData") 
 ls()
 ```
+
+Visualize missing data patterns. 
 
 ```{r mplot, cache=TRUE, warning=FALSE}
 library(dplyr)
@@ -40,6 +44,9 @@ plot_missing(analytic.with.miss)
 ```
 
 #### Formatting variables
+
+Rename variables to avoid conflicts. Recode variables into binary or categorical as needed. Ensure variable types (factor, numeric) are appropriate.
+
 
 ```{r format, cache=TRUE}
 # to avaoid any confusion later
@@ -98,6 +105,8 @@ table(analytic.with.miss$strata,analytic.with.miss$psu)
 
 #### Complete case data
 
+Create a dataset (`analytic.data`) without `NA` values for analysis. This is done for simplified analysis, but this approach has it's own challenges. In a next tutorial, we will appropriately deal with missing observations in a propensity score modelling. 
+
 ```{r ccdata, cache=TRUE}
 dim(analytic.with.miss)
 analytic.data <- as.data.frame(na.omit(analytic.with.miss))
@@ -107,6 +116,20 @@ dim(analytic.data) # complete case
 ### Zanutto (2006)
 
 -   Ref: [@zanutto2006comparison]
+
+
+#### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/bIzek3FumW0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
 
 #### Set seed
 
@@ -129,7 +152,7 @@ ps.formula <- as.formula(diabetes ~ gender + born +
 
 #### Step 2
 
-Match treated and untreated subjects on the estimated propensity scores
+Match treated and untreated subjects on the estimated propensity scores. Perform nearest-neighbor matching using the propensity scores. Visualize the distribution of propensity scores before and after matching.
 
 ```{r Zanstep2, cache=TRUE}
 require(MatchIt)
@@ -181,9 +204,9 @@ print(tab1m, smd = TRUE)
 
 #### Step 4
 
-Estimate the effect of treatment on outcomes using propensity score-matched sample
+Estimate the effect of treatment on outcomes using propensity score-matched sample. Use the matched sample to estimate the treatment effect, considering survey design.
 
--   "it is important to incorporate the survey design in both linear regression and propensity score analysis. Ignoring the survey weights affects the estimates of population-level effects substantially"
+Incorporating the survey design into both linear regression and propensity score analysis is crucial. Neglecting the survey weights can significantly impact the estimates, altering the representation of population-level effects.
 
 ```{r Zanstep4, cache=TRUE}
 require(survey)
@@ -212,9 +235,21 @@ summ(sfit, exp = TRUE, confint = TRUE)
 
 Propensity score analysis in 4 steps (PATT)
 
+#### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/FPx5gF8gy9M" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
 #### Step 1
 
-Specify the propensity score model to estimate propensity scores
+Specify the propensity score model to estimate propensity scores. Similar to Zanutto but includes additional covariates in the model.
 
 ```{r Dugstep1, cache=TRUE}
 # response = exposure variable
@@ -294,9 +329,21 @@ summ(sfit, exp = TRUE, confint = TRUE)
 
 Propensity score analysis in 4 steps (PATT)
 
+#### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/UBp38smBtFA" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
 #### Step 1
 
-Specify the propensity score model to estimate propensity scores
+Specify the propensity score model to estimate propensity scores. Use survey logistic regression to account for survey design in propensity score estimation.
 
 ```{r Ausstep1, cache=TRUE}
 # response = exposure variable
@@ -314,7 +361,7 @@ summary(analytic.data$PS)
 
 #### Step 2
 
-Match treated and untreated subjects on the estimated propensity scores
+Match treated and untreated subjects on the estimated propensity scores. Two methods are explored: using the `Matching` package and the `MatchIt` package.
 
 ```{r Ausstep2a, cache=TRUE}
 require(Matching)
