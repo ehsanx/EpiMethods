@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - Overfitting and performance</title>
 <style>
@@ -424,7 +424,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -715,7 +715,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Overfitting and performance</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Overfitting and performance</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -730,82 +730,82 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 </header><p>The following tutorial extends the work from the previous lab and focuses on understanding overfitting, evaluating performance, and function writing in the context of linear modeling for a continuous outcome variable, cholesterol levels.</p>
 <div class="cell" data-hash="predictivefactors4_cache/html/setup_9abadbfe52120dd7659ff1a6a348b0c0">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">Publish</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-forge.r-project.org/projects/car/">car</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(Publish)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(car)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>Load the data saved at the end of previous part of the lab.</p>
 <div class="cell" data-hash="predictivefactors4_cache/html/load_414bb884a8e550c7cee46fa7be627e1f">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Now we will fit the final model that we decided at the end of previous part of the lab.</p>
 <div class="cell" data-hash="predictivefactors4_cache/html/lm_729f97fe0a22b541142d0b9dc10c749e">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol~gender + age + born + </span></span>
-<span><span class="st">             race + education + married + </span></span>
-<span><span class="st">             income + diastolicBP + systolicBP + </span></span>
-<span><span class="st">             bmi +</span></span>
-<span><span class="st">             triglycerides + uric.acid + </span></span>
-<span><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
-<span><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
-<span><span class="st">             diabetes"</span><span class="op">)</span></span>
-<span><span class="va">formula4</span></span>
-<span><span class="co">#&gt; cholesterol ~ gender + age + born + race + education + married + </span></span>
-<span><span class="co">#&gt;     income + diastolicBP + systolicBP + bmi + triglycerides + </span></span>
-<span><span class="co">#&gt;     uric.acid + protein + bilirubin + phosphorus + sodium + potassium + </span></span>
-<span><span class="co">#&gt;     globulin + calcium + physical.work + physical.recreational + </span></span>
-<span><span class="co">#&gt;     diabetes</span></span>
-<span><span class="va">fit4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">formula4</span>, data <span class="op">=</span> <span class="va">analytic3</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; lm(formula = formula4, data = analytic3)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residuals:</span></span>
-<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">#&gt; -115.465  -23.695   -2.598   20.017  177.264 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;                             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept)               136.871606  51.998527   2.632  0.00853 ** </span></span>
-<span><span class="co">#&gt; genderMale                -13.064857   1.802099  -7.250 5.48e-13 ***</span></span>
-<span><span class="co">#&gt; age                         0.351838   0.056116   6.270 4.22e-10 ***</span></span>
-<span><span class="co">#&gt; bornOthers                  7.877420   1.947498   4.045 5.39e-05 ***</span></span>
-<span><span class="co">#&gt; raceHispanic               -5.790547   2.323010  -2.493  0.01274 *  </span></span>
-<span><span class="co">#&gt; raceOther                  -4.879882   2.781673  -1.754  0.07950 .  </span></span>
-<span><span class="co">#&gt; raceWhite                  -0.847635   2.130149  -0.398  0.69072    </span></span>
-<span><span class="co">#&gt; educationHigh.School        2.851633   1.617435   1.763  0.07801 .  </span></span>
-<span><span class="co">#&gt; educationSchool            -2.446765   3.084409  -0.793  0.42769    </span></span>
-<span><span class="co">#&gt; marriedNever.married       -5.739509   1.997152  -2.874  0.00409 ** </span></span>
-<span><span class="co">#&gt; marriedPreviously.married   0.342206   1.968165   0.174  0.86198    </span></span>
-<span><span class="co">#&gt; incomeBetween.25kto54k     -0.867063   1.990253  -0.436  0.66312    </span></span>
-<span><span class="co">#&gt; incomeBetween.55kto99k      2.462130   2.169757   1.135  0.25658    </span></span>
-<span><span class="co">#&gt; incomeOver100k              2.626046   2.394560   1.097  0.27289    </span></span>
-<span><span class="co">#&gt; diastolicBP                 0.374971   0.062238   6.025 1.93e-09 ***</span></span>
-<span><span class="co">#&gt; systolicBP                  0.029976   0.049515   0.605  0.54497    </span></span>
-<span><span class="co">#&gt; bmi                        -0.309530   0.118927  -2.603  0.00930 ** </span></span>
-<span><span class="co">#&gt; triglycerides               0.124806   0.006427  19.419  &lt; 2e-16 ***</span></span>
-<span><span class="co">#&gt; uric.acid                   1.357242   0.609012   2.229  0.02593 *  </span></span>
-<span><span class="co">#&gt; protein                     4.767008   2.931636   1.626  0.10406    </span></span>
-<span><span class="co">#&gt; bilirubin                  -6.060791   2.593508  -2.337  0.01952 *  </span></span>
-<span><span class="co">#&gt; phosphorus                 -0.076472   1.341957  -0.057  0.95456    </span></span>
-<span><span class="co">#&gt; sodium                     -1.026686   0.347679  -2.953  0.00318 ** </span></span>
-<span><span class="co">#&gt; potassium                   0.893507   2.283488   0.391  0.69561    </span></span>
-<span><span class="co">#&gt; globulin                   -2.198037   3.036091  -0.724  0.46915    </span></span>
-<span><span class="co">#&gt; calcium                    12.202366   2.574400   4.740 2.25e-06 ***</span></span>
-<span><span class="co">#&gt; physical.workYes           -0.439108   1.651078  -0.266  0.79030    </span></span>
-<span><span class="co">#&gt; physical.recreationalYes    1.238756   1.667670   0.743  0.45767    </span></span>
-<span><span class="co">#&gt; diabetesYes               -19.032748   2.158825  -8.816  &lt; 2e-16 ***</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual standard error: 35.22 on 2603 degrees of freedom</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.2415, Adjusted R-squared:  0.2334 </span></span>
-<span><span class="co">#&gt; F-statistic: 29.61 on 28 and 2603 DF,  p-value: &lt; 2.2e-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>formula4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born + </span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="st">             race + education + married + </span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="st">             bmi +</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="st">             triglycerides + uric.acid + </span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">             diabetes"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9"></a>formula4</span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt; cholesterol ~ gender + age + born + race + education + married + </span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;     income + diastolicBP + systolicBP + bmi + triglycerides + </span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt;     uric.acid + protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt;     globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt;     diabetes</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula4, <span class="at">data =</span> analytic3)</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="fu">summary</span>(fit4)</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; </span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt; lm(formula = formula4, data = analytic3)</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; </span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; -115.465  -23.695   -2.598   20.017  177.264 </span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt; </span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt;                             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt; (Intercept)               136.871606  51.998527   2.632  0.00853 ** </span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt; genderMale                -13.064857   1.802099  -7.250 5.48e-13 ***</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt; age                         0.351838   0.056116   6.270 4.22e-10 ***</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt; bornOthers                  7.877420   1.947498   4.045 5.39e-05 ***</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt; raceHispanic               -5.790547   2.323010  -2.493  0.01274 *  </span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt; raceOther                  -4.879882   2.781673  -1.754  0.07950 .  </span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt; raceWhite                  -0.847635   2.130149  -0.398  0.69072    </span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt; educationHigh.School        2.851633   1.617435   1.763  0.07801 .  </span></span>
+<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt; educationSchool            -2.446765   3.084409  -0.793  0.42769    </span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt; marriedNever.married       -5.739509   1.997152  -2.874  0.00409 ** </span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt; marriedPreviously.married   0.342206   1.968165   0.174  0.86198    </span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt; incomeBetween.25kto54k     -0.867063   1.990253  -0.436  0.66312    </span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt; incomeBetween.55kto99k      2.462130   2.169757   1.135  0.25658    </span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt; incomeOver100k              2.626046   2.394560   1.097  0.27289    </span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt; diastolicBP                 0.374971   0.062238   6.025 1.93e-09 ***</span></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="co">#&gt; systolicBP                  0.029976   0.049515   0.605  0.54497    </span></span>
+<span id="cb3-43"><a href="#cb3-43"></a><span class="co">#&gt; bmi                        -0.309530   0.118927  -2.603  0.00930 ** </span></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co">#&gt; triglycerides               0.124806   0.006427  19.419  &lt; 2e-16 ***</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a><span class="co">#&gt; uric.acid                   1.357242   0.609012   2.229  0.02593 *  </span></span>
+<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt; protein                     4.767008   2.931636   1.626  0.10406    </span></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="co">#&gt; bilirubin                  -6.060791   2.593508  -2.337  0.01952 *  </span></span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="co">#&gt; phosphorus                 -0.076472   1.341957  -0.057  0.95456    </span></span>
+<span id="cb3-49"><a href="#cb3-49"></a><span class="co">#&gt; sodium                     -1.026686   0.347679  -2.953  0.00318 ** </span></span>
+<span id="cb3-50"><a href="#cb3-50"></a><span class="co">#&gt; potassium                   0.893507   2.283488   0.391  0.69561    </span></span>
+<span id="cb3-51"><a href="#cb3-51"></a><span class="co">#&gt; globulin                   -2.198037   3.036091  -0.724  0.46915    </span></span>
+<span id="cb3-52"><a href="#cb3-52"></a><span class="co">#&gt; calcium                    12.202366   2.574400   4.740 2.25e-06 ***</span></span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co">#&gt; physical.workYes           -0.439108   1.651078  -0.266  0.79030    </span></span>
+<span id="cb3-54"><a href="#cb3-54"></a><span class="co">#&gt; physical.recreationalYes    1.238756   1.667670   0.743  0.45767    </span></span>
+<span id="cb3-55"><a href="#cb3-55"></a><span class="co">#&gt; diabetesYes               -19.032748   2.158825  -8.816  &lt; 2e-16 ***</span></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-57"><a href="#cb3-57"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span id="cb3-58"><a href="#cb3-58"></a><span class="co">#&gt; </span></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="co">#&gt; Residual standard error: 35.22 on 2603 degrees of freedom</span></span>
+<span id="cb3-60"><a href="#cb3-60"></a><span class="co">#&gt; Multiple R-squared:  0.2415, Adjusted R-squared:  0.2334 </span></span>
+<span id="cb3-61"><a href="#cb3-61"></a><span class="co">#&gt; F-statistic: 29.61 on 28 and 2603 DF,  p-value: &lt; 2.2e-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="design-matrix" class="level3"><h3 class="anchored" data-anchor-id="design-matrix">Design Matrix</h3>
@@ -825,124 +825,124 @@ Tip
 </div>
 <p>The dimensions of the model matrix are obtained, and the total number of model parameters (<code>p</code>) is calculated.</p>
 <div class="cell" data-hash="predictivefactors4_cache/html/dim_4f6d64134f3a2a6060d91fb03b922206">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    (Intercept) genderMale age bornOthers raceHispanic raceOther raceWhite</span></span>
-<span><span class="co">#&gt; 1            1          1  62          0            0         0         1</span></span>
-<span><span class="co">#&gt; 2            1          1  53          1            0         0         1</span></span>
-<span><span class="co">#&gt; 4            1          0  56          0            0         0         1</span></span>
-<span><span class="co">#&gt; 5            1          0  42          0            0         0         0</span></span>
-<span><span class="co">#&gt; 10           1          1  22          0            0         0         0</span></span>
-<span><span class="co">#&gt; 11           1          0  32          1            1         0         0</span></span>
-<span><span class="co">#&gt;    educationHigh.School educationSchool marriedNever.married</span></span>
-<span><span class="co">#&gt; 1                     0               0                    0</span></span>
-<span><span class="co">#&gt; 2                     1               0                    0</span></span>
-<span><span class="co">#&gt; 4                     0               0                    0</span></span>
-<span><span class="co">#&gt; 5                     0               0                    0</span></span>
-<span><span class="co">#&gt; 10                    0               0                    1</span></span>
-<span><span class="co">#&gt; 11                    0               0                    0</span></span>
-<span><span class="co">#&gt;    marriedPreviously.married incomeBetween.25kto54k incomeBetween.55kto99k</span></span>
-<span><span class="co">#&gt; 1                          0                      0                      1</span></span>
-<span><span class="co">#&gt; 2                          1                      0                      0</span></span>
-<span><span class="co">#&gt; 4                          0                      0                      1</span></span>
-<span><span class="co">#&gt; 5                          1                      1                      0</span></span>
-<span><span class="co">#&gt; 10                         0                      1                      0</span></span>
-<span><span class="co">#&gt; 11                         0                      1                      0</span></span>
-<span><span class="co">#&gt;    incomeOver100k diastolicBP systolicBP  bmi triglycerides uric.acid protein</span></span>
-<span><span class="co">#&gt; 1               0          70        128 27.8           158       4.2     7.5</span></span>
-<span><span class="co">#&gt; 2               0          88        146 30.8           170       7.0     7.4</span></span>
-<span><span class="co">#&gt; 4               0          72        132 42.4            93       5.4     6.1</span></span>
-<span><span class="co">#&gt; 5               0          70        100 20.3            52       3.3     7.7</span></span>
-<span><span class="co">#&gt; 10              0          70        110 28.0            77       6.0     7.4</span></span>
-<span><span class="co">#&gt; 11              0          70        120 28.2           295       5.2     7.4</span></span>
-<span><span class="co">#&gt;    bilirubin phosphorus sodium potassium globulin calcium physical.workYes</span></span>
-<span><span class="co">#&gt; 1        0.5        4.7    136      4.30      2.9     9.8                0</span></span>
-<span><span class="co">#&gt; 2        0.6        4.4    140      4.55      2.9     9.8                0</span></span>
-<span><span class="co">#&gt; 4        0.3        3.8    141      4.08      2.3     8.9                0</span></span>
-<span><span class="co">#&gt; 5        0.3        3.2    136      3.50      3.4     9.3                0</span></span>
-<span><span class="co">#&gt; 10       0.2        5.3    139      4.16      3.0     9.3                0</span></span>
-<span><span class="co">#&gt; 11       0.4        3.1    138      4.31      2.9    10.3                0</span></span>
-<span><span class="co">#&gt;    physical.recreationalYes diabetesYes</span></span>
-<span><span class="co">#&gt; 1                         0           1</span></span>
-<span><span class="co">#&gt; 2                         0           0</span></span>
-<span><span class="co">#&gt; 4                         0           0</span></span>
-<span><span class="co">#&gt; 5                         0           0</span></span>
-<span><span class="co">#&gt; 10                        1           0</span></span>
-<span><span class="co">#&gt; 11                        0           0</span></span>
-<span></span>
-<span><span class="co"># Dimension of the model matrix</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2632   29</span></span>
-<span></span>
-<span><span class="co"># Number of parameters = intercept + slopes</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> </span>
-<span><span class="va">p</span></span>
-<span><span class="co">#&gt; [1] 29</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">head</span>(<span class="fu">model.matrix</span>(fit4))</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt;    (Intercept) genderMale age bornOthers raceHispanic raceOther raceWhite</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; 1            1          1  62          0            0         0         1</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; 2            1          1  53          1            0         0         1</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt; 4            1          0  56          0            0         0         1</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; 5            1          0  42          0            0         0         0</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; 10           1          1  22          0            0         0         0</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; 11           1          0  32          1            1         0         0</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt;    educationHigh.School educationSchool marriedNever.married</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; 1                     0               0                    0</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; 2                     1               0                    0</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; 4                     0               0                    0</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; 5                     0               0                    0</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt; 10                    0               0                    1</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; 11                    0               0                    0</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt;    marriedPreviously.married incomeBetween.25kto54k incomeBetween.55kto99k</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; 1                          0                      0                      1</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; 2                          1                      0                      0</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; 4                          0                      0                      1</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; 5                          1                      1                      0</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; 10                         0                      1                      0</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; 11                         0                      1                      0</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt;    incomeOver100k diastolicBP systolicBP  bmi triglycerides uric.acid protein</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; 1               0          70        128 27.8           158       4.2     7.5</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; 2               0          88        146 30.8           170       7.0     7.4</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; 4               0          72        132 42.4            93       5.4     6.1</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; 5               0          70        100 20.3            52       3.3     7.7</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; 10              0          70        110 28.0            77       6.0     7.4</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt; 11              0          70        120 28.2           295       5.2     7.4</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;    bilirubin phosphorus sodium potassium globulin calcium physical.workYes</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; 1        0.5        4.7    136      4.30      2.9     9.8                0</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt; 2        0.6        4.4    140      4.55      2.9     9.8                0</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt; 4        0.3        3.8    141      4.08      2.3     8.9                0</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt; 5        0.3        3.2    136      3.50      3.4     9.3                0</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt; 10       0.2        5.3    139      4.16      3.0     9.3                0</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt; 11       0.4        3.1    138      4.31      2.9    10.3                0</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co">#&gt;    physical.recreationalYes diabetesYes</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="co">#&gt; 1                         0           1</span></span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="co">#&gt; 2                         0           0</span></span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co">#&gt; 4                         0           0</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a><span class="co">#&gt; 5                         0           0</span></span>
+<span id="cb4-42"><a href="#cb4-42"></a><span class="co">#&gt; 10                        1           0</span></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co">#&gt; 11                        0           0</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a></span>
+<span id="cb4-45"><a href="#cb4-45"></a><span class="co"># Dimension of the model matrix</span></span>
+<span id="cb4-46"><a href="#cb4-46"></a><span class="fu">dim</span>(<span class="fu">model.matrix</span>(fit4))</span>
+<span id="cb4-47"><a href="#cb4-47"></a><span class="co">#&gt; [1] 2632   29</span></span>
+<span id="cb4-48"><a href="#cb4-48"></a></span>
+<span id="cb4-49"><a href="#cb4-49"></a><span class="co"># Number of parameters = intercept + slopes</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a>p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(fit4))[<span class="dv">2</span>] </span>
+<span id="cb4-51"><a href="#cb4-51"></a>p</span>
+<span id="cb4-52"><a href="#cb4-52"></a><span class="co">#&gt; [1] 29</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="check-prediction" class="level3"><h3 class="anchored" data-anchor-id="check-prediction">Check prediction</h3>
 <p>The observed and predicted cholesterol values are summarized.</p>
 <div class="cell" data-hash="predictivefactors4_cache/html/pred_e7bc0d224e0c4272bc85f7b619ee86a3">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obs.y</span> <span class="op">&lt;-</span> <span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">obs.y</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;    81.0   163.0   189.0   191.5   216.0   362.0</span></span>
-<span></span>
-<span><span class="co"># Predict the above fit on analytic3 data</span></span>
-<span><span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit4</span>, <span class="va">analytic3</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">pred.y</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;   136.3   178.2   189.4   191.5   202.4   337.6</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">pred.y</span><span class="op">)</span></span>
-<span><span class="va">n</span></span>
-<span><span class="co">#&gt; [1] 2632</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">obs.y</span>,<span class="va">pred.y</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lowess.html">lowess</a></span><span class="op">(</span><span class="va">obs.y</span>,<span class="va">pred.y</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>obs.y <span class="ot">&lt;-</span> analytic3<span class="sc">$</span>cholesterol</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">summary</span>(obs.y)</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt;    81.0   163.0   189.0   191.5   216.0   362.0</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co"># Predict the above fit on analytic3 data</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, analytic3)</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">summary</span>(pred.y)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt;   136.3   178.2   189.4   191.5   202.4   337.6</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(pred.y)</span>
+<span id="cb5-12"><a href="#cb5-12"></a>n</span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; [1] 2632</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="fu">plot</span>(obs.y,pred.y)</span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="fu">lines</span>(<span class="fu">lowess</span>(obs.y,pred.y), <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 <p><img src="predictivefactors4_files/figure-html/pred-1.png" class="img-fluid" width="672"></p>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span></span>
-<span><span class="co"># Prediction on a new data: fictitious.data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">fictitious.data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 'data.frame':    4121 obs. of  33 variables:</span></span>
-<span><span class="co">#&gt;  $ ID                   : num  83732 83733 83734 83735 83736 ...</span></span>
-<span><span class="co">#&gt;  $ gender               : chr  "Male" "Male" "Male" "Female" ...</span></span>
-<span><span class="co">#&gt;  $ age                  : num  62 53 78 56 42 72 22 32 56 46 ...</span></span>
-<span><span class="co">#&gt;  $ born                 : chr  "Born in 50 US states or Washingt" "Others" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
-<span><span class="co">#&gt;  $ race                 : chr  "White" "White" "White" "White" ...</span></span>
-<span><span class="co">#&gt;  $ education            : chr  "College" "High.School" "High.School" "College" ...</span></span>
-<span><span class="co">#&gt;  $ married              : chr  "Married" "Previously.married" "Married" "Married" ...</span></span>
-<span><span class="co">#&gt;  $ income               : chr  "Between.55kto99k" "&lt;25k" "&lt;25k" "Between.55kto99k" ...</span></span>
-<span><span class="co">#&gt;  $ weight               : num  135630 25282 12576 102079 18235 ...</span></span>
-<span><span class="co">#&gt;  $ psu                  : num  1 1 1 1 2 1 2 1 2 1 ...</span></span>
-<span><span class="co">#&gt;  $ strata               : num  125 125 131 131 126 128 128 125 126 121 ...</span></span>
-<span><span class="co">#&gt;  $ diastolicBP          : num  70 88 46 72 70 58 70 70 116 94 ...</span></span>
-<span><span class="co">#&gt;  $ systolicBP           : num  128 146 138 132 100 116 110 120 178 144 ...</span></span>
-<span><span class="co">#&gt;  $ bodyweight           : num  94.8 90.4 83.4 109.8 55.2 ...</span></span>
-<span><span class="co">#&gt;  $ bodyheight           : num  184 171 170 161 165 ...</span></span>
-<span><span class="co">#&gt;  $ bmi                  : num  27.8 30.8 28.8 42.4 20.3 28.6 28 28.2 33.6 27.6 ...</span></span>
-<span><span class="co">#&gt;  $ waist                : num  101.1 107.9 116.5 110.1 80.4 ...</span></span>
-<span><span class="co">#&gt;  $ smoke                : chr  "Not.at.all" "Every.day" "Not.at.all" "Not.at.all" ...</span></span>
-<span><span class="co">#&gt;  $ alcohol              : num  1 6 0 1 1 0 8 1 0 1 ...</span></span>
-<span><span class="co">#&gt;  $ cholesterol          : num  173 265 229 174 204 190 164 190 145 242 ...</span></span>
-<span><span class="co">#&gt;  $ cholesterolM2        : num  4.47 6.85 5.92 4.5 5.28 4.91 4.24 4.91 3.75 6.26 ...</span></span>
-<span><span class="co">#&gt;  $ triglycerides        : num  158 170 299 93 52 52 77 295 121 497 ...</span></span>
-<span><span class="co">#&gt;  $ uric.acid            : num  4.2 7 7.3 5.4 3.3 4.9 6 5.2 4.8 6.5 ...</span></span>
-<span><span class="co">#&gt;  $ protein              : num  7.5 7.4 7.3 6.1 7.7 7.1 7.4 7.4 6.9 6.8 ...</span></span>
-<span><span class="co">#&gt;  $ bilirubin            : num  0.5 0.6 0.5 0.3 0.3 0.5 0.2 0.4 0.4 0.5 ...</span></span>
-<span><span class="co">#&gt;  $ phosphorus           : num  4.7 4.4 3.6 3.8 3.2 3.7 5.3 3.1 4.1 3.6 ...</span></span>
-<span><span class="co">#&gt;  $ sodium               : num  136 140 140 141 136 140 139 138 140 138 ...</span></span>
-<span><span class="co">#&gt;  $ potassium            : num  4.3 4.55 4.7 4.08 3.5 4.2 4.16 4.31 4.5 4.27 ...</span></span>
-<span><span class="co">#&gt;  $ globulin             : num  2.9 2.9 2.8 2.3 3.4 3 3 2.9 2.9 2.6 ...</span></span>
-<span><span class="co">#&gt;  $ calcium              : num  9.8 9.8 9.7 8.9 9.3 9.3 9.3 10.3 9.5 9.3 ...</span></span>
-<span><span class="co">#&gt;  $ physical.work        : chr  "No" "No" "No" "No" ...</span></span>
-<span><span class="co">#&gt;  $ physical.recreational: chr  "No" "No" "No" "No" ...</span></span>
-<span><span class="co">#&gt;  $ diabetes             : chr  "Yes" "No" "Yes" "No" ...</span></span>
-<span><span class="co">#&gt;  - attr(*, "na.action")= 'omit' Named int [1:885] 16 30 39 48 50 58 61 65 67 68 ...</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:885] "27" "68" "90" "112" ...</span></span>
-<span><span class="va">pred.y.new1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit4</span>, <span class="va">fictitious.data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">pred.y.new1</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;   128.7   178.9   190.6   192.5   203.3   557.4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># Prediction on a new data: fictitious.data</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">str</span>(fictitious.data)</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; 'data.frame':    4121 obs. of  33 variables:</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt;  $ ID                   : num  83732 83733 83734 83735 83736 ...</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt;  $ gender               : chr  "Male" "Male" "Male" "Female" ...</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;  $ age                  : num  62 53 78 56 42 72 22 32 56 46 ...</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;  $ born                 : chr  "Born in 50 US states or Washingt" "Others" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;  $ race                 : chr  "White" "White" "White" "White" ...</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;  $ education            : chr  "College" "High.School" "High.School" "College" ...</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;  $ married              : chr  "Married" "Previously.married" "Married" "Married" ...</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;  $ income               : chr  "Between.55kto99k" "&lt;25k" "&lt;25k" "Between.55kto99k" ...</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;  $ weight               : num  135630 25282 12576 102079 18235 ...</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;  $ psu                  : num  1 1 1 1 2 1 2 1 2 1 ...</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;  $ strata               : num  125 125 131 131 126 128 128 125 126 121 ...</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;  $ diastolicBP          : num  70 88 46 72 70 58 70 70 116 94 ...</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;  $ systolicBP           : num  128 146 138 132 100 116 110 120 178 144 ...</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt;  $ bodyweight           : num  94.8 90.4 83.4 109.8 55.2 ...</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt;  $ bodyheight           : num  184 171 170 161 165 ...</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt;  $ bmi                  : num  27.8 30.8 28.8 42.4 20.3 28.6 28 28.2 33.6 27.6 ...</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt;  $ waist                : num  101.1 107.9 116.5 110.1 80.4 ...</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt;  $ smoke                : chr  "Not.at.all" "Every.day" "Not.at.all" "Not.at.all" ...</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt;  $ alcohol              : num  1 6 0 1 1 0 8 1 0 1 ...</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt;  $ cholesterol          : num  173 265 229 174 204 190 164 190 145 242 ...</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt;  $ cholesterolM2        : num  4.47 6.85 5.92 4.5 5.28 4.91 4.24 4.91 3.75 6.26 ...</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt;  $ triglycerides        : num  158 170 299 93 52 52 77 295 121 497 ...</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="co">#&gt;  $ uric.acid            : num  4.2 7 7.3 5.4 3.3 4.9 6 5.2 4.8 6.5 ...</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt;  $ protein              : num  7.5 7.4 7.3 6.1 7.7 7.1 7.4 7.4 6.9 6.8 ...</span></span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt;  $ bilirubin            : num  0.5 0.6 0.5 0.3 0.3 0.5 0.2 0.4 0.4 0.5 ...</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt;  $ phosphorus           : num  4.7 4.4 3.6 3.8 3.2 3.7 5.3 3.1 4.1 3.6 ...</span></span>
+<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;  $ sodium               : num  136 140 140 141 136 140 139 138 140 138 ...</span></span>
+<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt;  $ potassium            : num  4.3 4.55 4.7 4.08 3.5 4.2 4.16 4.31 4.5 4.27 ...</span></span>
+<span id="cb6-33"><a href="#cb6-33"></a><span class="co">#&gt;  $ globulin             : num  2.9 2.9 2.8 2.3 3.4 3 3 2.9 2.9 2.6 ...</span></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="co">#&gt;  $ calcium              : num  9.8 9.8 9.7 8.9 9.3 9.3 9.3 10.3 9.5 9.3 ...</span></span>
+<span id="cb6-35"><a href="#cb6-35"></a><span class="co">#&gt;  $ physical.work        : chr  "No" "No" "No" "No" ...</span></span>
+<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt;  $ physical.recreational: chr  "No" "No" "No" "No" ...</span></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt;  $ diabetes             : chr  "Yes" "No" "Yes" "No" ...</span></span>
+<span id="cb6-38"><a href="#cb6-38"></a><span class="co">#&gt;  - attr(*, "na.action")= 'omit' Named int [1:885] 16 30 39 48 50 58 61 65 67 68 ...</span></span>
+<span id="cb6-39"><a href="#cb6-39"></a><span class="co">#&gt;   ..- attr(*, "names")= chr [1:885] "27" "68" "90" "112" ...</span></span>
+<span id="cb6-40"><a href="#cb6-40"></a>pred.y.new1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, fictitious.data)</span>
+<span id="cb6-41"><a href="#cb6-41"></a><span class="fu">summary</span>(pred.y.new1)</span>
+<span id="cb6-42"><a href="#cb6-42"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb6-43"><a href="#cb6-43"></a><span class="co">#&gt;   128.7   178.9   190.6   192.5   203.3   557.4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="measuring-prediction-error" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="measuring-prediction-error">Measuring prediction error</h3>
@@ -953,25 +953,25 @@ Tip
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="coefd">Wikipedia (<a href="#ref-coefd" role="doc-biblioref">2023a</a>)</span></p>
 </div></div><div class="cell" data-hash="predictivefactors4_cache/html/pe_31d84b2f7b0c6fc358d7df2830b18848">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Find SSE</span></span>
-<span><span class="va">SSE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span> <span class="op">(</span><span class="va">obs.y</span> <span class="op">-</span> <span class="va">pred.y</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">)</span></span>
-<span><span class="va">SSE</span></span>
-<span><span class="co">#&gt; [1] 3228460</span></span>
-<span></span>
-<span><span class="co"># Find SST</span></span>
-<span><span class="va">mean.obs.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">obs.y</span><span class="op">)</span></span>
-<span><span class="va">SST</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span> <span class="op">(</span><span class="va">obs.y</span> <span class="op">-</span> <span class="va">mean.obs.y</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">)</span></span>
-<span><span class="va">SST</span></span>
-<span><span class="co">#&gt; [1] 4256586</span></span>
-<span></span>
-<span><span class="co"># Find R2</span></span>
-<span><span class="va">R.2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">-</span> <span class="va">SSE</span><span class="op">/</span><span class="va">SST</span></span>
-<span><span class="va">R.2</span></span>
-<span><span class="co">#&gt; [1] 0.2415378</span></span>
-<span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">R2</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">obs.y</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.2415378</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Find SSE</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> pred.y)<span class="sc">^</span><span class="dv">2</span> )</span>
+<span id="cb7-3"><a href="#cb7-3"></a>SSE</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; [1] 3228460</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co"># Find SST</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>mean.obs.y <span class="ot">&lt;-</span> <span class="fu">mean</span>(obs.y)</span>
+<span id="cb7-8"><a href="#cb7-8"></a>SST <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> mean.obs.y)<span class="sc">^</span><span class="dv">2</span> )</span>
+<span id="cb7-9"><a href="#cb7-9"></a>SST</span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt; [1] 4256586</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co"># Find R2</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a>R<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span> SSE<span class="sc">/</span>SST</span>
+<span id="cb7-14"><a href="#cb7-14"></a>R<span class="fl">.2</span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt; [1] 0.2415378</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="fu">require</span>(caret)</span>
+<span id="cb7-18"><a href="#cb7-18"></a><span class="fu">R2</span>(pred.y, obs.y)</span>
+<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt; [1] 0.2415378</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="rmse" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="rmse">RMSE</h4>
@@ -980,13 +980,13 @@ Tip
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="anova">Wikipedia (<a href="#ref-anova" role="doc-biblioref">2023b</a>)</span></p>
 </div></div><div class="cell" data-hash="predictivefactors4_cache/html/rmse_5c2dd8879299a1281da189f133af40a3">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Find RMSE</span></span>
-<span><span class="va">Rmse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">SSE</span><span class="op">/</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="va">p</span><span class="op">)</span><span class="op">)</span> </span>
-<span><span class="va">Rmse</span></span>
-<span><span class="co">#&gt; [1] 35.21767</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">RMSE</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">obs.y</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 35.02311</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Find RMSE</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>Rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(SSE<span class="sc">/</span>(n<span class="sc">-</span>p)) </span>
+<span id="cb8-3"><a href="#cb8-3"></a>Rmse</span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; [1] 35.21767</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="fu">RMSE</span>(pred.y, obs.y)</span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt; [1] 35.02311</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="adj-r2" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="adj-r2">Adj R2</h4>
@@ -995,118 +995,120 @@ Tip
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="coefd">Wikipedia (<a href="#ref-coefd" role="doc-biblioref">2023a</a>)</span></p>
 </div></div><div class="cell" data-hash="predictivefactors4_cache/html/adjr2_112e8bc13f52da62b43d4fdf6f362494">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Find adj R2</span></span>
-<span><span class="va">adjR2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">R.2</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">adjR2</span></span>
-<span><span class="co">#&gt; [1] 0.2333791</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Find adj R2</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R<span class="fl">.2</span>)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>(n<span class="sc">-</span>p))</span>
+<span id="cb9-3"><a href="#cb9-3"></a>adjR2</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; [1] 0.2333791</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section></section><section id="writing-function" class="level3"><h3 class="anchored" data-anchor-id="writing-function">Writing function</h3>
 <section id="syntax-for-writing-functions" class="level4"><h4 class="anchored" data-anchor-id="syntax-for-writing-functions">Syntax for Writing Functions</h4>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>func_name <span class="ot">&lt;-</span> <span class="cf">function</span> (argument) {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  A statement or multiple lines of statements</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>func_name <span class="ot">&lt;-</span> <span class="cf">function</span> (argument) {</span>
+<span id="cb10-2"><a href="#cb10-2"></a>  A statement or multiple lines of statements</span>
+<span id="cb10-3"><a href="#cb10-3"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb10-4"><a href="#cb10-4"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="example-of-a-simple-function" class="level4"><h4 class="anchored" data-anchor-id="example-of-a-simple-function">Example of a simple function</h4>
 <div class="cell" data-hash="predictivefactors4_cache/html/simfunc_1e62e4fb6555cbd4f364595d1d8b34c4">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">f1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>,<span class="va">b</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="fu">f1</span><span class="op">(</span>a<span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 4</span></span>
-<span><span class="fu">f1</span><span class="op">(</span>a<span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 7</span></span>
-<span><span class="co"># setting default values</span></span>
-<span><span class="va">f1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span><span class="op">=</span><span class="fl">1</span>,<span class="va">b</span><span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="fu">f1</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="fu">f1</span><span class="op">(</span>b <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 11</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(a,b){</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  result <span class="ot">&lt;-</span> a <span class="sc">+</span> b</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb11-4"><a href="#cb11-4"></a>}</span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="fu">f1</span>(<span class="at">a=</span><span class="dv">1</span>,<span class="at">b=</span><span class="dv">3</span>)</span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; [1] 4</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="fu">f1</span>(<span class="at">a=</span><span class="dv">1</span>,<span class="at">b=</span><span class="dv">6</span>)</span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt; [1] 7</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co"># setting default values</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">a=</span><span class="dv">1</span>,<span class="at">b=</span><span class="dv">1</span>){</span>
+<span id="cb11-11"><a href="#cb11-11"></a>  result <span class="ot">&lt;-</span> a <span class="sc">+</span> b</span>
+<span id="cb11-12"><a href="#cb11-12"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb11-13"><a href="#cb11-13"></a>}</span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="fu">f1</span>()</span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="fu">f1</span>(<span class="at">b =</span> <span class="dv">10</span>)</span>
+<span id="cb11-17"><a href="#cb11-17"></a><span class="co">#&gt; [1] 11</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="a-bit-more-complicated" class="level4"><h4 class="anchored" data-anchor-id="a-bit-more-complicated">A bit more complicated</h4>
 <div class="cell" data-hash="predictivefactors4_cache/html/compfunc_d831403f2e78e676402262830a5ed239">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># one argument</span></span>
-<span><span class="va">model.fit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data.for.fitting</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="va">formulax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol~gender + age + born"</span><span class="op">)</span></span>
-<span>  <span class="va">fitx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">formulax</span>, data <span class="op">=</span> <span class="va">data.for.fitting</span><span class="op">)</span></span>
-<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fitx</span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
-<span><span class="co">#&gt; 184.3131838  -7.8095595   0.2225745  11.1557140</span></span>
-<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
-<span><span class="co">#&gt; 176.1286576  -4.8256829   0.3375009   7.7186190</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># one argument</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>model.fit <span class="ot">&lt;-</span> <span class="cf">function</span>(data.for.fitting){</span>
+<span id="cb12-3"><a href="#cb12-3"></a>  formulax <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4"></a>  fitx <span class="ot">&lt;-</span> <span class="fu">lm</span>(formulax, <span class="at">data =</span> data.for.fitting)</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  result <span class="ot">&lt;-</span> <span class="fu">coef</span>(fitx)</span>
+<span id="cb12-6"><a href="#cb12-6"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb12-7"><a href="#cb12-7"></a>}</span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic)</span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co">#&gt; 184.3131838  -7.8095595   0.2225745  11.1557140</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic3)</span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="co">#&gt; 176.1286576  -4.8256829   0.3375009   7.7186190</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-hash="predictivefactors4_cache/html/compfunc2_380d4b2ee3d480dc2e599aaf2885a794">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># adding one more argument: digits</span></span>
-<span><span class="va">model.fit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data.for.fitting</span>, <span class="va">digits</span><span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="va">formulax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol~gender + age + born"</span><span class="op">)</span></span>
-<span>  <span class="va">fitx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">formulax</span>, data <span class="op">=</span> <span class="va">data.for.fitting</span><span class="op">)</span></span>
-<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fitx</span><span class="op">)</span></span>
-<span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">result</span>,<span class="va">digits</span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
-<span><span class="co">#&gt;      184.31       -7.81        0.22       11.16</span></span>
-<span><span class="fu">model.fit</span><span class="op">(</span>data.for.fitting<span class="op">=</span><span class="va">analytic3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
-<span><span class="co">#&gt;      176.13       -4.83        0.34        7.72</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># adding one more argument: digits</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>model.fit <span class="ot">&lt;-</span> <span class="cf">function</span>(data.for.fitting, <span class="at">digits=</span><span class="dv">2</span>){</span>
+<span id="cb13-3"><a href="#cb13-3"></a>  formulax <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4"></a>  fitx <span class="ot">&lt;-</span> <span class="fu">lm</span>(formulax, <span class="at">data =</span> data.for.fitting)</span>
+<span id="cb13-5"><a href="#cb13-5"></a>  result <span class="ot">&lt;-</span> <span class="fu">coef</span>(fitx)</span>
+<span id="cb13-6"><a href="#cb13-6"></a>  result <span class="ot">&lt;-</span> <span class="fu">round</span>(result,digits)</span>
+<span id="cb13-7"><a href="#cb13-7"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb13-8"><a href="#cb13-8"></a>}</span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic)</span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt;      184.31       -7.81        0.22       11.16</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic3)</span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt;      176.13       -4.83        0.34        7.72</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="function-that-gives-performance-measures" class="level4"><h4 class="anchored" data-anchor-id="function-that-gives-performance-measures">Function that gives performance measures</h4>
 <p>let us create a function that will give us the performance measures:</p>
 <div class="cell" data-hash="predictivefactors4_cache/html/perfom_73429ab358bd9ae1792420255f774200">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">perform</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">new.data</span>,</span>
-<span>                    <span class="va">model.fit</span>,<span class="va">model.formula</span><span class="op">=</span><span class="cn">NULL</span>, </span>
-<span>                    <span class="va">y.name</span> <span class="op">=</span> <span class="st">"Y"</span>,</span>
-<span>                    <span class="va">digits</span><span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="co"># data dimension</span></span>
-<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">model.fit</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  </span>
-<span>  <span class="co"># predicted value</span></span>
-<span>  <span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">model.fit</span>, <span class="va">new.data</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># sample size</span></span>
-<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">pred.y</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># outcome</span></span>
-<span>  <span class="va">new.data.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">new.data</span><span class="op">[</span>,<span class="va">y.name</span><span class="op">]</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># R2</span></span>
-<span>  <span class="va">R2</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">R2</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">new.data.y</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># adj R2 using alternate formula</span></span>
-<span>  <span class="va">df.residual</span> <span class="op">&lt;-</span> <span class="va">n</span><span class="op">-</span><span class="va">p</span></span>
-<span>  <span class="va">adjR2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">R2</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">df.residual</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># RMSE</span></span>
-<span>  <span class="va">RMSE</span> <span class="op">&lt;-</span>  <span class="fu">caret</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">RMSE</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">new.data.y</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># combine all of the results</span></span>
-<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">n</span>,<span class="va">p</span>,<span class="va">R2</span>,<span class="va">adjR2</span>,<span class="va">RMSE</span><span class="op">)</span>,<span class="va">digits</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># returning object</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="fu">perform</span><span class="op">(</span>new.data <span class="op">=</span> <span class="va">analytic3</span>, y.name <span class="op">=</span> <span class="st">"cholesterol"</span>, model.fit <span class="op">=</span> <span class="va">fit4</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
-<span><span class="co">#&gt; [1,] 2632 29 0.242 0.233 35.023</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>perform <span class="ot">&lt;-</span> <span class="cf">function</span>(new.data,</span>
+<span id="cb14-2"><a href="#cb14-2"></a>                    model.fit,<span class="at">model.formula=</span><span class="cn">NULL</span>, </span>
+<span id="cb14-3"><a href="#cb14-3"></a>                    <span class="at">y.name =</span> <span class="st">"Y"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4"></a>                    <span class="at">digits=</span><span class="dv">3</span>){</span>
+<span id="cb14-5"><a href="#cb14-5"></a>  <span class="co"># data dimension</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a>  p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(model.fit))[<span class="dv">2</span>]</span>
+<span id="cb14-7"><a href="#cb14-7"></a>  </span>
+<span id="cb14-8"><a href="#cb14-8"></a>  <span class="co"># predicted value</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a>  pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(model.fit, new.data)</span>
+<span id="cb14-10"><a href="#cb14-10"></a>  </span>
+<span id="cb14-11"><a href="#cb14-11"></a>  <span class="co"># sample size</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(pred.y)</span>
+<span id="cb14-13"><a href="#cb14-13"></a>  </span>
+<span id="cb14-14"><a href="#cb14-14"></a>  <span class="co"># outcome</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a>  new.data.y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(new.data[,y.name])</span>
+<span id="cb14-16"><a href="#cb14-16"></a>  </span>
+<span id="cb14-17"><a href="#cb14-17"></a>  <span class="co"># R2</span></span>
+<span id="cb14-18"><a href="#cb14-18"></a>  R2 <span class="ot">&lt;-</span> caret<span class="sc">:::</span><span class="fu">R2</span>(pred.y, new.data.y)</span>
+<span id="cb14-19"><a href="#cb14-19"></a>  </span>
+<span id="cb14-20"><a href="#cb14-20"></a>  <span class="co"># adj R2 using alternate formula</span></span>
+<span id="cb14-21"><a href="#cb14-21"></a>  df.residual <span class="ot">&lt;-</span> n<span class="sc">-</span>p</span>
+<span id="cb14-22"><a href="#cb14-22"></a>  adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R2)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>df.residual)</span>
+<span id="cb14-23"><a href="#cb14-23"></a>  </span>
+<span id="cb14-24"><a href="#cb14-24"></a>  <span class="co"># RMSE</span></span>
+<span id="cb14-25"><a href="#cb14-25"></a>  RMSE <span class="ot">&lt;-</span>  caret<span class="sc">:::</span><span class="fu">RMSE</span>(pred.y, new.data.y)</span>
+<span id="cb14-26"><a href="#cb14-26"></a>  </span>
+<span id="cb14-27"><a href="#cb14-27"></a>  <span class="co"># combine all of the results</span></span>
+<span id="cb14-28"><a href="#cb14-28"></a>  res <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">cbind</span>(n,p,R2,adjR2,RMSE),digits)</span>
+<span id="cb14-29"><a href="#cb14-29"></a>  </span>
+<span id="cb14-30"><a href="#cb14-30"></a>  <span class="co"># returning object</span></span>
+<span id="cb14-31"><a href="#cb14-31"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb14-32"><a href="#cb14-32"></a>}</span>
+<span id="cb14-33"><a href="#cb14-33"></a><span class="fu">perform</span>(<span class="at">new.data =</span> analytic3, <span class="at">y.name =</span> <span class="st">"cholesterol"</span>, <span class="at">model.fit =</span> fit4)</span>
+<span id="cb14-34"><a href="#cb14-34"></a><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
+<span id="cb14-35"><a href="#cb14-35"></a><span class="co">#&gt; [1,] 2632 29 0.242 0.233 35.023</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section></section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
 
+
+<!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-coefd" class="csl-entry" role="doc-biblioentry">
@@ -1309,7 +1311,244 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Data spliting</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb15" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">## Overfitting and performance {.unnumbered}</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3"></a>The following tutorial extends the work from the previous lab and focuses on understanding overfitting, evaluating performance, and function writing in the context of linear modeling for a continuous outcome variable, cholesterol levels. </span>
+<span id="cb15-4"><a href="#cb15-4"></a></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="in">```{r setup, warning=FALSE, cache=TRUE, message=FALSE}</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="co"># Load required packages</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="fu">library</span>(caret)</span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="fu">library</span>(Publish)</span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="fu">library</span>(car)</span>
+<span id="cb15-11"><a href="#cb15-11"></a><span class="in">```</span></span>
+<span id="cb15-12"><a href="#cb15-12"></a></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="fu">### Load data</span></span>
+<span id="cb15-14"><a href="#cb15-14"></a></span>
+<span id="cb15-15"><a href="#cb15-15"></a>Load the data saved at the end of previous part of the lab.</span>
+<span id="cb15-16"><a href="#cb15-16"></a></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="in">```{r load, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-18"><a href="#cb15-18"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span>)</span>
+<span id="cb15-19"><a href="#cb15-19"></a><span class="in">```</span></span>
+<span id="cb15-20"><a href="#cb15-20"></a></span>
+<span id="cb15-21"><a href="#cb15-21"></a>Now we will fit the final model that we decided at the end of previous part of the lab.</span>
+<span id="cb15-22"><a href="#cb15-22"></a></span>
+<span id="cb15-23"><a href="#cb15-23"></a><span class="in">```{r lm, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-24"><a href="#cb15-24"></a>formula4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born + </span></span>
+<span id="cb15-25"><a href="#cb15-25"></a><span class="st">             race + education + married + </span></span>
+<span id="cb15-26"><a href="#cb15-26"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
+<span id="cb15-27"><a href="#cb15-27"></a><span class="st">             bmi +</span></span>
+<span id="cb15-28"><a href="#cb15-28"></a><span class="st">             triglycerides + uric.acid + </span></span>
+<span id="cb15-29"><a href="#cb15-29"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb15-30"><a href="#cb15-30"></a><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb15-31"><a href="#cb15-31"></a><span class="st">             diabetes"</span>)</span>
+<span id="cb15-32"><a href="#cb15-32"></a>formula4</span>
+<span id="cb15-33"><a href="#cb15-33"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula4, <span class="at">data =</span> analytic3)</span>
+<span id="cb15-34"><a href="#cb15-34"></a><span class="fu">summary</span>(fit4)</span>
+<span id="cb15-35"><a href="#cb15-35"></a><span class="in">```</span></span>
+<span id="cb15-36"><a href="#cb15-36"></a></span>
+<span id="cb15-37"><a href="#cb15-37"></a><span class="fu">### Design Matrix</span></span>
+<span id="cb15-38"><a href="#cb15-38"></a></span>
+<span id="cb15-39"><a href="#cb15-39"></a>Expands factors to a set of dummy variables.</span>
+<span id="cb15-40"><a href="#cb15-40"></a></span>
+<span id="cb15-41"><a href="#cb15-41"></a>::: callout-tip</span>
+<span id="cb15-42"><a href="#cb15-42"></a>We can use the <span class="in">`model.matrix`</span> function to construct a design/model matrix, such as expand factor variables to a matrix of dummy variable</span>
+<span id="cb15-43"><a href="#cb15-43"></a>:::</span>
+<span id="cb15-44"><a href="#cb15-44"></a></span>
+<span id="cb15-45"><a href="#cb15-45"></a>The dimensions of the model matrix are obtained, and the total number of model parameters (<span class="in">`p`</span>) is calculated.</span>
+<span id="cb15-46"><a href="#cb15-46"></a></span>
+<span id="cb15-47"><a href="#cb15-47"></a><span class="in">```{r dim, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-48"><a href="#cb15-48"></a><span class="fu">head</span>(<span class="fu">model.matrix</span>(fit4))</span>
+<span id="cb15-49"><a href="#cb15-49"></a></span>
+<span id="cb15-50"><a href="#cb15-50"></a><span class="co"># Dimension of the model matrix</span></span>
+<span id="cb15-51"><a href="#cb15-51"></a><span class="fu">dim</span>(<span class="fu">model.matrix</span>(fit4))</span>
+<span id="cb15-52"><a href="#cb15-52"></a></span>
+<span id="cb15-53"><a href="#cb15-53"></a><span class="co"># Number of parameters = intercept + slopes</span></span>
+<span id="cb15-54"><a href="#cb15-54"></a>p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(fit4))[<span class="dv">2</span>] </span>
+<span id="cb15-55"><a href="#cb15-55"></a>p</span>
+<span id="cb15-56"><a href="#cb15-56"></a><span class="in">```</span></span>
+<span id="cb15-57"><a href="#cb15-57"></a></span>
+<span id="cb15-58"><a href="#cb15-58"></a><span class="fu">### Check prediction</span></span>
+<span id="cb15-59"><a href="#cb15-59"></a></span>
+<span id="cb15-60"><a href="#cb15-60"></a>The observed and predicted cholesterol values are summarized.</span>
+<span id="cb15-61"><a href="#cb15-61"></a></span>
+<span id="cb15-62"><a href="#cb15-62"></a><span class="in">```{r pred, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-63"><a href="#cb15-63"></a>obs.y <span class="ot">&lt;-</span> analytic3<span class="sc">$</span>cholesterol</span>
+<span id="cb15-64"><a href="#cb15-64"></a><span class="fu">summary</span>(obs.y)</span>
+<span id="cb15-65"><a href="#cb15-65"></a></span>
+<span id="cb15-66"><a href="#cb15-66"></a><span class="co"># Predict the above fit on analytic3 data</span></span>
+<span id="cb15-67"><a href="#cb15-67"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, analytic3)</span>
+<span id="cb15-68"><a href="#cb15-68"></a><span class="fu">summary</span>(pred.y)</span>
+<span id="cb15-69"><a href="#cb15-69"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(pred.y)</span>
+<span id="cb15-70"><a href="#cb15-70"></a>n</span>
+<span id="cb15-71"><a href="#cb15-71"></a><span class="fu">plot</span>(obs.y,pred.y)</span>
+<span id="cb15-72"><a href="#cb15-72"></a><span class="fu">lines</span>(<span class="fu">lowess</span>(obs.y,pred.y), <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb15-73"><a href="#cb15-73"></a></span>
+<span id="cb15-74"><a href="#cb15-74"></a><span class="co"># Prediction on a new data: fictitious.data</span></span>
+<span id="cb15-75"><a href="#cb15-75"></a><span class="fu">str</span>(fictitious.data)</span>
+<span id="cb15-76"><a href="#cb15-76"></a>pred.y.new1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, fictitious.data)</span>
+<span id="cb15-77"><a href="#cb15-77"></a><span class="fu">summary</span>(pred.y.new1)</span>
+<span id="cb15-78"><a href="#cb15-78"></a><span class="in">```</span></span>
+<span id="cb15-79"><a href="#cb15-79"></a></span>
+<span id="cb15-80"><a href="#cb15-80"></a><span class="fu">### Measuring prediction error</span></span>
+<span id="cb15-81"><a href="#cb15-81"></a></span>
+<span id="cb15-82"><a href="#cb15-82"></a>Continuous outcomes</span>
+<span id="cb15-83"><a href="#cb15-83"></a></span>
+<span id="cb15-84"><a href="#cb15-84"></a><span class="fu">#### R2</span></span>
+<span id="cb15-85"><a href="#cb15-85"></a></span>
+<span id="cb15-86"><a href="#cb15-86"></a>The Sum of Squares of Errors (SSE) and the Total Sum of Squares (SST) are calculated. The proportion of variance explained by the model is then calculated as R2.</span>
+<span id="cb15-87"><a href="#cb15-87"></a></span>
+<span id="cb15-88"><a href="#cb15-88"></a>::: column-margin</span>
+<span id="cb15-89"><a href="#cb15-89"></a>See @coefd</span>
+<span id="cb15-90"><a href="#cb15-90"></a>:::</span>
+<span id="cb15-91"><a href="#cb15-91"></a></span>
+<span id="cb15-92"><a href="#cb15-92"></a><span class="in">```{r pe, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-93"><a href="#cb15-93"></a><span class="co"># Find SSE</span></span>
+<span id="cb15-94"><a href="#cb15-94"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> pred.y)<span class="sc">^</span><span class="dv">2</span> )</span>
+<span id="cb15-95"><a href="#cb15-95"></a>SSE</span>
+<span id="cb15-96"><a href="#cb15-96"></a></span>
+<span id="cb15-97"><a href="#cb15-97"></a><span class="co"># Find SST</span></span>
+<span id="cb15-98"><a href="#cb15-98"></a>mean.obs.y <span class="ot">&lt;-</span> <span class="fu">mean</span>(obs.y)</span>
+<span id="cb15-99"><a href="#cb15-99"></a>SST <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> mean.obs.y)<span class="sc">^</span><span class="dv">2</span> )</span>
+<span id="cb15-100"><a href="#cb15-100"></a>SST</span>
+<span id="cb15-101"><a href="#cb15-101"></a></span>
+<span id="cb15-102"><a href="#cb15-102"></a><span class="co"># Find R2</span></span>
+<span id="cb15-103"><a href="#cb15-103"></a>R<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span> SSE<span class="sc">/</span>SST</span>
+<span id="cb15-104"><a href="#cb15-104"></a>R<span class="fl">.2</span></span>
+<span id="cb15-105"><a href="#cb15-105"></a></span>
+<span id="cb15-106"><a href="#cb15-106"></a><span class="fu">require</span>(caret)</span>
+<span id="cb15-107"><a href="#cb15-107"></a><span class="fu">R2</span>(pred.y, obs.y)</span>
+<span id="cb15-108"><a href="#cb15-108"></a><span class="in">```</span></span>
+<span id="cb15-109"><a href="#cb15-109"></a></span>
+<span id="cb15-110"><a href="#cb15-110"></a><span class="fu">#### RMSE</span></span>
+<span id="cb15-111"><a href="#cb15-111"></a></span>
+<span id="cb15-112"><a href="#cb15-112"></a>The Root Mean Square Error is calculated to measure the average magnitude of the errors between predicted and observed values.</span>
+<span id="cb15-113"><a href="#cb15-113"></a></span>
+<span id="cb15-114"><a href="#cb15-114"></a>::: column-margin</span>
+<span id="cb15-115"><a href="#cb15-115"></a>See @anova</span>
+<span id="cb15-116"><a href="#cb15-116"></a>:::</span>
+<span id="cb15-117"><a href="#cb15-117"></a></span>
+<span id="cb15-118"><a href="#cb15-118"></a><span class="in">```{r rmse, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-119"><a href="#cb15-119"></a><span class="co"># Find RMSE</span></span>
+<span id="cb15-120"><a href="#cb15-120"></a>Rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(SSE<span class="sc">/</span>(n<span class="sc">-</span>p)) </span>
+<span id="cb15-121"><a href="#cb15-121"></a>Rmse</span>
+<span id="cb15-122"><a href="#cb15-122"></a></span>
+<span id="cb15-123"><a href="#cb15-123"></a><span class="fu">RMSE</span>(pred.y, obs.y)</span>
+<span id="cb15-124"><a href="#cb15-124"></a><span class="in">```</span></span>
+<span id="cb15-125"><a href="#cb15-125"></a></span>
+<span id="cb15-126"><a href="#cb15-126"></a><span class="fu">#### Adj R2</span></span>
+<span id="cb15-127"><a href="#cb15-127"></a></span>
+<span id="cb15-128"><a href="#cb15-128"></a>It provides a measure of how well the model generalizes and adjusts R2 based on the number of predictors.</span>
+<span id="cb15-129"><a href="#cb15-129"></a></span>
+<span id="cb15-130"><a href="#cb15-130"></a>::: column-margin</span>
+<span id="cb15-131"><a href="#cb15-131"></a>See @coefd</span>
+<span id="cb15-132"><a href="#cb15-132"></a>:::</span>
+<span id="cb15-133"><a href="#cb15-133"></a></span>
+<span id="cb15-134"><a href="#cb15-134"></a><span class="in">```{r adjr2, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-135"><a href="#cb15-135"></a><span class="co"># Find adj R2</span></span>
+<span id="cb15-136"><a href="#cb15-136"></a>adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R<span class="fl">.2</span>)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>(n<span class="sc">-</span>p))</span>
+<span id="cb15-137"><a href="#cb15-137"></a>adjR2</span>
+<span id="cb15-138"><a href="#cb15-138"></a><span class="in">```</span></span>
+<span id="cb15-139"><a href="#cb15-139"></a></span>
+<span id="cb15-140"><a href="#cb15-140"></a><span class="fu">### Writing function</span></span>
+<span id="cb15-141"><a href="#cb15-141"></a></span>
+<span id="cb15-142"><a href="#cb15-142"></a><span class="fu">#### Syntax for Writing Functions</span></span>
+<span id="cb15-143"><a href="#cb15-143"></a></span>
+<span id="cb15-144"><a href="#cb15-144"></a><span class="in">```{r func, eval=FALSE}</span></span>
+<span id="cb15-145"><a href="#cb15-145"></a>func_name <span class="ot">&lt;-</span> <span class="cf">function</span> (argument) {</span>
+<span id="cb15-146"><a href="#cb15-146"></a>  A statement or multiple lines of statements</span>
+<span id="cb15-147"><a href="#cb15-147"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb15-148"><a href="#cb15-148"></a>}</span>
+<span id="cb15-149"><a href="#cb15-149"></a><span class="in">```</span></span>
+<span id="cb15-150"><a href="#cb15-150"></a></span>
+<span id="cb15-151"><a href="#cb15-151"></a><span class="fu">#### Example of a simple function</span></span>
+<span id="cb15-152"><a href="#cb15-152"></a></span>
+<span id="cb15-153"><a href="#cb15-153"></a><span class="in">```{r simfunc, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-154"><a href="#cb15-154"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(a,b){</span>
+<span id="cb15-155"><a href="#cb15-155"></a>  result <span class="ot">&lt;-</span> a <span class="sc">+</span> b</span>
+<span id="cb15-156"><a href="#cb15-156"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb15-157"><a href="#cb15-157"></a>}</span>
+<span id="cb15-158"><a href="#cb15-158"></a><span class="fu">f1</span>(<span class="at">a=</span><span class="dv">1</span>,<span class="at">b=</span><span class="dv">3</span>)</span>
+<span id="cb15-159"><a href="#cb15-159"></a><span class="fu">f1</span>(<span class="at">a=</span><span class="dv">1</span>,<span class="at">b=</span><span class="dv">6</span>)</span>
+<span id="cb15-160"><a href="#cb15-160"></a><span class="co"># setting default values</span></span>
+<span id="cb15-161"><a href="#cb15-161"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">a=</span><span class="dv">1</span>,<span class="at">b=</span><span class="dv">1</span>){</span>
+<span id="cb15-162"><a href="#cb15-162"></a>  result <span class="ot">&lt;-</span> a <span class="sc">+</span> b</span>
+<span id="cb15-163"><a href="#cb15-163"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb15-164"><a href="#cb15-164"></a>}</span>
+<span id="cb15-165"><a href="#cb15-165"></a><span class="fu">f1</span>()</span>
+<span id="cb15-166"><a href="#cb15-166"></a><span class="fu">f1</span>(<span class="at">b =</span> <span class="dv">10</span>)</span>
+<span id="cb15-167"><a href="#cb15-167"></a><span class="in">```</span></span>
+<span id="cb15-168"><a href="#cb15-168"></a></span>
+<span id="cb15-169"><a href="#cb15-169"></a><span class="fu">#### A bit more complicated</span></span>
+<span id="cb15-170"><a href="#cb15-170"></a></span>
+<span id="cb15-171"><a href="#cb15-171"></a><span class="in">```{r compfunc, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-172"><a href="#cb15-172"></a><span class="co"># one argument</span></span>
+<span id="cb15-173"><a href="#cb15-173"></a>model.fit <span class="ot">&lt;-</span> <span class="cf">function</span>(data.for.fitting){</span>
+<span id="cb15-174"><a href="#cb15-174"></a>  formulax <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born"</span>)</span>
+<span id="cb15-175"><a href="#cb15-175"></a>  fitx <span class="ot">&lt;-</span> <span class="fu">lm</span>(formulax, <span class="at">data =</span> data.for.fitting)</span>
+<span id="cb15-176"><a href="#cb15-176"></a>  result <span class="ot">&lt;-</span> <span class="fu">coef</span>(fitx)</span>
+<span id="cb15-177"><a href="#cb15-177"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb15-178"><a href="#cb15-178"></a>}</span>
+<span id="cb15-179"><a href="#cb15-179"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic)</span>
+<span id="cb15-180"><a href="#cb15-180"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic3)</span>
+<span id="cb15-181"><a href="#cb15-181"></a><span class="in">```</span></span>
+<span id="cb15-182"><a href="#cb15-182"></a></span>
+<span id="cb15-183"><a href="#cb15-183"></a><span class="in">```{r compfunc2, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-184"><a href="#cb15-184"></a><span class="co"># adding one more argument: digits</span></span>
+<span id="cb15-185"><a href="#cb15-185"></a>model.fit <span class="ot">&lt;-</span> <span class="cf">function</span>(data.for.fitting, <span class="at">digits=</span><span class="dv">2</span>){</span>
+<span id="cb15-186"><a href="#cb15-186"></a>  formulax <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born"</span>)</span>
+<span id="cb15-187"><a href="#cb15-187"></a>  fitx <span class="ot">&lt;-</span> <span class="fu">lm</span>(formulax, <span class="at">data =</span> data.for.fitting)</span>
+<span id="cb15-188"><a href="#cb15-188"></a>  result <span class="ot">&lt;-</span> <span class="fu">coef</span>(fitx)</span>
+<span id="cb15-189"><a href="#cb15-189"></a>  result <span class="ot">&lt;-</span> <span class="fu">round</span>(result,digits)</span>
+<span id="cb15-190"><a href="#cb15-190"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb15-191"><a href="#cb15-191"></a>}</span>
+<span id="cb15-192"><a href="#cb15-192"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic)</span>
+<span id="cb15-193"><a href="#cb15-193"></a><span class="fu">model.fit</span>(<span class="at">data.for.fitting=</span>analytic3)</span>
+<span id="cb15-194"><a href="#cb15-194"></a><span class="in">```</span></span>
+<span id="cb15-195"><a href="#cb15-195"></a></span>
+<span id="cb15-196"><a href="#cb15-196"></a><span class="fu">#### Function that gives performance measures</span></span>
+<span id="cb15-197"><a href="#cb15-197"></a></span>
+<span id="cb15-198"><a href="#cb15-198"></a>let us create a function that will give us the performance measures:</span>
+<span id="cb15-199"><a href="#cb15-199"></a></span>
+<span id="cb15-200"><a href="#cb15-200"></a><span class="in">```{r perfom, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb15-201"><a href="#cb15-201"></a>perform <span class="ot">&lt;-</span> <span class="cf">function</span>(new.data,</span>
+<span id="cb15-202"><a href="#cb15-202"></a>                    model.fit,<span class="at">model.formula=</span><span class="cn">NULL</span>, </span>
+<span id="cb15-203"><a href="#cb15-203"></a>                    <span class="at">y.name =</span> <span class="st">"Y"</span>,</span>
+<span id="cb15-204"><a href="#cb15-204"></a>                    <span class="at">digits=</span><span class="dv">3</span>){</span>
+<span id="cb15-205"><a href="#cb15-205"></a>  <span class="co"># data dimension</span></span>
+<span id="cb15-206"><a href="#cb15-206"></a>  p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(model.fit))[<span class="dv">2</span>]</span>
+<span id="cb15-207"><a href="#cb15-207"></a>  </span>
+<span id="cb15-208"><a href="#cb15-208"></a>  <span class="co"># predicted value</span></span>
+<span id="cb15-209"><a href="#cb15-209"></a>  pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(model.fit, new.data)</span>
+<span id="cb15-210"><a href="#cb15-210"></a>  </span>
+<span id="cb15-211"><a href="#cb15-211"></a>  <span class="co"># sample size</span></span>
+<span id="cb15-212"><a href="#cb15-212"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(pred.y)</span>
+<span id="cb15-213"><a href="#cb15-213"></a>  </span>
+<span id="cb15-214"><a href="#cb15-214"></a>  <span class="co"># outcome</span></span>
+<span id="cb15-215"><a href="#cb15-215"></a>  new.data.y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(new.data[,y.name])</span>
+<span id="cb15-216"><a href="#cb15-216"></a>  </span>
+<span id="cb15-217"><a href="#cb15-217"></a>  <span class="co"># R2</span></span>
+<span id="cb15-218"><a href="#cb15-218"></a>  R2 <span class="ot">&lt;-</span> caret<span class="sc">:::</span><span class="fu">R2</span>(pred.y, new.data.y)</span>
+<span id="cb15-219"><a href="#cb15-219"></a>  </span>
+<span id="cb15-220"><a href="#cb15-220"></a>  <span class="co"># adj R2 using alternate formula</span></span>
+<span id="cb15-221"><a href="#cb15-221"></a>  df.residual <span class="ot">&lt;-</span> n<span class="sc">-</span>p</span>
+<span id="cb15-222"><a href="#cb15-222"></a>  adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R2)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>df.residual)</span>
+<span id="cb15-223"><a href="#cb15-223"></a>  </span>
+<span id="cb15-224"><a href="#cb15-224"></a>  <span class="co"># RMSE</span></span>
+<span id="cb15-225"><a href="#cb15-225"></a>  RMSE <span class="ot">&lt;-</span>  caret<span class="sc">:::</span><span class="fu">RMSE</span>(pred.y, new.data.y)</span>
+<span id="cb15-226"><a href="#cb15-226"></a>  </span>
+<span id="cb15-227"><a href="#cb15-227"></a>  <span class="co"># combine all of the results</span></span>
+<span id="cb15-228"><a href="#cb15-228"></a>  res <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">cbind</span>(n,p,R2,adjR2,RMSE),digits)</span>
+<span id="cb15-229"><a href="#cb15-229"></a>  </span>
+<span id="cb15-230"><a href="#cb15-230"></a>  <span class="co"># returning object</span></span>
+<span id="cb15-231"><a href="#cb15-231"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb15-232"><a href="#cb15-232"></a>}</span>
+<span id="cb15-233"><a href="#cb15-233"></a><span class="fu">perform</span>(<span class="at">new.data =</span> analytic3, <span class="at">y.name =</span> <span class="st">"cholesterol"</span>, <span class="at">model.fit =</span> fit4)</span>
+<span id="cb15-234"><a href="#cb15-234"></a><span class="in">```</span></span>
+<span id="cb15-235"><a href="#cb15-235"></a></span>
+<span id="cb15-236"><a href="#cb15-236"></a><span class="fu">### References</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

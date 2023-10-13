@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - Mediator</title>
 <style>
@@ -405,7 +405,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -692,7 +692,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Mediator</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Mediator</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -707,8 +707,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 </header><p>Mediators play a crucial role in understanding how a treatment variable affects an outcome. A mediator variable lies in the pathway between the treatment and outcome, essentially transmitting or explaining the effect of the treatment variable. In this expanded tutorial, we’ll delve into more details based on the lecture, specifically focusing on the true direct and indirect effects when a mediator is present.</p>
 <div class="cell" data-hash="confounding2_cache/html/setup_506967b0b456e8a37001fecaa572dc2f">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/osofr/simcausal">simcausal</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(simcausal)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Let us consider</p>
@@ -724,29 +724,29 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>Our true treatment effect is 1.3, and the mediator variable’s effect on the outcome Y is 0.5. It’s important to differentiate between these effects.</p>
 <section id="data-generating-process" class="level4"><h4 class="anchored" data-anchor-id="data-generating-process">Data generating process</h4>
 <div class="cell" data-hash="confounding2_cache/html/dgm_184392ae0928959755831f5250c44245">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/osofr/simcausal">simcausal</a></span><span class="op">)</span></span>
-<span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/DAG.empty.html">DAG.empty</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">D</span> <span class="op">&lt;-</span> <span class="va">D</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/node.html">node</a></span><span class="op">(</span><span class="st">"A"</span>, distr <span class="op">=</span> <span class="st">"rbern"</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/node.html">node</a></span><span class="op">(</span><span class="st">"M"</span>, distr <span class="op">=</span> <span class="st">"rnorm"</span>, mean <span class="op">=</span> <span class="fl">10</span> <span class="op">+</span> <span class="fl">0.9</span> <span class="op">*</span> <span class="va">A</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/node.html">node</a></span><span class="op">(</span><span class="st">"Y"</span>, distr <span class="op">=</span> <span class="st">"rnorm"</span>, mean <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">M</span> <span class="op">+</span> <span class="fl">1.3</span> <span class="op">*</span> <span class="va">A</span>, sd <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span></span>
-<span><span class="va">Dset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/set.DAG.html">set.DAG</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
+<span id="cb2-3"><a href="#cb2-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
+<span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">node</span>(<span class="st">"M"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">10</span> <span class="sc">+</span> <span class="fl">0.9</span> <span class="sc">*</span> A, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> M <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> A, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="generate-dag" class="level4"><h4 class="anchored" data-anchor-id="generate-dag">Generate DAG</h4>
 <div class="cell" data-hash="confounding2_cache/html/dag_de5b692cf0d6579ca09f8b368c6c67ae">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/plotDAG.html">plotDAG</a></span><span class="op">(</span><span class="va">Dset</span>, xjitter <span class="op">=</span> <span class="fl">0.1</span>, yjitter <span class="op">=</span> <span class="fl">.9</span>,</span>
-<span>        edge_attrs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.5</span>, arrow.width <span class="op">=</span> <span class="fl">0.4</span>, arrow.size <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span>,</span>
-<span>        vertex_attrs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">12</span>, label.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
+<span id="cb3-2"><a href="#cb3-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
+<span id="cb3-3"><a href="#cb3-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 <p><img src="confounding2_files/figure-html/dag-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="generate-data" class="level4"><h4 class="anchored" data-anchor-id="generate-data">Generate Data</h4>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/osofr/simcausal">simcausal</a></span><span class="op">)</span></span>
-<span><span class="va">Obs.Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/sim.html">sim</a></span><span class="op">(</span>DAG <span class="op">=</span> <span class="va">Dset</span>, n <span class="op">=</span> <span class="fl">1000000</span>, rndseed <span class="op">=</span> <span class="fl">123</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">Obs.Data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="fu">head</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -758,17 +758,17 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="estimate-effect" class="level4"><h4 class="anchored" data-anchor-id="estimate-effect">Estimate effect</h4>
 <div class="cell" data-hash="confounding2_cache/html/est_631bbe9c8af5410b7956fe7aef26e11e">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Not adjusted for M</span></span>
-<span><span class="va">fit0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">A</span>, family<span class="op">=</span><span class="st">"gaussian"</span>, data<span class="op">=</span><span class="va">Obs.Data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fit0</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)           A </span></span>
-<span><span class="co">#&gt;        5.00        1.69</span></span>
-<span></span>
-<span><span class="co"># Adjusted for M</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">A</span> <span class="op">+</span> <span class="va">M</span>, family<span class="op">=</span><span class="st">"gaussian"</span>, data<span class="op">=</span><span class="va">Obs.Data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)           A           M </span></span>
-<span><span class="co">#&gt;         0.0         1.3         0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Not adjusted for M</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; (Intercept)           A </span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt;        5.00        1.69</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co"># Adjusted for M</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A <span class="sc">+</span> M, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit),<span class="dv">2</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; (Intercept)           A           M </span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;         0.0         1.3         0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout-important callout callout-style-default callout-captioned">
@@ -792,29 +792,29 @@ Important
 </ul>
 <section id="data-generating-process-1" class="level4"><h4 class="anchored" data-anchor-id="data-generating-process-1">Data generating process</h4>
 <div class="cell" data-hash="confounding2_cache/html/dgm0_04a216a32beb89309f213eddbfb6aaa0">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/osofr/simcausal">simcausal</a></span><span class="op">)</span></span>
-<span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/DAG.empty.html">DAG.empty</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">D</span> <span class="op">&lt;-</span> <span class="va">D</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/node.html">node</a></span><span class="op">(</span><span class="st">"A"</span>, distr <span class="op">=</span> <span class="st">"rbern"</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/node.html">node</a></span><span class="op">(</span><span class="st">"M"</span>, distr <span class="op">=</span> <span class="st">"rnorm"</span>, mean <span class="op">=</span> <span class="fl">10</span> <span class="op">+</span> <span class="fl">0.9</span> <span class="op">*</span> <span class="va">A</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/node.html">node</a></span><span class="op">(</span><span class="st">"Y"</span>, distr <span class="op">=</span> <span class="st">"rnorm"</span>, mean <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">M</span>, sd <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span></span>
-<span><span class="va">Dset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/set.DAG.html">set.DAG</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
+<span id="cb6-3"><a href="#cb6-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>  <span class="fu">node</span>(<span class="st">"M"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">10</span> <span class="sc">+</span> <span class="fl">0.9</span> <span class="sc">*</span> A, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> M, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
+<span id="cb6-7"><a href="#cb6-7"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="generate-dag-1" class="level4"><h4 class="anchored" data-anchor-id="generate-dag-1">Generate DAG</h4>
 <div class="cell" data-hash="confounding2_cache/html/dag0_32366d394769b623eb75ec7b1a44c060">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/plotDAG.html">plotDAG</a></span><span class="op">(</span><span class="va">Dset</span>, xjitter <span class="op">=</span> <span class="fl">0.1</span>, yjitter <span class="op">=</span> <span class="fl">.9</span>,</span>
-<span>        edge_attrs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.5</span>, arrow.width <span class="op">=</span> <span class="fl">0.4</span>, arrow.size <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span>,</span>
-<span>        vertex_attrs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">12</span>, label.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
+<span id="cb7-2"><a href="#cb7-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
+<span id="cb7-3"><a href="#cb7-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 <p><img src="confounding2_files/figure-html/dag0-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="generate-data-1" class="level4"><h4 class="anchored" data-anchor-id="generate-data-1">Generate Data</h4>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/osofr/simcausal">simcausal</a></span><span class="op">)</span></span>
-<span><span class="va">Obs.Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/simcausal/man/sim.html">sim</a></span><span class="op">(</span>DAG <span class="op">=</span> <span class="va">Dset</span>, n <span class="op">=</span> <span class="fl">1000000</span>, rndseed <span class="op">=</span> <span class="fl">123</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">Obs.Data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="fu">head</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -826,17 +826,17 @@ Important
 </div>
 </section><section id="estimate-effect-1" class="level4"><h4 class="anchored" data-anchor-id="estimate-effect-1">Estimate effect</h4>
 <div class="cell" data-hash="confounding2_cache/html/est0_f725220f23b7db9803998ab5265b2824">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Not adjusted for M</span></span>
-<span><span class="va">fit0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">A</span>, family<span class="op">=</span><span class="st">"gaussian"</span>, data<span class="op">=</span><span class="va">Obs.Data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fit0</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)           A </span></span>
-<span><span class="co">#&gt;        5.00        0.39</span></span>
-<span></span>
-<span><span class="co"># Adjusted for M</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">A</span> <span class="op">+</span> <span class="va">M</span>, family<span class="op">=</span><span class="st">"gaussian"</span>, data<span class="op">=</span><span class="va">Obs.Data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (Intercept)           A           M </span></span>
-<span><span class="co">#&gt;         0.0         0.0         0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Not adjusted for M</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; (Intercept)           A </span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt;        5.00        0.39</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co"># Adjusted for M</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A <span class="sc">+</span> M, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit),<span class="dv">2</span>)</span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt; (Intercept)           A           M </span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt;         0.0         0.0         0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout-important callout callout-style-default callout-captioned">
@@ -855,6 +855,8 @@ Important
 </div>
 </div>
 
+
+<!-- -->
 
 </section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1049,7 +1051,128 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Collider</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb10" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">## Mediator {.unnumbered}</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a>Mediators play a crucial role in understanding how a treatment variable affects an outcome. A mediator variable lies in the pathway between the treatment and outcome, essentially transmitting or explaining the effect of the treatment variable. In this expanded tutorial, we'll delve into more details based on the lecture, specifically focusing on the true direct and indirect effects when a mediator is present.</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co"># Load required packages</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="fu">library</span>(simcausal)</span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="in">```</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a></span>
+<span id="cb10-10"><a href="#cb10-10"></a>Let us consider</span>
+<span id="cb10-11"><a href="#cb10-11"></a></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="ss">-   </span>M is continuous variable</span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="ss">-   </span>A is binary treatment</span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="ss">-   </span>Y is continuous outcome</span>
+<span id="cb10-15"><a href="#cb10-15"></a></span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="fu">### Non-null effect</span></span>
+<span id="cb10-17"><a href="#cb10-17"></a></span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="ss">-   </span>True treatment effect = 1.3</span>
+<span id="cb10-19"><a href="#cb10-19"></a></span>
+<span id="cb10-20"><a href="#cb10-20"></a>Our true treatment effect is 1.3, and the mediator variable's effect on the outcome Y is 0.5. It's important to differentiate between these effects.</span>
+<span id="cb10-21"><a href="#cb10-21"></a></span>
+<span id="cb10-22"><a href="#cb10-22"></a><span class="fu">#### Data generating process</span></span>
+<span id="cb10-23"><a href="#cb10-23"></a></span>
+<span id="cb10-24"><a href="#cb10-24"></a><span class="in">```{r dgm, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb10-26"><a href="#cb10-26"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
+<span id="cb10-27"><a href="#cb10-27"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
+<span id="cb10-28"><a href="#cb10-28"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb10-29"><a href="#cb10-29"></a>  <span class="fu">node</span>(<span class="st">"M"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">10</span> <span class="sc">+</span> <span class="fl">0.9</span> <span class="sc">*</span> A, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb10-30"><a href="#cb10-30"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> M <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> A, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
+<span id="cb10-31"><a href="#cb10-31"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span>
+<span id="cb10-32"><a href="#cb10-32"></a><span class="in">```</span></span>
+<span id="cb10-33"><a href="#cb10-33"></a></span>
+<span id="cb10-34"><a href="#cb10-34"></a><span class="fu">#### Generate DAG</span></span>
+<span id="cb10-35"><a href="#cb10-35"></a></span>
+<span id="cb10-36"><a href="#cb10-36"></a><span class="in">```{r dag, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-37"><a href="#cb10-37"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
+<span id="cb10-38"><a href="#cb10-38"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
+<span id="cb10-39"><a href="#cb10-39"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span>
+<span id="cb10-40"><a href="#cb10-40"></a><span class="in">```</span></span>
+<span id="cb10-41"><a href="#cb10-41"></a></span>
+<span id="cb10-42"><a href="#cb10-42"></a><span class="fu">#### Generate Data</span></span>
+<span id="cb10-43"><a href="#cb10-43"></a></span>
+<span id="cb10-44"><a href="#cb10-44"></a><span class="in">```{r data, cache = FALSE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-45"><a href="#cb10-45"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb10-46"><a href="#cb10-46"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
+<span id="cb10-47"><a href="#cb10-47"></a><span class="fu">head</span>(Obs.Data)</span>
+<span id="cb10-48"><a href="#cb10-48"></a><span class="in">```</span></span>
+<span id="cb10-49"><a href="#cb10-49"></a></span>
+<span id="cb10-50"><a href="#cb10-50"></a><span class="fu">#### Estimate effect</span></span>
+<span id="cb10-51"><a href="#cb10-51"></a></span>
+<span id="cb10-52"><a href="#cb10-52"></a><span class="in">```{r est, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-53"><a href="#cb10-53"></a><span class="co"># Not adjusted for M</span></span>
+<span id="cb10-54"><a href="#cb10-54"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb10-55"><a href="#cb10-55"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
+<span id="cb10-56"><a href="#cb10-56"></a></span>
+<span id="cb10-57"><a href="#cb10-57"></a><span class="co"># Adjusted for M</span></span>
+<span id="cb10-58"><a href="#cb10-58"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A <span class="sc">+</span> M, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb10-59"><a href="#cb10-59"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit),<span class="dv">2</span>)</span>
+<span id="cb10-60"><a href="#cb10-60"></a><span class="in">```</span></span>
+<span id="cb10-61"><a href="#cb10-61"></a></span>
+<span id="cb10-62"><a href="#cb10-62"></a>::: callout-important</span>
+<span id="cb10-63"><a href="#cb10-63"></a>You might notice a total effect that could differ from the true effects. In the lecture example, a crude association showed an effect of 1.69, which is the total effect combining both direct and indirect pathways.</span>
+<span id="cb10-64"><a href="#cb10-64"></a></span>
+<span id="cb10-65"><a href="#cb10-65"></a>Upon adjusting for M, the coefficients will show you the direct effect of A on Y and the indirect effect through M. These should align closely with our true effects: a direct effect of 1.3 and an indirect effect of 0.5.</span>
+<span id="cb10-66"><a href="#cb10-66"></a></span>
+<span id="cb10-67"><a href="#cb10-67"></a>In this expanded tutorial, we've shown how essential it is to consider mediator variables when estimating treatment effects. We've also illustrated how adjusting for mediators allows you to differentiate between true direct and indirect effects, thereby reducing the risk of drawing incorrect conclusions from your data.</span>
+<span id="cb10-68"><a href="#cb10-68"></a>::: </span>
+<span id="cb10-69"><a href="#cb10-69"></a></span>
+<span id="cb10-70"><a href="#cb10-70"></a><span class="fu">### Null effect</span></span>
+<span id="cb10-71"><a href="#cb10-71"></a></span>
+<span id="cb10-72"><a href="#cb10-72"></a><span class="ss">-   </span>True treatment effect = 0</span>
+<span id="cb10-73"><a href="#cb10-73"></a></span>
+<span id="cb10-74"><a href="#cb10-74"></a><span class="fu">#### Data generating process</span></span>
+<span id="cb10-75"><a href="#cb10-75"></a></span>
+<span id="cb10-76"><a href="#cb10-76"></a><span class="in">```{r dgm0, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-77"><a href="#cb10-77"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb10-78"><a href="#cb10-78"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
+<span id="cb10-79"><a href="#cb10-79"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
+<span id="cb10-80"><a href="#cb10-80"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb10-81"><a href="#cb10-81"></a>  <span class="fu">node</span>(<span class="st">"M"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">10</span> <span class="sc">+</span> <span class="fl">0.9</span> <span class="sc">*</span> A, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb10-82"><a href="#cb10-82"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> M, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
+<span id="cb10-83"><a href="#cb10-83"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span>
+<span id="cb10-84"><a href="#cb10-84"></a><span class="in">```</span></span>
+<span id="cb10-85"><a href="#cb10-85"></a></span>
+<span id="cb10-86"><a href="#cb10-86"></a><span class="fu">#### Generate DAG</span></span>
+<span id="cb10-87"><a href="#cb10-87"></a></span>
+<span id="cb10-88"><a href="#cb10-88"></a><span class="in">```{r dag0, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-89"><a href="#cb10-89"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
+<span id="cb10-90"><a href="#cb10-90"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
+<span id="cb10-91"><a href="#cb10-91"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span>
+<span id="cb10-92"><a href="#cb10-92"></a><span class="in">```</span></span>
+<span id="cb10-93"><a href="#cb10-93"></a></span>
+<span id="cb10-94"><a href="#cb10-94"></a><span class="fu">#### Generate Data</span></span>
+<span id="cb10-95"><a href="#cb10-95"></a></span>
+<span id="cb10-96"><a href="#cb10-96"></a><span class="in">```{r data0, cache = FALSE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-97"><a href="#cb10-97"></a><span class="fu">require</span>(simcausal)</span>
+<span id="cb10-98"><a href="#cb10-98"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
+<span id="cb10-99"><a href="#cb10-99"></a><span class="fu">head</span>(Obs.Data)</span>
+<span id="cb10-100"><a href="#cb10-100"></a><span class="in">```</span></span>
+<span id="cb10-101"><a href="#cb10-101"></a></span>
+<span id="cb10-102"><a href="#cb10-102"></a><span class="fu">#### Estimate effect</span></span>
+<span id="cb10-103"><a href="#cb10-103"></a></span>
+<span id="cb10-104"><a href="#cb10-104"></a><span class="in">```{r est0, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
+<span id="cb10-105"><a href="#cb10-105"></a><span class="co"># Not adjusted for M</span></span>
+<span id="cb10-106"><a href="#cb10-106"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb10-107"><a href="#cb10-107"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
+<span id="cb10-108"><a href="#cb10-108"></a></span>
+<span id="cb10-109"><a href="#cb10-109"></a><span class="co"># Adjusted for M</span></span>
+<span id="cb10-110"><a href="#cb10-110"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A <span class="sc">+</span> M, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
+<span id="cb10-111"><a href="#cb10-111"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit),<span class="dv">2</span>)</span>
+<span id="cb10-112"><a href="#cb10-112"></a><span class="in">```</span></span>
+<span id="cb10-113"><a href="#cb10-113"></a></span>
+<span id="cb10-114"><a href="#cb10-114"></a>::: callout-important</span>
+<span id="cb10-115"><a href="#cb10-115"></a>**Total Effect**: If you want to measure the "total effect" of a treatment on an outcome, then you typically don't adjust for the mediator. The reason is that the total effect captures both the direct effect of the treatment on the outcome and the indirect effect through the mediator.</span>
+<span id="cb10-116"><a href="#cb10-116"></a></span>
+<span id="cb10-117"><a href="#cb10-117"></a>**Direct and Indirect Effects**: If you want to separate out the direct and indirect effects, then you would adjust for the mediator. In essence, when you control for the mediator, what remains is the direct effect of the treatment on the outcome.</span>
+<span id="cb10-118"><a href="#cb10-118"></a></span>
+<span id="cb10-119"><a href="#cb10-119"></a>**Linearity and Decomposition**: In linear models with continuous outcomes, it is more straightforward to decompose total effects into direct and indirect effects. The mathematics get more complicated in non-linear models or when dealing with non-continuous outcomes.</span>
+<span id="cb10-120"><a href="#cb10-120"></a>::: </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

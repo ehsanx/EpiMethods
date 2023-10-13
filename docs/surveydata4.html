@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - CCHS: Regression</title>
 <style>
@@ -405,7 +405,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -696,7 +696,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">CCHS: Regression</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">CCHS: Regression</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -712,113 +712,113 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><p>This tutorial is for a complex data analysis, specifically using regression techniques to analyze survey data.</p>
 <p>Loads necessary R packages for the analysis</p>
 <div class="cell" data-hash="surveydata4_cache/html/setup_edcad072621fd40bffab56dccb0d6471">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://r-survey.r-forge.r-project.org/survey/">survey</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-forge.r-project.org/projects/car/">car</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/kaz-yos/tableone">tableone</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://boxuancui.github.io/DataExplorer/">DataExplorer</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">Publish</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ipa-tys.github.io/ROCR/">ROCR</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tdhock/WeightedROC">WeightedROC</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://jtools.jacob-long.com">jtools</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/">MASS</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(survey)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(car)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(tableone)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(DataExplorer)</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">library</span>(Publish)</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="fu">library</span>(ROCR)</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="fu">library</span>(WeightedROC)</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="fu">library</span>(jtools)</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="fu">library</span>(MASS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>Loads a dataset and provides some quick data checks, like the dimensions and summary of weights.</p>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"Data/surveydata/cchs123w.RData"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "analytic.miss" "analytic2"     "w.design"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">analytic.miss</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 397173     23</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">analytic2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 185613     22</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/weights.html">weights</a></span><span class="op">(</span><span class="va">w.design</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Length  Class   Mode </span></span>
-<span><span class="co">#&gt;      0   NULL   NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/surveydata/cchs123w.RData"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic.miss" "analytic2"     "w.design"</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="fu">dim</span>(analytic.miss)</span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; [1] 397173     23</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="fu">dim</span>(analytic2)</span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; [1] 185613     22</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">summary</span>(<span class="fu">weights</span>(w.design))</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; Length  Class   Mode </span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;      0   NULL   NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="logistic-for-complex-survey" class="level3"><h3 class="anchored" data-anchor-id="logistic-for-complex-survey">Logistic for complex survey</h3>
 <p>Performs a simple logistic regression using the complex survey data, focusing on the relationship between cardiovascular disease and osteoarthritis.</p>
 <div class="cell" data-hash="surveydata4_cache/html/logistc_a5ae95a21e27cd2ffe6672464fd2472b">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">CVD</span><span class="op">==</span><span class="st">"event"</span><span class="op">)</span> <span class="op">~</span> <span class="va">OA</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## Crude regression</span></span>
-<span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">formula0</span>, </span>
-<span>              design <span class="op">=</span> <span class="va">w.design</span>, </span>
-<span>              family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="va">logit</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va">Publish</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/Publish/man/publish.html">publish</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  Variable   Units OddsRatio       CI.95 p-value </span></span>
-<span><span class="co">#&gt;        OA Control       Ref                     </span></span>
-<span><span class="co">#&gt;                OA      4.52 [4.19;4.87]  &lt;1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>formula0 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="do">## Crude regression</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula0, </span>
+<span id="cb3-5"><a href="#cb3-5"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb3-6"><a href="#cb3-6"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="fu">require</span>(Publish)</span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="fu">publish</span>(fit2)</span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt;  Variable   Units OddsRatio       CI.95 p-value </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;        OA Control       Ref                     </span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;                OA      4.52 [4.19;4.87]  &lt;1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="multivariable-analysis" class="level3"><h3 class="anchored" data-anchor-id="multivariable-analysis">Multivariable analysis</h3>
 <p>Runs a more complex logistic regression model, adding multiple covariates to better understand the relationship.</p>
 <div class="cell" data-hash="surveydata4_cache/html/multivariable_ef5c4652f3d07d08cff8ebef82405145">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">CVD</span><span class="op">==</span><span class="st">"event"</span><span class="op">)</span> <span class="op">~</span> <span class="va">OA</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">married</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span> </span>
-<span>              <span class="va">edu</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">phyact</span> <span class="op">+</span> <span class="va">doctor</span> <span class="op">+</span> <span class="va">stress</span> <span class="op">+</span> </span>
-<span>              <span class="va">smoke</span> <span class="op">+</span> <span class="va">drink</span> <span class="op">+</span> <span class="va">fruit</span> <span class="op">+</span> <span class="va">bp</span> <span class="op">+</span> <span class="va">diab</span> <span class="op">+</span> <span class="va">province</span> <span class="op">+</span> <span class="va">immigrate</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">formula1</span>, </span>
-<span>              design <span class="op">=</span> <span class="va">w.design</span>, </span>
-<span>              family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="va">logit</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/Publish/man/publish.html">publish</a></span><span class="op">(</span><span class="va">fit3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Variable             Units OddsRatio         CI.95     p-value </span></span>
-<span><span class="co">#&gt;         OA           Control       Ref                           </span></span>
-<span><span class="co">#&gt;                           OA      1.52   [1.40;1.66]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;        age       20-29 years       Ref                           </span></span>
-<span><span class="co">#&gt;                  30-39 years      1.29   [0.98;1.69]   0.0707636 </span></span>
-<span><span class="co">#&gt;                  40-49 years      2.74   [2.17;3.47]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                  50-59 years      6.24   [4.97;7.83]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                  60-64 years      9.71  [7.68;12.29]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;            65 years and over     15.85 [12.57;20.00]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                         teen      0.46   [0.20;1.07]   0.0707295 </span></span>
-<span><span class="co">#&gt;        sex            Female       Ref                           </span></span>
-<span><span class="co">#&gt;                         Male      1.73   [1.60;1.88]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;    married        not single       Ref                           </span></span>
-<span><span class="co">#&gt;                       single      0.97   [0.90;1.05]   0.5209444 </span></span>
-<span><span class="co">#&gt;       race         Non-white       Ref                           </span></span>
-<span><span class="co">#&gt;                        White      1.44   [1.19;1.75]   0.0002219 </span></span>
-<span><span class="co">#&gt;        edu          &lt; 2ndary       Ref                           </span></span>
-<span><span class="co">#&gt;                    2nd grad.      0.90   [0.80;1.00]   0.0512330 </span></span>
-<span><span class="co">#&gt;              Other 2nd grad.      0.97   [0.83;1.13]   0.6737665 </span></span>
-<span><span class="co">#&gt;               Post-2nd grad.      0.93   [0.85;1.02]   0.1016562 </span></span>
-<span><span class="co">#&gt;     income   $29,999 or less       Ref                           </span></span>
-<span><span class="co">#&gt;              $30,000-$49,999      0.74   [0.67;0.81]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;              $50,000-$79,999      0.64   [0.58;0.72]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;              $80,000 or more      0.58   [0.51;0.66]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;        bmi       Underweight       Ref                           </span></span>
-<span><span class="co">#&gt;               healthy weight      0.86   [0.67;1.10]   0.2350526 </span></span>
-<span><span class="co">#&gt;                   Overweight      0.88   [0.69;1.12]   0.3033213 </span></span>
-<span><span class="co">#&gt;     phyact            Active       Ref                           </span></span>
-<span><span class="co">#&gt;                     Inactive      1.21   [1.10;1.34]   0.0001345 </span></span>
-<span><span class="co">#&gt;                     Moderate      1.08   [0.97;1.21]   0.1771985 </span></span>
-<span><span class="co">#&gt;     doctor                No       Ref                           </span></span>
-<span><span class="co">#&gt;                          Yes      1.75   [1.49;2.06]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;     stress  Not too stressed       Ref                           </span></span>
-<span><span class="co">#&gt;                     stressed      1.30   [1.18;1.42]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;      smoke      Never smoker       Ref                           </span></span>
-<span><span class="co">#&gt;               Current smoker      1.18   [1.05;1.32]   0.0050518 </span></span>
-<span><span class="co">#&gt;                Former smoker      1.21   [1.11;1.33]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;      drink       Never drank       Ref                           </span></span>
-<span><span class="co">#&gt;              Current drinker      0.82   [0.68;0.98]   0.0290605 </span></span>
-<span><span class="co">#&gt;                Former driker      1.13   [0.93;1.36]   0.2133779 </span></span>
-<span><span class="co">#&gt;      fruit 0-3 daily serving       Ref                           </span></span>
-<span><span class="co">#&gt;            4-6 daily serving      0.94   [0.86;1.03]   0.1758214 </span></span>
-<span><span class="co">#&gt;             6+ daily serving      1.09   [0.97;1.23]   0.1311029 </span></span>
-<span><span class="co">#&gt;         bp                No       Ref                           </span></span>
-<span><span class="co">#&gt;                          Yes      2.35   [2.16;2.55]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;       diab                No       Ref                           </span></span>
-<span><span class="co">#&gt;                          Yes      1.86   [1.66;2.07]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;   province             South       Ref                           </span></span>
-<span><span class="co">#&gt;                        North      1.21   [0.90;1.62]   0.2103030 </span></span>
-<span><span class="co">#&gt;  immigrate     not immigrant       Ref                           </span></span>
-<span><span class="co">#&gt;                   &gt; 10 years      1.02   [0.89;1.16]   0.8057243 </span></span>
-<span><span class="co">#&gt;                       recent      1.06   [0.73;1.53]   0.7651069</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>formula1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span> </span>
+<span id="cb4-2"><a href="#cb4-2"></a>              edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> doctor <span class="sc">+</span> stress <span class="sc">+</span> </span>
+<span id="cb4-3"><a href="#cb4-3"></a>              smoke <span class="sc">+</span> drink <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab <span class="sc">+</span> province <span class="sc">+</span> immigrate)</span>
+<span id="cb4-4"><a href="#cb4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1, </span>
+<span id="cb4-6"><a href="#cb4-6"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb4-7"><a href="#cb4-7"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="fu">publish</span>(fit3)</span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt;   Variable             Units OddsRatio         CI.95     p-value </span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt;         OA           Control       Ref                           </span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;                           OA      1.52   [1.40;1.66]     &lt; 1e-04 </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt;        age       20-29 years       Ref                           </span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt;                  30-39 years      1.29   [0.98;1.69]   0.0707636 </span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt;                  40-49 years      2.74   [2.17;3.47]     &lt; 1e-04 </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt;                  50-59 years      6.24   [4.97;7.83]     &lt; 1e-04 </span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt;                  60-64 years      9.71  [7.68;12.29]     &lt; 1e-04 </span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt;            65 years and over     15.85 [12.57;20.00]     &lt; 1e-04 </span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt;                         teen      0.46   [0.20;1.07]   0.0707295 </span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt;        sex            Female       Ref                           </span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt;                         Male      1.73   [1.60;1.88]     &lt; 1e-04 </span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt;    married        not single       Ref                           </span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt;                       single      0.97   [0.90;1.05]   0.5209444 </span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt;       race         Non-white       Ref                           </span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt;                        White      1.44   [1.19;1.75]   0.0002219 </span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt;        edu          &lt; 2ndary       Ref                           </span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt;                    2nd grad.      0.90   [0.80;1.00]   0.0512330 </span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt;              Other 2nd grad.      0.97   [0.83;1.13]   0.6737665 </span></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt;               Post-2nd grad.      0.93   [0.85;1.02]   0.1016562 </span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;     income   $29,999 or less       Ref                           </span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;              $30,000-$49,999      0.74   [0.67;0.81]     &lt; 1e-04 </span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt;              $50,000-$79,999      0.64   [0.58;0.72]     &lt; 1e-04 </span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt;              $80,000 or more      0.58   [0.51;0.66]     &lt; 1e-04 </span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt;        bmi       Underweight       Ref                           </span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt;               healthy weight      0.86   [0.67;1.10]   0.2350526 </span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt;                   Overweight      0.88   [0.69;1.12]   0.3033213 </span></span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt;     phyact            Active       Ref                           </span></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co">#&gt;                     Inactive      1.21   [1.10;1.34]   0.0001345 </span></span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="co">#&gt;                     Moderate      1.08   [0.97;1.21]   0.1771985 </span></span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="co">#&gt;     doctor                No       Ref                           </span></span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co">#&gt;                          Yes      1.75   [1.49;2.06]     &lt; 1e-04 </span></span>
+<span id="cb4-41"><a href="#cb4-41"></a><span class="co">#&gt;     stress  Not too stressed       Ref                           </span></span>
+<span id="cb4-42"><a href="#cb4-42"></a><span class="co">#&gt;                     stressed      1.30   [1.18;1.42]     &lt; 1e-04 </span></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co">#&gt;      smoke      Never smoker       Ref                           </span></span>
+<span id="cb4-44"><a href="#cb4-44"></a><span class="co">#&gt;               Current smoker      1.18   [1.05;1.32]   0.0050518 </span></span>
+<span id="cb4-45"><a href="#cb4-45"></a><span class="co">#&gt;                Former smoker      1.21   [1.11;1.33]     &lt; 1e-04 </span></span>
+<span id="cb4-46"><a href="#cb4-46"></a><span class="co">#&gt;      drink       Never drank       Ref                           </span></span>
+<span id="cb4-47"><a href="#cb4-47"></a><span class="co">#&gt;              Current drinker      0.82   [0.68;0.98]   0.0290605 </span></span>
+<span id="cb4-48"><a href="#cb4-48"></a><span class="co">#&gt;                Former driker      1.13   [0.93;1.36]   0.2133779 </span></span>
+<span id="cb4-49"><a href="#cb4-49"></a><span class="co">#&gt;      fruit 0-3 daily serving       Ref                           </span></span>
+<span id="cb4-50"><a href="#cb4-50"></a><span class="co">#&gt;            4-6 daily serving      0.94   [0.86;1.03]   0.1758214 </span></span>
+<span id="cb4-51"><a href="#cb4-51"></a><span class="co">#&gt;             6+ daily serving      1.09   [0.97;1.23]   0.1311029 </span></span>
+<span id="cb4-52"><a href="#cb4-52"></a><span class="co">#&gt;         bp                No       Ref                           </span></span>
+<span id="cb4-53"><a href="#cb4-53"></a><span class="co">#&gt;                          Yes      2.35   [2.16;2.55]     &lt; 1e-04 </span></span>
+<span id="cb4-54"><a href="#cb4-54"></a><span class="co">#&gt;       diab                No       Ref                           </span></span>
+<span id="cb4-55"><a href="#cb4-55"></a><span class="co">#&gt;                          Yes      1.86   [1.66;2.07]     &lt; 1e-04 </span></span>
+<span id="cb4-56"><a href="#cb4-56"></a><span class="co">#&gt;   province             South       Ref                           </span></span>
+<span id="cb4-57"><a href="#cb4-57"></a><span class="co">#&gt;                        North      1.21   [0.90;1.62]   0.2103030 </span></span>
+<span id="cb4-58"><a href="#cb4-58"></a><span class="co">#&gt;  immigrate     not immigrant       Ref                           </span></span>
+<span id="cb4-59"><a href="#cb4-59"></a><span class="co">#&gt;                   &gt; 10 years      1.02   [0.89;1.16]   0.8057243 </span></span>
+<span id="cb4-60"><a href="#cb4-60"></a><span class="co">#&gt;                       recent      1.06   [0.73;1.53]   0.7651069</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="model-fit-assessment" class="level4"><h4 class="anchored" data-anchor-id="model-fit-assessment">Model fit assessment</h4>
@@ -837,19 +837,19 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <p>Evaluates the model fit using Akaike Information Criterion (AIC) and pseudo R-squared metrics.</p>
 <div class="cell" data-hash="surveydata4_cache/html/fit_c8dcff560cf44c853701c992e44da14f">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">formula1</span>, </span>
-<span>              design <span class="op">=</span> <span class="va">w.design</span>, </span>
-<span>              family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">quasibinomial</a></span><span class="op">(</span><span class="va">logit</span><span class="op">)</span><span class="op">)</span> <span class="co"># publish does not work</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html">AIC</a></span><span class="op">(</span><span class="va">fit3</span><span class="op">)</span> </span>
-<span><span class="co">#&gt;        eff.p          AIC     deltabar </span></span>
-<span><span class="co">#&gt;    67.752064 45362.706032     2.053093</span></span>
-<span></span>
-<span><span class="co"># AIC for survey weighted regressions</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/psrsq.html">psrsq</a></span><span class="op">(</span><span class="va">fit3</span>, method <span class="op">=</span> <span class="st">"Cox-Snell"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.06091896</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/psrsq.html">psrsq</a></span><span class="op">(</span><span class="va">fit3</span>, method <span class="op">=</span> <span class="st">"Nagelkerke"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.2307586</span></span>
-<span><span class="co"># Nagelkerke and Cox-Snell pseudo-rsquared statistics</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1, </span>
+<span id="cb5-2"><a href="#cb5-2"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb5-3"><a href="#cb5-3"></a>              <span class="at">family =</span> <span class="fu">quasibinomial</span>(logit)) <span class="co"># publish does not work</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="fu">AIC</span>(fit3) </span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt;        eff.p          AIC     deltabar </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;    67.752064 45362.706032     2.053093</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co"># AIC for survey weighted regressions</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="fu">psrsq</span>(fit3, <span class="at">method =</span> <span class="st">"Cox-Snell"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; [1] 0.06091896</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="fu">psrsq</span>(fit3, <span class="at">method =</span> <span class="st">"Nagelkerke"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; [1] 0.2307586</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co"># Nagelkerke and Cox-Snell pseudo-rsquared statistics</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section></section><section id="backward-elimination" class="level3"><h3 class="anchored" data-anchor-id="backward-elimination">Backward Elimination</h3>
@@ -864,207 +864,207 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="checking-one-by-one" class="level4"><h4 class="anchored" data-anchor-id="checking-one-by-one">Checking one by one</h4>
 <p>Checks the significance of each variable one by one and removes those that are not statistically significant.</p>
 <div class="cell" data-hash="surveydata4_cache/html/be_27da9bf149f78a42591ca6a7d4e27660">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit3</span><span class="op">)</span><span class="op">$</span><span class="va">coef</span><span class="op">[</span>,<span class="st">"Pr(&gt;|t|)"</span><span class="op">]</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            (Intercept)   age65 years and over                  bpYes </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         age60-64 years         age50-59 years                sexMale </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;                diabYes                   OAOA  income$80,000 or more </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         age40-49 years  income$50,000-$79,999              doctorYes </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;  income$30,000-$49,999         stressstressed     smokeFormer smoker </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         phyactInactive              raceWhite    smokeCurrent smoker </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.01 </span></span>
-<span><span class="co">#&gt;   drinkCurrent drinker           edu2nd grad.                ageteen </span></span>
-<span><span class="co">#&gt;                   0.03                   0.05                   0.07 </span></span>
-<span><span class="co">#&gt;         age30-39 years      eduPost-2nd grad.  fruit6+ daily serving </span></span>
-<span><span class="co">#&gt;                   0.07                   0.10                   0.13 </span></span>
-<span><span class="co">#&gt; fruit4-6 daily serving         phyactModerate          provinceNorth </span></span>
-<span><span class="co">#&gt;                   0.18                   0.18                   0.21 </span></span>
-<span><span class="co">#&gt;     drinkFormer driker      bmihealthy weight          bmiOverweight </span></span>
-<span><span class="co">#&gt;                   0.21                   0.24                   0.30 </span></span>
-<span><span class="co">#&gt;          marriedsingle     eduOther 2nd grad.        immigraterecent </span></span>
-<span><span class="co">#&gt;                   0.52                   0.67                   0.77 </span></span>
-<span><span class="co">#&gt;    immigrate&gt; 10 years </span></span>
-<span><span class="co">#&gt;                   0.81</span></span>
-<span><span class="co"># bmiOverweight is associated with largest p-value</span></span>
-<span><span class="co"># but what about other categories?</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/regTermTest.html">regTermTest</a></span><span class="op">(</span><span class="va">fit3</span>,<span class="op">~</span><span class="va">bmi</span><span class="op">)</span> <span class="co"># coef of all bmi cat = 0</span></span>
-<span><span class="co">#&gt; Wald test for bmi</span></span>
-<span><span class="co">#&gt;  in svyglm(formula = formula1, design = w.design, family = quasibinomial(logit))</span></span>
-<span><span class="co">#&gt; F =  0.7591291  on  2  and  185579  df: p= 0.46808</span></span>
-<span><span class="va">fit4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fit3</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">-</span><span class="va">bmi</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">fit3</span>, <span class="va">fit4</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Working (Rao-Scott+F) LRT for bmi</span></span>
-<span><span class="co">#&gt;  in svyglm(formula = formula1, design = w.design, family = quasibinomial(logit))</span></span>
-<span><span class="co">#&gt; Working 2logLR =  1.424634 p= 0.49071 </span></span>
-<span><span class="co">#&gt; (scale factors:  1.1 0.93 );  denominator df= 185579</span></span>
-<span><span class="co"># high p-value (in both wald and Anova) makes it more likely that you should exclude bmi</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html">AIC</a></span><span class="op">(</span><span class="va">fit3</span>,<span class="va">fit4</span><span class="op">)</span> </span>
-<span><span class="co">#&gt;         eff.p      AIC deltabar</span></span>
-<span><span class="co">#&gt; [1,] 67.75206 45362.71 2.053093</span></span>
-<span><span class="co">#&gt; [2,] 64.30460 45358.26 2.074342</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit4</span><span class="op">)</span><span class="op">$</span><span class="va">coef</span><span class="op">[</span>,<span class="st">"Pr(&gt;|t|)"</span><span class="op">]</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            (Intercept)   age65 years and over                  bpYes </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         age60-64 years         age50-59 years                sexMale </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;                diabYes                   OAOA  income$80,000 or more </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         age40-49 years  income$50,000-$79,999              doctorYes </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;  income$30,000-$49,999         stressstressed     smokeFormer smoker </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         phyactInactive              raceWhite    smokeCurrent smoker </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;   drinkCurrent drinker           edu2nd grad.         age30-39 years </span></span>
-<span><span class="co">#&gt;                   0.03                   0.05                   0.07 </span></span>
-<span><span class="co">#&gt;                ageteen      eduPost-2nd grad.  fruit6+ daily serving </span></span>
-<span><span class="co">#&gt;                   0.07                   0.10                   0.13 </span></span>
-<span><span class="co">#&gt; fruit4-6 daily serving         phyactModerate          provinceNorth </span></span>
-<span><span class="co">#&gt;                   0.17                   0.17                   0.21 </span></span>
-<span><span class="co">#&gt;     drinkFormer driker          marriedsingle     eduOther 2nd grad. </span></span>
-<span><span class="co">#&gt;                   0.21                   0.53                   0.67 </span></span>
-<span><span class="co">#&gt;        immigraterecent    immigrate&gt; 10 years </span></span>
-<span><span class="co">#&gt;                   0.76                   0.81</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fit3)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt;            (Intercept)   age65 years and over                  bpYes </span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt;         age60-64 years         age50-59 years                sexMale </span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt;                diabYes                   OAOA  income$80,000 or more </span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;         age40-49 years  income$50,000-$79,999              doctorYes </span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;  income$30,000-$49,999         stressstressed     smokeFormer smoker </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;         phyactInactive              raceWhite    smokeCurrent smoker </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;                   0.00                   0.00                   0.01 </span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;   drinkCurrent drinker           edu2nd grad.                ageteen </span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;                   0.03                   0.05                   0.07 </span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;         age30-39 years      eduPost-2nd grad.  fruit6+ daily serving </span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;                   0.07                   0.10                   0.13 </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; fruit4-6 daily serving         phyactModerate          provinceNorth </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt;                   0.18                   0.18                   0.21 </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt;     drinkFormer driker      bmihealthy weight          bmiOverweight </span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt;                   0.21                   0.24                   0.30 </span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt;          marriedsingle     eduOther 2nd grad.        immigraterecent </span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt;                   0.52                   0.67                   0.77 </span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt;    immigrate&gt; 10 years </span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt;                   0.81</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co"># bmiOverweight is associated with largest p-value</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="co"># but what about other categories?</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a></span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="fu">regTermTest</span>(fit3,<span class="sc">~</span>bmi) <span class="co"># coef of all bmi cat = 0</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt; Wald test for bmi</span></span>
+<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;  in svyglm(formula = formula1, design = w.design, family = quasibinomial(logit))</span></span>
+<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt; F =  0.7591291  on  2  and  185579  df: p= 0.46808</span></span>
+<span id="cb6-33"><a href="#cb6-33"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">update</span>(fit3, .<span class="sc">~</span>. <span class="sc">-</span>bmi) </span>
+<span id="cb6-34"><a href="#cb6-34"></a></span>
+<span id="cb6-35"><a href="#cb6-35"></a><span class="fu">anova</span>(fit3, fit4)</span>
+<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt; Working (Rao-Scott+F) LRT for bmi</span></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt;  in svyglm(formula = formula1, design = w.design, family = quasibinomial(logit))</span></span>
+<span id="cb6-38"><a href="#cb6-38"></a><span class="co">#&gt; Working 2logLR =  1.424634 p= 0.49071 </span></span>
+<span id="cb6-39"><a href="#cb6-39"></a><span class="co">#&gt; (scale factors:  1.1 0.93 );  denominator df= 185579</span></span>
+<span id="cb6-40"><a href="#cb6-40"></a><span class="co"># high p-value (in both wald and Anova) makes it more likely that you should exclude bmi</span></span>
+<span id="cb6-41"><a href="#cb6-41"></a><span class="fu">AIC</span>(fit3,fit4) </span>
+<span id="cb6-42"><a href="#cb6-42"></a><span class="co">#&gt;         eff.p      AIC deltabar</span></span>
+<span id="cb6-43"><a href="#cb6-43"></a><span class="co">#&gt; [1,] 67.75206 45362.71 2.053093</span></span>
+<span id="cb6-44"><a href="#cb6-44"></a><span class="co">#&gt; [2,] 64.30460 45358.26 2.074342</span></span>
+<span id="cb6-45"><a href="#cb6-45"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fit4)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb6-46"><a href="#cb6-46"></a><span class="co">#&gt;            (Intercept)   age65 years and over                  bpYes </span></span>
+<span id="cb6-47"><a href="#cb6-47"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-48"><a href="#cb6-48"></a><span class="co">#&gt;         age60-64 years         age50-59 years                sexMale </span></span>
+<span id="cb6-49"><a href="#cb6-49"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-50"><a href="#cb6-50"></a><span class="co">#&gt;                diabYes                   OAOA  income$80,000 or more </span></span>
+<span id="cb6-51"><a href="#cb6-51"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-52"><a href="#cb6-52"></a><span class="co">#&gt;         age40-49 years  income$50,000-$79,999              doctorYes </span></span>
+<span id="cb6-53"><a href="#cb6-53"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-54"><a href="#cb6-54"></a><span class="co">#&gt;  income$30,000-$49,999         stressstressed     smokeFormer smoker </span></span>
+<span id="cb6-55"><a href="#cb6-55"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-56"><a href="#cb6-56"></a><span class="co">#&gt;         phyactInactive              raceWhite    smokeCurrent smoker </span></span>
+<span id="cb6-57"><a href="#cb6-57"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb6-58"><a href="#cb6-58"></a><span class="co">#&gt;   drinkCurrent drinker           edu2nd grad.         age30-39 years </span></span>
+<span id="cb6-59"><a href="#cb6-59"></a><span class="co">#&gt;                   0.03                   0.05                   0.07 </span></span>
+<span id="cb6-60"><a href="#cb6-60"></a><span class="co">#&gt;                ageteen      eduPost-2nd grad.  fruit6+ daily serving </span></span>
+<span id="cb6-61"><a href="#cb6-61"></a><span class="co">#&gt;                   0.07                   0.10                   0.13 </span></span>
+<span id="cb6-62"><a href="#cb6-62"></a><span class="co">#&gt; fruit4-6 daily serving         phyactModerate          provinceNorth </span></span>
+<span id="cb6-63"><a href="#cb6-63"></a><span class="co">#&gt;                   0.17                   0.17                   0.21 </span></span>
+<span id="cb6-64"><a href="#cb6-64"></a><span class="co">#&gt;     drinkFormer driker          marriedsingle     eduOther 2nd grad. </span></span>
+<span id="cb6-65"><a href="#cb6-65"></a><span class="co">#&gt;                   0.21                   0.53                   0.67 </span></span>
+<span id="cb6-66"><a href="#cb6-66"></a><span class="co">#&gt;        immigraterecent    immigrate&gt; 10 years </span></span>
+<span id="cb6-67"><a href="#cb6-67"></a><span class="co">#&gt;                   0.76                   0.81</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="using-aic-to-automate" class="level4"><h4 class="anchored" data-anchor-id="using-aic-to-automate">Using AIC to automate</h4>
 <p>Uses stepwise regression guided by AIC to automatically select the most important variables.</p>
 <div class="cell" data-hash="surveydata4_cache/html/aic_c7002f715d1cc806c24abd8c411aafa5">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/">MASS</a></span><span class="op">)</span></span>
-<span><span class="va">formula1b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">CVD</span><span class="op">==</span><span class="st">"event"</span><span class="op">)</span> <span class="op">~</span> <span class="va">OA</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span><span class="op">)</span></span>
-<span><span class="va">fit1b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">formula1b</span>, </span>
-<span>              design <span class="op">=</span> <span class="va">w.design</span>, </span>
-<span>              family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="va">logit</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fit5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html">stepAIC</a></span><span class="op">(</span><span class="va">fit1b</span>, direction <span class="op">=</span> <span class="st">"backward"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Start:  AIC=47384.51</span></span>
-<span><span class="co">#&gt; I(CVD == "event") ~ OA + age + sex</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;        Df Deviance   AIC</span></span>
-<span><span class="co">#&gt; &lt;none&gt;       47353 47385</span></span>
-<span><span class="co">#&gt; - sex   1    47634 47658</span></span>
-<span><span class="co">#&gt; - OA    1    47679 47702</span></span>
-<span><span class="co">#&gt; - age   6    54414 54291</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">require</span>(MASS)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>formula1b <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex)</span>
+<span id="cb7-3"><a href="#cb7-3"></a>fit1b <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1b, </span>
+<span id="cb7-4"><a href="#cb7-4"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb7-5"><a href="#cb7-5"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb7-6"><a href="#cb7-6"></a>fit5 <span class="ot">&lt;-</span> <span class="fu">stepAIC</span>(fit1b, <span class="at">direction =</span> <span class="st">"backward"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; Start:  AIC=47384.51</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; I(CVD == "event") ~ OA + age + sex</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; </span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;        Df Deviance   AIC</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt; &lt;none&gt;       47353 47385</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; - sex   1    47634 47658</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt; - OA    1    47679 47702</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt; - age   6    54414 54291</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-hash="surveydata4_cache/html/resround_233fd17497b899f51c14401dd5c7a93b">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Publish/man/publish.html">publish</a></span><span class="op">(</span><span class="va">fit5</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  Variable             Units OddsRatio         CI.95   p-value </span></span>
-<span><span class="co">#&gt;        OA           Control       Ref                         </span></span>
-<span><span class="co">#&gt;                          OA      1.81   [1.66;1.97]   &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;       age       20-29 years       Ref                         </span></span>
-<span><span class="co">#&gt;                 30-39 years      1.40   [1.07;1.84]   0.01374 </span></span>
-<span><span class="co">#&gt;                 40-49 years      3.39   [2.69;4.27]   &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                 50-59 years      9.42  [7.55;11.76]   &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                 60-64 years     17.78 [14.22;22.23]   &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;           65 years and over     33.82 [27.26;41.97]   &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                        teen      0.45   [0.20;1.02]   0.05462 </span></span>
-<span><span class="co">#&gt;       sex            Female       Ref                         </span></span>
-<span><span class="co">#&gt;                        Male      1.57   [1.46;1.69]   &lt; 1e-04</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit5</span><span class="op">)</span><span class="op">$</span><span class="va">coef</span><span class="op">[</span>,<span class="st">"Pr(&gt;|t|)"</span><span class="op">]</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt;          (Intercept) age65 years and over       age60-64 years </span></span>
-<span><span class="co">#&gt;                 0.00                 0.00                 0.00 </span></span>
-<span><span class="co">#&gt;       age50-59 years                 OAOA              sexMale </span></span>
-<span><span class="co">#&gt;                 0.00                 0.00                 0.00 </span></span>
-<span><span class="co">#&gt;       age40-49 years       age30-39 years              ageteen </span></span>
-<span><span class="co">#&gt;                 0.00                 0.01                 0.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">publish</span>(fit5)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt;  Variable             Units OddsRatio         CI.95   p-value </span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt;        OA           Control       Ref                         </span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt;                          OA      1.81   [1.66;1.97]   &lt; 1e-04 </span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt;       age       20-29 years       Ref                         </span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt;                 30-39 years      1.40   [1.07;1.84]   0.01374 </span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt;                 40-49 years      3.39   [2.69;4.27]   &lt; 1e-04 </span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co">#&gt;                 50-59 years      9.42  [7.55;11.76]   &lt; 1e-04 </span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt;                 60-64 years     17.78 [14.22;22.23]   &lt; 1e-04 </span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt;           65 years and over     33.82 [27.26;41.97]   &lt; 1e-04 </span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="co">#&gt;                        teen      0.45   [0.20;1.02]   0.05462 </span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt;       sex            Female       Ref                         </span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt;                        Male      1.57   [1.46;1.69]   &lt; 1e-04</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fit5)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="co">#&gt;          (Intercept) age65 years and over       age60-64 years </span></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt;                 0.00                 0.00                 0.00 </span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co">#&gt;       age50-59 years                 OAOA              sexMale </span></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="co">#&gt;                 0.00                 0.00                 0.00 </span></span>
+<span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt;       age40-49 years       age30-39 years              ageteen </span></span>
+<span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt;                 0.00                 0.01                 0.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="using-aic-but-keeping-importants" class="level4"><h4 class="anchored" data-anchor-id="using-aic-but-keeping-importants">Using AIC, but keeping importants</h4>
 <p>Similar to the previous step but ensures certain important variables remain in the model.</p>
 <div class="cell" data-hash="surveydata4_cache/html/aic2_d5228cf07b281f7dd3d100f3cbeabe66">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula1c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">CVD</span><span class="op">==</span><span class="st">"event"</span><span class="op">)</span> <span class="op">~</span> <span class="va">OA</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">married</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span></span>
-<span>                         <span class="va">edu</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">phyact</span> <span class="op">+</span> <span class="va">fruit</span> <span class="op">+</span> <span class="va">bp</span> <span class="op">+</span> <span class="va">diab</span> <span class="op">+</span> </span>
-<span>                         <span class="va">doctor</span> <span class="op">+</span> <span class="va">stress</span> <span class="op">+</span> <span class="va">smoke</span> <span class="op">+</span> <span class="va">drink</span> <span class="op">+</span> <span class="va">province</span> <span class="op">+</span> <span class="va">immigrate</span><span class="op">)</span></span>
-<span><span class="va">scope</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>upper <span class="op">=</span> <span class="op">~</span> <span class="va">OA</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">married</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span></span>
-<span>                         <span class="va">edu</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">phyact</span> <span class="op">+</span> <span class="va">fruit</span> <span class="op">+</span> <span class="va">bp</span> <span class="op">+</span> <span class="va">diab</span> <span class="op">+</span> </span>
-<span>                         <span class="va">doctor</span> <span class="op">+</span> <span class="va">stress</span> <span class="op">+</span> <span class="va">smoke</span> <span class="op">+</span> <span class="va">drink</span> <span class="op">+</span> <span class="va">province</span> <span class="op">+</span> <span class="va">immigrate</span>,</span>
-<span>              lower <span class="op">=</span> <span class="op">~</span> <span class="va">OA</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">married</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span></span>
-<span>                         <span class="va">edu</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">phyact</span> <span class="op">+</span> <span class="va">fruit</span> <span class="op">+</span> <span class="va">bp</span> <span class="op">+</span> <span class="va">diab</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">fit1c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyglm.html">svyglm</a></span><span class="op">(</span><span class="va">formula1c</span>, design <span class="op">=</span> <span class="va">w.design</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="va">logit</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">fitstep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/step.html">step</a></span><span class="op">(</span><span class="va">fit1c</span>, scope <span class="op">=</span> <span class="va">scope</span>, trace <span class="op">=</span> <span class="cn">FALSE</span>, k <span class="op">=</span> <span class="fl">2</span>, direction <span class="op">=</span> <span class="st">"backward"</span><span class="op">)</span></span>
-<span><span class="co"># k = 2 gives the genuine AIC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>formula1c <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>                         edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab <span class="sc">+</span> </span>
+<span id="cb9-3"><a href="#cb9-3"></a>                         doctor <span class="sc">+</span> stress <span class="sc">+</span> smoke <span class="sc">+</span> drink <span class="sc">+</span> province <span class="sc">+</span> immigrate)</span>
+<span id="cb9-4"><a href="#cb9-4"></a>scope <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">upper =</span> <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a>                         edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab <span class="sc">+</span> </span>
+<span id="cb9-6"><a href="#cb9-6"></a>                         doctor <span class="sc">+</span> stress <span class="sc">+</span> smoke <span class="sc">+</span> drink <span class="sc">+</span> province <span class="sc">+</span> immigrate,</span>
+<span id="cb9-7"><a href="#cb9-7"></a>              <span class="at">lower =</span> <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>                         edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab)</span>
+<span id="cb9-9"><a href="#cb9-9"></a></span>
+<span id="cb9-10"><a href="#cb9-10"></a>fit1c <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1c, <span class="at">design =</span> w.design, <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb9-11"><a href="#cb9-11"></a></span>
+<span id="cb9-12"><a href="#cb9-12"></a>fitstep <span class="ot">&lt;-</span> <span class="fu">step</span>(fit1c, <span class="at">scope =</span> scope, <span class="at">trace =</span> <span class="cn">FALSE</span>, <span class="at">k =</span> <span class="dv">2</span>, <span class="at">direction =</span> <span class="st">"backward"</span>)</span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co"># k = 2 gives the genuine AIC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-hash="surveydata4_cache/html/res_a3c86caaebf9617c56f266238416770b">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Publish/man/publish.html">publish</a></span><span class="op">(</span><span class="va">fitstep</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  Variable             Units OddsRatio         CI.95     p-value </span></span>
-<span><span class="co">#&gt;        OA           Control       Ref                           </span></span>
-<span><span class="co">#&gt;                          OA      1.52   [1.40;1.66]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;       age       20-29 years       Ref                           </span></span>
-<span><span class="co">#&gt;                 30-39 years      1.29   [0.98;1.70]   0.0697699 </span></span>
-<span><span class="co">#&gt;                 40-49 years      2.74   [2.17;3.47]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                 50-59 years      6.24   [4.97;7.83]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                 60-64 years      9.71  [7.68;12.28]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;           65 years and over     15.85 [12.57;19.98]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                        teen      0.46   [0.20;1.07]   0.0705660 </span></span>
-<span><span class="co">#&gt;       sex            Female       Ref                           </span></span>
-<span><span class="co">#&gt;                        Male      1.73   [1.60;1.88]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;   married        not single       Ref                           </span></span>
-<span><span class="co">#&gt;                      single      0.97   [0.90;1.05]   0.5042496 </span></span>
-<span><span class="co">#&gt;      race         Non-white       Ref                           </span></span>
-<span><span class="co">#&gt;                       White      1.41   [1.18;1.70]   0.0001986 </span></span>
-<span><span class="co">#&gt;       edu          &lt; 2ndary       Ref                           </span></span>
-<span><span class="co">#&gt;                   2nd grad.      0.90   [0.80;1.00]   0.0524940 </span></span>
-<span><span class="co">#&gt;             Other 2nd grad.      0.97   [0.83;1.13]   0.6732446 </span></span>
-<span><span class="co">#&gt;              Post-2nd grad.      0.93   [0.85;1.02]   0.1045975 </span></span>
-<span><span class="co">#&gt;    income   $29,999 or less       Ref                           </span></span>
-<span><span class="co">#&gt;             $30,000-$49,999      0.74   [0.67;0.81]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;             $50,000-$79,999      0.64   [0.58;0.72]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;             $80,000 or more      0.58   [0.51;0.66]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;       bmi       Underweight       Ref                           </span></span>
-<span><span class="co">#&gt;              healthy weight      0.86   [0.67;1.10]   0.2316915 </span></span>
-<span><span class="co">#&gt;                  Overweight      0.88   [0.69;1.12]   0.2982852 </span></span>
-<span><span class="co">#&gt;    phyact            Active       Ref                           </span></span>
-<span><span class="co">#&gt;                    Inactive      1.22   [1.10;1.34]   0.0001227 </span></span>
-<span><span class="co">#&gt;                    Moderate      1.08   [0.97;1.21]   0.1754422 </span></span>
-<span><span class="co">#&gt;     fruit 0-3 daily serving       Ref                           </span></span>
-<span><span class="co">#&gt;           4-6 daily serving      0.94   [0.86;1.03]   0.1807666 </span></span>
-<span><span class="co">#&gt;            6+ daily serving      1.09   [0.97;1.23]   0.1295281 </span></span>
-<span><span class="co">#&gt;        bp                No       Ref                           </span></span>
-<span><span class="co">#&gt;                         Yes      2.35   [2.16;2.55]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;      diab                No       Ref                           </span></span>
-<span><span class="co">#&gt;                         Yes      1.85   [1.66;2.07]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;    doctor                No       Ref                           </span></span>
-<span><span class="co">#&gt;                         Yes      1.75   [1.49;2.05]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;    stress  Not too stressed       Ref                           </span></span>
-<span><span class="co">#&gt;                    stressed      1.30   [1.18;1.42]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;     smoke      Never smoker       Ref                           </span></span>
-<span><span class="co">#&gt;              Current smoker      1.17   [1.05;1.31]   0.0053412 </span></span>
-<span><span class="co">#&gt;               Former smoker      1.21   [1.10;1.33]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;     drink       Never drank       Ref                           </span></span>
-<span><span class="co">#&gt;             Current drinker      0.82   [0.68;0.98]   0.0254942 </span></span>
-<span><span class="co">#&gt;               Former driker      1.12   [0.93;1.36]   0.2205315</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fitstep</span><span class="op">)</span><span class="op">$</span><span class="va">coef</span><span class="op">[</span>,<span class="st">"Pr(&gt;|t|)"</span><span class="op">]</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            (Intercept)   age65 years and over                  bpYes </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         age60-64 years         age50-59 years                sexMale </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;                diabYes                   OAOA  income$80,000 or more </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         age40-49 years  income$50,000-$79,999              doctorYes </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;  income$30,000-$49,999         stressstressed     smokeFormer smoker </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
-<span><span class="co">#&gt;         phyactInactive              raceWhite    smokeCurrent smoker </span></span>
-<span><span class="co">#&gt;                   0.00                   0.00                   0.01 </span></span>
-<span><span class="co">#&gt;   drinkCurrent drinker           edu2nd grad.         age30-39 years </span></span>
-<span><span class="co">#&gt;                   0.03                   0.05                   0.07 </span></span>
-<span><span class="co">#&gt;                ageteen      eduPost-2nd grad.  fruit6+ daily serving </span></span>
-<span><span class="co">#&gt;                   0.07                   0.10                   0.13 </span></span>
-<span><span class="co">#&gt;         phyactModerate fruit4-6 daily serving     drinkFormer driker </span></span>
-<span><span class="co">#&gt;                   0.18                   0.18                   0.22 </span></span>
-<span><span class="co">#&gt;      bmihealthy weight          bmiOverweight          marriedsingle </span></span>
-<span><span class="co">#&gt;                   0.23                   0.30                   0.50 </span></span>
-<span><span class="co">#&gt;     eduOther 2nd grad. </span></span>
-<span><span class="co">#&gt;                   0.67</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">publish</span>(fitstep)</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt;  Variable             Units OddsRatio         CI.95     p-value </span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;        OA           Control       Ref                           </span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;                          OA      1.52   [1.40;1.66]     &lt; 1e-04 </span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt;       age       20-29 years       Ref                           </span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt;                 30-39 years      1.29   [0.98;1.70]   0.0697699 </span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt;                 40-49 years      2.74   [2.17;3.47]     &lt; 1e-04 </span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt;                 50-59 years      6.24   [4.97;7.83]     &lt; 1e-04 </span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt;                 60-64 years      9.71  [7.68;12.28]     &lt; 1e-04 </span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt;           65 years and over     15.85 [12.57;19.98]     &lt; 1e-04 </span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt;                        teen      0.46   [0.20;1.07]   0.0705660 </span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="co">#&gt;       sex            Female       Ref                           </span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="co">#&gt;                        Male      1.73   [1.60;1.88]     &lt; 1e-04 </span></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#&gt;   married        not single       Ref                           </span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="co">#&gt;                      single      0.97   [0.90;1.05]   0.5042496 </span></span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="co">#&gt;      race         Non-white       Ref                           </span></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co">#&gt;                       White      1.41   [1.18;1.70]   0.0001986 </span></span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="co">#&gt;       edu          &lt; 2ndary       Ref                           </span></span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="co">#&gt;                   2nd grad.      0.90   [0.80;1.00]   0.0524940 </span></span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="co">#&gt;             Other 2nd grad.      0.97   [0.83;1.13]   0.6732446 </span></span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="co">#&gt;              Post-2nd grad.      0.93   [0.85;1.02]   0.1045975 </span></span>
+<span id="cb10-22"><a href="#cb10-22"></a><span class="co">#&gt;    income   $29,999 or less       Ref                           </span></span>
+<span id="cb10-23"><a href="#cb10-23"></a><span class="co">#&gt;             $30,000-$49,999      0.74   [0.67;0.81]     &lt; 1e-04 </span></span>
+<span id="cb10-24"><a href="#cb10-24"></a><span class="co">#&gt;             $50,000-$79,999      0.64   [0.58;0.72]     &lt; 1e-04 </span></span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="co">#&gt;             $80,000 or more      0.58   [0.51;0.66]     &lt; 1e-04 </span></span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="co">#&gt;       bmi       Underweight       Ref                           </span></span>
+<span id="cb10-27"><a href="#cb10-27"></a><span class="co">#&gt;              healthy weight      0.86   [0.67;1.10]   0.2316915 </span></span>
+<span id="cb10-28"><a href="#cb10-28"></a><span class="co">#&gt;                  Overweight      0.88   [0.69;1.12]   0.2982852 </span></span>
+<span id="cb10-29"><a href="#cb10-29"></a><span class="co">#&gt;    phyact            Active       Ref                           </span></span>
+<span id="cb10-30"><a href="#cb10-30"></a><span class="co">#&gt;                    Inactive      1.22   [1.10;1.34]   0.0001227 </span></span>
+<span id="cb10-31"><a href="#cb10-31"></a><span class="co">#&gt;                    Moderate      1.08   [0.97;1.21]   0.1754422 </span></span>
+<span id="cb10-32"><a href="#cb10-32"></a><span class="co">#&gt;     fruit 0-3 daily serving       Ref                           </span></span>
+<span id="cb10-33"><a href="#cb10-33"></a><span class="co">#&gt;           4-6 daily serving      0.94   [0.86;1.03]   0.1807666 </span></span>
+<span id="cb10-34"><a href="#cb10-34"></a><span class="co">#&gt;            6+ daily serving      1.09   [0.97;1.23]   0.1295281 </span></span>
+<span id="cb10-35"><a href="#cb10-35"></a><span class="co">#&gt;        bp                No       Ref                           </span></span>
+<span id="cb10-36"><a href="#cb10-36"></a><span class="co">#&gt;                         Yes      2.35   [2.16;2.55]     &lt; 1e-04 </span></span>
+<span id="cb10-37"><a href="#cb10-37"></a><span class="co">#&gt;      diab                No       Ref                           </span></span>
+<span id="cb10-38"><a href="#cb10-38"></a><span class="co">#&gt;                         Yes      1.85   [1.66;2.07]     &lt; 1e-04 </span></span>
+<span id="cb10-39"><a href="#cb10-39"></a><span class="co">#&gt;    doctor                No       Ref                           </span></span>
+<span id="cb10-40"><a href="#cb10-40"></a><span class="co">#&gt;                         Yes      1.75   [1.49;2.05]     &lt; 1e-04 </span></span>
+<span id="cb10-41"><a href="#cb10-41"></a><span class="co">#&gt;    stress  Not too stressed       Ref                           </span></span>
+<span id="cb10-42"><a href="#cb10-42"></a><span class="co">#&gt;                    stressed      1.30   [1.18;1.42]     &lt; 1e-04 </span></span>
+<span id="cb10-43"><a href="#cb10-43"></a><span class="co">#&gt;     smoke      Never smoker       Ref                           </span></span>
+<span id="cb10-44"><a href="#cb10-44"></a><span class="co">#&gt;              Current smoker      1.17   [1.05;1.31]   0.0053412 </span></span>
+<span id="cb10-45"><a href="#cb10-45"></a><span class="co">#&gt;               Former smoker      1.21   [1.10;1.33]     &lt; 1e-04 </span></span>
+<span id="cb10-46"><a href="#cb10-46"></a><span class="co">#&gt;     drink       Never drank       Ref                           </span></span>
+<span id="cb10-47"><a href="#cb10-47"></a><span class="co">#&gt;             Current drinker      0.82   [0.68;0.98]   0.0254942 </span></span>
+<span id="cb10-48"><a href="#cb10-48"></a><span class="co">#&gt;               Former driker      1.12   [0.93;1.36]   0.2205315</span></span>
+<span id="cb10-49"><a href="#cb10-49"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fitstep)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb10-50"><a href="#cb10-50"></a><span class="co">#&gt;            (Intercept)   age65 years and over                  bpYes </span></span>
+<span id="cb10-51"><a href="#cb10-51"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb10-52"><a href="#cb10-52"></a><span class="co">#&gt;         age60-64 years         age50-59 years                sexMale </span></span>
+<span id="cb10-53"><a href="#cb10-53"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb10-54"><a href="#cb10-54"></a><span class="co">#&gt;                diabYes                   OAOA  income$80,000 or more </span></span>
+<span id="cb10-55"><a href="#cb10-55"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb10-56"><a href="#cb10-56"></a><span class="co">#&gt;         age40-49 years  income$50,000-$79,999              doctorYes </span></span>
+<span id="cb10-57"><a href="#cb10-57"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb10-58"><a href="#cb10-58"></a><span class="co">#&gt;  income$30,000-$49,999         stressstressed     smokeFormer smoker </span></span>
+<span id="cb10-59"><a href="#cb10-59"></a><span class="co">#&gt;                   0.00                   0.00                   0.00 </span></span>
+<span id="cb10-60"><a href="#cb10-60"></a><span class="co">#&gt;         phyactInactive              raceWhite    smokeCurrent smoker </span></span>
+<span id="cb10-61"><a href="#cb10-61"></a><span class="co">#&gt;                   0.00                   0.00                   0.01 </span></span>
+<span id="cb10-62"><a href="#cb10-62"></a><span class="co">#&gt;   drinkCurrent drinker           edu2nd grad.         age30-39 years </span></span>
+<span id="cb10-63"><a href="#cb10-63"></a><span class="co">#&gt;                   0.03                   0.05                   0.07 </span></span>
+<span id="cb10-64"><a href="#cb10-64"></a><span class="co">#&gt;                ageteen      eduPost-2nd grad.  fruit6+ daily serving </span></span>
+<span id="cb10-65"><a href="#cb10-65"></a><span class="co">#&gt;                   0.07                   0.10                   0.13 </span></span>
+<span id="cb10-66"><a href="#cb10-66"></a><span class="co">#&gt;         phyactModerate fruit4-6 daily serving     drinkFormer driker </span></span>
+<span id="cb10-67"><a href="#cb10-67"></a><span class="co">#&gt;                   0.18                   0.18                   0.22 </span></span>
+<span id="cb10-68"><a href="#cb10-68"></a><span class="co">#&gt;      bmihealthy weight          bmiOverweight          marriedsingle </span></span>
+<span id="cb10-69"><a href="#cb10-69"></a><span class="co">#&gt;                   0.23                   0.30                   0.50 </span></span>
+<span id="cb10-70"><a href="#cb10-70"></a><span class="co">#&gt;     eduOther 2nd grad. </span></span>
+<span id="cb10-71"><a href="#cb10-71"></a><span class="co">#&gt;                   0.67</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="assess-interactions" class="level4"><h4 class="anchored" data-anchor-id="assess-interactions">Assess interactions</h4>
@@ -1072,50 +1072,50 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="check-one-by-one" class="level5"><h5 class="anchored" data-anchor-id="check-one-by-one">Check one by one</h5>
 <p>Checks if there is a significant interaction effect between ‘age’ and ‘sex’.</p>
 <div class="cell" data-hash="surveydata4_cache/html/interactions0_3ae3a7653b79cf716af983a0e316d8e9">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fit8a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html">interaction</a></span><span class="op">(</span><span class="va">age</span>,<span class="va">sex</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">fit8a</span><span class="op">)</span> <span class="co"># keep interaction</span></span>
-<span><span class="co">#&gt; Working (Rao-Scott+F) LRT for interaction(age, sex)</span></span>
-<span><span class="co">#&gt;  in svyglm(formula = I(CVD == "event") ~ OA + age + sex + married + </span></span>
-<span><span class="co">#&gt;     race + edu + income + bmi + phyact + fruit + bp + diab + </span></span>
-<span><span class="co">#&gt;     doctor + stress + smoke + drink + interaction(age, sex), </span></span>
-<span><span class="co">#&gt;     design = w.design, family = binomial(logit))</span></span>
-<span><span class="co">#&gt; Working 2logLR =  40.16528 p= 1.2167e-06 </span></span>
-<span><span class="co">#&gt; (scale factors:  1.3 1.2 1.2 0.93 0.78 0.71 );  denominator df= 185576</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>fit8a <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(age,sex))</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="fu">anova</span>(fitstep, fit8a) <span class="co"># keep interaction</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt; Working (Rao-Scott+F) LRT for interaction(age, sex)</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt;  in svyglm(formula = I(CVD == "event") ~ OA + age + sex + married + </span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="co">#&gt;     race + edu + income + bmi + phyact + fruit + bp + diab + </span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt;     doctor + stress + smoke + drink + interaction(age, sex), </span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt;     design = w.design, family = binomial(logit))</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt; Working 2logLR =  40.16528 p= 1.2167e-06 </span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt; (scale factors:  1.3 1.2 1.2 0.93 0.78 0.71 );  denominator df= 185576</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Checks if there is a significant interaction effect between ‘sex’ and ‘diabetes’.</p>
 <div class="cell" data-hash="surveydata4_cache/html/interactions1_556bce006184fcced89eb392de31617a">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fit8b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html">interaction</a></span><span class="op">(</span><span class="va">sex</span>,<span class="va">diab</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">fit8b</span><span class="op">)</span> <span class="co"># Do not keep this interaction</span></span>
-<span><span class="co">#&gt; Working (Rao-Scott+F) LRT for interaction(sex, diab)</span></span>
-<span><span class="co">#&gt;  in svyglm(formula = I(CVD == "event") ~ OA + age + sex + married + </span></span>
-<span><span class="co">#&gt;     race + edu + income + bmi + phyact + fruit + bp + diab + </span></span>
-<span><span class="co">#&gt;     doctor + stress + smoke + drink + interaction(sex, diab), </span></span>
-<span><span class="co">#&gt;     design = w.design, family = binomial(logit))</span></span>
-<span><span class="co">#&gt; Working 2logLR =  0.4591456 p= 0.49597 </span></span>
-<span><span class="co">#&gt; df=1;  denominator df= 185581</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>fit8b <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(sex,diab))</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="fu">anova</span>(fitstep, fit8b) <span class="co"># Do not keep this interaction</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt; Working (Rao-Scott+F) LRT for interaction(sex, diab)</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt;  in svyglm(formula = I(CVD == "event") ~ OA + age + sex + married + </span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt;     race + edu + income + bmi + phyact + fruit + bp + diab + </span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#&gt;     doctor + stress + smoke + drink + interaction(sex, diab), </span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#&gt;     design = w.design, family = binomial(logit))</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co">#&gt; Working 2logLR =  0.4591456 p= 0.49597 </span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt; df=1;  denominator df= 185581</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Checks if there is a significant interaction effect between ‘BMI’ and ‘diabetes’.</p>
 <div class="cell" data-hash="surveydata4_cache/html/interactions2_ed121994c1549a5da017fc44d190b6f8">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fit8c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html">interaction</a></span><span class="op">(</span><span class="va">bmi</span>,<span class="va">diab</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">fit8c</span><span class="op">)</span> <span class="co"># keep this interaction</span></span>
-<span><span class="co">#&gt; Working (Rao-Scott+F) LRT for interaction(bmi, diab)</span></span>
-<span><span class="co">#&gt;  in svyglm(formula = I(CVD == "event") ~ OA + age + sex + married + </span></span>
-<span><span class="co">#&gt;     race + edu + income + bmi + phyact + fruit + bp + diab + </span></span>
-<span><span class="co">#&gt;     doctor + stress + smoke + drink + interaction(bmi, diab), </span></span>
-<span><span class="co">#&gt;     design = w.design, family = binomial(logit))</span></span>
-<span><span class="co">#&gt; Working 2logLR =  7.92727 p= 0.02533 </span></span>
-<span><span class="co">#&gt; (scale factors:  1.4 0.6 );  denominator df= 185580</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>fit8c <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(bmi,diab))</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">anova</span>(fitstep, fit8c) <span class="co"># keep this interaction</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; Working (Rao-Scott+F) LRT for interaction(bmi, diab)</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt;  in svyglm(formula = I(CVD == "event") ~ OA + age + sex + married + </span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt;     race + edu + income + bmi + phyact + fruit + bp + diab + </span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt;     doctor + stress + smoke + drink + interaction(bmi, diab), </span></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt;     design = w.design, family = binomial(logit))</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt; Working 2logLR =  7.92727 p= 0.02533 </span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; (scale factors:  1.4 0.6 );  denominator df= 185580</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="add-all-significant-interactions-in-1-model" class="level5"><h5 class="anchored" data-anchor-id="add-all-significant-interactions-in-1-model">Add all significant interactions in 1 model</h5>
 <p>Updates the model to include significant interaction terms.</p>
 <p>Note that we have 0 effect modifier, 2 interactions</p>
 <div class="cell" data-hash="surveydata4_cache/html/interactions3_e37e38f5f68419a63390c6bf2e9a0476">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fit9</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html">interaction</a></span><span class="op">(</span><span class="va">age</span>,<span class="va">sex</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html">interaction</a></span><span class="op">(</span><span class="va">bmi</span>,<span class="va">diab</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://jtools.jacob-long.com">jtools</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://jtools.jacob-long.com/reference/summ.html">summ</a></span><span class="op">(</span><span class="va">fit9</span>, confint <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>fit9 <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(age,sex) <span class="sc">+</span> <span class="fu">interaction</span>(bmi,diab))</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="fu">require</span>(jtools)</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="fu">summ</span>(fit9, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
@@ -1483,110 +1483,110 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 <div class="cell" data-hash="surveydata4_cache/html/interactions4_c5d9ae2401a46009ee18954f80618e41">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fit9</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fitstep</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">+</span> <span class="va">age</span><span class="op">:</span><span class="va">sex</span> <span class="op">+</span> <span class="va">bmi</span><span class="op">:</span><span class="va">diab</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/Publish/man/publish.html">publish</a></span><span class="op">(</span><span class="va">fit9</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                                            Variable             Units OddsRatio         CI.95     p-value </span></span>
-<span><span class="co">#&gt;                                                  OA           Control       Ref                           </span></span>
-<span><span class="co">#&gt;                                                                    OA      1.55   [1.42;1.69]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                                             married        not single       Ref                           </span></span>
-<span><span class="co">#&gt;                                                                single      0.98   [0.91;1.07]   0.7026897 </span></span>
-<span><span class="co">#&gt;                                                race         Non-white       Ref                           </span></span>
-<span><span class="co">#&gt;                                                                 White      1.42   [1.18;1.70]   0.0001960 </span></span>
-<span><span class="co">#&gt;                                                 edu          &lt; 2ndary       Ref                           </span></span>
-<span><span class="co">#&gt;                                                             2nd grad.      0.90   [0.81;1.00]   0.0566536 </span></span>
-<span><span class="co">#&gt;                                                       Other 2nd grad.      0.96   [0.83;1.12]   0.6183383 </span></span>
-<span><span class="co">#&gt;                                                        Post-2nd grad.      0.92   [0.84;1.01]   0.0807393 </span></span>
-<span><span class="co">#&gt;                                              income   $29,999 or less       Ref                           </span></span>
-<span><span class="co">#&gt;                                                       $30,000-$49,999      0.74   [0.67;0.81]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                                                       $50,000-$79,999      0.64   [0.58;0.71]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                                                       $80,000 or more      0.57   [0.50;0.65]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                                              phyact            Active       Ref                           </span></span>
-<span><span class="co">#&gt;                                                              Inactive      1.21   [1.10;1.34]   0.0001349 </span></span>
-<span><span class="co">#&gt;                                                              Moderate      1.08   [0.97;1.21]   0.1760803 </span></span>
-<span><span class="co">#&gt;                                               fruit 0-3 daily serving       Ref                           </span></span>
-<span><span class="co">#&gt;                                                     4-6 daily serving      0.94   [0.86;1.03]   0.1892549 </span></span>
-<span><span class="co">#&gt;                                                      6+ daily serving      1.10   [0.98;1.23]   0.1142759 </span></span>
-<span><span class="co">#&gt;                                                  bp                No       Ref                           </span></span>
-<span><span class="co">#&gt;                                                                   Yes      2.37   [2.18;2.57]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                                              doctor                No       Ref                           </span></span>
-<span><span class="co">#&gt;                                                                   Yes      1.71   [1.45;2.01]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                                              stress  Not too stressed       Ref                           </span></span>
-<span><span class="co">#&gt;                                                              stressed      1.29   [1.18;1.42]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                                               smoke      Never smoker       Ref                           </span></span>
-<span><span class="co">#&gt;                                                        Current smoker      1.16   [1.04;1.30]   0.0085960 </span></span>
-<span><span class="co">#&gt;                                                         Former smoker      1.19   [1.09;1.31]   0.0002579 </span></span>
-<span><span class="co">#&gt;                                               drink       Never drank       Ref                           </span></span>
-<span><span class="co">#&gt;                                                       Current drinker      0.81   [0.68;0.97]   0.0227934 </span></span>
-<span><span class="co">#&gt;                                                         Former driker      1.12   [0.93;1.35]   0.2264702 </span></span>
-<span><span class="co">#&gt;               age(20-29 years): sex(Male vs Female)                        0.97   [0.64;1.48]   0.8945322 </span></span>
-<span><span class="co">#&gt;               age(30-39 years): sex(Male vs Female)                        1.06   [0.75;1.49]   0.7583565 </span></span>
-<span><span class="co">#&gt;               age(40-49 years): sex(Male vs Female)                        1.32   [1.07;1.62]   0.0091527 </span></span>
-<span><span class="co">#&gt;               age(50-59 years): sex(Male vs Female)                        2.18   [1.85;2.58]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;               age(60-64 years): sex(Male vs Female)                        2.14   [1.80;2.53]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;         age(65 years and over): sex(Male vs Female)                        1.78   [1.58;1.99]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                      age(teen): sex(Male vs Female)                        1.11   [0.22;5.62]   0.9033924 </span></span>
-<span><span class="co">#&gt;        sex(Female): age(30-39 years vs 20-29 years)                        1.24   [0.87;1.77]   0.2276609 </span></span>
-<span><span class="co">#&gt;        sex(Female): age(40-49 years vs 20-29 years)                        2.35   [1.75;3.16]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;        sex(Female): age(50-59 years vs 20-29 years)                        3.94   [2.95;5.27]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;        sex(Female): age(60-64 years vs 20-29 years)                        6.25   [4.66;8.39]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;  sex(Female): age(65 years and over vs 20-29 years)                       11.37  [8.60;15.02]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;               sex(Female): age(teen vs 20-29 years)                        0.44   [0.11;1.69]   0.2320840 </span></span>
-<span><span class="co">#&gt;          sex(Male): age(30-39 years vs 20-29 years)                        1.35   [0.89;2.05]   0.1599938 </span></span>
-<span><span class="co">#&gt;          sex(Male): age(40-49 years vs 20-29 years)                        3.18   [2.21;4.58]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;          sex(Male): age(50-59 years vs 20-29 years)                        8.85  [6.24;12.56]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;          sex(Male): age(60-64 years vs 20-29 years)                       13.73  [9.61;19.61]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;    sex(Male): age(65 years and over vs 20-29 years)                       20.77 [14.59;29.57]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                 sex(Male): age(teen vs 20-29 years)                        0.50   [0.18;1.37]   0.1769155 </span></span>
-<span><span class="co">#&gt;                   bmi(Underweight): diab(Yes vs No)                        5.72  [1.59;20.63]   0.0076561 </span></span>
-<span><span class="co">#&gt;                bmi(healthy weight): diab(Yes vs No)                        1.44   [1.19;1.75]   0.0002221 </span></span>
-<span><span class="co">#&gt;                    bmi(Overweight): diab(Yes vs No)                        1.93   [1.70;2.20]     &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;        diab(No): bmi(healthy weight vs Underweight)                        0.97   [0.76;1.25]   0.8394972 </span></span>
-<span><span class="co">#&gt;            diab(No): bmi(Overweight vs Underweight)                        0.97   [0.76;1.25]   0.8400722 </span></span>
-<span><span class="co">#&gt;       diab(Yes): bmi(healthy weight vs Underweight)                        0.25   [0.07;0.87]   0.0302066 </span></span>
-<span><span class="co">#&gt;           diab(Yes): bmi(Overweight vs Underweight)                        0.33   [0.09;1.17]   0.0852377</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>fit9 <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> age<span class="sc">:</span>sex <span class="sc">+</span> bmi<span class="sc">:</span>diab)</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">publish</span>(fit9)</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="co">#&gt;                                            Variable             Units OddsRatio         CI.95     p-value </span></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="co">#&gt;                                                  OA           Control       Ref                           </span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#&gt;                                                                    OA      1.55   [1.42;1.69]     &lt; 1e-04 </span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="co">#&gt;                                             married        not single       Ref                           </span></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="co">#&gt;                                                                single      0.98   [0.91;1.07]   0.7026897 </span></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="co">#&gt;                                                race         Non-white       Ref                           </span></span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="co">#&gt;                                                                 White      1.42   [1.18;1.70]   0.0001960 </span></span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="co">#&gt;                                                 edu          &lt; 2ndary       Ref                           </span></span>
+<span id="cb15-11"><a href="#cb15-11"></a><span class="co">#&gt;                                                             2nd grad.      0.90   [0.81;1.00]   0.0566536 </span></span>
+<span id="cb15-12"><a href="#cb15-12"></a><span class="co">#&gt;                                                       Other 2nd grad.      0.96   [0.83;1.12]   0.6183383 </span></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="co">#&gt;                                                        Post-2nd grad.      0.92   [0.84;1.01]   0.0807393 </span></span>
+<span id="cb15-14"><a href="#cb15-14"></a><span class="co">#&gt;                                              income   $29,999 or less       Ref                           </span></span>
+<span id="cb15-15"><a href="#cb15-15"></a><span class="co">#&gt;                                                       $30,000-$49,999      0.74   [0.67;0.81]     &lt; 1e-04 </span></span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">#&gt;                                                       $50,000-$79,999      0.64   [0.58;0.71]     &lt; 1e-04 </span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="co">#&gt;                                                       $80,000 or more      0.57   [0.50;0.65]     &lt; 1e-04 </span></span>
+<span id="cb15-18"><a href="#cb15-18"></a><span class="co">#&gt;                                              phyact            Active       Ref                           </span></span>
+<span id="cb15-19"><a href="#cb15-19"></a><span class="co">#&gt;                                                              Inactive      1.21   [1.10;1.34]   0.0001349 </span></span>
+<span id="cb15-20"><a href="#cb15-20"></a><span class="co">#&gt;                                                              Moderate      1.08   [0.97;1.21]   0.1760803 </span></span>
+<span id="cb15-21"><a href="#cb15-21"></a><span class="co">#&gt;                                               fruit 0-3 daily serving       Ref                           </span></span>
+<span id="cb15-22"><a href="#cb15-22"></a><span class="co">#&gt;                                                     4-6 daily serving      0.94   [0.86;1.03]   0.1892549 </span></span>
+<span id="cb15-23"><a href="#cb15-23"></a><span class="co">#&gt;                                                      6+ daily serving      1.10   [0.98;1.23]   0.1142759 </span></span>
+<span id="cb15-24"><a href="#cb15-24"></a><span class="co">#&gt;                                                  bp                No       Ref                           </span></span>
+<span id="cb15-25"><a href="#cb15-25"></a><span class="co">#&gt;                                                                   Yes      2.37   [2.18;2.57]     &lt; 1e-04 </span></span>
+<span id="cb15-26"><a href="#cb15-26"></a><span class="co">#&gt;                                              doctor                No       Ref                           </span></span>
+<span id="cb15-27"><a href="#cb15-27"></a><span class="co">#&gt;                                                                   Yes      1.71   [1.45;2.01]     &lt; 1e-04 </span></span>
+<span id="cb15-28"><a href="#cb15-28"></a><span class="co">#&gt;                                              stress  Not too stressed       Ref                           </span></span>
+<span id="cb15-29"><a href="#cb15-29"></a><span class="co">#&gt;                                                              stressed      1.29   [1.18;1.42]     &lt; 1e-04 </span></span>
+<span id="cb15-30"><a href="#cb15-30"></a><span class="co">#&gt;                                               smoke      Never smoker       Ref                           </span></span>
+<span id="cb15-31"><a href="#cb15-31"></a><span class="co">#&gt;                                                        Current smoker      1.16   [1.04;1.30]   0.0085960 </span></span>
+<span id="cb15-32"><a href="#cb15-32"></a><span class="co">#&gt;                                                         Former smoker      1.19   [1.09;1.31]   0.0002579 </span></span>
+<span id="cb15-33"><a href="#cb15-33"></a><span class="co">#&gt;                                               drink       Never drank       Ref                           </span></span>
+<span id="cb15-34"><a href="#cb15-34"></a><span class="co">#&gt;                                                       Current drinker      0.81   [0.68;0.97]   0.0227934 </span></span>
+<span id="cb15-35"><a href="#cb15-35"></a><span class="co">#&gt;                                                         Former driker      1.12   [0.93;1.35]   0.2264702 </span></span>
+<span id="cb15-36"><a href="#cb15-36"></a><span class="co">#&gt;               age(20-29 years): sex(Male vs Female)                        0.97   [0.64;1.48]   0.8945322 </span></span>
+<span id="cb15-37"><a href="#cb15-37"></a><span class="co">#&gt;               age(30-39 years): sex(Male vs Female)                        1.06   [0.75;1.49]   0.7583565 </span></span>
+<span id="cb15-38"><a href="#cb15-38"></a><span class="co">#&gt;               age(40-49 years): sex(Male vs Female)                        1.32   [1.07;1.62]   0.0091527 </span></span>
+<span id="cb15-39"><a href="#cb15-39"></a><span class="co">#&gt;               age(50-59 years): sex(Male vs Female)                        2.18   [1.85;2.58]     &lt; 1e-04 </span></span>
+<span id="cb15-40"><a href="#cb15-40"></a><span class="co">#&gt;               age(60-64 years): sex(Male vs Female)                        2.14   [1.80;2.53]     &lt; 1e-04 </span></span>
+<span id="cb15-41"><a href="#cb15-41"></a><span class="co">#&gt;         age(65 years and over): sex(Male vs Female)                        1.78   [1.58;1.99]     &lt; 1e-04 </span></span>
+<span id="cb15-42"><a href="#cb15-42"></a><span class="co">#&gt;                      age(teen): sex(Male vs Female)                        1.11   [0.22;5.62]   0.9033924 </span></span>
+<span id="cb15-43"><a href="#cb15-43"></a><span class="co">#&gt;        sex(Female): age(30-39 years vs 20-29 years)                        1.24   [0.87;1.77]   0.2276609 </span></span>
+<span id="cb15-44"><a href="#cb15-44"></a><span class="co">#&gt;        sex(Female): age(40-49 years vs 20-29 years)                        2.35   [1.75;3.16]     &lt; 1e-04 </span></span>
+<span id="cb15-45"><a href="#cb15-45"></a><span class="co">#&gt;        sex(Female): age(50-59 years vs 20-29 years)                        3.94   [2.95;5.27]     &lt; 1e-04 </span></span>
+<span id="cb15-46"><a href="#cb15-46"></a><span class="co">#&gt;        sex(Female): age(60-64 years vs 20-29 years)                        6.25   [4.66;8.39]     &lt; 1e-04 </span></span>
+<span id="cb15-47"><a href="#cb15-47"></a><span class="co">#&gt;  sex(Female): age(65 years and over vs 20-29 years)                       11.37  [8.60;15.02]     &lt; 1e-04 </span></span>
+<span id="cb15-48"><a href="#cb15-48"></a><span class="co">#&gt;               sex(Female): age(teen vs 20-29 years)                        0.44   [0.11;1.69]   0.2320840 </span></span>
+<span id="cb15-49"><a href="#cb15-49"></a><span class="co">#&gt;          sex(Male): age(30-39 years vs 20-29 years)                        1.35   [0.89;2.05]   0.1599938 </span></span>
+<span id="cb15-50"><a href="#cb15-50"></a><span class="co">#&gt;          sex(Male): age(40-49 years vs 20-29 years)                        3.18   [2.21;4.58]     &lt; 1e-04 </span></span>
+<span id="cb15-51"><a href="#cb15-51"></a><span class="co">#&gt;          sex(Male): age(50-59 years vs 20-29 years)                        8.85  [6.24;12.56]     &lt; 1e-04 </span></span>
+<span id="cb15-52"><a href="#cb15-52"></a><span class="co">#&gt;          sex(Male): age(60-64 years vs 20-29 years)                       13.73  [9.61;19.61]     &lt; 1e-04 </span></span>
+<span id="cb15-53"><a href="#cb15-53"></a><span class="co">#&gt;    sex(Male): age(65 years and over vs 20-29 years)                       20.77 [14.59;29.57]     &lt; 1e-04 </span></span>
+<span id="cb15-54"><a href="#cb15-54"></a><span class="co">#&gt;                 sex(Male): age(teen vs 20-29 years)                        0.50   [0.18;1.37]   0.1769155 </span></span>
+<span id="cb15-55"><a href="#cb15-55"></a><span class="co">#&gt;                   bmi(Underweight): diab(Yes vs No)                        5.72  [1.59;20.63]   0.0076561 </span></span>
+<span id="cb15-56"><a href="#cb15-56"></a><span class="co">#&gt;                bmi(healthy weight): diab(Yes vs No)                        1.44   [1.19;1.75]   0.0002221 </span></span>
+<span id="cb15-57"><a href="#cb15-57"></a><span class="co">#&gt;                    bmi(Overweight): diab(Yes vs No)                        1.93   [1.70;2.20]     &lt; 1e-04 </span></span>
+<span id="cb15-58"><a href="#cb15-58"></a><span class="co">#&gt;        diab(No): bmi(healthy weight vs Underweight)                        0.97   [0.76;1.25]   0.8394972 </span></span>
+<span id="cb15-59"><a href="#cb15-59"></a><span class="co">#&gt;            diab(No): bmi(Overweight vs Underweight)                        0.97   [0.76;1.25]   0.8400722 </span></span>
+<span id="cb15-60"><a href="#cb15-60"></a><span class="co">#&gt;       diab(Yes): bmi(healthy weight vs Underweight)                        0.25   [0.07;0.87]   0.0302066 </span></span>
+<span id="cb15-61"><a href="#cb15-61"></a><span class="co">#&gt;           diab(Yes): bmi(Overweight vs Underweight)                        0.33   [0.09;1.17]   0.0852377</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-hash="surveydata4_cache/html/interactions5_352f1ea2307787fcf7f8e0368d90154a">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic.model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span><span class="op">(</span><span class="va">fit5</span><span class="op">$</span><span class="va">call</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">basic.model</span></span>
-<span><span class="co">#&gt; I(CVD == "event") ~ OA + age + sex</span></span>
-<span><span class="co">#&gt; attr(,"variables")</span></span>
-<span><span class="co">#&gt; list(I(CVD == "event"), OA, age, sex)</span></span>
-<span><span class="co">#&gt; attr(,"factors")</span></span>
-<span><span class="co">#&gt;                   OA age sex</span></span>
-<span><span class="co">#&gt; I(CVD == "event")  0   0   0</span></span>
-<span><span class="co">#&gt; OA                 1   0   0</span></span>
-<span><span class="co">#&gt; age                0   1   0</span></span>
-<span><span class="co">#&gt; sex                0   0   1</span></span>
-<span><span class="co">#&gt; attr(,"term.labels")</span></span>
-<span><span class="co">#&gt; [1] "OA"  "age" "sex"</span></span>
-<span><span class="co">#&gt; attr(,"order")</span></span>
-<span><span class="co">#&gt; [1] 1 1 1</span></span>
-<span><span class="co">#&gt; attr(,"intercept")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,"response")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,".Environment")</span></span>
-<span><span class="co">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span>
-<span><span class="co">#&gt; attr(,"predvars")</span></span>
-<span><span class="co">#&gt; list(I(CVD == "event"), OA, age, sex)</span></span>
-<span><span class="co">#&gt; attr(,"dataClasses")</span></span>
-<span><span class="co">#&gt; I(CVD == "event")                OA               age               sex </span></span>
-<span><span class="co">#&gt;         "logical"          "factor"          "factor"          "factor" </span></span>
-<span><span class="co">#&gt;         (weights) </span></span>
-<span><span class="co">#&gt;         "numeric"</span></span>
-<span></span>
-<span><span class="va">aic.int.model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span><span class="op">(</span><span class="va">fit9</span><span class="op">$</span><span class="va">call</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">aic.int.model</span></span>
-<span><span class="co">#&gt; I(CVD == "event") ~ OA + age + sex + married + race + edu + income + </span></span>
-<span><span class="co">#&gt;     bmi + phyact + fruit + bp + diab + doctor + stress + smoke + </span></span>
-<span><span class="co">#&gt;     drink + age:sex + bmi:diab</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>basic.model <span class="ot">&lt;-</span> <span class="fu">eval</span>(fit5<span class="sc">$</span>call[[<span class="dv">2</span>]])</span>
+<span id="cb16-2"><a href="#cb16-2"></a>basic.model</span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt; I(CVD == "event") ~ OA + age + sex</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt; attr(,"variables")</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="co">#&gt; list(I(CVD == "event"), OA, age, sex)</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt; attr(,"factors")</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt;                   OA age sex</span></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="co">#&gt; I(CVD == "event")  0   0   0</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a><span class="co">#&gt; OA                 1   0   0</span></span>
+<span id="cb16-10"><a href="#cb16-10"></a><span class="co">#&gt; age                0   1   0</span></span>
+<span id="cb16-11"><a href="#cb16-11"></a><span class="co">#&gt; sex                0   0   1</span></span>
+<span id="cb16-12"><a href="#cb16-12"></a><span class="co">#&gt; attr(,"term.labels")</span></span>
+<span id="cb16-13"><a href="#cb16-13"></a><span class="co">#&gt; [1] "OA"  "age" "sex"</span></span>
+<span id="cb16-14"><a href="#cb16-14"></a><span class="co">#&gt; attr(,"order")</span></span>
+<span id="cb16-15"><a href="#cb16-15"></a><span class="co">#&gt; [1] 1 1 1</span></span>
+<span id="cb16-16"><a href="#cb16-16"></a><span class="co">#&gt; attr(,"intercept")</span></span>
+<span id="cb16-17"><a href="#cb16-17"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb16-18"><a href="#cb16-18"></a><span class="co">#&gt; attr(,"response")</span></span>
+<span id="cb16-19"><a href="#cb16-19"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb16-20"><a href="#cb16-20"></a><span class="co">#&gt; attr(,".Environment")</span></span>
+<span id="cb16-21"><a href="#cb16-21"></a><span class="co">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span>
+<span id="cb16-22"><a href="#cb16-22"></a><span class="co">#&gt; attr(,"predvars")</span></span>
+<span id="cb16-23"><a href="#cb16-23"></a><span class="co">#&gt; list(I(CVD == "event"), OA, age, sex)</span></span>
+<span id="cb16-24"><a href="#cb16-24"></a><span class="co">#&gt; attr(,"dataClasses")</span></span>
+<span id="cb16-25"><a href="#cb16-25"></a><span class="co">#&gt; I(CVD == "event")                OA               age               sex </span></span>
+<span id="cb16-26"><a href="#cb16-26"></a><span class="co">#&gt;         "logical"          "factor"          "factor"          "factor" </span></span>
+<span id="cb16-27"><a href="#cb16-27"></a><span class="co">#&gt;         (weights) </span></span>
+<span id="cb16-28"><a href="#cb16-28"></a><span class="co">#&gt;         "numeric"</span></span>
+<span id="cb16-29"><a href="#cb16-29"></a></span>
+<span id="cb16-30"><a href="#cb16-30"></a>aic.int.model <span class="ot">&lt;-</span> <span class="fu">eval</span>(fit9<span class="sc">$</span>call[[<span class="dv">2</span>]])</span>
+<span id="cb16-31"><a href="#cb16-31"></a>aic.int.model</span>
+<span id="cb16-32"><a href="#cb16-32"></a><span class="co">#&gt; I(CVD == "event") ~ OA + age + sex + married + race + edu + income + </span></span>
+<span id="cb16-33"><a href="#cb16-33"></a><span class="co">#&gt;     bmi + phyact + fruit + bp + diab + doctor + stress + smoke + </span></span>
+<span id="cb16-34"><a href="#cb16-34"></a><span class="co">#&gt;     drink + age:sex + bmi:diab</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section></section></section><section id="saving-data" class="level3"><h3 class="anchored" data-anchor-id="saving-data">Saving data</h3>
 <p>Saves the final regression models for future use.</p>
 <div class="cell" data-hash="surveydata4_cache/html/save_044db6a408516ee72686e6e62a6aeae9">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span><span class="va">basic.model</span>, <span class="va">aic.int.model</span>, file <span class="op">=</span> <span class="st">"Data/surveydata/cchs123w2.RData"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">save</span>(basic.model, aic.int.model, <span class="at">file =</span> <span class="st">"Data/surveydata/cchs123w2.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
@@ -1608,6 +1608,8 @@ Tip
 </iframe>
 </div>
 
+
+<!-- -->
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1802,7 +1804,238 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">CCHS: Performance</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb18" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">## CCHS: Regression {.unnumbered}</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a></span>
+<span id="cb18-3"><a href="#cb18-3"></a>This tutorial is for a complex data analysis, specifically using regression techniques to analyze survey data.</span>
+<span id="cb18-4"><a href="#cb18-4"></a></span>
+<span id="cb18-5"><a href="#cb18-5"></a>Loads necessary R packages for the analysis</span>
+<span id="cb18-6"><a href="#cb18-6"></a></span>
+<span id="cb18-7"><a href="#cb18-7"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
+<span id="cb18-8"><a href="#cb18-8"></a><span class="co"># Load required packages</span></span>
+<span id="cb18-9"><a href="#cb18-9"></a><span class="fu">library</span>(survey)</span>
+<span id="cb18-10"><a href="#cb18-10"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb18-11"><a href="#cb18-11"></a><span class="fu">library</span>(car)</span>
+<span id="cb18-12"><a href="#cb18-12"></a><span class="fu">library</span>(tableone)</span>
+<span id="cb18-13"><a href="#cb18-13"></a><span class="fu">library</span>(DataExplorer)</span>
+<span id="cb18-14"><a href="#cb18-14"></a><span class="fu">library</span>(Publish)</span>
+<span id="cb18-15"><a href="#cb18-15"></a><span class="fu">library</span>(ROCR)</span>
+<span id="cb18-16"><a href="#cb18-16"></a><span class="fu">library</span>(WeightedROC)</span>
+<span id="cb18-17"><a href="#cb18-17"></a><span class="fu">library</span>(jtools)</span>
+<span id="cb18-18"><a href="#cb18-18"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb18-19"><a href="#cb18-19"></a><span class="in">```</span></span>
+<span id="cb18-20"><a href="#cb18-20"></a></span>
+<span id="cb18-21"><a href="#cb18-21"></a><span class="fu">### Load data</span></span>
+<span id="cb18-22"><a href="#cb18-22"></a></span>
+<span id="cb18-23"><a href="#cb18-23"></a>Loads a dataset and provides some quick data checks, like the dimensions and summary of weights.</span>
+<span id="cb18-24"><a href="#cb18-24"></a></span>
+<span id="cb18-25"><a href="#cb18-25"></a><span class="in">```{r data, warning=FALSE, message=FALSE, cache = FALSE}</span></span>
+<span id="cb18-26"><a href="#cb18-26"></a><span class="fu">load</span>(<span class="st">"Data/surveydata/cchs123w.RData"</span>)</span>
+<span id="cb18-27"><a href="#cb18-27"></a><span class="fu">ls</span>()</span>
+<span id="cb18-28"><a href="#cb18-28"></a><span class="fu">dim</span>(analytic.miss)</span>
+<span id="cb18-29"><a href="#cb18-29"></a><span class="fu">dim</span>(analytic2)</span>
+<span id="cb18-30"><a href="#cb18-30"></a><span class="fu">summary</span>(<span class="fu">weights</span>(w.design))</span>
+<span id="cb18-31"><a href="#cb18-31"></a><span class="in">```</span></span>
+<span id="cb18-32"><a href="#cb18-32"></a></span>
+<span id="cb18-33"><a href="#cb18-33"></a><span class="fu">### Logistic for complex survey</span></span>
+<span id="cb18-34"><a href="#cb18-34"></a></span>
+<span id="cb18-35"><a href="#cb18-35"></a>Performs a simple logistic regression using the complex survey data, focusing on the relationship between cardiovascular disease and osteoarthritis.</span>
+<span id="cb18-36"><a href="#cb18-36"></a></span>
+<span id="cb18-37"><a href="#cb18-37"></a><span class="in">```{r logistc, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-38"><a href="#cb18-38"></a>formula0 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA)</span>
+<span id="cb18-39"><a href="#cb18-39"></a></span>
+<span id="cb18-40"><a href="#cb18-40"></a><span class="do">## Crude regression</span></span>
+<span id="cb18-41"><a href="#cb18-41"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula0, </span>
+<span id="cb18-42"><a href="#cb18-42"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb18-43"><a href="#cb18-43"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb18-44"><a href="#cb18-44"></a><span class="fu">require</span>(Publish)</span>
+<span id="cb18-45"><a href="#cb18-45"></a><span class="fu">publish</span>(fit2)</span>
+<span id="cb18-46"><a href="#cb18-46"></a><span class="in">```</span></span>
+<span id="cb18-47"><a href="#cb18-47"></a></span>
+<span id="cb18-48"><a href="#cb18-48"></a><span class="fu">### Multivariable analysis</span></span>
+<span id="cb18-49"><a href="#cb18-49"></a></span>
+<span id="cb18-50"><a href="#cb18-50"></a>Runs a more complex logistic regression model, adding multiple covariates to better understand the relationship.</span>
+<span id="cb18-51"><a href="#cb18-51"></a></span>
+<span id="cb18-52"><a href="#cb18-52"></a><span class="in">```{r multivariable, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-53"><a href="#cb18-53"></a>formula1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span> </span>
+<span id="cb18-54"><a href="#cb18-54"></a>              edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> doctor <span class="sc">+</span> stress <span class="sc">+</span> </span>
+<span id="cb18-55"><a href="#cb18-55"></a>              smoke <span class="sc">+</span> drink <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab <span class="sc">+</span> province <span class="sc">+</span> immigrate)</span>
+<span id="cb18-56"><a href="#cb18-56"></a></span>
+<span id="cb18-57"><a href="#cb18-57"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1, </span>
+<span id="cb18-58"><a href="#cb18-58"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb18-59"><a href="#cb18-59"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb18-60"><a href="#cb18-60"></a><span class="fu">publish</span>(fit3)</span>
+<span id="cb18-61"><a href="#cb18-61"></a><span class="in">```</span></span>
+<span id="cb18-62"><a href="#cb18-62"></a></span>
+<span id="cb18-63"><a href="#cb18-63"></a><span class="fu">#### Model fit assessment</span></span>
+<span id="cb18-64"><a href="#cb18-64"></a></span>
+<span id="cb18-65"><a href="#cb18-65"></a><span class="fu">#### Variability explained</span></span>
+<span id="cb18-66"><a href="#cb18-66"></a></span>
+<span id="cb18-67"><a href="#cb18-67"></a>Pseudo-R-square values indicate how much of the total variability in the outcomes is explainable by the fitted model (analogous to R-square)</span>
+<span id="cb18-68"><a href="#cb18-68"></a></span>
+<span id="cb18-69"><a href="#cb18-69"></a><span class="ss">1.  </span>Cox/Snell (never reaches max 1)</span>
+<span id="cb18-70"><a href="#cb18-70"></a><span class="ss">2.  </span>Nagelkerke R-square (scaled to max 1)</span>
+<span id="cb18-71"><a href="#cb18-71"></a></span>
+<span id="cb18-72"><a href="#cb18-72"></a><span class="ss">-   </span>The larger Cox &amp; Snell estimate is the better the model.</span>
+<span id="cb18-73"><a href="#cb18-73"></a><span class="ss">-   </span>These Pseudo-R-square values should be interpreted with caution (if not ignored).</span>
+<span id="cb18-74"><a href="#cb18-74"></a><span class="ss">-   </span>They offer little confidence in interpreting the model fit.</span>
+<span id="cb18-75"><a href="#cb18-75"></a><span class="ss">-   </span>Survey weighted version of them are available.</span>
+<span id="cb18-76"><a href="#cb18-76"></a><span class="ss">-   </span>Not trivial to decide which statistic to use under complex surveys.</span>
+<span id="cb18-77"><a href="#cb18-77"></a></span>
+<span id="cb18-78"><a href="#cb18-78"></a>Evaluates the model fit using Akaike Information Criterion (AIC) and pseudo R-squared metrics.</span>
+<span id="cb18-79"><a href="#cb18-79"></a></span>
+<span id="cb18-80"><a href="#cb18-80"></a><span class="in">```{r fit, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-81"><a href="#cb18-81"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1, </span>
+<span id="cb18-82"><a href="#cb18-82"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb18-83"><a href="#cb18-83"></a>              <span class="at">family =</span> <span class="fu">quasibinomial</span>(logit)) <span class="co"># publish does not work</span></span>
+<span id="cb18-84"><a href="#cb18-84"></a><span class="fu">AIC</span>(fit3) </span>
+<span id="cb18-85"><a href="#cb18-85"></a></span>
+<span id="cb18-86"><a href="#cb18-86"></a><span class="co"># AIC for survey weighted regressions</span></span>
+<span id="cb18-87"><a href="#cb18-87"></a><span class="fu">psrsq</span>(fit3, <span class="at">method =</span> <span class="st">"Cox-Snell"</span>)</span>
+<span id="cb18-88"><a href="#cb18-88"></a><span class="fu">psrsq</span>(fit3, <span class="at">method =</span> <span class="st">"Nagelkerke"</span>)</span>
+<span id="cb18-89"><a href="#cb18-89"></a><span class="co"># Nagelkerke and Cox-Snell pseudo-rsquared statistics</span></span>
+<span id="cb18-90"><a href="#cb18-90"></a><span class="in">```</span></span>
+<span id="cb18-91"><a href="#cb18-91"></a></span>
+<span id="cb18-92"><a href="#cb18-92"></a><span class="fu">### Backward Elimination</span></span>
+<span id="cb18-93"><a href="#cb18-93"></a></span>
+<span id="cb18-94"><a href="#cb18-94"></a><span class="ss">-   </span>Model comparisons</span>
+<span id="cb18-95"><a href="#cb18-95"></a><span class="ss">    -   </span>LRT-aprroximation</span>
+<span id="cb18-96"><a href="#cb18-96"></a><span class="ss">    -   </span>Wald-based</span>
+<span id="cb18-97"><a href="#cb18-97"></a></span>
+<span id="cb18-98"><a href="#cb18-98"></a><span class="fu">#### Checking one by one</span></span>
+<span id="cb18-99"><a href="#cb18-99"></a></span>
+<span id="cb18-100"><a href="#cb18-100"></a>Checks the significance of each variable one by one and removes those that are not statistically significant.</span>
+<span id="cb18-101"><a href="#cb18-101"></a></span>
+<span id="cb18-102"><a href="#cb18-102"></a><span class="in">```{r be, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-103"><a href="#cb18-103"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fit3)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb18-104"><a href="#cb18-104"></a><span class="co"># bmiOverweight is associated with largest p-value</span></span>
+<span id="cb18-105"><a href="#cb18-105"></a><span class="co"># but what about other categories?</span></span>
+<span id="cb18-106"><a href="#cb18-106"></a></span>
+<span id="cb18-107"><a href="#cb18-107"></a><span class="fu">regTermTest</span>(fit3,<span class="sc">~</span>bmi) <span class="co"># coef of all bmi cat = 0</span></span>
+<span id="cb18-108"><a href="#cb18-108"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">update</span>(fit3, .<span class="sc">~</span>. <span class="sc">-</span>bmi) </span>
+<span id="cb18-109"><a href="#cb18-109"></a></span>
+<span id="cb18-110"><a href="#cb18-110"></a><span class="fu">anova</span>(fit3, fit4)</span>
+<span id="cb18-111"><a href="#cb18-111"></a><span class="co"># high p-value (in both wald and Anova) makes it more likely that you should exclude bmi</span></span>
+<span id="cb18-112"><a href="#cb18-112"></a><span class="fu">AIC</span>(fit3,fit4) </span>
+<span id="cb18-113"><a href="#cb18-113"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fit4)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb18-114"><a href="#cb18-114"></a><span class="in">```</span></span>
+<span id="cb18-115"><a href="#cb18-115"></a></span>
+<span id="cb18-116"><a href="#cb18-116"></a><span class="fu">#### Using AIC to automate</span></span>
+<span id="cb18-117"><a href="#cb18-117"></a></span>
+<span id="cb18-118"><a href="#cb18-118"></a>Uses stepwise regression guided by AIC to automatically select the most important variables.</span>
+<span id="cb18-119"><a href="#cb18-119"></a></span>
+<span id="cb18-120"><a href="#cb18-120"></a><span class="in">```{r aic, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-121"><a href="#cb18-121"></a><span class="fu">require</span>(MASS)</span>
+<span id="cb18-122"><a href="#cb18-122"></a>formula1b <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex)</span>
+<span id="cb18-123"><a href="#cb18-123"></a>fit1b <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1b, </span>
+<span id="cb18-124"><a href="#cb18-124"></a>              <span class="at">design =</span> w.design, </span>
+<span id="cb18-125"><a href="#cb18-125"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb18-126"><a href="#cb18-126"></a>fit5 <span class="ot">&lt;-</span> <span class="fu">stepAIC</span>(fit1b, <span class="at">direction =</span> <span class="st">"backward"</span>)</span>
+<span id="cb18-127"><a href="#cb18-127"></a><span class="in">```</span></span>
+<span id="cb18-128"><a href="#cb18-128"></a></span>
+<span id="cb18-129"><a href="#cb18-129"></a><span class="in">```{r resround, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-130"><a href="#cb18-130"></a><span class="fu">publish</span>(fit5)</span>
+<span id="cb18-131"><a href="#cb18-131"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fit5)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb18-132"><a href="#cb18-132"></a><span class="in">```</span></span>
+<span id="cb18-133"><a href="#cb18-133"></a></span>
+<span id="cb18-134"><a href="#cb18-134"></a><span class="fu">#### Using AIC, but keeping importants</span></span>
+<span id="cb18-135"><a href="#cb18-135"></a></span>
+<span id="cb18-136"><a href="#cb18-136"></a>Similar to the previous step but ensures certain important variables remain in the model.</span>
+<span id="cb18-137"><a href="#cb18-137"></a></span>
+<span id="cb18-138"><a href="#cb18-138"></a><span class="in">```{r aic2, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-139"><a href="#cb18-139"></a>formula1c <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span></span>
+<span id="cb18-140"><a href="#cb18-140"></a>                         edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab <span class="sc">+</span> </span>
+<span id="cb18-141"><a href="#cb18-141"></a>                         doctor <span class="sc">+</span> stress <span class="sc">+</span> smoke <span class="sc">+</span> drink <span class="sc">+</span> province <span class="sc">+</span> immigrate)</span>
+<span id="cb18-142"><a href="#cb18-142"></a>scope <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">upper =</span> <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span></span>
+<span id="cb18-143"><a href="#cb18-143"></a>                         edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab <span class="sc">+</span> </span>
+<span id="cb18-144"><a href="#cb18-144"></a>                         doctor <span class="sc">+</span> stress <span class="sc">+</span> smoke <span class="sc">+</span> drink <span class="sc">+</span> province <span class="sc">+</span> immigrate,</span>
+<span id="cb18-145"><a href="#cb18-145"></a>              <span class="at">lower =</span> <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> married <span class="sc">+</span> race <span class="sc">+</span></span>
+<span id="cb18-146"><a href="#cb18-146"></a>                         edu <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> fruit <span class="sc">+</span> bp <span class="sc">+</span> diab)</span>
+<span id="cb18-147"><a href="#cb18-147"></a></span>
+<span id="cb18-148"><a href="#cb18-148"></a>fit1c <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(formula1c, <span class="at">design =</span> w.design, <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
+<span id="cb18-149"><a href="#cb18-149"></a></span>
+<span id="cb18-150"><a href="#cb18-150"></a>fitstep <span class="ot">&lt;-</span> <span class="fu">step</span>(fit1c, <span class="at">scope =</span> scope, <span class="at">trace =</span> <span class="cn">FALSE</span>, <span class="at">k =</span> <span class="dv">2</span>, <span class="at">direction =</span> <span class="st">"backward"</span>)</span>
+<span id="cb18-151"><a href="#cb18-151"></a><span class="co"># k = 2 gives the genuine AIC</span></span>
+<span id="cb18-152"><a href="#cb18-152"></a><span class="in">```</span></span>
+<span id="cb18-153"><a href="#cb18-153"></a></span>
+<span id="cb18-154"><a href="#cb18-154"></a><span class="in">```{r res, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-155"><a href="#cb18-155"></a><span class="fu">publish</span>(fitstep)</span>
+<span id="cb18-156"><a href="#cb18-156"></a><span class="fu">round</span>(<span class="fu">sort</span>(<span class="fu">summary</span>(fitstep)<span class="sc">$</span>coef[,<span class="st">"Pr(&gt;|t|)"</span>]),<span class="dv">2</span>)</span>
+<span id="cb18-157"><a href="#cb18-157"></a><span class="in">```</span></span>
+<span id="cb18-158"><a href="#cb18-158"></a></span>
+<span id="cb18-159"><a href="#cb18-159"></a><span class="fu">#### Assess interactions</span></span>
+<span id="cb18-160"><a href="#cb18-160"></a></span>
+<span id="cb18-161"><a href="#cb18-161"></a>Check biologically interesting ones.</span>
+<span id="cb18-162"><a href="#cb18-162"></a></span>
+<span id="cb18-163"><a href="#cb18-163"></a><span class="fu">##### Check one by one</span></span>
+<span id="cb18-164"><a href="#cb18-164"></a></span>
+<span id="cb18-165"><a href="#cb18-165"></a>Checks if there is a significant interaction effect between 'age' and 'sex'.</span>
+<span id="cb18-166"><a href="#cb18-166"></a></span>
+<span id="cb18-167"><a href="#cb18-167"></a><span class="in">```{r interactions0, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-168"><a href="#cb18-168"></a>fit8a <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(age,sex))</span>
+<span id="cb18-169"><a href="#cb18-169"></a><span class="fu">anova</span>(fitstep, fit8a) <span class="co"># keep interaction</span></span>
+<span id="cb18-170"><a href="#cb18-170"></a><span class="in">```</span></span>
+<span id="cb18-171"><a href="#cb18-171"></a></span>
+<span id="cb18-172"><a href="#cb18-172"></a>Checks if there is a significant interaction effect between 'sex' and 'diabetes'.</span>
+<span id="cb18-173"><a href="#cb18-173"></a></span>
+<span id="cb18-174"><a href="#cb18-174"></a><span class="in">```{r interactions1, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-175"><a href="#cb18-175"></a>fit8b <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(sex,diab))</span>
+<span id="cb18-176"><a href="#cb18-176"></a><span class="fu">anova</span>(fitstep, fit8b) <span class="co"># Do not keep this interaction</span></span>
+<span id="cb18-177"><a href="#cb18-177"></a><span class="in">```</span></span>
+<span id="cb18-178"><a href="#cb18-178"></a></span>
+<span id="cb18-179"><a href="#cb18-179"></a>Checks if there is a significant interaction effect between 'BMI' and 'diabetes'.</span>
+<span id="cb18-180"><a href="#cb18-180"></a></span>
+<span id="cb18-181"><a href="#cb18-181"></a><span class="in">```{r interactions2, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-182"><a href="#cb18-182"></a>fit8c <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(bmi,diab))</span>
+<span id="cb18-183"><a href="#cb18-183"></a><span class="fu">anova</span>(fitstep, fit8c) <span class="co"># keep this interaction</span></span>
+<span id="cb18-184"><a href="#cb18-184"></a><span class="in">```</span></span>
+<span id="cb18-185"><a href="#cb18-185"></a></span>
+<span id="cb18-186"><a href="#cb18-186"></a><span class="fu">##### Add all significant interactions in 1 model</span></span>
+<span id="cb18-187"><a href="#cb18-187"></a></span>
+<span id="cb18-188"><a href="#cb18-188"></a>Updates the model to include significant interaction terms.</span>
+<span id="cb18-189"><a href="#cb18-189"></a></span>
+<span id="cb18-190"><a href="#cb18-190"></a>Note that we have 0 effect modifier, 2 interactions</span>
+<span id="cb18-191"><a href="#cb18-191"></a></span>
+<span id="cb18-192"><a href="#cb18-192"></a><span class="in">```{r interactions3, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-193"><a href="#cb18-193"></a>fit9 <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> <span class="fu">interaction</span>(age,sex) <span class="sc">+</span> <span class="fu">interaction</span>(bmi,diab))</span>
+<span id="cb18-194"><a href="#cb18-194"></a><span class="fu">require</span>(jtools)</span>
+<span id="cb18-195"><a href="#cb18-195"></a><span class="fu">summ</span>(fit9, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span>
+<span id="cb18-196"><a href="#cb18-196"></a><span class="in">```</span></span>
+<span id="cb18-197"><a href="#cb18-197"></a></span>
+<span id="cb18-198"><a href="#cb18-198"></a><span class="in">```{r interactions4, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-199"><a href="#cb18-199"></a>fit9 <span class="ot">&lt;-</span> <span class="fu">update</span>(fitstep, .<span class="sc">~</span>. <span class="sc">+</span> age<span class="sc">:</span>sex <span class="sc">+</span> bmi<span class="sc">:</span>diab)</span>
+<span id="cb18-200"><a href="#cb18-200"></a><span class="fu">publish</span>(fit9)</span>
+<span id="cb18-201"><a href="#cb18-201"></a><span class="in">```</span></span>
+<span id="cb18-202"><a href="#cb18-202"></a></span>
+<span id="cb18-203"><a href="#cb18-203"></a><span class="in">```{r interactions5, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-204"><a href="#cb18-204"></a>basic.model <span class="ot">&lt;-</span> <span class="fu">eval</span>(fit5<span class="sc">$</span>call[[<span class="dv">2</span>]])</span>
+<span id="cb18-205"><a href="#cb18-205"></a>basic.model</span>
+<span id="cb18-206"><a href="#cb18-206"></a></span>
+<span id="cb18-207"><a href="#cb18-207"></a>aic.int.model <span class="ot">&lt;-</span> <span class="fu">eval</span>(fit9<span class="sc">$</span>call[[<span class="dv">2</span>]])</span>
+<span id="cb18-208"><a href="#cb18-208"></a>aic.int.model</span>
+<span id="cb18-209"><a href="#cb18-209"></a><span class="in">```</span></span>
+<span id="cb18-210"><a href="#cb18-210"></a></span>
+<span id="cb18-211"><a href="#cb18-211"></a><span class="fu">### Saving data</span></span>
+<span id="cb18-212"><a href="#cb18-212"></a></span>
+<span id="cb18-213"><a href="#cb18-213"></a>Saves the final regression models for future use.</span>
+<span id="cb18-214"><a href="#cb18-214"></a></span>
+<span id="cb18-215"><a href="#cb18-215"></a><span class="in">```{r save, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
+<span id="cb18-216"><a href="#cb18-216"></a><span class="fu">save</span>(basic.model, aic.int.model, <span class="at">file =</span> <span class="st">"Data/surveydata/cchs123w2.RData"</span>)</span>
+<span id="cb18-217"><a href="#cb18-217"></a><span class="in">```</span></span>
+<span id="cb18-218"><a href="#cb18-218"></a></span>
+<span id="cb18-219"><a href="#cb18-219"></a></span>
+<span id="cb18-220"><a href="#cb18-220"></a><span class="fu">### Video content (optional)</span></span>
+<span id="cb18-221"><a href="#cb18-221"></a></span>
+<span id="cb18-222"><a href="#cb18-222"></a>::: callout-tip</span>
+<span id="cb18-223"><a href="#cb18-223"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
+<span id="cb18-224"><a href="#cb18-224"></a>:::</span>
+<span id="cb18-225"><a href="#cb18-225"></a></span>
+<span id="cb18-226"><a href="#cb18-226"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
+<span id="cb18-227"><a href="#cb18-227"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/ebFkdeHV6m8"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
+<span id="cb18-228"><a href="#cb18-228"></a></span>
+<span id="cb18-229"><a href="#cb18-229"></a><span class="kw">&lt;/iframe&gt;</span></span>
+<span id="cb18-230"><a href="#cb18-230"></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

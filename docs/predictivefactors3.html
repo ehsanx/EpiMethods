@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - Binary outcome</title>
 <style>
@@ -405,7 +405,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -693,7 +693,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Binary outcome</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Binary outcome</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -713,27 +713,27 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="load-data" class="level4"><h4 class="anchored" data-anchor-id="load-data">Load data</h4>
 <div class="cell" data-hash="predictivefactors3_cache/html/load_e5fcadca6b3086b406f3fd8950b24a02">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part1.RData"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part1.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="creating-binary-variable" class="level4"><h4 class="anchored" data-anchor-id="creating-binary-variable">Creating binary variable</h4>
 <p><strong>Binary categorization</strong>: The cholesterol variable is converted into a binary outcome (“healthy” or “unhealthy”) using the <code>ifelse</code> function based on a threshold value of 200.</p>
 <p><strong>Re-leveling</strong>: The reference category for the binary variable is changed to “unhealthy.”</p>
 <div class="cell" data-hash="predictivefactors3_cache/html/binary_f441bd4901779ec67b1677819004c21b">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Binary variable</span></span>
-<span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol</span> <span class="op">&lt;</span> <span class="fl">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   healthy unhealthy </span></span>
-<span><span class="co">#&gt;      1586      1046</span></span>
-<span></span>
-<span><span class="co"># Changing the reference category</span></span>
-<span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span><span class="op">)</span></span>
-<span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/relevel.html">relevel</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span>, ref <span class="op">=</span> <span class="st">"unhealthy"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; unhealthy   healthy </span></span>
-<span><span class="co">#&gt;      1046      1586</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Binary variable</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>analytic3<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(analytic3<span class="sc">$</span>cholesterol <span class="sc">&lt;</span> <span class="dv">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">table</span>(analytic3<span class="sc">$</span>cholesterol.bin)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; </span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt;   healthy unhealthy </span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;      1586      1046</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co"># Changing the reference category</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>analytic3<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(analytic3<span class="sc">$</span>cholesterol.bin)</span>
+<span id="cb2-10"><a href="#cb2-10"></a>analytic3<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">relevel</span>(analytic3<span class="sc">$</span>cholesterol.bin, <span class="at">ref =</span> <span class="st">"unhealthy"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="fu">table</span>(analytic3<span class="sc">$</span>cholesterol.bin)</span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; </span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; unhealthy   healthy </span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt;      1046      1586</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="modelling-data" class="level4"><h4 class="anchored" data-anchor-id="modelling-data">Modelling data</h4>
@@ -752,89 +752,89 @@ Tip
 </div>
 </div>
 <div class="cell" data-hash="predictivefactors3_cache/html/glm_fcb557b4863c0a4bee08c0ac8f2f1daa">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Regression model</span></span>
-<span><span class="va">formula5x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol.bin~gender + age + born + </span></span>
-<span><span class="st">             race + education + married + </span></span>
-<span><span class="st">             income + diastolicBP + systolicBP + </span></span>
-<span><span class="st">             bmi + bodyweight + bodyheight + waist +  </span></span>
-<span><span class="st">             triglycerides + uric.acid + </span></span>
-<span><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
-<span><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
-<span><span class="st">             diabetes"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Summary</span></span>
-<span><span class="va">fit5x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">formula5x</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">analytic3</span><span class="op">)</span></span>
-<span><span class="fu">publish</span><span class="op">(</span><span class="va">fit5x</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               Variable                            Units OddsRatio       CI.95    p-value </span></span>
-<span><span class="co">#&gt;                 gender                           Female       Ref                        </span></span>
-<span><span class="co">#&gt;                                                    Male      1.68 [1.27;2.23]   0.000313 </span></span>
-<span><span class="co">#&gt;                    age                                       0.97 [0.97;0.98]    &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                   born Born in 50 US states or Washingt       Ref                        </span></span>
-<span><span class="co">#&gt;                                                  Others      0.69 [0.54;0.88]   0.002636 </span></span>
-<span><span class="co">#&gt;                   race                            Black       Ref                        </span></span>
-<span><span class="co">#&gt;                                                Hispanic      1.29 [0.95;1.75]   0.107104 </span></span>
-<span><span class="co">#&gt;                                                   Other      1.24 [0.87;1.79]   0.234062 </span></span>
-<span><span class="co">#&gt;                                                   White      1.10 [0.83;1.44]   0.505147 </span></span>
-<span><span class="co">#&gt;              education                          College       Ref                        </span></span>
-<span><span class="co">#&gt;                                             High.School      0.84 [0.68;1.02]   0.082168 </span></span>
-<span><span class="co">#&gt;                                                  School      1.23 [0.84;1.82]   0.292070 </span></span>
-<span><span class="co">#&gt;                married                          Married       Ref                        </span></span>
-<span><span class="co">#&gt;                                           Never.married      1.29 [1.00;1.67]   0.052969 </span></span>
-<span><span class="co">#&gt;                                      Previously.married      0.89 [0.70;1.13]   0.345688 </span></span>
-<span><span class="co">#&gt;                 income                             &lt;25k       Ref                        </span></span>
-<span><span class="co">#&gt;                                        Between.25kto54k      1.01 [0.78;1.29]   0.957537 </span></span>
-<span><span class="co">#&gt;                                        Between.55kto99k      0.90 [0.69;1.19]   0.462854 </span></span>
-<span><span class="co">#&gt;                                                Over100k      0.90 [0.66;1.21]   0.472137 </span></span>
-<span><span class="co">#&gt;            diastolicBP                                       0.98 [0.97;0.98]    &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;             systolicBP                                       1.01 [1.00;1.01]   0.029513 </span></span>
-<span><span class="co">#&gt;                    bmi                                       1.11 [0.99;1.24]   0.065627 </span></span>
-<span><span class="co">#&gt;             bodyweight                                       0.96 [0.92;1.00]   0.045338 </span></span>
-<span><span class="co">#&gt;             bodyheight                                       1.05 [1.00;1.09]   0.030995 </span></span>
-<span><span class="co">#&gt;                  waist                                       1.01 [0.99;1.02]   0.464825 </span></span>
-<span><span class="co">#&gt;          triglycerides                                       0.99 [0.99;0.99]    &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;              uric.acid                                       0.96 [0.89;1.03]   0.273792 </span></span>
-<span><span class="co">#&gt;                protein                                       0.61 [0.42;0.89]   0.009192 </span></span>
-<span><span class="co">#&gt;              bilirubin                                       1.19 [0.86;1.66]   0.292632 </span></span>
-<span><span class="co">#&gt;             phosphorus                                       0.96 [0.81;1.13]   0.610931 </span></span>
-<span><span class="co">#&gt;                 sodium                                       1.06 [1.02;1.11]   0.007980 </span></span>
-<span><span class="co">#&gt;              potassium                                       0.95 [0.71;1.26]   0.729218 </span></span>
-<span><span class="co">#&gt;               globulin                                       1.38 [0.94;2.01]   0.101667 </span></span>
-<span><span class="co">#&gt;                calcium                                       0.64 [0.47;0.89]   0.007026 </span></span>
-<span><span class="co">#&gt;          physical.work                               No       Ref                        </span></span>
-<span><span class="co">#&gt;                                                     Yes      0.91 [0.74;1.12]   0.392539 </span></span>
-<span><span class="co">#&gt;  physical.recreational                               No       Ref                        </span></span>
-<span><span class="co">#&gt;                                                     Yes      1.05 [0.85;1.29]   0.681388 </span></span>
-<span><span class="co">#&gt;               diabetes                               No       Ref                        </span></span>
-<span><span class="co">#&gt;                                                     Yes      2.68 [2.02;3.56]    &lt; 1e-04</span></span>
-<span></span>
-<span><span class="co"># VIF</span></span>
-<span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/vif.html">vif</a></span><span class="op">(</span><span class="va">fit5x</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                             GVIF Df GVIF^(1/(2*Df))</span></span>
-<span><span class="co">#&gt; gender                  2.735258  1        1.653862</span></span>
-<span><span class="co">#&gt; age                     2.121098  1        1.456399</span></span>
-<span><span class="co">#&gt; born                    1.664094  1        1.289998</span></span>
-<span><span class="co">#&gt; race                    2.585539  3        1.171544</span></span>
-<span><span class="co">#&gt; education               1.458430  2        1.098933</span></span>
-<span><span class="co">#&gt; married                 1.432595  2        1.094034</span></span>
-<span><span class="co">#&gt; income                  1.426911  3        1.061043</span></span>
-<span><span class="co">#&gt; diastolicBP             1.297308  1        1.138994</span></span>
-<span><span class="co">#&gt; systolicBP              1.614374  1        1.270580</span></span>
-<span><span class="co">#&gt; bmi                    81.928815  1        9.051454</span></span>
-<span><span class="co">#&gt; bodyweight            103.125772  1       10.155086</span></span>
-<span><span class="co">#&gt; bodyheight             22.647853  1        4.758976</span></span>
-<span><span class="co">#&gt; waist                  11.493710  1        3.390237</span></span>
-<span><span class="co">#&gt; triglycerides           1.258340  1        1.121758</span></span>
-<span><span class="co">#&gt; uric.acid               1.636512  1        1.279262</span></span>
-<span><span class="co">#&gt; protein                 3.684816  1        1.919587</span></span>
-<span><span class="co">#&gt; bilirubin               1.186181  1        1.089119</span></span>
-<span><span class="co">#&gt; phosphorus              1.117915  1        1.057315</span></span>
-<span><span class="co">#&gt; sodium                  1.123193  1        1.059808</span></span>
-<span><span class="co">#&gt; potassium               1.181358  1        1.086903</span></span>
-<span><span class="co">#&gt; globulin                3.427401  1        1.851324</span></span>
-<span><span class="co">#&gt; calcium                 1.543019  1        1.242183</span></span>
-<span><span class="co">#&gt; physical.work           1.090958  1        1.044490</span></span>
-<span><span class="co">#&gt; physical.recreational   1.218558  1        1.103883</span></span>
-<span><span class="co">#&gt; diabetes                1.212365  1        1.101074</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Regression model</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>formula5x <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol.bin~gender + age + born + </span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="st">             race + education + married + </span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="st">             bmi + bodyweight + bodyheight + waist +  </span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="st">             triglycerides + uric.acid + </span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="st">             diabetes"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10"></a></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co"># Summary</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a>fit5x <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula5x, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> analytic3)</span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="fu">publish</span>(fit5x)</span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt;               Variable                            Units OddsRatio       CI.95    p-value </span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt;                 gender                           Female       Ref                        </span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt;                                                    Male      1.68 [1.27;2.23]   0.000313 </span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt;                    age                                       0.97 [0.97;0.98]    &lt; 1e-04 </span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt;                   born Born in 50 US states or Washingt       Ref                        </span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt;                                                  Others      0.69 [0.54;0.88]   0.002636 </span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt;                   race                            Black       Ref                        </span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt;                                                Hispanic      1.29 [0.95;1.75]   0.107104 </span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt;                                                   Other      1.24 [0.87;1.79]   0.234062 </span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt;                                                   White      1.10 [0.83;1.44]   0.505147 </span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt;              education                          College       Ref                        </span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt;                                             High.School      0.84 [0.68;1.02]   0.082168 </span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt;                                                  School      1.23 [0.84;1.82]   0.292070 </span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt;                married                          Married       Ref                        </span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt;                                           Never.married      1.29 [1.00;1.67]   0.052969 </span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt;                                      Previously.married      0.89 [0.70;1.13]   0.345688 </span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt;                 income                             &lt;25k       Ref                        </span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt;                                        Between.25kto54k      1.01 [0.78;1.29]   0.957537 </span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt;                                        Between.55kto99k      0.90 [0.69;1.19]   0.462854 </span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt;                                                Over100k      0.90 [0.66;1.21]   0.472137 </span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt;            diastolicBP                                       0.98 [0.97;0.98]    &lt; 1e-04 </span></span>
+<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt;             systolicBP                                       1.01 [1.00;1.01]   0.029513 </span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt;                    bmi                                       1.11 [0.99;1.24]   0.065627 </span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt;             bodyweight                                       0.96 [0.92;1.00]   0.045338 </span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt;             bodyheight                                       1.05 [1.00;1.09]   0.030995 </span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt;                  waist                                       1.01 [0.99;1.02]   0.464825 </span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt;          triglycerides                                       0.99 [0.99;0.99]    &lt; 1e-04 </span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt;              uric.acid                                       0.96 [0.89;1.03]   0.273792 </span></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="co">#&gt;                protein                                       0.61 [0.42;0.89]   0.009192 </span></span>
+<span id="cb3-43"><a href="#cb3-43"></a><span class="co">#&gt;              bilirubin                                       1.19 [0.86;1.66]   0.292632 </span></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co">#&gt;             phosphorus                                       0.96 [0.81;1.13]   0.610931 </span></span>
+<span id="cb3-45"><a href="#cb3-45"></a><span class="co">#&gt;                 sodium                                       1.06 [1.02;1.11]   0.007980 </span></span>
+<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt;              potassium                                       0.95 [0.71;1.26]   0.729218 </span></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="co">#&gt;               globulin                                       1.38 [0.94;2.01]   0.101667 </span></span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="co">#&gt;                calcium                                       0.64 [0.47;0.89]   0.007026 </span></span>
+<span id="cb3-49"><a href="#cb3-49"></a><span class="co">#&gt;          physical.work                               No       Ref                        </span></span>
+<span id="cb3-50"><a href="#cb3-50"></a><span class="co">#&gt;                                                     Yes      0.91 [0.74;1.12]   0.392539 </span></span>
+<span id="cb3-51"><a href="#cb3-51"></a><span class="co">#&gt;  physical.recreational                               No       Ref                        </span></span>
+<span id="cb3-52"><a href="#cb3-52"></a><span class="co">#&gt;                                                     Yes      1.05 [0.85;1.29]   0.681388 </span></span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co">#&gt;               diabetes                               No       Ref                        </span></span>
+<span id="cb3-54"><a href="#cb3-54"></a><span class="co">#&gt;                                                     Yes      2.68 [2.02;3.56]    &lt; 1e-04</span></span>
+<span id="cb3-55"><a href="#cb3-55"></a></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="co"># VIF</span></span>
+<span id="cb3-57"><a href="#cb3-57"></a>car<span class="sc">::</span><span class="fu">vif</span>(fit5x)</span>
+<span id="cb3-58"><a href="#cb3-58"></a><span class="co">#&gt;                             GVIF Df GVIF^(1/(2*Df))</span></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="co">#&gt; gender                  2.735258  1        1.653862</span></span>
+<span id="cb3-60"><a href="#cb3-60"></a><span class="co">#&gt; age                     2.121098  1        1.456399</span></span>
+<span id="cb3-61"><a href="#cb3-61"></a><span class="co">#&gt; born                    1.664094  1        1.289998</span></span>
+<span id="cb3-62"><a href="#cb3-62"></a><span class="co">#&gt; race                    2.585539  3        1.171544</span></span>
+<span id="cb3-63"><a href="#cb3-63"></a><span class="co">#&gt; education               1.458430  2        1.098933</span></span>
+<span id="cb3-64"><a href="#cb3-64"></a><span class="co">#&gt; married                 1.432595  2        1.094034</span></span>
+<span id="cb3-65"><a href="#cb3-65"></a><span class="co">#&gt; income                  1.426911  3        1.061043</span></span>
+<span id="cb3-66"><a href="#cb3-66"></a><span class="co">#&gt; diastolicBP             1.297308  1        1.138994</span></span>
+<span id="cb3-67"><a href="#cb3-67"></a><span class="co">#&gt; systolicBP              1.614374  1        1.270580</span></span>
+<span id="cb3-68"><a href="#cb3-68"></a><span class="co">#&gt; bmi                    81.928815  1        9.051454</span></span>
+<span id="cb3-69"><a href="#cb3-69"></a><span class="co">#&gt; bodyweight            103.125772  1       10.155086</span></span>
+<span id="cb3-70"><a href="#cb3-70"></a><span class="co">#&gt; bodyheight             22.647853  1        4.758976</span></span>
+<span id="cb3-71"><a href="#cb3-71"></a><span class="co">#&gt; waist                  11.493710  1        3.390237</span></span>
+<span id="cb3-72"><a href="#cb3-72"></a><span class="co">#&gt; triglycerides           1.258340  1        1.121758</span></span>
+<span id="cb3-73"><a href="#cb3-73"></a><span class="co">#&gt; uric.acid               1.636512  1        1.279262</span></span>
+<span id="cb3-74"><a href="#cb3-74"></a><span class="co">#&gt; protein                 3.684816  1        1.919587</span></span>
+<span id="cb3-75"><a href="#cb3-75"></a><span class="co">#&gt; bilirubin               1.186181  1        1.089119</span></span>
+<span id="cb3-76"><a href="#cb3-76"></a><span class="co">#&gt; phosphorus              1.117915  1        1.057315</span></span>
+<span id="cb3-77"><a href="#cb3-77"></a><span class="co">#&gt; sodium                  1.123193  1        1.059808</span></span>
+<span id="cb3-78"><a href="#cb3-78"></a><span class="co">#&gt; potassium               1.181358  1        1.086903</span></span>
+<span id="cb3-79"><a href="#cb3-79"></a><span class="co">#&gt; globulin                3.427401  1        1.851324</span></span>
+<span id="cb3-80"><a href="#cb3-80"></a><span class="co">#&gt; calcium                 1.543019  1        1.242183</span></span>
+<span id="cb3-81"><a href="#cb3-81"></a><span class="co">#&gt; physical.work           1.090958  1        1.044490</span></span>
+<span id="cb3-82"><a href="#cb3-82"></a><span class="co">#&gt; physical.recreational   1.218558  1        1.103883</span></span>
+<span id="cb3-83"><a href="#cb3-83"></a><span class="co">#&gt; diabetes                1.212365  1        1.101074</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="auc" class="level4"><h4 class="anchored" data-anchor-id="auc">AUC</h4>
@@ -853,127 +853,129 @@ Tip
 </div>
 </div>
 <div class="cell" data-hash="predictivefactors3_cache/html/auc1_8ab7f0ba46b9f86c1a52aebf7f2661fa">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="http://expasy.org/tools/pROC/">pROC</a></span><span class="op">)</span></span>
-<span><span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit5x</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
-<span><span class="va">rocobj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/pROC/man/roc.html">roc</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span>, <span class="va">pred.y</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Setting levels: control = unhealthy, case = healthy</span></span>
-<span><span class="co">#&gt; Setting direction: controls &lt; cases</span></span>
-<span><span class="va">rocobj</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; roc.default(response = analytic3$cholesterol.bin, predictor = pred.y)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Data: pred.y in 1046 controls (analytic3$cholesterol.bin unhealthy) &lt; 1586 cases (analytic3$cholesterol.bin healthy).</span></span>
-<span><span class="co">#&gt; Area under the curve: 0.7411</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/pROC/man/auc.html">auc</a></span><span class="op">(</span><span class="va">rocobj</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Area under the curve: 0.7411</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(pROC)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit5x, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(analytic3<span class="sc">$</span>cholesterol.bin, pred.y)</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; Setting levels: control = unhealthy, case = healthy</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt; Setting direction: controls &lt; cases</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>rocobj</span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; roc.default(response = analytic3$cholesterol.bin, predictor = pred.y)</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; </span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; Data: pred.y in 1046 controls (analytic3$cholesterol.bin unhealthy) &lt; 1586 cases (analytic3$cholesterol.bin healthy).</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; Area under the curve: 0.7411</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="fu">auc</span>(rocobj)</span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; Area under the curve: 0.7411</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="re-modelling" class="level4"><h4 class="anchored" data-anchor-id="re-modelling">Re-modelling</h4>
 <p>Let us re-fit the model and measure the AUC. VIF is calculated again for this new model.</p>
 <div class="cell" data-hash="predictivefactors3_cache/html/refit1_2db6b1cb635bb0ecc42223301566941c">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">formula5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">as.formula</a></span><span class="op">(</span><span class="st">"cholesterol.bin~gender + age + born + </span></span>
-<span><span class="st">             race + education + married + </span></span>
-<span><span class="st">             income + diastolicBP + systolicBP + </span></span>
-<span><span class="st">             bmi +</span></span>
-<span><span class="st">             triglycerides + uric.acid + </span></span>
-<span><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
-<span><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
-<span><span class="st">             diabetes"</span><span class="op">)</span></span>
-<span><span class="va">fit5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">formula5</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">analytic3</span><span class="op">)</span></span>
-<span><span class="fu">publish</span><span class="op">(</span><span class="va">fit5</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               Variable                            Units OddsRatio       CI.95    p-value </span></span>
-<span><span class="co">#&gt;                 gender                           Female       Ref                        </span></span>
-<span><span class="co">#&gt;                                                    Male      1.86 [1.48;2.33]    &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                    age                                       0.97 [0.97;0.98]    &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;                   born Born in 50 US states or Washingt       Ref                        </span></span>
-<span><span class="co">#&gt;                                                  Others      0.67 [0.52;0.85]   0.001233 </span></span>
-<span><span class="co">#&gt;                   race                            Black       Ref                        </span></span>
-<span><span class="co">#&gt;                                                Hispanic      1.26 [0.94;1.69]   0.128165 </span></span>
-<span><span class="co">#&gt;                                                   Other      1.21 [0.85;1.73]   0.284083 </span></span>
-<span><span class="co">#&gt;                                                   White      1.11 [0.85;1.45]   0.460652 </span></span>
-<span><span class="co">#&gt;              education                          College       Ref                        </span></span>
-<span><span class="co">#&gt;                                             High.School      0.84 [0.68;1.02]   0.083806 </span></span>
-<span><span class="co">#&gt;                                                  School      1.22 [0.83;1.80]   0.305514 </span></span>
-<span><span class="co">#&gt;                married                          Married       Ref                        </span></span>
-<span><span class="co">#&gt;                                           Never.married      1.29 [1.00;1.68]   0.049983 </span></span>
-<span><span class="co">#&gt;                                      Previously.married      0.89 [0.70;1.13]   0.339401 </span></span>
-<span><span class="co">#&gt;                 income                             &lt;25k       Ref                        </span></span>
-<span><span class="co">#&gt;                                        Between.25kto54k      1.00 [0.78;1.28]   0.999445 </span></span>
-<span><span class="co">#&gt;                                        Between.55kto99k      0.90 [0.68;1.17]   0.425427 </span></span>
-<span><span class="co">#&gt;                                                Over100k      0.89 [0.66;1.20]   0.447012 </span></span>
-<span><span class="co">#&gt;            diastolicBP                                       0.98 [0.97;0.99]    &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;             systolicBP                                       1.01 [1.00;1.01]   0.042769 </span></span>
-<span><span class="co">#&gt;                    bmi                                       1.01 [0.99;1.02]   0.496430 </span></span>
-<span><span class="co">#&gt;          triglycerides                                       0.99 [0.99;0.99]    &lt; 1e-04 </span></span>
-<span><span class="co">#&gt;              uric.acid                                       0.96 [0.89;1.03]   0.242942 </span></span>
-<span><span class="co">#&gt;                protein                                       0.62 [0.43;0.89]   0.010343 </span></span>
-<span><span class="co">#&gt;              bilirubin                                       1.24 [0.89;1.72]   0.203993 </span></span>
-<span><span class="co">#&gt;             phosphorus                                       0.95 [0.80;1.12]   0.539847 </span></span>
-<span><span class="co">#&gt;                 sodium                                       1.06 [1.02;1.11]   0.006777 </span></span>
-<span><span class="co">#&gt;              potassium                                       0.96 [0.72;1.28]   0.790080 </span></span>
-<span><span class="co">#&gt;               globulin                                       1.37 [0.94;2.00]   0.102430 </span></span>
-<span><span class="co">#&gt;                calcium                                       0.64 [0.46;0.88]   0.005772 </span></span>
-<span><span class="co">#&gt;          physical.work                               No       Ref                        </span></span>
-<span><span class="co">#&gt;                                                     Yes      0.91 [0.74;1.12]   0.382281 </span></span>
-<span><span class="co">#&gt;  physical.recreational                               No       Ref                        </span></span>
-<span><span class="co">#&gt;                                                     Yes      1.04 [0.85;1.29]   0.682962 </span></span>
-<span><span class="co">#&gt;               diabetes                               No       Ref                        </span></span>
-<span><span class="co">#&gt;                                                     Yes      2.69 [2.03;3.57]    &lt; 1e-04</span></span>
-<span></span>
-<span><span class="co"># VIF</span></span>
-<span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/vif.html">vif</a></span><span class="op">(</span><span class="va">fit5</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                           GVIF Df GVIF^(1/(2*Df))</span></span>
-<span><span class="co">#&gt; gender                1.749947  1        1.322856</span></span>
-<span><span class="co">#&gt; age                   1.850160  1        1.360206</span></span>
-<span><span class="co">#&gt; born                  1.640947  1        1.280994</span></span>
-<span><span class="co">#&gt; race                  2.345460  3        1.152669</span></span>
-<span><span class="co">#&gt; education             1.430721  2        1.093676</span></span>
-<span><span class="co">#&gt; married               1.432015  2        1.093923</span></span>
-<span><span class="co">#&gt; income                1.409064  3        1.058819</span></span>
-<span><span class="co">#&gt; diastolicBP           1.289411  1        1.135523</span></span>
-<span><span class="co">#&gt; systolicBP            1.605248  1        1.266984</span></span>
-<span><span class="co">#&gt; bmi                   1.477795  1        1.215646</span></span>
-<span><span class="co">#&gt; triglycerides         1.246395  1        1.116421</span></span>
-<span><span class="co">#&gt; uric.acid             1.624039  1        1.274378</span></span>
-<span><span class="co">#&gt; protein               3.648367  1        1.910070</span></span>
-<span><span class="co">#&gt; bilirubin             1.177643  1        1.085193</span></span>
-<span><span class="co">#&gt; phosphorus            1.114298  1        1.055603</span></span>
-<span><span class="co">#&gt; sodium                1.117463  1        1.057101</span></span>
-<span><span class="co">#&gt; potassium             1.176914  1        1.084857</span></span>
-<span><span class="co">#&gt; globulin              3.395946  1        1.842809</span></span>
-<span><span class="co">#&gt; calcium               1.542486  1        1.241969</span></span>
-<span><span class="co">#&gt; physical.work         1.089742  1        1.043907</span></span>
-<span><span class="co">#&gt; physical.recreational 1.197719  1        1.094404</span></span>
-<span><span class="co">#&gt; diabetes              1.200402  1        1.095629</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>formula5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol.bin~gender + age + born + </span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="st">             race + education + married + </span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="st">             bmi +</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="st">             triglycerides + uric.acid + </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="st">             diabetes"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9"></a>fit5 <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula5, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> analytic3)</span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="fu">publish</span>(fit5)</span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;               Variable                            Units OddsRatio       CI.95    p-value </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;                 gender                           Female       Ref                        </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;                                                    Male      1.86 [1.48;2.33]    &lt; 1e-04 </span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;                    age                                       0.97 [0.97;0.98]    &lt; 1e-04 </span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;                   born Born in 50 US states or Washingt       Ref                        </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt;                                                  Others      0.67 [0.52;0.85]   0.001233 </span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt;                   race                            Black       Ref                        </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt;                                                Hispanic      1.26 [0.94;1.69]   0.128165 </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt;                                                   Other      1.21 [0.85;1.73]   0.284083 </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt;                                                   White      1.11 [0.85;1.45]   0.460652 </span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt;              education                          College       Ref                        </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt;                                             High.School      0.84 [0.68;1.02]   0.083806 </span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt;                                                  School      1.22 [0.83;1.80]   0.305514 </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt;                married                          Married       Ref                        </span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt;                                           Never.married      1.29 [1.00;1.68]   0.049983 </span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt;                                      Previously.married      0.89 [0.70;1.13]   0.339401 </span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;                 income                             &lt;25k       Ref                        </span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;                                        Between.25kto54k      1.00 [0.78;1.28]   0.999445 </span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;                                        Between.55kto99k      0.90 [0.68;1.17]   0.425427 </span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt;                                                Over100k      0.89 [0.66;1.20]   0.447012 </span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt;            diastolicBP                                       0.98 [0.97;0.99]    &lt; 1e-04 </span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt;             systolicBP                                       1.01 [1.00;1.01]   0.042769 </span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt;                    bmi                                       1.01 [0.99;1.02]   0.496430 </span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt;          triglycerides                                       0.99 [0.99;0.99]    &lt; 1e-04 </span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt;              uric.acid                                       0.96 [0.89;1.03]   0.242942 </span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt;                protein                                       0.62 [0.43;0.89]   0.010343 </span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt;              bilirubin                                       1.24 [0.89;1.72]   0.203993 </span></span>
+<span id="cb5-38"><a href="#cb5-38"></a><span class="co">#&gt;             phosphorus                                       0.95 [0.80;1.12]   0.539847 </span></span>
+<span id="cb5-39"><a href="#cb5-39"></a><span class="co">#&gt;                 sodium                                       1.06 [1.02;1.11]   0.006777 </span></span>
+<span id="cb5-40"><a href="#cb5-40"></a><span class="co">#&gt;              potassium                                       0.96 [0.72;1.28]   0.790080 </span></span>
+<span id="cb5-41"><a href="#cb5-41"></a><span class="co">#&gt;               globulin                                       1.37 [0.94;2.00]   0.102430 </span></span>
+<span id="cb5-42"><a href="#cb5-42"></a><span class="co">#&gt;                calcium                                       0.64 [0.46;0.88]   0.005772 </span></span>
+<span id="cb5-43"><a href="#cb5-43"></a><span class="co">#&gt;          physical.work                               No       Ref                        </span></span>
+<span id="cb5-44"><a href="#cb5-44"></a><span class="co">#&gt;                                                     Yes      0.91 [0.74;1.12]   0.382281 </span></span>
+<span id="cb5-45"><a href="#cb5-45"></a><span class="co">#&gt;  physical.recreational                               No       Ref                        </span></span>
+<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#&gt;                                                     Yes      1.04 [0.85;1.29]   0.682962 </span></span>
+<span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt;               diabetes                               No       Ref                        </span></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt;                                                     Yes      2.69 [2.03;3.57]    &lt; 1e-04</span></span>
+<span id="cb5-49"><a href="#cb5-49"></a></span>
+<span id="cb5-50"><a href="#cb5-50"></a><span class="co"># VIF</span></span>
+<span id="cb5-51"><a href="#cb5-51"></a>car<span class="sc">::</span><span class="fu">vif</span>(fit5)</span>
+<span id="cb5-52"><a href="#cb5-52"></a><span class="co">#&gt;                           GVIF Df GVIF^(1/(2*Df))</span></span>
+<span id="cb5-53"><a href="#cb5-53"></a><span class="co">#&gt; gender                1.749947  1        1.322856</span></span>
+<span id="cb5-54"><a href="#cb5-54"></a><span class="co">#&gt; age                   1.850160  1        1.360206</span></span>
+<span id="cb5-55"><a href="#cb5-55"></a><span class="co">#&gt; born                  1.640947  1        1.280994</span></span>
+<span id="cb5-56"><a href="#cb5-56"></a><span class="co">#&gt; race                  2.345460  3        1.152669</span></span>
+<span id="cb5-57"><a href="#cb5-57"></a><span class="co">#&gt; education             1.430721  2        1.093676</span></span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="co">#&gt; married               1.432015  2        1.093923</span></span>
+<span id="cb5-59"><a href="#cb5-59"></a><span class="co">#&gt; income                1.409064  3        1.058819</span></span>
+<span id="cb5-60"><a href="#cb5-60"></a><span class="co">#&gt; diastolicBP           1.289411  1        1.135523</span></span>
+<span id="cb5-61"><a href="#cb5-61"></a><span class="co">#&gt; systolicBP            1.605248  1        1.266984</span></span>
+<span id="cb5-62"><a href="#cb5-62"></a><span class="co">#&gt; bmi                   1.477795  1        1.215646</span></span>
+<span id="cb5-63"><a href="#cb5-63"></a><span class="co">#&gt; triglycerides         1.246395  1        1.116421</span></span>
+<span id="cb5-64"><a href="#cb5-64"></a><span class="co">#&gt; uric.acid             1.624039  1        1.274378</span></span>
+<span id="cb5-65"><a href="#cb5-65"></a><span class="co">#&gt; protein               3.648367  1        1.910070</span></span>
+<span id="cb5-66"><a href="#cb5-66"></a><span class="co">#&gt; bilirubin             1.177643  1        1.085193</span></span>
+<span id="cb5-67"><a href="#cb5-67"></a><span class="co">#&gt; phosphorus            1.114298  1        1.055603</span></span>
+<span id="cb5-68"><a href="#cb5-68"></a><span class="co">#&gt; sodium                1.117463  1        1.057101</span></span>
+<span id="cb5-69"><a href="#cb5-69"></a><span class="co">#&gt; potassium             1.176914  1        1.084857</span></span>
+<span id="cb5-70"><a href="#cb5-70"></a><span class="co">#&gt; globulin              3.395946  1        1.842809</span></span>
+<span id="cb5-71"><a href="#cb5-71"></a><span class="co">#&gt; calcium               1.542486  1        1.241969</span></span>
+<span id="cb5-72"><a href="#cb5-72"></a><span class="co">#&gt; physical.work         1.089742  1        1.043907</span></span>
+<span id="cb5-73"><a href="#cb5-73"></a><span class="co">#&gt; physical.recreational 1.197719  1        1.094404</span></span>
+<span id="cb5-74"><a href="#cb5-74"></a><span class="co">#&gt; diabetes              1.200402  1        1.095629</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>The AUC for this new model is also calculated.</p>
 <div class="cell" data-hash="predictivefactors3_cache/html/auc2_92980eeca74734e218f0799160c02adb">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#### AUC</span></span>
-<span><span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit5</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
-<span><span class="va">rocobj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/pROC/man/roc.html">roc</a></span><span class="op">(</span><span class="va">analytic3</span><span class="op">$</span><span class="va">cholesterol.bin</span>, <span class="va">pred.y</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Setting levels: control = unhealthy, case = healthy</span></span>
-<span><span class="co">#&gt; Setting direction: controls &lt; cases</span></span>
-<span><span class="va">rocobj</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; roc.default(response = analytic3$cholesterol.bin, predictor = pred.y)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Data: pred.y in 1046 controls (analytic3$cholesterol.bin unhealthy) &lt; 1586 cases (analytic3$cholesterol.bin healthy).</span></span>
-<span><span class="co">#&gt; Area under the curve: 0.7406</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/pROC/man/auc.html">auc</a></span><span class="op">(</span><span class="va">rocobj</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Area under the curve: 0.7406</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="do">#### AUC</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit5, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(analytic3<span class="sc">$</span>cholesterol.bin, pred.y)</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; Setting levels: control = unhealthy, case = healthy</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; Setting direction: controls &lt; cases</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>rocobj</span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; roc.default(response = analytic3$cholesterol.bin, predictor = pred.y)</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; Data: pred.y in 1046 controls (analytic3$cholesterol.bin unhealthy) &lt; 1586 cases (analytic3$cholesterol.bin healthy).</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt; Area under the curve: 0.7406</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="fu">auc</span>(rocobj)</span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; Area under the curve: 0.7406</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section></section><section id="save-data" class="level3"><h3 class="anchored" data-anchor-id="save-data">Save data</h3>
 <div class="cell" data-hash="predictivefactors3_cache/html/save_de2e59fd6bcc7b3c534f78f36d277ce2">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html">save.image</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">save.image</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
 
+
+<!-- -->
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1168,7 +1170,127 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Overfitting and performance</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">## Binary outcome {.unnumbered}</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>We focuse on statistical analysis and modeling of a binary outcome, cholesterol levels that are categorized as either "healthy" or "unhealthy." </span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="fu">### Explore relationships for binary outcome variable</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="in">```{r setup, warning=FALSE, echo=FALSE,cache=TRUE}</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co"># Load required packages</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="fu">library</span>(rms)</span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="fu">library</span>(Hmisc)</span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="fu">library</span>(Publish)</span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="fu">library</span>(car)</span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="fu">library</span>(pROC)</span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="in">```</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="fu">#### Load data</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="in">```{r load, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb8-19"><a href="#cb8-19"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part1.RData"</span>)</span>
+<span id="cb8-20"><a href="#cb8-20"></a><span class="in">```</span></span>
+<span id="cb8-21"><a href="#cb8-21"></a></span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="fu">#### Creating binary variable</span></span>
+<span id="cb8-23"><a href="#cb8-23"></a></span>
+<span id="cb8-24"><a href="#cb8-24"></a>**Binary categorization**: The cholesterol variable is converted into a binary outcome ("healthy" or "unhealthy") using the <span class="in">`ifelse`</span> function based on a threshold value of 200. </span>
+<span id="cb8-25"><a href="#cb8-25"></a></span>
+<span id="cb8-26"><a href="#cb8-26"></a>**Re-leveling**: The reference category for the binary variable is changed to "unhealthy."</span>
+<span id="cb8-27"><a href="#cb8-27"></a></span>
+<span id="cb8-28"><a href="#cb8-28"></a><span class="in">```{r binary, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb8-29"><a href="#cb8-29"></a><span class="co"># Binary variable</span></span>
+<span id="cb8-30"><a href="#cb8-30"></a>analytic3<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(analytic3<span class="sc">$</span>cholesterol <span class="sc">&lt;</span> <span class="dv">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span>)</span>
+<span id="cb8-31"><a href="#cb8-31"></a><span class="fu">table</span>(analytic3<span class="sc">$</span>cholesterol.bin)</span>
+<span id="cb8-32"><a href="#cb8-32"></a></span>
+<span id="cb8-33"><a href="#cb8-33"></a><span class="co"># Changing the reference category</span></span>
+<span id="cb8-34"><a href="#cb8-34"></a>analytic3<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(analytic3<span class="sc">$</span>cholesterol.bin)</span>
+<span id="cb8-35"><a href="#cb8-35"></a>analytic3<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">relevel</span>(analytic3<span class="sc">$</span>cholesterol.bin, <span class="at">ref =</span> <span class="st">"unhealthy"</span>)</span>
+<span id="cb8-36"><a href="#cb8-36"></a><span class="fu">table</span>(analytic3<span class="sc">$</span>cholesterol.bin)</span>
+<span id="cb8-37"><a href="#cb8-37"></a><span class="in">```</span></span>
+<span id="cb8-38"><a href="#cb8-38"></a></span>
+<span id="cb8-39"><a href="#cb8-39"></a><span class="fu">#### Modelling data</span></span>
+<span id="cb8-40"><a href="#cb8-40"></a></span>
+<span id="cb8-41"><a href="#cb8-41"></a>A logistic regression is fitted to predict the binary cholesterol outcome from multiple predictor variables.</span>
+<span id="cb8-42"><a href="#cb8-42"></a></span>
+<span id="cb8-43"><a href="#cb8-43"></a>::: callout-tip</span>
+<span id="cb8-44"><a href="#cb8-44"></a>We use the <span class="in">`glm`</span> function to run generalized linear models. The default family is gaussian with identity link. Setting binomial family with logit link (logit link is default for binomial family) means fitting logistic regression.</span>
+<span id="cb8-45"><a href="#cb8-45"></a>:::</span>
+<span id="cb8-46"><a href="#cb8-46"></a></span>
+<span id="cb8-47"><a href="#cb8-47"></a><span class="in">```{r glm, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb8-48"><a href="#cb8-48"></a><span class="co"># Regression model</span></span>
+<span id="cb8-49"><a href="#cb8-49"></a>formula5x <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol.bin~gender + age + born + </span></span>
+<span id="cb8-50"><a href="#cb8-50"></a><span class="st">             race + education + married + </span></span>
+<span id="cb8-51"><a href="#cb8-51"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
+<span id="cb8-52"><a href="#cb8-52"></a><span class="st">             bmi + bodyweight + bodyheight + waist +  </span></span>
+<span id="cb8-53"><a href="#cb8-53"></a><span class="st">             triglycerides + uric.acid + </span></span>
+<span id="cb8-54"><a href="#cb8-54"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb8-55"><a href="#cb8-55"></a><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb8-56"><a href="#cb8-56"></a><span class="st">             diabetes"</span>)</span>
+<span id="cb8-57"><a href="#cb8-57"></a></span>
+<span id="cb8-58"><a href="#cb8-58"></a><span class="co"># Summary</span></span>
+<span id="cb8-59"><a href="#cb8-59"></a>fit5x <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula5x, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> analytic3)</span>
+<span id="cb8-60"><a href="#cb8-60"></a><span class="fu">publish</span>(fit5x)</span>
+<span id="cb8-61"><a href="#cb8-61"></a></span>
+<span id="cb8-62"><a href="#cb8-62"></a><span class="co"># VIF</span></span>
+<span id="cb8-63"><a href="#cb8-63"></a>car<span class="sc">::</span><span class="fu">vif</span>(fit5x)</span>
+<span id="cb8-64"><a href="#cb8-64"></a><span class="in">```</span></span>
+<span id="cb8-65"><a href="#cb8-65"></a></span>
+<span id="cb8-66"><a href="#cb8-66"></a><span class="fu">#### AUC</span></span>
+<span id="cb8-67"><a href="#cb8-67"></a></span>
+<span id="cb8-68"><a href="#cb8-68"></a>The Area Under the Receiver Operating Characteristic (ROC) Curve (AUC) is calculated to assess the model's predictive performance. Let us measure the accuracy for classification models <span class="in">`fit5x`</span>.</span>
+<span id="cb8-69"><a href="#cb8-69"></a></span>
+<span id="cb8-70"><a href="#cb8-70"></a>::: callout-tip</span>
+<span id="cb8-71"><a href="#cb8-71"></a>We can use the <span class="in">`roc`</span> function to build a ROC curve and <span class="in">`auc`</span> function to calculate the AUC (are under the ROC curve) value.</span>
+<span id="cb8-72"><a href="#cb8-72"></a>:::</span>
+<span id="cb8-73"><a href="#cb8-73"></a></span>
+<span id="cb8-74"><a href="#cb8-74"></a><span class="in">```{r auc1, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb8-75"><a href="#cb8-75"></a><span class="fu">require</span>(pROC)</span>
+<span id="cb8-76"><a href="#cb8-76"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit5x, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb8-77"><a href="#cb8-77"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(analytic3<span class="sc">$</span>cholesterol.bin, pred.y)</span>
+<span id="cb8-78"><a href="#cb8-78"></a>rocobj</span>
+<span id="cb8-79"><a href="#cb8-79"></a></span>
+<span id="cb8-80"><a href="#cb8-80"></a><span class="fu">auc</span>(rocobj)</span>
+<span id="cb8-81"><a href="#cb8-81"></a><span class="in">```</span></span>
+<span id="cb8-82"><a href="#cb8-82"></a></span>
+<span id="cb8-83"><a href="#cb8-83"></a><span class="fu">#### Re-modelling</span></span>
+<span id="cb8-84"><a href="#cb8-84"></a></span>
+<span id="cb8-85"><a href="#cb8-85"></a>Let us re-fit the model and measure the AUC. VIF is calculated again for this new model.</span>
+<span id="cb8-86"><a href="#cb8-86"></a></span>
+<span id="cb8-87"><a href="#cb8-87"></a><span class="in">```{r refit1, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb8-88"><a href="#cb8-88"></a>formula5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol.bin~gender + age + born + </span></span>
+<span id="cb8-89"><a href="#cb8-89"></a><span class="st">             race + education + married + </span></span>
+<span id="cb8-90"><a href="#cb8-90"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
+<span id="cb8-91"><a href="#cb8-91"></a><span class="st">             bmi +</span></span>
+<span id="cb8-92"><a href="#cb8-92"></a><span class="st">             triglycerides + uric.acid + </span></span>
+<span id="cb8-93"><a href="#cb8-93"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb8-94"><a href="#cb8-94"></a><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb8-95"><a href="#cb8-95"></a><span class="st">             diabetes"</span>)</span>
+<span id="cb8-96"><a href="#cb8-96"></a>fit5 <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula5, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> analytic3)</span>
+<span id="cb8-97"><a href="#cb8-97"></a><span class="fu">publish</span>(fit5)</span>
+<span id="cb8-98"><a href="#cb8-98"></a></span>
+<span id="cb8-99"><a href="#cb8-99"></a><span class="co"># VIF</span></span>
+<span id="cb8-100"><a href="#cb8-100"></a>car<span class="sc">::</span><span class="fu">vif</span>(fit5)</span>
+<span id="cb8-101"><a href="#cb8-101"></a><span class="in">```</span></span>
+<span id="cb8-102"><a href="#cb8-102"></a></span>
+<span id="cb8-103"><a href="#cb8-103"></a>The AUC for this new model is also calculated.</span>
+<span id="cb8-104"><a href="#cb8-104"></a></span>
+<span id="cb8-105"><a href="#cb8-105"></a><span class="in">```{r auc2, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb8-106"><a href="#cb8-106"></a><span class="do">#### AUC</span></span>
+<span id="cb8-107"><a href="#cb8-107"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit5, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb8-108"><a href="#cb8-108"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(analytic3<span class="sc">$</span>cholesterol.bin, pred.y)</span>
+<span id="cb8-109"><a href="#cb8-109"></a>rocobj</span>
+<span id="cb8-110"><a href="#cb8-110"></a><span class="fu">auc</span>(rocobj)</span>
+<span id="cb8-111"><a href="#cb8-111"></a><span class="in">```</span></span>
+<span id="cb8-112"><a href="#cb8-112"></a></span>
+<span id="cb8-113"><a href="#cb8-113"></a><span class="fu">### Save data</span></span>
+<span id="cb8-114"><a href="#cb8-114"></a></span>
+<span id="cb8-115"><a href="#cb8-115"></a><span class="in">```{r save, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb8-116"><a href="#cb8-116"></a><span class="fu">save.image</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span>)</span>
+<span id="cb8-117"><a href="#cb8-117"></a><span class="in">```</span></span>
+<span id="cb8-118"><a href="#cb8-118"></a></span>
+<span id="cb8-119"><a href="#cb8-119"></a><span class="fu">### References</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

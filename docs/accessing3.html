@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - Importing NHANES to R</title>
 <style>
@@ -424,7 +424,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -716,7 +716,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Importing NHANES to R</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Importing NHANES to R</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -749,19 +749,19 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>Using R packages, specifically the nhanesA package: A concise guide on how to download and get summaries of the NHANES data using this R package.</li>
 </ul>
 <div class="cell" data-hash="accessing3_cache/html/setup_8549b58f8e4f0b357d4ca5f7a4b13272">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
-<span><span class="co">#devtools::install_github("warnes/SASxport")</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/warnes/SASxport">SASxport</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/foreign/">foreign</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cran.r-project.org/package=nhanesA">nhanesA</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rich-iannone/DiagrammeR">DiagrammeR</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rich-iannone/DiagrammeRsvg">DiagrammeRsvg</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rsvg/">rsvg</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://svglite.r-lib.org">svglite</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.rforge.net/png/">png</a></span><span class="op">)</span></span>
-<span><span class="va">use.saved.chche</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#devtools::install_github("warnes/SASxport")</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(SASxport)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(foreign)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(nhanesA)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">require</span>(DiagrammeR)</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="fu">require</span>(DiagrammeRsvg)</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="fu">require</span>(rsvg)</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="fu">library</span>(svglite)</span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="fu">library</span>(png)</span>
+<span id="cb1-13"><a href="#cb1-13"></a>use.saved.chche <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 
@@ -910,7 +910,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <strong>Step 3</strong>: We can download the XPT data in the local PC folder and read the data into R as as follows:</li>
 </ul>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">DEMO</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SASxport/man/read.xport.html">read.xport</a></span><span class="op">(</span><span class="st">"Data/accessing/DEMO_I.XPT"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>DEMO <span class="ot">&lt;-</span> <span class="fu">read.xport</span>(<span class="st">"Data/accessing/DEMO_I.XPT"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -930,15 +930,15 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <strong>Step 5</strong>: We can also check the variable names in this <code>DEMO</code> dataset as follows:</li>
 </ul>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">DEMO</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "SEQN"     "SDDSRVYR" "RIDSTATR" "RIAGENDR" "RIDAGEYR" "RIDAGEMN"</span></span>
-<span><span class="co">#&gt;  [7] "RIDRETH1" "RIDRETH3" "RIDEXMON" "RIDEXAGM" "DMQMILIZ" "DMQADFC" </span></span>
-<span><span class="co">#&gt; [13] "DMDBORN4" "DMDCITZN" "DMDYRSUS" "DMDEDUC3" "DMDEDUC2" "DMDMARTL"</span></span>
-<span><span class="co">#&gt; [19] "RIDEXPRG" "SIALANG"  "SIAPROXY" "SIAINTRP" "FIALANG"  "FIAPROXY"</span></span>
-<span><span class="co">#&gt; [25] "FIAINTRP" "MIALANG"  "MIAPROXY" "MIAINTRP" "AIALANGA" "DMDHHSIZ"</span></span>
-<span><span class="co">#&gt; [31] "DMDFMSIZ" "DMDHHSZA" "DMDHHSZB" "DMDHHSZE" "DMDHRGND" "DMDHRAGE"</span></span>
-<span><span class="co">#&gt; [37] "DMDHRBR4" "DMDHREDU" "DMDHRMAR" "DMDHSEDU" "WTINT2YR" "WTMEC2YR"</span></span>
-<span><span class="co">#&gt; [43] "SDMVPSU"  "SDMVSTRA" "INDHHIN2" "INDFMIN2" "INDFMPIR"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">names</span>(DEMO)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co">#&gt;  [1] "SEQN"     "SDDSRVYR" "RIDSTATR" "RIAGENDR" "RIDAGEYR" "RIDAGEMN"</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt;  [7] "RIDRETH1" "RIDRETH3" "RIDEXMON" "RIDEXAGM" "DMQMILIZ" "DMQADFC" </span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; [13] "DMDBORN4" "DMDCITZN" "DMDYRSUS" "DMDEDUC3" "DMDEDUC2" "DMDMARTL"</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; [19] "RIDEXPRG" "SIALANG"  "SIAPROXY" "SIAINTRP" "FIALANG"  "FIAPROXY"</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; [25] "FIAINTRP" "MIALANG"  "MIAPROXY" "MIAINTRP" "AIALANGA" "DMDHHSIZ"</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; [31] "DMDFMSIZ" "DMDHHSZA" "DMDHHSZB" "DMDHHSZE" "DMDHRGND" "DMDHRAGE"</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; [37] "DMDHRBR4" "DMDHREDU" "DMDHRMAR" "DMDHSEDU" "WTINT2YR" "WTMEC2YR"</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; [43] "SDMVPSU"  "SDMVSTRA" "INDHHIN2" "INDFMIN2" "INDFMPIR"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <ul>
@@ -973,21 +973,21 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <strong>Step 9</strong>: We can assess if the numbers reported under count and cumulative (from the above Figure) matches with what we get from the <code>DEMO</code> data we just imported (particularly, for the <code>DMDHSEDU</code> variable):</li>
 </ul>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">DEMO</span><span class="op">$</span><span class="va">DMDHSEDU</span><span class="op">)</span> <span class="co"># Frequency table</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
-<span><span class="co">#&gt;  619  511  980 1462 1629    2   23</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">DEMO</span><span class="op">$</span><span class="va">DMDHSEDU</span><span class="op">)</span><span class="op">)</span> <span class="co"># Cumulative frequency table</span></span>
-<span><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
-<span><span class="co">#&gt;  619 1130 2110 3572 5201 5203 5226</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">DEMO</span><span class="op">$</span><span class="va">DMDHSEDU</span><span class="op">)</span><span class="op">)</span> <span class="co"># Number of non-NA observations</span></span>
-<span><span class="co">#&gt; [1] 9971</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">table</span>(DEMO<span class="sc">$</span>DMDHSEDU) <span class="co"># Frequency table</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; </span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt;  619  511  980 1462 1629    2   23</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="fu">cumsum</span>(<span class="fu">table</span>(DEMO<span class="sc">$</span>DMDHSEDU)) <span class="co"># Cumulative frequency table</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt;  619 1130 2110 3572 5201 5203 5226</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="fu">length</span>(<span class="fu">is.na</span>(DEMO<span class="sc">$</span>DMDHSEDU)) <span class="co"># Number of non-NA observations</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; [1] 9971</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="accessing-nhanes-data-using-r-packages" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="accessing-nhanes-data-using-r-packages">Accessing NHANES Data Using R Packages</h3>
 <section id="nhanesa-package" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="nhanesa-package">nhanesA package</h4>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cran.r-project.org/package=nhanesA">nhanesA</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">library</span>(nhanesA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout-tip callout callout-style-default callout-captioned">
@@ -1020,7 +1020,7 @@ Tip
 </ul>
 <p>To get a list of available variables within a data file, we run the following command (e.g., we check variable names within <code>DEMO</code> data):</p>
 <div class="cell" data-hash="accessing3_cache/html/search_6e8b1b1049fe93479530f727a606d3da">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanesTables.html">nhanesTables</a></span><span class="op">(</span>data_group<span class="op">=</span><span class="st">'DEMO'</span>, year<span class="op">=</span><span class="fl">2015</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">nhanesTables</span>(<span class="at">data_group=</span><span class="st">'DEMO'</span>, <span class="at">year=</span><span class="dv">2015</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -1035,29 +1035,31 @@ Tip
 <strong>Step 2</strong>: We can obtain the summaries of the downloaded data as follows (see below):</li>
 </ul>
 <div class="cell" data-hash="accessing3_cache/html/search3_b689eaaf83c953f7dbcdc1465a215d6a">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html">nhanes</a></span><span class="op">(</span><span class="st">'DEMO_I'</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">demo</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "SEQN"     "SDDSRVYR" "RIDSTATR" "RIAGENDR" "RIDAGEYR" "RIDAGEMN"</span></span>
-<span><span class="co">#&gt;  [7] "RIDRETH1" "RIDRETH3" "RIDEXMON" "RIDEXAGM" "DMQMILIZ" "DMQADFC" </span></span>
-<span><span class="co">#&gt; [13] "DMDBORN4" "DMDCITZN" "DMDYRSUS" "DMDEDUC3" "DMDEDUC2" "DMDMARTL"</span></span>
-<span><span class="co">#&gt; [19] "RIDEXPRG" "SIALANG"  "SIAPROXY" "SIAINTRP" "FIALANG"  "FIAPROXY"</span></span>
-<span><span class="co">#&gt; [25] "FIAINTRP" "MIALANG"  "MIAPROXY" "MIAINTRP" "AIALANGA" "DMDHHSIZ"</span></span>
-<span><span class="co">#&gt; [31] "DMDFMSIZ" "DMDHHSZA" "DMDHHSZB" "DMDHHSZE" "DMDHRGND" "DMDHRAGE"</span></span>
-<span><span class="co">#&gt; [37] "DMDHRBR4" "DMDHREDU" "DMDHRMAR" "DMDHSEDU" "WTINT2YR" "WTMEC2YR"</span></span>
-<span><span class="co">#&gt; [43] "SDMVPSU"  "SDMVSTRA" "INDHHIN2" "INDFMIN2" "INDFMPIR"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">DMDHSEDU</span><span class="op">)</span> <span class="co"># Frequency table</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
-<span><span class="co">#&gt;  619  511  980 1462 1629    2   23</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">DMDHSEDU</span><span class="op">)</span><span class="op">)</span> <span class="co"># Cumulative frequency table</span></span>
-<span><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
-<span><span class="co">#&gt;  619 1130 2110 3572 5201 5203 5226</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">DMDHSEDU</span><span class="op">)</span><span class="op">)</span> <span class="co"># Number of non-NA observations</span></span>
-<span><span class="co">#&gt; [1] 9971</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>demo <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">'DEMO_I'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">names</span>(demo)</span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;  [1] "SEQN"     "SDDSRVYR" "RIDSTATR" "RIAGENDR" "RIDAGEYR" "RIDAGEMN"</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt;  [7] "RIDRETH1" "RIDRETH3" "RIDEXMON" "RIDEXAGM" "DMQMILIZ" "DMQADFC" </span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; [13] "DMDBORN4" "DMDCITZN" "DMDYRSUS" "DMDEDUC3" "DMDEDUC2" "DMDMARTL"</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; [19] "RIDEXPRG" "SIALANG"  "SIAPROXY" "SIAINTRP" "FIALANG"  "FIAPROXY"</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; [25] "FIAINTRP" "MIALANG"  "MIAPROXY" "MIAINTRP" "AIALANGA" "DMDHHSIZ"</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; [31] "DMDFMSIZ" "DMDHHSZA" "DMDHHSZB" "DMDHHSZE" "DMDHRGND" "DMDHRAGE"</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; [37] "DMDHRBR4" "DMDHREDU" "DMDHRMAR" "DMDHSEDU" "WTINT2YR" "WTMEC2YR"</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt; [43] "SDMVPSU"  "SDMVSTRA" "INDHHIN2" "INDFMIN2" "INDFMPIR"</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="fu">table</span>(demo<span class="sc">$</span>DMDHSEDU) <span class="co"># Frequency table</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; </span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt;  619  511  980 1462 1629    2   23</span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="fu">cumsum</span>(<span class="fu">table</span>(demo<span class="sc">$</span>DMDHSEDU)) <span class="co"># Cumulative frequency table</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt;    1    2    3    4    5    7    9 </span></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt;  619 1130 2110 3572 5201 5203 5226</span></span>
+<span id="cb7-18"><a href="#cb7-18"></a><span class="fu">length</span>(<span class="fu">is.na</span>(demo<span class="sc">$</span>DMDHSEDU)) <span class="co"># Number of non-NA observations</span></span>
+<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt; [1] 9971</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section></section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
 
+
+<!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-CDCfaq" class="csl-entry" role="doc-biblioentry">
@@ -1263,7 +1265,400 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Reproducing results</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">## Importing NHANES to R {.unnumbered}</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>This tutorial provides comprehensive instructions on accessing the National Health and Nutrition Examination Survey (NHANES) dataset from the US Centers for Disease Control and Prevention (CDC) website and importing it into the RStudio environment. It covers:</span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="ss">1. </span>Introduction to the NHANES dataset, highlighting its significance in evaluating the health and nutritional status of U.S. adults and children.</span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="ss">2. </span>Sampling Procedure details, explaining the multi-stage sampling strategy and emphasizing the importance of using survey features like weights, strata, and primary sampling units for population-level estimates.</span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="ss">3. </span>Survey History with a visualization representing different NHANES survey cycles.</span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="ss">4. </span>NHANES Data Files and Documents:</span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="ss">- </span>Explains the data's file format, mostly in SAS transport file format (.xpt).</span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="ss">- </span>Breaks down the NHANES components, which include demographics, dietary, examination, laboratory, and questionnaire data.</span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="ss">- </span>Provides guidelines on combining data from different cycles and handling missing data or outliers.</span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="ss">5. </span>Accessing NHANES Data:</span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="ss">- </span>Directly from the CDC website: A step-by-step guide with accompanying images, illustrating how to navigate the CDC website, download the data, and interpret the accompanying codebook.</span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="ss">- </span>Using R packages, specifically the nhanesA package: A concise guide on how to download and get summaries of the NHANES data using this R package.</span>
+<span id="cb8-15"><a href="#cb8-15"></a></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co"># Load required packages</span></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="co">#devtools::install_github("warnes/SASxport")</span></span>
+<span id="cb8-19"><a href="#cb8-19"></a><span class="fu">library</span>(SASxport)</span>
+<span id="cb8-20"><a href="#cb8-20"></a><span class="fu">library</span>(foreign)</span>
+<span id="cb8-21"><a href="#cb8-21"></a><span class="fu">library</span>(nhanesA)</span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb8-23"><a href="#cb8-23"></a><span class="fu">require</span>(DiagrammeR)</span>
+<span id="cb8-24"><a href="#cb8-24"></a><span class="fu">require</span>(DiagrammeRsvg)</span>
+<span id="cb8-25"><a href="#cb8-25"></a><span class="fu">require</span>(rsvg)</span>
+<span id="cb8-26"><a href="#cb8-26"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb8-27"><a href="#cb8-27"></a><span class="fu">library</span>(svglite)</span>
+<span id="cb8-28"><a href="#cb8-28"></a><span class="fu">library</span>(png)</span>
+<span id="cb8-29"><a href="#cb8-29"></a>use.saved.chche <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb8-30"><a href="#cb8-30"></a><span class="in">```</span></span>
+<span id="cb8-31"><a href="#cb8-31"></a></span>
+<span id="cb8-32"><a href="#cb8-32"></a>::: column-margin</span>
+<span id="cb8-33"><a href="#cb8-33"></a>Before installing a package from GitHub, it's better to check whether you installed the right version of <span class="co">[</span><span class="ot">Rtools</span><span class="co">](https://cran.r-project.org/bin/windows/Rtools/)</span></span>
+<span id="cb8-34"><a href="#cb8-34"></a>:::</span>
+<span id="cb8-35"><a href="#cb8-35"></a></span>
+<span id="cb8-36"><a href="#cb8-36"></a><span class="fu">### Overview</span></span>
+<span id="cb8-37"><a href="#cb8-37"></a></span>
+<span id="cb8-38"><a href="#cb8-38"></a>National Center for Health Statistics (NCHS) conducts National Health and Nutrition Examination Survey (NHANES) <span class="co">[</span><span class="ot">@nhanes</span><span class="co">]</span>. These surveys are designed to evaluate the health and nutritional status of U.S. adults and children. These surveys are being administered in two-year cycles or intervals starting from 1999-2000. Prior to 1999, a number of surveys were conducted (e.g., NHANES III), but in our discussion, we will mostly restrict our discussions to continuous NHANES (e.g., NHANES 1999-2000 to NHANES 2017-2018).</span>
+<span id="cb8-39"><a href="#cb8-39"></a></span>
+<span id="cb8-40"><a href="#cb8-40"></a>::: column-margin</span>
+<span id="cb8-41"><a href="#cb8-41"></a>@nhanes</span>
+<span id="cb8-42"><a href="#cb8-42"></a>:::</span>
+<span id="cb8-43"><a href="#cb8-43"></a></span>
+<span id="cb8-44"><a href="#cb8-44"></a><span class="fu">### Sampling Procedure:</span></span>
+<span id="cb8-45"><a href="#cb8-45"></a></span>
+<span id="cb8-46"><a href="#cb8-46"></a>It is a probabilistic sample (we know probability of getting selected for all individuals). This sample is unlikely to be representative of the entire population, as some under/oversampling occurs (unlike SRS), and samples may be dependent (due to proximity of some samples). For example, household with the following characteristics may be oversampled in NHANES, e.g., African Americans, Mexican Americans, Low income White Americans, Persons age 60+ years.</span>
+<span id="cb8-47"><a href="#cb8-47"></a></span>
+<span id="cb8-48"><a href="#cb8-48"></a>::: column-margin</span>
+<span id="cb8-49"><a href="#cb8-49"></a>Sampling Procedure:</span>
+<span id="cb8-50"><a href="#cb8-50"></a></span>
+<span id="cb8-51"><a href="#cb8-51"></a><span class="ss">-   </span>not obtained via simple random sample</span>
+<span id="cb8-52"><a href="#cb8-52"></a><span class="ss">-   </span>multistage sample designs</span>
+<span id="cb8-53"><a href="#cb8-53"></a><span class="ss">-   </span>A sample weight is assigned to each sample person where weight = the number of people in the target population represented by that sample person in NHANES</span>
+<span id="cb8-54"><a href="#cb8-54"></a>:::</span>
+<span id="cb8-55"><a href="#cb8-55"></a></span>
+<span id="cb8-56"><a href="#cb8-56"></a>NHANES used multistage sample designs:</span>
+<span id="cb8-57"><a href="#cb8-57"></a></span>
+<span id="cb8-58"><a href="#cb8-58"></a><span class="ss">-   </span>Stage 1: PSU/clusters = geographically contiguous counties. 50 states - divided into \~3100 counties. Each PSU is assigned to a strata (e.g., urban/rural or PSU size etc.). The counties are randomly/PPS selected using a 2-per-stratum design. Complex sample variance estimation requires PSU + strata (masking involved).</span>
+<span id="cb8-59"><a href="#cb8-59"></a><span class="ss">-   </span>Stage 2: each selected county is broken into segments (with at least \~50-100 housing units). Segments are randomly/PPS selected.</span>
+<span id="cb8-60"><a href="#cb8-60"></a><span class="ss">-   </span>Stage 3: each selected segment is divided into households. Households are randomly selected.</span>
+<span id="cb8-61"><a href="#cb8-61"></a><span class="ss">-   </span>Stage 4: Within each sampled household, an individual is randomly selected.</span>
+<span id="cb8-62"><a href="#cb8-62"></a></span>
+<span id="cb8-63"><a href="#cb8-63"></a>::: column-margin</span>
+<span id="cb8-64"><a href="#cb8-64"></a>To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster)</span>
+<span id="cb8-65"><a href="#cb8-65"></a>:::</span>
+<span id="cb8-66"><a href="#cb8-66"></a></span>
+<span id="cb8-67"><a href="#cb8-67"></a><span class="fu">### Survey history</span></span>
+<span id="cb8-68"><a href="#cb8-68"></a></span>
+<span id="cb8-69"><a href="#cb8-69"></a>Overall NHANES survey history</span>
+<span id="cb8-70"><a href="#cb8-70"></a></span>
+<span id="cb8-71"><a href="#cb8-71"></a><span class="in">```{r graph0i, echo=FALSE, cache=use.saved.chche}</span></span>
+<span id="cb8-72"><a href="#cb8-72"></a>g1 <span class="ot">&lt;-</span> <span class="fu">grViz</span>(<span class="st">"</span></span>
+<span id="cb8-73"><a href="#cb8-73"></a><span class="st">    digraph causal {</span></span>
+<span id="cb8-74"><a href="#cb8-74"></a><span class="st">    </span></span>
+<span id="cb8-75"><a href="#cb8-75"></a><span class="st">      # Nodes</span></span>
+<span id="cb8-76"><a href="#cb8-76"></a><span class="st">    node [shape = circle]</span></span>
+<span id="cb8-77"><a href="#cb8-77"></a><span class="st">    O0 [label = 'Older surveys</span><span class="sc">\n</span><span class="st"> NHES']</span></span>
+<span id="cb8-78"><a href="#cb8-78"></a><span class="st">    M0 [label = 'Periodic survey</span><span class="sc">\n</span><span class="st"> NHANES I-III']</span></span>
+<span id="cb8-79"><a href="#cb8-79"></a><span class="st">    N [label = 'Continuous</span><span class="sc">\n</span><span class="st"> NHANES']</span></span>
+<span id="cb8-80"><a href="#cb8-80"></a><span class="st">    </span></span>
+<span id="cb8-81"><a href="#cb8-81"></a><span class="st">      node [shape = plaintext]</span></span>
+<span id="cb8-82"><a href="#cb8-82"></a><span class="st">    # node [shape = circle]</span></span>
+<span id="cb8-83"><a href="#cb8-83"></a><span class="st">    S [label = 'NHANES</span><span class="sc">\n</span><span class="st"> Surveys']</span></span>
+<span id="cb8-84"><a href="#cb8-84"></a><span class="st">      O [label = '1960-1970']</span></span>
+<span id="cb8-85"><a href="#cb8-85"></a><span class="st">      o1 [label = 'NHES I']</span></span>
+<span id="cb8-86"><a href="#cb8-86"></a><span class="st">      o2 [label = 'NHES II']</span></span>
+<span id="cb8-87"><a href="#cb8-87"></a><span class="st">      o3 [label = 'NHES III']</span></span>
+<span id="cb8-88"><a href="#cb8-88"></a><span class="st">    M [label = '1971-1975']</span></span>
+<span id="cb8-89"><a href="#cb8-89"></a><span class="st">    m [label = 'NHANES I']</span></span>
+<span id="cb8-90"><a href="#cb8-90"></a><span class="st">    M1 [label = '1976-1980']</span></span>
+<span id="cb8-91"><a href="#cb8-91"></a><span class="st">    m1 [label = 'NHANES II']</span></span>
+<span id="cb8-92"><a href="#cb8-92"></a><span class="st">    M2 [label = '1988-1994']</span></span>
+<span id="cb8-93"><a href="#cb8-93"></a><span class="st">    m2 [label = 'NHANES III']</span></span>
+<span id="cb8-94"><a href="#cb8-94"></a><span class="st">    n [label = '1999 - ']</span></span>
+<span id="cb8-95"><a href="#cb8-95"></a><span class="st">    n10 [label = 'NHANES 2017-2018']</span></span>
+<span id="cb8-96"><a href="#cb8-96"></a><span class="st">    n9 [label = 'NHANES 2015-2016']</span></span>
+<span id="cb8-97"><a href="#cb8-97"></a><span class="st">    n8 [label = 'NHANES 2013-2014']</span></span>
+<span id="cb8-98"><a href="#cb8-98"></a><span class="st">    n7 [label = 'NHANES 2011-2012']</span></span>
+<span id="cb8-99"><a href="#cb8-99"></a><span class="st">    n6 [label = 'NHANES 2009-2010']</span></span>
+<span id="cb8-100"><a href="#cb8-100"></a><span class="st">    n5 [label = 'NHANES 2007-2008']</span></span>
+<span id="cb8-101"><a href="#cb8-101"></a><span class="st">    n4 [label = 'NHANES 2005-2006']</span></span>
+<span id="cb8-102"><a href="#cb8-102"></a><span class="st">    n3 [label = 'NHANES 2003-2004']</span></span>
+<span id="cb8-103"><a href="#cb8-103"></a><span class="st">    n2 [label = 'NHANES 2001-2002']</span></span>
+<span id="cb8-104"><a href="#cb8-104"></a><span class="st">    n1 [label = 'NHANES 1999-2000']</span></span>
+<span id="cb8-105"><a href="#cb8-105"></a><span class="st">      </span></span>
+<span id="cb8-106"><a href="#cb8-106"></a><span class="st">      # Edges</span></span>
+<span id="cb8-107"><a href="#cb8-107"></a><span class="st">      edge [color = black,</span></span>
+<span id="cb8-108"><a href="#cb8-108"></a><span class="st">            arrowhead = vee]</span></span>
+<span id="cb8-109"><a href="#cb8-109"></a><span class="st">      rankdir = LR</span></span>
+<span id="cb8-110"><a href="#cb8-110"></a><span class="st">    S -&gt; {O0 M0 N}</span></span>
+<span id="cb8-111"><a href="#cb8-111"></a><span class="st">    O0 -&gt; O</span></span>
+<span id="cb8-112"><a href="#cb8-112"></a><span class="st">    M0 -&gt; {M M1 M2}</span></span>
+<span id="cb8-113"><a href="#cb8-113"></a><span class="st">      O-&gt; {o1 o2 o3}</span></span>
+<span id="cb8-114"><a href="#cb8-114"></a><span class="st">    M -&gt; m</span></span>
+<span id="cb8-115"><a href="#cb8-115"></a><span class="st">    M1 -&gt; m1</span></span>
+<span id="cb8-116"><a href="#cb8-116"></a><span class="st">    M2 -&gt; m2</span></span>
+<span id="cb8-117"><a href="#cb8-117"></a><span class="st">    N -&gt; n</span></span>
+<span id="cb8-118"><a href="#cb8-118"></a><span class="st">    n -&gt; {n1 n2 n3 n4 n5 n6 n7 n8 n9 n10}</span></span>
+<span id="cb8-119"><a href="#cb8-119"></a><span class="st">      </span></span>
+<span id="cb8-120"><a href="#cb8-120"></a><span class="st">      # Graph</span></span>
+<span id="cb8-121"><a href="#cb8-121"></a><span class="st">      graph [overlap = true, fontsize = 10]</span></span>
+<span id="cb8-122"><a href="#cb8-122"></a><span class="st">    }"</span>)</span>
+<span id="cb8-123"><a href="#cb8-123"></a>g1 <span class="sc">%&gt;%</span> export_svg <span class="sc">%&gt;%</span> charToRaw <span class="sc">%&gt;%</span> rsvg <span class="sc">%&gt;%</span> png<span class="sc">::</span><span class="fu">writePNG</span>(<span class="st">"Images/accessing/g1.png"</span>)</span>
+<span id="cb8-124"><a href="#cb8-124"></a><span class="in">```</span></span>
+<span id="cb8-125"><a href="#cb8-125"></a></span>
+<span id="cb8-126"><a href="#cb8-126"></a><span class="in">```{r graph0xi, echo=FALSE, out.width = '75%'}</span></span>
+<span id="cb8-127"><a href="#cb8-127"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/g1.png"</span>)</span>
+<span id="cb8-128"><a href="#cb8-128"></a><span class="in">```</span></span>
+<span id="cb8-129"><a href="#cb8-129"></a></span>
+<span id="cb8-130"><a href="#cb8-130"></a><span class="fu">### NHANES datafile and documents</span></span>
+<span id="cb8-131"><a href="#cb8-131"></a></span>
+<span id="cb8-132"><a href="#cb8-132"></a><span class="fu">#### File format</span></span>
+<span id="cb8-133"><a href="#cb8-133"></a></span>
+<span id="cb8-134"><a href="#cb8-134"></a>The Continuous NHANES files are stored in the NHANES website as SAS transport file formats (.xpt). You can import this data in any statistical package that supports this file format.</span>
+<span id="cb8-135"><a href="#cb8-135"></a></span>
+<span id="cb8-136"><a href="#cb8-136"></a><span class="fu">#### Continuous NHANES Components</span></span>
+<span id="cb8-137"><a href="#cb8-137"></a></span>
+<span id="cb8-138"><a href="#cb8-138"></a>Continuous NHANES components separated to reduce the amount of time to download and documentation size:</span>
+<span id="cb8-139"><a href="#cb8-139"></a></span>
+<span id="cb8-140"><a href="#cb8-140"></a>::: column-margin</span>
+<span id="cb8-141"><a href="#cb8-141"></a><span class="co">[</span><span class="ot">NHANES Tutorials</span><span class="co">](https://wwwn.cdc.gov/nchs/nhanes/tutorials/default.aspx?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fnchs%2Ftutorials%2Findex.htm)</span></span>
+<span id="cb8-142"><a href="#cb8-142"></a>:::</span>
+<span id="cb8-143"><a href="#cb8-143"></a></span>
+<span id="cb8-144"><a href="#cb8-144"></a><span class="in">```{r graph1i, echo=FALSE, cache=use.saved.chche}</span></span>
+<span id="cb8-145"><a href="#cb8-145"></a>g2 <span class="ot">&lt;-</span> <span class="fu">grViz</span>(<span class="st">"</span></span>
+<span id="cb8-146"><a href="#cb8-146"></a><span class="st">    digraph causal {</span></span>
+<span id="cb8-147"><a href="#cb8-147"></a><span class="st">    </span></span>
+<span id="cb8-148"><a href="#cb8-148"></a><span class="st">      # Nodes</span></span>
+<span id="cb8-149"><a href="#cb8-149"></a><span class="st">    node [shape = box]</span></span>
+<span id="cb8-150"><a href="#cb8-150"></a><span class="st">    # node [shape = circle]</span></span>
+<span id="cb8-151"><a href="#cb8-151"></a><span class="st">    d [label = 'Demographics']</span></span>
+<span id="cb8-152"><a href="#cb8-152"></a><span class="st">    i [label = 'Dietary']</span></span>
+<span id="cb8-153"><a href="#cb8-153"></a><span class="st">    e [label = 'Examination'] </span></span>
+<span id="cb8-154"><a href="#cb8-154"></a><span class="st">    l [label = 'Laboratory']</span></span>
+<span id="cb8-155"><a href="#cb8-155"></a><span class="st">    q [label = 'Questionnaire']</span></span>
+<span id="cb8-156"><a href="#cb8-156"></a></span>
+<span id="cb8-157"><a href="#cb8-157"></a><span class="st">    node [shape = plaintext]</span></span>
+<span id="cb8-158"><a href="#cb8-158"></a><span class="st">    N [label = 'Continuous NHANES</span><span class="sc">\n</span><span class="st"> cycles data</span><span class="sc">\n</span><span class="st"> collection']</span></span>
+<span id="cb8-159"><a href="#cb8-159"></a><span class="st">    d1 [label = 'Survey design']</span></span>
+<span id="cb8-160"><a href="#cb8-160"></a><span class="st">    d2 [label = 'demographic</span><span class="sc">\n</span><span class="st"> variables']</span></span>
+<span id="cb8-161"><a href="#cb8-161"></a><span class="st">    i1 [label = 'foods']</span></span>
+<span id="cb8-162"><a href="#cb8-162"></a><span class="st">    i2 [label = 'beverages']</span></span>
+<span id="cb8-163"><a href="#cb8-163"></a><span class="st">    i3 [label = 'dietary</span><span class="sc">\n</span><span class="st"> supplements']</span></span>
+<span id="cb8-164"><a href="#cb8-164"></a><span class="st">    e1 [label = 'physical exams*']</span></span>
+<span id="cb8-165"><a href="#cb8-165"></a><span class="st">    e2 [label = 'dental exams']</span></span>
+<span id="cb8-166"><a href="#cb8-166"></a><span class="st">    #e3 [label = 'dietary interview']</span></span>
+<span id="cb8-167"><a href="#cb8-167"></a><span class="st">    l1 [label = 'blood']</span></span>
+<span id="cb8-168"><a href="#cb8-168"></a><span class="st">    l2 [label = 'urine']</span></span>
+<span id="cb8-169"><a href="#cb8-169"></a><span class="st">    l3 [label = 'hair']</span></span>
+<span id="cb8-170"><a href="#cb8-170"></a><span class="st">    l4 [label = 'air']</span></span>
+<span id="cb8-171"><a href="#cb8-171"></a><span class="st">    l5 [label = 'tuberculosis</span><span class="sc">\n</span><span class="st"> skin test']</span></span>
+<span id="cb8-172"><a href="#cb8-172"></a><span class="st">    l6 [label = 'household</span><span class="sc">\n</span><span class="st"> dust and</span><span class="sc">\n</span><span class="st"> water</span><span class="sc">\n</span><span class="st"> specimens']</span></span>
+<span id="cb8-173"><a href="#cb8-173"></a><span class="st">    q1 [label = 'household</span><span class="sc">\n</span><span class="st"> interview']</span></span>
+<span id="cb8-174"><a href="#cb8-174"></a><span class="st">    q2 [label = 'mobile</span><span class="sc">\n</span><span class="st"> examination</span><span class="sc">\n</span><span class="st"> center (MEC)</span><span class="sc">\n</span><span class="st"> interview']</span></span>
+<span id="cb8-175"><a href="#cb8-175"></a><span class="st">    d11 [label = 'weights']</span></span>
+<span id="cb8-176"><a href="#cb8-176"></a><span class="st">    d12 [label = 'design</span><span class="sc">\n</span><span class="st"> strata']</span></span>
+<span id="cb8-177"><a href="#cb8-177"></a><span class="st">    d13 [label = 'primary</span><span class="sc">\n</span><span class="st"> sampling</span><span class="sc">\n</span><span class="st"> units']</span></span>
+<span id="cb8-178"><a href="#cb8-178"></a><span class="st">      </span></span>
+<span id="cb8-179"><a href="#cb8-179"></a><span class="st">      # Edges</span></span>
+<span id="cb8-180"><a href="#cb8-180"></a><span class="st">      edge [color = black,</span></span>
+<span id="cb8-181"><a href="#cb8-181"></a><span class="st">            arrowhead = vee]</span></span>
+<span id="cb8-182"><a href="#cb8-182"></a><span class="st">      rankdir = LR</span></span>
+<span id="cb8-183"><a href="#cb8-183"></a><span class="st">    N -&gt; {d i e l q}</span></span>
+<span id="cb8-184"><a href="#cb8-184"></a><span class="st">    d -&gt; {d1 d2}</span></span>
+<span id="cb8-185"><a href="#cb8-185"></a><span class="st">    i -&gt; {i1 i2 i3}</span></span>
+<span id="cb8-186"><a href="#cb8-186"></a><span class="st">    e -&gt; {e1 e2}</span></span>
+<span id="cb8-187"><a href="#cb8-187"></a><span class="st">    l -&gt; {l1 l2 l3 l4 l5 l6}</span></span>
+<span id="cb8-188"><a href="#cb8-188"></a><span class="st">    q -&gt; {q1 q2}</span></span>
+<span id="cb8-189"><a href="#cb8-189"></a><span class="st">    d1 -&gt; {d11 d12 d13}</span></span>
+<span id="cb8-190"><a href="#cb8-190"></a></span>
+<span id="cb8-191"><a href="#cb8-191"></a><span class="st">      # Graph</span></span>
+<span id="cb8-192"><a href="#cb8-192"></a><span class="st">      graph [overlap = true, fontsize = 10]</span></span>
+<span id="cb8-193"><a href="#cb8-193"></a><span class="st">    }"</span>)</span>
+<span id="cb8-194"><a href="#cb8-194"></a>g2 <span class="sc">%&gt;%</span> export_svg <span class="sc">%&gt;%</span> charToRaw <span class="sc">%&gt;%</span> rsvg <span class="sc">%&gt;%</span> png<span class="sc">::</span><span class="fu">writePNG</span>(<span class="st">"Images/accessing/g2.png"</span>)</span>
+<span id="cb8-195"><a href="#cb8-195"></a><span class="in">```</span></span>
+<span id="cb8-196"><a href="#cb8-196"></a></span>
+<span id="cb8-197"><a href="#cb8-197"></a><span class="in">```{r graph1xi, echo=FALSE, out.width = '75%'}</span></span>
+<span id="cb8-198"><a href="#cb8-198"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/g2.png"</span>)</span>
+<span id="cb8-199"><a href="#cb8-199"></a><span class="in">```</span></span>
+<span id="cb8-200"><a href="#cb8-200"></a></span>
+<span id="cb8-201"><a href="#cb8-201"></a>::: column-margin</span>
+<span id="cb8-202"><a href="#cb8-202"></a>Broadly, continuous NHANES data are available in 5 categories:</span>
+<span id="cb8-203"><a href="#cb8-203"></a></span>
+<span id="cb8-204"><a href="#cb8-204"></a><span class="ss">-   </span>Demographics</span>
+<span id="cb8-205"><a href="#cb8-205"></a><span class="ss">-   </span>Dietary</span>
+<span id="cb8-206"><a href="#cb8-206"></a><span class="ss">-   </span>Examination</span>
+<span id="cb8-207"><a href="#cb8-207"></a><span class="ss">-   </span>Laboratory</span>
+<span id="cb8-208"><a href="#cb8-208"></a><span class="ss">-   </span>Questionnaire</span>
+<span id="cb8-209"><a href="#cb8-209"></a>:::</span>
+<span id="cb8-210"><a href="#cb8-210"></a></span>
+<span id="cb8-211"><a href="#cb8-211"></a><span class="fu">#### Combining data</span></span>
+<span id="cb8-212"><a href="#cb8-212"></a></span>
+<span id="cb8-213"><a href="#cb8-213"></a><span class="fu">##### Different cycles</span></span>
+<span id="cb8-214"><a href="#cb8-214"></a></span>
+<span id="cb8-215"><a href="#cb8-215"></a>It is possible to combine datasets from different years/cycles together in NHANES. However, NHANES is a cross-sectional data, and identification of the same person accross different cycles is not possible in the public release datasets. For appending data from different cycles, please make sure that the variable names/labels are the same/identical in years under consideration (in some years, names and labels do change).</span>
+<span id="cb8-216"><a href="#cb8-216"></a></span>
+<span id="cb8-217"><a href="#cb8-217"></a>::: column-margin</span>
+<span id="cb8-218"><a href="#cb8-218"></a>The following data have not been released on the NHANES website as public release files due to confidentiality concerns:</span>
+<span id="cb8-219"><a href="#cb8-219"></a></span>
+<span id="cb8-220"><a href="#cb8-220"></a><span class="ss">-   </span>adolescent data on alcohol use</span>
+<span id="cb8-221"><a href="#cb8-221"></a><span class="ss">-   </span>smoking</span>
+<span id="cb8-222"><a href="#cb8-222"></a><span class="ss">-   </span>sexual behavior</span>
+<span id="cb8-223"><a href="#cb8-223"></a><span class="ss">-   </span>reproductive health and drug use</span>
+<span id="cb8-224"><a href="#cb8-224"></a>:::</span>
+<span id="cb8-225"><a href="#cb8-225"></a></span>
+<span id="cb8-226"><a href="#cb8-226"></a><span class="fu">##### Within the same cycle</span></span>
+<span id="cb8-227"><a href="#cb8-227"></a></span>
+<span id="cb8-228"><a href="#cb8-228"></a>Within NHANES datasets in a given cycle, each sampled person has an unique identifier sequence number (variable <span class="in">`SEQN`</span>).</span>
+<span id="cb8-229"><a href="#cb8-229"></a></span>
+<span id="cb8-230"><a href="#cb8-230"></a><span class="fu">#### Missing data and outliers</span></span>
+<span id="cb8-231"><a href="#cb8-231"></a></span>
+<span id="cb8-232"><a href="#cb8-232"></a>@CDCfaq recommends:</span>
+<span id="cb8-233"><a href="#cb8-233"></a></span>
+<span id="cb8-234"><a href="#cb8-234"></a>::: column-margin</span>
+<span id="cb8-235"><a href="#cb8-235"></a>@CDCfaq</span>
+<span id="cb8-236"><a href="#cb8-236"></a>:::</span>
+<span id="cb8-237"><a href="#cb8-237"></a></span>
+<span id="cb8-238"><a href="#cb8-238"></a><span class="at">&gt; 1.  "As a general rule, if 10% or less of your data for a variable are missing from your analytic dataset, it is usually acceptable to continue your analysis without further evaluation or adjustment. However, if more than 10% of the data for a variable are missing, you may need to determine whether the missing values are distributed equally across socio-demographic characteristics, and decide whether further imputation of missing values or use of adjusted weights are necessary."</span></span>
+<span id="cb8-239"><a href="#cb8-239"></a></span>
+<span id="cb8-240"><a href="#cb8-240"></a><span class="at">&gt; 2.  "If you fail to identify 'refusal' or 'do not know' as types of missing data, and treat the assigned values for 'refused' or 'do not know' as real values, you will get distorted results in your statistical analyses. Therefore, it is important to recode 'refused' or 'don't know' responses as missing values (either as a period (.) for numeric variables or as a blank for character variables)."</span></span>
+<span id="cb8-241"><a href="#cb8-241"></a></span>
+<span id="cb8-242"><a href="#cb8-242"></a><span class="at">&gt; 3.  "Outliers with extremely large weights could have an influential impact on your estimates. You will have to decide whether to keep these influential outliers in your analysis or not. It is up to the analysts to make that decision."</span></span>
+<span id="cb8-243"><a href="#cb8-243"></a></span>
+<span id="cb8-244"><a href="#cb8-244"></a><span class="fu">#### NHANES documents</span></span>
+<span id="cb8-245"><a href="#cb8-245"></a></span>
+<span id="cb8-246"><a href="#cb8-246"></a><span class="in">```{r graph2i, echo=FALSE,cache=use.saved.chche}</span></span>
+<span id="cb8-247"><a href="#cb8-247"></a>g3 <span class="ot">&lt;-</span> <span class="fu">grViz</span>(<span class="st">"</span></span>
+<span id="cb8-248"><a href="#cb8-248"></a><span class="st">    digraph causal {</span></span>
+<span id="cb8-249"><a href="#cb8-249"></a><span class="st">    </span></span>
+<span id="cb8-250"><a href="#cb8-250"></a><span class="st">      # Nodes</span></span>
+<span id="cb8-251"><a href="#cb8-251"></a><span class="st">      node [shape = plaintext]</span></span>
+<span id="cb8-252"><a href="#cb8-252"></a><span class="st">    # node [shape = circle]</span></span>
+<span id="cb8-253"><a href="#cb8-253"></a><span class="st">    N [label = 'Continuous NHANES cycles']</span></span>
+<span id="cb8-254"><a href="#cb8-254"></a><span class="st">    c [label = 'codebook']</span></span>
+<span id="cb8-255"><a href="#cb8-255"></a><span class="st">    d [label = 'data file</span><span class="sc">\n</span><span class="st"> documentation'] </span></span>
+<span id="cb8-256"><a href="#cb8-256"></a><span class="st">    f [label = 'frequency tables']</span></span>
+<span id="cb8-257"><a href="#cb8-257"></a><span class="st">      </span></span>
+<span id="cb8-258"><a href="#cb8-258"></a><span class="st">      # Edges</span></span>
+<span id="cb8-259"><a href="#cb8-259"></a><span class="st">      edge [color = black,</span></span>
+<span id="cb8-260"><a href="#cb8-260"></a><span class="st">            arrowhead = vee]</span></span>
+<span id="cb8-261"><a href="#cb8-261"></a><span class="st">      rankdir = LR</span></span>
+<span id="cb8-262"><a href="#cb8-262"></a><span class="st">    N -&gt; {c d f}</span></span>
+<span id="cb8-263"><a href="#cb8-263"></a></span>
+<span id="cb8-264"><a href="#cb8-264"></a><span class="st">      # Graph</span></span>
+<span id="cb8-265"><a href="#cb8-265"></a><span class="st">      graph [overlap = true, fontsize = 10]</span></span>
+<span id="cb8-266"><a href="#cb8-266"></a><span class="st">    }"</span>)</span>
+<span id="cb8-267"><a href="#cb8-267"></a>g3 <span class="sc">%&gt;%</span> export_svg <span class="sc">%&gt;%</span> charToRaw <span class="sc">%&gt;%</span> rsvg <span class="sc">%&gt;%</span> png<span class="sc">::</span><span class="fu">writePNG</span>(<span class="st">"Images/accessing/g3.png"</span>)</span>
+<span id="cb8-268"><a href="#cb8-268"></a><span class="in">```</span></span>
+<span id="cb8-269"><a href="#cb8-269"></a></span>
+<span id="cb8-270"><a href="#cb8-270"></a><span class="in">```{r graph2xi, echo=FALSE, out.width = '65%'}</span></span>
+<span id="cb8-271"><a href="#cb8-271"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/g3.png"</span>)</span>
+<span id="cb8-272"><a href="#cb8-272"></a><span class="in">```</span></span>
+<span id="cb8-273"><a href="#cb8-273"></a></span>
+<span id="cb8-274"><a href="#cb8-274"></a>::: column-margin</span>
+<span id="cb8-275"><a href="#cb8-275"></a>The following websites could be helpful: - For more information about <span class="co">[</span><span class="ot">NHANES design</span><span class="co">](https://wwwn.cdc.gov/nchs/nhanes/tutorials/module2.aspx)</span>.</span>
+<span id="cb8-276"><a href="#cb8-276"></a></span>
+<span id="cb8-277"><a href="#cb8-277"></a><span class="ss">-   </span>Visit <span class="co">[</span><span class="ot">US CDC</span><span class="co">](https://wwwn.cdc.gov/Nchs/Nhanes/search/)</span> website and do a variable keyword search based on your research interest (e.g., arthritis).</span>
+<span id="cb8-278"><a href="#cb8-278"></a>:::</span>
+<span id="cb8-279"><a href="#cb8-279"></a></span>
+<span id="cb8-280"><a href="#cb8-280"></a><span class="fu">### Accessing NHANES Data Directly from the CDC website</span></span>
+<span id="cb8-281"><a href="#cb8-281"></a></span>
+<span id="cb8-282"><a href="#cb8-282"></a>In the following example, we will see how to download 'Demographics' data, and check associated variable in that dataset.</span>
+<span id="cb8-283"><a href="#cb8-283"></a></span>
+<span id="cb8-284"><a href="#cb8-284"></a><span class="in">```{r cdc1, echo=FALSE, out.width = '65%'}</span></span>
+<span id="cb8-285"><a href="#cb8-285"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/n15.png"</span>)</span>
+<span id="cb8-286"><a href="#cb8-286"></a><span class="in">```</span></span>
+<span id="cb8-287"><a href="#cb8-287"></a></span>
+<span id="cb8-288"><a href="#cb8-288"></a>::: column-margin</span>
+<span id="cb8-289"><a href="#cb8-289"></a>NHANES 1999-2000 and onward survey datasets are publicly available at <span class="co">[</span><span class="ot">wwwn.cdc.gov/nchs/nhanes/</span><span class="co">](https://wwwn.cdc.gov/nchs/nhanes/)</span></span>
+<span id="cb8-290"><a href="#cb8-290"></a>:::</span>
+<span id="cb8-291"><a href="#cb8-291"></a></span>
+<span id="cb8-292"><a href="#cb8-292"></a><span class="ss">-   </span>**Step 1**: Say, for example, we are interested about the NHANES 2015-2016 survey. Clicking the associated link in the above Figure gets us to the page for the corresponding cycle (see below).</span>
+<span id="cb8-293"><a href="#cb8-293"></a></span>
+<span id="cb8-294"><a href="#cb8-294"></a><span class="in">```{r cdc2, echo=FALSE, out.width = '65%'}</span></span>
+<span id="cb8-295"><a href="#cb8-295"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/n15demo.png"</span>)</span>
+<span id="cb8-296"><a href="#cb8-296"></a><span class="in">```</span></span>
+<span id="cb8-297"><a href="#cb8-297"></a></span>
+<span id="cb8-298"><a href="#cb8-298"></a><span class="ss">-   </span>**Step 2**: There are various types of data available for this survey. Let's explore the demographic information from this cycle. These data are mostly available in the form of SAS <span class="in">`XPT`</span> format (see below).</span>
+<span id="cb8-299"><a href="#cb8-299"></a></span>
+<span id="cb8-300"><a href="#cb8-300"></a><span class="in">```{r cdc3, echo=FALSE, out.width = '65%'}</span></span>
+<span id="cb8-301"><a href="#cb8-301"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/xptsasdata.png"</span>)</span>
+<span id="cb8-302"><a href="#cb8-302"></a><span class="in">```</span></span>
+<span id="cb8-303"><a href="#cb8-303"></a></span>
+<span id="cb8-304"><a href="#cb8-304"></a><span class="ss">-   </span>**Step 3**: We can download the XPT data in the local PC folder and read the data into R as as follows:</span>
+<span id="cb8-305"><a href="#cb8-305"></a></span>
+<span id="cb8-306"><a href="#cb8-306"></a><span class="in">```{r load, echo=TRUE, eval=FALSE}</span></span>
+<span id="cb8-307"><a href="#cb8-307"></a>DEMO <span class="ot">&lt;-</span> <span class="fu">read.xport</span>(<span class="st">"Data/accessing/DEMO_I.XPT"</span>)</span>
+<span id="cb8-308"><a href="#cb8-308"></a><span class="in">```</span></span>
+<span id="cb8-309"><a href="#cb8-309"></a></span>
+<span id="cb8-310"><a href="#cb8-310"></a><span class="in">```{r loadMirror, echo=FALSE, eval=TRUE}</span></span>
+<span id="cb8-311"><a href="#cb8-311"></a><span class="fu">library</span>(foreign)</span>
+<span id="cb8-312"><a href="#cb8-312"></a>DEMO <span class="ot">&lt;-</span> <span class="fu">read.xport</span>(<span class="st">"Data/accessing/DEMO_I.XPT"</span>)</span>
+<span id="cb8-313"><a href="#cb8-313"></a><span class="in">```</span></span>
+<span id="cb8-314"><a href="#cb8-314"></a></span>
+<span id="cb8-315"><a href="#cb8-315"></a><span class="ss">-   </span>**Step 4**: Once data is imported in RStudio, we will see the <span class="in">`DEMO`</span> object listed under data window (see below):</span>
+<span id="cb8-316"><a href="#cb8-316"></a></span>
+<span id="cb8-317"><a href="#cb8-317"></a><span class="in">```{r cdc4, echo=FALSE, out.width = '65%'}</span></span>
+<span id="cb8-318"><a href="#cb8-318"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/rdata.png"</span>)</span>
+<span id="cb8-319"><a href="#cb8-319"></a><span class="in">```</span></span>
+<span id="cb8-320"><a href="#cb8-320"></a></span>
+<span id="cb8-321"><a href="#cb8-321"></a><span class="ss">-   </span>**Step 5**: We can also check the variable names in this <span class="in">`DEMO`</span> dataset as follows:</span>
+<span id="cb8-322"><a href="#cb8-322"></a></span>
+<span id="cb8-323"><a href="#cb8-323"></a><span class="in">```{r cdc5, echo=TRUE}</span></span>
+<span id="cb8-324"><a href="#cb8-324"></a><span class="fu">names</span>(DEMO)</span>
+<span id="cb8-325"><a href="#cb8-325"></a><span class="in">```</span></span>
+<span id="cb8-326"><a href="#cb8-326"></a></span>
+<span id="cb8-327"><a href="#cb8-327"></a><span class="ss">-   </span>**Step 6**: We can open the data in RStudio in the dataview window (by clicking the <span class="in">`DEMO`</span> data from the data window). The next Figure shows only a few columns and rows from this large dataset. Note that there are some values marked as "NA", which represents missing values.</span>
+<span id="cb8-328"><a href="#cb8-328"></a></span>
+<span id="cb8-329"><a href="#cb8-329"></a><span class="in">```{r cdc6, echo=FALSE, out.width = '99%'}</span></span>
+<span id="cb8-330"><a href="#cb8-330"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/dataview.png"</span>)</span>
+<span id="cb8-331"><a href="#cb8-331"></a><span class="in">```</span></span>
+<span id="cb8-332"><a href="#cb8-332"></a></span>
+<span id="cb8-333"><a href="#cb8-333"></a><span class="ss">-   </span>**Step 7**: There is a column name associated with each column, e.g., <span class="in">`DMDHSEDU`</span> in the first column in the above Figure. To understand what the column names mean in this Figure, we need to take a look at the codebook. To access codebook, click the <span class="in">`'DEMO|Doc'`</span> link (in step 2). This will show the data documentation and associated codebook (see the next Figure).</span>
+<span id="cb8-334"><a href="#cb8-334"></a></span>
+<span id="cb8-335"><a href="#cb8-335"></a><span class="in">```{r cdc7, echo=FALSE, out.width = '65%'}</span></span>
+<span id="cb8-336"><a href="#cb8-336"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/toc.png"</span>)</span>
+<span id="cb8-337"><a href="#cb8-337"></a><span class="in">```</span></span>
+<span id="cb8-338"><a href="#cb8-338"></a></span>
+<span id="cb8-339"><a href="#cb8-339"></a><span class="ss">-   </span>**Step 8**: We can see a link for the column or variable <span class="in">`DMDHSEDU`</span> in the table of content (in the above Figure). Clicking that link will provide us further information about what this variable means (see the next Figure).</span>
+<span id="cb8-340"><a href="#cb8-340"></a></span>
+<span id="cb8-341"><a href="#cb8-341"></a><span class="in">```{r cdc8, echo=FALSE, out.width = '85%'}</span></span>
+<span id="cb8-342"><a href="#cb8-342"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/DMDHSEDU.png"</span>)</span>
+<span id="cb8-343"><a href="#cb8-343"></a><span class="in">```</span></span>
+<span id="cb8-344"><a href="#cb8-344"></a></span>
+<span id="cb8-345"><a href="#cb8-345"></a><span class="ss">-   </span>**Step 9**: We can assess if the numbers reported under count and cumulative (from the above Figure) matches with what we get from the <span class="in">`DEMO`</span> data we just imported (particularly, for the <span class="in">`DMDHSEDU`</span> variable):</span>
+<span id="cb8-346"><a href="#cb8-346"></a></span>
+<span id="cb8-347"><a href="#cb8-347"></a><span class="in">```{r cdc9, echo=TRUE}</span></span>
+<span id="cb8-348"><a href="#cb8-348"></a><span class="fu">table</span>(DEMO<span class="sc">$</span>DMDHSEDU) <span class="co"># Frequency table</span></span>
+<span id="cb8-349"><a href="#cb8-349"></a><span class="fu">cumsum</span>(<span class="fu">table</span>(DEMO<span class="sc">$</span>DMDHSEDU)) <span class="co"># Cumulative frequency table</span></span>
+<span id="cb8-350"><a href="#cb8-350"></a><span class="fu">length</span>(<span class="fu">is.na</span>(DEMO<span class="sc">$</span>DMDHSEDU)) <span class="co"># Number of non-NA observations</span></span>
+<span id="cb8-351"><a href="#cb8-351"></a><span class="in">```</span></span>
+<span id="cb8-352"><a href="#cb8-352"></a></span>
+<span id="cb8-353"><a href="#cb8-353"></a><span class="fu">### Accessing NHANES Data Using R Packages</span></span>
+<span id="cb8-354"><a href="#cb8-354"></a></span>
+<span id="cb8-355"><a href="#cb8-355"></a><span class="fu">#### nhanesA package</span></span>
+<span id="cb8-356"><a href="#cb8-356"></a></span>
+<span id="cb8-357"><a href="#cb8-357"></a><span class="in">```{r load1, echo=TRUE, eval=FALSE}</span></span>
+<span id="cb8-358"><a href="#cb8-358"></a><span class="fu">library</span>(nhanesA)</span>
+<span id="cb8-359"><a href="#cb8-359"></a><span class="in">```</span></span>
+<span id="cb8-360"><a href="#cb8-360"></a></span>
+<span id="cb8-361"><a href="#cb8-361"></a>::: callout-tip</span>
+<span id="cb8-362"><a href="#cb8-362"></a>R package <span class="in">`nhanesA`</span> provides a convenient way to download and analyze NHANES survey data.</span>
+<span id="cb8-363"><a href="#cb8-363"></a>:::</span>
+<span id="cb8-364"><a href="#cb8-364"></a></span>
+<span id="cb8-365"><a href="#cb8-365"></a>::: column-margin</span>
+<span id="cb8-366"><a href="#cb8-366"></a>RNHANES <span class="co">[</span><span class="ot">@RNHANES</span><span class="co">]</span> is another packages for downloading the NHANES data easily.</span>
+<span id="cb8-367"><a href="#cb8-367"></a>:::</span>
+<span id="cb8-368"><a href="#cb8-368"></a></span>
+<span id="cb8-369"><a href="#cb8-369"></a><span class="ss">-   </span>**Step 1**: Witin the CDC website, NHANES data are available in 5 categories</span>
+<span id="cb8-370"><a href="#cb8-370"></a><span class="ss">    -   </span>Demographics (<span class="in">`DEMO`</span>)</span>
+<span id="cb8-371"><a href="#cb8-371"></a><span class="ss">    -   </span>Dietary (<span class="in">`DIET`</span>)</span>
+<span id="cb8-372"><a href="#cb8-372"></a><span class="ss">    -   </span>Examination (<span class="in">`EXAM`</span>)</span>
+<span id="cb8-373"><a href="#cb8-373"></a><span class="ss">    -   </span>Laboratory (<span class="in">`LAB`</span>)</span>
+<span id="cb8-374"><a href="#cb8-374"></a><span class="ss">    -   </span>Questionnaire (<span class="in">`Q`</span>)</span>
+<span id="cb8-375"><a href="#cb8-375"></a></span>
+<span id="cb8-376"><a href="#cb8-376"></a>To get a list of available variables within a data file, we run the following command (e.g., we check variable names within <span class="in">`DEMO`</span> data):</span>
+<span id="cb8-377"><a href="#cb8-377"></a></span>
+<span id="cb8-378"><a href="#cb8-378"></a><span class="in">```{r search, eval=TRUE, cache=use.saved.chche}</span></span>
+<span id="cb8-379"><a href="#cb8-379"></a><span class="fu">nhanesTables</span>(<span class="at">data_group=</span><span class="st">'DEMO'</span>, <span class="at">year=</span><span class="dv">2015</span>)</span>
+<span id="cb8-380"><a href="#cb8-380"></a><span class="in">```</span></span>
+<span id="cb8-381"><a href="#cb8-381"></a></span>
+<span id="cb8-382"><a href="#cb8-382"></a><span class="ss">-   </span>**Step 2**: We can obtain the summaries of the downloaded data as follows (see below):</span>
+<span id="cb8-383"><a href="#cb8-383"></a></span>
+<span id="cb8-384"><a href="#cb8-384"></a><span class="in">```{r search3, eval=TRUE, cache=use.saved.chche}</span></span>
+<span id="cb8-385"><a href="#cb8-385"></a>demo <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">'DEMO_I'</span>)</span>
+<span id="cb8-386"><a href="#cb8-386"></a><span class="fu">names</span>(demo)</span>
+<span id="cb8-387"><a href="#cb8-387"></a><span class="fu">table</span>(demo<span class="sc">$</span>DMDHSEDU) <span class="co"># Frequency table</span></span>
+<span id="cb8-388"><a href="#cb8-388"></a><span class="fu">cumsum</span>(<span class="fu">table</span>(demo<span class="sc">$</span>DMDHSEDU)) <span class="co"># Cumulative frequency table</span></span>
+<span id="cb8-389"><a href="#cb8-389"></a><span class="fu">length</span>(<span class="fu">is.na</span>(demo<span class="sc">$</span>DMDHSEDU)) <span class="co"># Number of non-NA observations</span></span>
+<span id="cb8-390"><a href="#cb8-390"></a><span class="in">```</span></span>
+<span id="cb8-391"><a href="#cb8-391"></a></span>
+<span id="cb8-392"><a href="#cb8-392"></a><span class="fu">### References</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

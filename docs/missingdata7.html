@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - Effect modification</title>
 <style>
@@ -405,7 +405,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -696,7 +696,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Effect modification</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Effect modification</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -743,65 +743,65 @@ Tip
 </div>
 <p>We start by loading the necessary packages that will aid in the analysis. We also define a function <code>tidy.pool_mi</code> to streamline the pooling process for multiple imputation results.</p>
 <div class="cell" data-hash="missingdata7_cache/html/setup_6c23b211fe8d98346b85188c3934cc80">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://r-survey.r-forge.r-project.org/survey/">survey</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://interactions.jacob-long.com">interactions</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va">mitools</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/amices/mice">mice</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/alexanderrobitzsch/miceadds">miceadds</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://vincentarelbundock.github.io/modelsummary/">modelsummary</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">tidy.pool_mi</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">msg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html">capture.output</a></span><span class="op">(</span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">out</span><span class="op">$</span><span class="va">term</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/row.names.html">row.names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"statistic"</span>, <span class="st">"p.value"</span>,</span>
-<span>                     <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span>, <span class="st">"miss"</span>, <span class="st">"term"</span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(survey)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(interactions)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">require</span>(mitools)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">require</span>(mice)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">require</span>(miceadds)</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">library</span>(modelsummary)</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a>tidy.pool_mi <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb1-10"><a href="#cb1-10"></a>  msg <span class="ot">&lt;-</span> <span class="fu">capture.output</span>(out <span class="ot">&lt;-</span> <span class="fu">summary</span>(x, ...))</span>
+<span id="cb1-11"><a href="#cb1-11"></a>  out<span class="sc">$</span>term <span class="ot">&lt;-</span> <span class="fu">row.names</span>(out)</span>
+<span id="cb1-12"><a href="#cb1-12"></a>  <span class="fu">colnames</span>(out) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"statistic"</span>, <span class="st">"p.value"</span>,</span>
+<span id="cb1-13"><a href="#cb1-13"></a>                     <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span>, <span class="st">"miss"</span>, <span class="st">"term"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14"></a>  <span class="fu">return</span>(out)</span>
+<span id="cb1-15"><a href="#cb1-15"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="data" class="level3"><h3 class="anchored" data-anchor-id="data">Data</h3>
 <p>We load a dataset named <code>smi</code>. This dataset is a list of multiple imputed datasets, which is evident from the structure and the way we access its elements.</p>
 <div class="cell" data-hash="missingdata7_cache/html/data_44487b43e1597c127813d3ba6b81b235">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va">mitools</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">smi</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">smi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">smi</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 5</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">smi</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       id wave mmetro parsmk         drkfre         alcdos alcdhi           smk</span></span>
-<span><span class="co">#&gt; 1 920006    1      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
-<span><span class="co">#&gt; 2 920006    2      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
-<span><span class="co">#&gt; 3 920006    3      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
-<span><span class="co">#&gt; 4 920006    4      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
-<span><span class="co">#&gt; 5 920006    5      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
-<span><span class="co">#&gt; 6 920006    6      1      0 not in last wk not in last wk      0 non/ex-smoker</span></span>
-<span><span class="co">#&gt;   cistot mdrkfre sex drinkreg</span></span>
-<span><span class="co">#&gt; 1      0       0   1    FALSE</span></span>
-<span><span class="co">#&gt; 2      0       0   1    FALSE</span></span>
-<span><span class="co">#&gt; 3      0       0   1    FALSE</span></span>
-<span><span class="co">#&gt; 4      1       0   1    FALSE</span></span>
-<span><span class="co">#&gt; 5      4       0   1    FALSE</span></span>
-<span><span class="co">#&gt; 6      3       0   1    FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(mitools)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">data</span>(smi)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">length</span>(smi)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="fu">length</span>(smi[[<span class="dv">1</span>]])</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; [1] 5</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="fu">head</span>(smi[[<span class="dv">1</span>]][[<span class="dv">1</span>]])</span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt;       id wave mmetro parsmk         drkfre         alcdos alcdhi           smk</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; 1 920006    1      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; 2 920006    2      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 3 920006    3      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; 4 920006    4      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; 5 920006    5      1      0    Non drinker    Non drinker      0 non/ex-smoker</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 6 920006    6      1      0 not in last wk not in last wk      0 non/ex-smoker</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt;   cistot mdrkfre sex drinkreg</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; 1      0       0   1    FALSE</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; 2      0       0   1    FALSE</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; 3      0       0   1    FALSE</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt; 4      1       0   1    FALSE</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; 5      4       0   1    FALSE</span></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; 6      3       0   1    FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="model-with-interaction-and-ors" class="level3"><h3 class="anchored" data-anchor-id="model-with-interaction-and-ors">Model with interaction and ORs</h3>
 <p>We’re interested in understanding how the variable <code>wave</code> interacts with <code>sex</code> in predicting <code>drinkreg</code>. We fit two logistic regression models, one for each level of the <code>sex</code> variable, to understand this interaction. <code>wave</code> is exposure here.</p>
 <p>For effect modifier sex = 0</p>
 <div class="cell" data-hash="missingdata7_cache/html/em0_9faab001571286373aecc73af29e18c2">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="va">smi</span>, <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">drinkreg</span><span class="op">~</span> <span class="va">wave</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">wave</span><span class="op">*</span><span class="va">sex</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="https://amices.org/mice/reference/pool.html">pool</a></span><span class="op">(</span><span class="va">models</span>, rule <span class="op">=</span> <span class="st">"rubin1987"</span><span class="op">)</span>, conf.int <span class="op">=</span> <span class="cn">TRUE</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span></span>
-<span><span class="co">#&gt;   term estimate  std.error statistic       df      p.value   2.5 %   97.5 %</span></span>
-<span><span class="co">#&gt; 2 wave 1.271952 0.06587423  3.651693 234.4974 0.0003212903 1.11714 1.448217</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>models <span class="ot">&lt;-</span> <span class="fu">with</span>(smi, <span class="fu">glm</span>(drinkreg<span class="sc">~</span> wave <span class="sc">+</span> sex <span class="sc">+</span> wave<span class="sc">*</span>sex, <span class="at">family =</span> <span class="fu">binomial</span>()))</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">summary</span>(<span class="fu">pool</span>(models, <span class="at">rule =</span> <span class="st">"rubin1987"</span>), <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span>,]</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt;   term estimate  std.error statistic       df      p.value   2.5 %   97.5 %</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; 2 wave 1.271952 0.06587423  3.651693 234.4974 0.0003212903 1.11714 1.448217</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>For effect modifier sex = 1 (just changing reference)</p>
 <div class="cell" data-hash="missingdata7_cache/html/em1_c9b1ae79a4a22dcc94d5eb5faf37b598">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">models2</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="va">smi</span>, <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">drinkreg</span><span class="op">~</span> <span class="va">wave</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">sex</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="va">wave</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">sex</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span>,family<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="https://amices.org/mice/reference/pool.html">pool</a></span><span class="op">(</span><span class="va">models2</span>, rule <span class="op">=</span> <span class="st">"rubin1987"</span><span class="op">)</span>,conf.int <span class="op">=</span> <span class="cn">TRUE</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span></span>
-<span><span class="co">#&gt;   term estimate  std.error statistic       df      p.value    2.5 %   97.5 %</span></span>
-<span><span class="co">#&gt; 2 wave 1.225438 0.05876369   3.45959 240.3053 0.0006399352 1.091487 1.375828</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>models2<span class="ot">&lt;-</span><span class="fu">with</span>(smi, <span class="fu">glm</span>(drinkreg<span class="sc">~</span> wave <span class="sc">+</span> <span class="fu">I</span>(sex<span class="sc">==</span><span class="dv">0</span>) <span class="sc">+</span> wave<span class="sc">*</span><span class="fu">I</span>(sex<span class="sc">==</span><span class="dv">0</span>),<span class="at">family=</span><span class="fu">binomial</span>()))</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="fu">summary</span>(<span class="fu">pool</span>(models2, <span class="at">rule =</span> <span class="st">"rubin1987"</span>),<span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span>,]</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;   term estimate  std.error statistic       df      p.value    2.5 %   97.5 %</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; 2 wave 1.225438 0.05876369   3.45959 240.3053 0.0006399352 1.091487 1.375828</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <ul>
@@ -810,75 +810,77 @@ Tip
 </ul></section><section id="simple-slopes-analyses" class="level3"><h3 class="anchored" data-anchor-id="simple-slopes-analyses">Simple slopes analyses</h3>
 <p>We perform a simple slopes analysis for each imputed dataset. This analysis helps in understanding the relationship between the predictor and the outcome at specific levels of the moderator.</p>
 <div class="cell" data-hash="missingdata7_cache/html/em2_da568002581d62c2ae1695c39d511790">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">a1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://interactions.jacob-long.com/reference/sim_slopes.html">sim_slopes</a></span><span class="op">(</span><span class="va">models</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, pred <span class="op">=</span> <span class="va">wave</span>, modx <span class="op">=</span> <span class="va">sex</span><span class="op">)</span></span>
-<span><span class="va">a2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://interactions.jacob-long.com/reference/sim_slopes.html">sim_slopes</a></span><span class="op">(</span><span class="va">models</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, pred <span class="op">=</span> <span class="va">wave</span>, modx <span class="op">=</span> <span class="va">sex</span><span class="op">)</span></span>
-<span><span class="va">a3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://interactions.jacob-long.com/reference/sim_slopes.html">sim_slopes</a></span><span class="op">(</span><span class="va">models</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span>, pred <span class="op">=</span> <span class="va">wave</span>, modx <span class="op">=</span> <span class="va">sex</span><span class="op">)</span></span>
-<span><span class="va">a4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://interactions.jacob-long.com/reference/sim_slopes.html">sim_slopes</a></span><span class="op">(</span><span class="va">models</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span>, pred <span class="op">=</span> <span class="va">wave</span>, modx <span class="op">=</span> <span class="va">sex</span><span class="op">)</span></span>
-<span><span class="va">a5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://interactions.jacob-long.com/reference/sim_slopes.html">sim_slopes</a></span><span class="op">(</span><span class="va">models</span><span class="op">[[</span><span class="fl">5</span><span class="op">]</span><span class="op">]</span>, pred <span class="op">=</span> <span class="va">wave</span>, modx <span class="op">=</span> <span class="va">sex</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>a1 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">1</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>a2 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">2</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>a3 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">3</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb5-4"><a href="#cb5-4"></a>a4 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">4</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb5-5"><a href="#cb5-5"></a>a5 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">5</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>After obtaining the results from each imputed dataset, we pool them to get a consolidated result. This is done separately for each level of the <code>sex</code> variable.</p>
 </section><section id="pooled-results-for-sex-0" class="level3"><h3 class="anchored" data-anchor-id="pooled-results-for-sex-0">Pooled results for sex = 0</h3>
 <div class="cell" data-hash="missingdata7_cache/html/em3_17736ee72afd3a2392738584591a5071">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># For sex = 0</span></span>
-<span><span class="va">ef.lev</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">est</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">a1</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a2</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a3</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a4</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a5</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">a1</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a2</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a3</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a4</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a5</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">vr</span> <span class="op">&lt;-</span> <span class="va">se</span><span class="op">^</span><span class="fl">2</span></span>
-<span><span class="va">OR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">est</span><span class="op">)</span></span>
-<span><span class="va">OR.se</span> <span class="op">&lt;-</span> <span class="va">OR</span> <span class="op">*</span> <span class="va">se</span></span>
-<span><span class="va">OR.v</span> <span class="op">&lt;-</span> <span class="va">OR.se</span><span class="op">^</span><span class="fl">2</span></span>
-<span></span>
-<span><span class="va">mod_pooled</span> <span class="op">&lt;-</span> <span class="fu">miceadds</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/miceadds/man/pool_mi.html">pool_mi</a></span><span class="op">(</span>qhat<span class="op">=</span><span class="va">OR</span>, u<span class="op">=</span><span class="va">OR.v</span><span class="op">)</span></span>
-<span><span class="fu">tidy.pool_mi</span><span class="op">(</span><span class="va">mod_pooled</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   estimate  std.error statistic      p.value conf.low conf.high   miss term</span></span>
-<span><span class="co">#&gt; 1 1.272164 0.08386552  15.16909 6.987679e-39 1.107118   1.43721 12.2 %    1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mitools/man/MIcombine.html">MIcombine</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">OR</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">OR.v</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Multiple imputation results:</span></span>
-<span><span class="co">#&gt;       MIcombine.default(as.list(OR), as.list(OR.v))</span></span>
-<span><span class="co">#&gt;    results         se   (lower  upper) missInfo</span></span>
-<span><span class="co">#&gt; 1 1.272164 0.08386552 1.107118 1.43721     12 %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># For sex = 0</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>ef.lev <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>est <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb6-4"><a href="#cb6-4"></a>         a2<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb6-5"><a href="#cb6-5"></a>         a3<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb6-6"><a href="#cb6-6"></a>         a4<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb6-7"><a href="#cb6-7"></a>         a5<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev])</span>
+<span id="cb6-8"><a href="#cb6-8"></a>se <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb6-9"><a href="#cb6-9"></a>        a2<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb6-10"><a href="#cb6-10"></a>        a3<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb6-11"><a href="#cb6-11"></a>        a4<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb6-12"><a href="#cb6-12"></a>        a5<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev])</span>
+<span id="cb6-13"><a href="#cb6-13"></a>vr <span class="ot">&lt;-</span> se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>OR <span class="ot">&lt;-</span> <span class="fu">exp</span>(est)</span>
+<span id="cb6-15"><a href="#cb6-15"></a>OR.se <span class="ot">&lt;-</span> OR <span class="sc">*</span> se</span>
+<span id="cb6-16"><a href="#cb6-16"></a>OR.v <span class="ot">&lt;-</span> OR.se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a></span>
+<span id="cb6-18"><a href="#cb6-18"></a>mod_pooled <span class="ot">&lt;-</span> miceadds<span class="sc">::</span><span class="fu">pool_mi</span>(<span class="at">qhat=</span>OR, <span class="at">u=</span>OR.v)</span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="fu">tidy.pool_mi</span>(mod_pooled)</span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt;   estimate  std.error statistic      p.value conf.low conf.high   miss term</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; 1 1.272164 0.08386552  15.16909 6.987679e-39 1.107118   1.43721 12.2 %    1</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="fu">summary</span>(<span class="fu">MIcombine</span>(<span class="fu">as.list</span>(OR), <span class="fu">as.list</span>(OR.v)))</span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt; Multiple imputation results:</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt;       MIcombine.default(as.list(OR), as.list(OR.v))</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt;    results         se   (lower  upper) missInfo</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt; 1 1.272164 0.08386552 1.107118 1.43721     12 %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="pooled-results-for-sex-1" class="level3"><h3 class="anchored" data-anchor-id="pooled-results-for-sex-1">Pooled results for sex = 1</h3>
 <div class="cell" data-hash="missingdata7_cache/html/em4_6c983c87c3b88aa51404d3ac9b3078d4">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># For sex = 1</span></span>
-<span><span class="va">ef.lev</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span><span class="va">est</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">a1</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a2</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a3</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a4</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>         <span class="va">a5</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">Est.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">a1</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a2</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a3</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a4</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span>,</span>
-<span>        <span class="va">a5</span><span class="op">$</span><span class="va">slopes</span><span class="op">$</span><span class="va">S.E.</span><span class="op">[</span><span class="va">ef.lev</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">vr</span> <span class="op">&lt;-</span> <span class="va">se</span><span class="op">^</span><span class="fl">2</span></span>
-<span><span class="va">OR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">est</span><span class="op">)</span></span>
-<span><span class="va">OR.se</span> <span class="op">&lt;-</span> <span class="va">OR</span> <span class="op">*</span> <span class="va">se</span></span>
-<span><span class="va">OR.v</span> <span class="op">&lt;-</span> <span class="va">OR.se</span><span class="op">^</span><span class="fl">2</span></span>
-<span></span>
-<span><span class="va">mod_pooled</span> <span class="op">&lt;-</span> <span class="fu">miceadds</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/miceadds/man/pool_mi.html">pool_mi</a></span><span class="op">(</span>qhat<span class="op">=</span><span class="va">OR</span>, u<span class="op">=</span><span class="va">OR.v</span><span class="op">)</span></span>
-<span><span class="fu">tidy.pool_mi</span><span class="op">(</span><span class="va">mod_pooled</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   estimate  std.error statistic      p.value conf.low conf.high   miss term</span></span>
-<span><span class="co">#&gt; 1 1.225598 0.07204679  17.01113 2.282427e-46 1.083838  1.367357 11.9 %    1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mitools/man/MIcombine.html">MIcombine</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">OR</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">OR.v</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Multiple imputation results:</span></span>
-<span><span class="co">#&gt;       MIcombine.default(as.list(OR), as.list(OR.v))</span></span>
-<span><span class="co">#&gt;    results         se   (lower   upper) missInfo</span></span>
-<span><span class="co">#&gt; 1 1.225598 0.07204679 1.083838 1.367357     12 %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># For sex = 1</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>ef.lev <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>est <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb7-4"><a href="#cb7-4"></a>         a2<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb7-5"><a href="#cb7-5"></a>         a3<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb7-6"><a href="#cb7-6"></a>         a4<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb7-7"><a href="#cb7-7"></a>         a5<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev])</span>
+<span id="cb7-8"><a href="#cb7-8"></a>se <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb7-9"><a href="#cb7-9"></a>        a2<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb7-10"><a href="#cb7-10"></a>        a3<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb7-11"><a href="#cb7-11"></a>        a4<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb7-12"><a href="#cb7-12"></a>        a5<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev])</span>
+<span id="cb7-13"><a href="#cb7-13"></a>vr <span class="ot">&lt;-</span> se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a>OR <span class="ot">&lt;-</span> <span class="fu">exp</span>(est)</span>
+<span id="cb7-15"><a href="#cb7-15"></a>OR.se <span class="ot">&lt;-</span> OR <span class="sc">*</span> se</span>
+<span id="cb7-16"><a href="#cb7-16"></a>OR.v <span class="ot">&lt;-</span> OR.se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb7-17"><a href="#cb7-17"></a></span>
+<span id="cb7-18"><a href="#cb7-18"></a>mod_pooled <span class="ot">&lt;-</span> miceadds<span class="sc">::</span><span class="fu">pool_mi</span>(<span class="at">qhat=</span>OR, <span class="at">u=</span>OR.v)</span>
+<span id="cb7-19"><a href="#cb7-19"></a><span class="fu">tidy.pool_mi</span>(mod_pooled)</span>
+<span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt;   estimate  std.error statistic      p.value conf.low conf.high   miss term</span></span>
+<span id="cb7-21"><a href="#cb7-21"></a><span class="co">#&gt; 1 1.225598 0.07204679  17.01113 2.282427e-46 1.083838  1.367357 11.9 %    1</span></span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="fu">summary</span>(<span class="fu">MIcombine</span>(<span class="fu">as.list</span>(OR), <span class="fu">as.list</span>(OR.v)))</span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt; Multiple imputation results:</span></span>
+<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt;       MIcombine.default(as.list(OR), as.list(OR.v))</span></span>
+<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt;    results         se   (lower   upper) missInfo</span></span>
+<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt; 1 1.225598 0.07204679 1.083838 1.367357     12 %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 
+
+<!-- -->
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1073,7 +1075,187 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">R functions (M)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">## Effect modification {.unnumbered}</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>In this tutorial, we delve into the concept of effect modification. </span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a>::: callout-important</span>
+<span id="cb8-6"><a href="#cb8-6"></a>**Effect modification** and **interaction** are two distinct concepts in epidemiology. Effect modification occurs when the causal effect of an exposure (A) on an outcome (Y) varies based on the levels of a third factor (B). In this scenario, the association between the exposure and the outcome differs within the strata of a second exposure, which acts as the effect modifier. For instance, the impact of alcohol (A) on oral cancer (Y) might differ based on tobacco smoking (B). On the other hand, interaction refers to the joint causal effect of two exposures (A and B) on an outcome (Y). It examines how the combination of multiple exposures influences the outcome, such as the combined effect of alcohol (A) and tobacco smoking (B) on oral cancer (Y). In essence, while effect modification looks at how a third factor influences the relationship between an exposure and an outcome, interaction focuses on the combined effect of two exposures on the outcome. To revisit or deepen your grasp of these two concepts, consider reviewing this <span class="co">[</span><span class="ot">external tutorial</span><span class="co">](https://ehsanx.github.io/interaction/)</span>.</span>
+<span id="cb8-7"><a href="#cb8-7"></a>::: </span>
+<span id="cb8-8"><a href="#cb8-8"></a></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="fu">### Video content (optional)</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a></span>
+<span id="cb8-11"><a href="#cb8-11"></a>::: callout-tip</span>
+<span id="cb8-12"><a href="#cb8-12"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
+<span id="cb8-13"><a href="#cb8-13"></a>:::</span>
+<span id="cb8-14"><a href="#cb8-14"></a></span>
+<span id="cb8-15"><a href="#cb8-15"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/cxfwqBD1M1c"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="kw">&lt;/iframe&gt;</span></span>
+<span id="cb8-19"><a href="#cb8-19"></a>:::</span>
+<span id="cb8-20"><a href="#cb8-20"></a></span>
+<span id="cb8-21"><a href="#cb8-21"></a>We start by loading the necessary packages that will aid in the analysis. We also define a function <span class="in">`tidy.pool_mi`</span> to streamline the pooling process for multiple imputation results.</span>
+<span id="cb8-22"><a href="#cb8-22"></a> </span>
+<span id="cb8-23"><a href="#cb8-23"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
+<span id="cb8-24"><a href="#cb8-24"></a><span class="co"># Load required packages</span></span>
+<span id="cb8-25"><a href="#cb8-25"></a><span class="fu">library</span>(survey)</span>
+<span id="cb8-26"><a href="#cb8-26"></a><span class="fu">require</span>(interactions)</span>
+<span id="cb8-27"><a href="#cb8-27"></a><span class="fu">require</span>(mitools)</span>
+<span id="cb8-28"><a href="#cb8-28"></a><span class="fu">require</span>(mice)</span>
+<span id="cb8-29"><a href="#cb8-29"></a><span class="fu">require</span>(miceadds)</span>
+<span id="cb8-30"><a href="#cb8-30"></a><span class="fu">library</span>(modelsummary)</span>
+<span id="cb8-31"><a href="#cb8-31"></a></span>
+<span id="cb8-32"><a href="#cb8-32"></a>tidy.pool_mi <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb8-33"><a href="#cb8-33"></a>  msg <span class="ot">&lt;-</span> <span class="fu">capture.output</span>(out <span class="ot">&lt;-</span> <span class="fu">summary</span>(x, ...))</span>
+<span id="cb8-34"><a href="#cb8-34"></a>  out<span class="sc">$</span>term <span class="ot">&lt;-</span> <span class="fu">row.names</span>(out)</span>
+<span id="cb8-35"><a href="#cb8-35"></a>  <span class="fu">colnames</span>(out) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"statistic"</span>, <span class="st">"p.value"</span>,</span>
+<span id="cb8-36"><a href="#cb8-36"></a>                     <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span>, <span class="st">"miss"</span>, <span class="st">"term"</span>)</span>
+<span id="cb8-37"><a href="#cb8-37"></a>  <span class="fu">return</span>(out)</span>
+<span id="cb8-38"><a href="#cb8-38"></a>}</span>
+<span id="cb8-39"><a href="#cb8-39"></a><span class="in">```</span></span>
+<span id="cb8-40"><a href="#cb8-40"></a></span>
+<span id="cb8-41"><a href="#cb8-41"></a><span class="fu">### Data</span></span>
+<span id="cb8-42"><a href="#cb8-42"></a></span>
+<span id="cb8-43"><a href="#cb8-43"></a>We load a dataset named <span class="in">`smi`</span>. This dataset is a list of multiple imputed datasets, which is evident from the structure and the way we access its elements.</span>
+<span id="cb8-44"><a href="#cb8-44"></a></span>
+<span id="cb8-45"><a href="#cb8-45"></a><span class="in">```{r data, cache=TRUE}</span></span>
+<span id="cb8-46"><a href="#cb8-46"></a><span class="fu">require</span>(mitools)</span>
+<span id="cb8-47"><a href="#cb8-47"></a><span class="fu">data</span>(smi)</span>
+<span id="cb8-48"><a href="#cb8-48"></a><span class="fu">length</span>(smi)</span>
+<span id="cb8-49"><a href="#cb8-49"></a><span class="fu">length</span>(smi[[<span class="dv">1</span>]])</span>
+<span id="cb8-50"><a href="#cb8-50"></a><span class="fu">head</span>(smi[[<span class="dv">1</span>]][[<span class="dv">1</span>]])</span>
+<span id="cb8-51"><a href="#cb8-51"></a><span class="in">```</span></span>
+<span id="cb8-52"><a href="#cb8-52"></a></span>
+<span id="cb8-53"><a href="#cb8-53"></a><span class="fu">### Model with interaction and ORs </span></span>
+<span id="cb8-54"><a href="#cb8-54"></a></span>
+<span id="cb8-55"><a href="#cb8-55"></a>We're interested in understanding how the variable <span class="in">`wave`</span> interacts with <span class="in">`sex`</span> in predicting <span class="in">`drinkreg`</span>. We fit two logistic regression models, one for each level of the <span class="in">`sex`</span> variable, to understand this interaction. <span class="in">`wave`</span> is exposure here.</span>
+<span id="cb8-56"><a href="#cb8-56"></a></span>
+<span id="cb8-57"><a href="#cb8-57"></a>For effect modifier sex = 0</span>
+<span id="cb8-58"><a href="#cb8-58"></a></span>
+<span id="cb8-59"><a href="#cb8-59"></a><span class="in">```{r em0, cache=TRUE}</span></span>
+<span id="cb8-60"><a href="#cb8-60"></a>models <span class="ot">&lt;-</span> <span class="fu">with</span>(smi, <span class="fu">glm</span>(drinkreg<span class="sc">~</span> wave <span class="sc">+</span> sex <span class="sc">+</span> wave<span class="sc">*</span>sex, <span class="at">family =</span> <span class="fu">binomial</span>()))</span>
+<span id="cb8-61"><a href="#cb8-61"></a><span class="fu">summary</span>(<span class="fu">pool</span>(models, <span class="at">rule =</span> <span class="st">"rubin1987"</span>), <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span>,]</span>
+<span id="cb8-62"><a href="#cb8-62"></a><span class="in">```</span></span>
+<span id="cb8-63"><a href="#cb8-63"></a></span>
+<span id="cb8-64"><a href="#cb8-64"></a>For effect modifier sex = 1 (just changing reference)</span>
+<span id="cb8-65"><a href="#cb8-65"></a></span>
+<span id="cb8-66"><a href="#cb8-66"></a><span class="in">```{r em1, cache=TRUE}</span></span>
+<span id="cb8-67"><a href="#cb8-67"></a>models2<span class="ot">&lt;-</span><span class="fu">with</span>(smi, <span class="fu">glm</span>(drinkreg<span class="sc">~</span> wave <span class="sc">+</span> <span class="fu">I</span>(sex<span class="sc">==</span><span class="dv">0</span>) <span class="sc">+</span> wave<span class="sc">*</span><span class="fu">I</span>(sex<span class="sc">==</span><span class="dv">0</span>),<span class="at">family=</span><span class="fu">binomial</span>()))</span>
+<span id="cb8-68"><a href="#cb8-68"></a><span class="fu">summary</span>(<span class="fu">pool</span>(models2, <span class="at">rule =</span> <span class="st">"rubin1987"</span>),<span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span>,]</span>
+<span id="cb8-69"><a href="#cb8-69"></a><span class="in">```</span></span>
+<span id="cb8-70"><a href="#cb8-70"></a></span>
+<span id="cb8-71"><a href="#cb8-71"></a><span class="ss">-   </span>Notice the ORs for <span class="in">`wave`</span> in the above 2 analyses. These are basically our target.</span>
+<span id="cb8-72"><a href="#cb8-72"></a><span class="ss">-   </span>For proper survey data analysis, you will have to work with design and make sure you subset your subpopulation (those eligible) appropriately.</span>
+<span id="cb8-73"><a href="#cb8-73"></a></span>
+<span id="cb8-74"><a href="#cb8-74"></a><span class="fu">### Simple slopes analyses</span></span>
+<span id="cb8-75"><a href="#cb8-75"></a></span>
+<span id="cb8-76"><a href="#cb8-76"></a>We perform a simple slopes analysis for each imputed dataset. This analysis helps in understanding the relationship between the predictor and the outcome at specific levels of the moderator.</span>
+<span id="cb8-77"><a href="#cb8-77"></a></span>
+<span id="cb8-78"><a href="#cb8-78"></a><span class="in">```{r em2, cache=TRUE}</span></span>
+<span id="cb8-79"><a href="#cb8-79"></a>a1 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">1</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb8-80"><a href="#cb8-80"></a>a2 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">2</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb8-81"><a href="#cb8-81"></a>a3 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">3</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb8-82"><a href="#cb8-82"></a>a4 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">4</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb8-83"><a href="#cb8-83"></a>a5 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">5</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>
+<span id="cb8-84"><a href="#cb8-84"></a><span class="in">```</span></span>
+<span id="cb8-85"><a href="#cb8-85"></a></span>
+<span id="cb8-86"><a href="#cb8-86"></a>After obtaining the results from each imputed dataset, we pool them to get a consolidated result. This is done separately for each level of the <span class="in">`sex`</span> variable.</span>
+<span id="cb8-87"><a href="#cb8-87"></a></span>
+<span id="cb8-88"><a href="#cb8-88"></a><span class="fu">### Pooled results for sex = 0</span></span>
+<span id="cb8-89"><a href="#cb8-89"></a></span>
+<span id="cb8-90"><a href="#cb8-90"></a><span class="in">```{r em3, cache=TRUE}</span></span>
+<span id="cb8-91"><a href="#cb8-91"></a><span class="co"># For sex = 0</span></span>
+<span id="cb8-92"><a href="#cb8-92"></a>ef.lev <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb8-93"><a href="#cb8-93"></a>est <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-94"><a href="#cb8-94"></a>         a2<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-95"><a href="#cb8-95"></a>         a3<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-96"><a href="#cb8-96"></a>         a4<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-97"><a href="#cb8-97"></a>         a5<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev])</span>
+<span id="cb8-98"><a href="#cb8-98"></a>se <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-99"><a href="#cb8-99"></a>        a2<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-100"><a href="#cb8-100"></a>        a3<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-101"><a href="#cb8-101"></a>        a4<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-102"><a href="#cb8-102"></a>        a5<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev])</span>
+<span id="cb8-103"><a href="#cb8-103"></a>vr <span class="ot">&lt;-</span> se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb8-104"><a href="#cb8-104"></a>OR <span class="ot">&lt;-</span> <span class="fu">exp</span>(est)</span>
+<span id="cb8-105"><a href="#cb8-105"></a>OR.se <span class="ot">&lt;-</span> OR <span class="sc">*</span> se</span>
+<span id="cb8-106"><a href="#cb8-106"></a>OR.v <span class="ot">&lt;-</span> OR.se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb8-107"><a href="#cb8-107"></a></span>
+<span id="cb8-108"><a href="#cb8-108"></a>mod_pooled <span class="ot">&lt;-</span> miceadds<span class="sc">::</span><span class="fu">pool_mi</span>(<span class="at">qhat=</span>OR, <span class="at">u=</span>OR.v)</span>
+<span id="cb8-109"><a href="#cb8-109"></a><span class="fu">tidy.pool_mi</span>(mod_pooled)</span>
+<span id="cb8-110"><a href="#cb8-110"></a><span class="fu">summary</span>(<span class="fu">MIcombine</span>(<span class="fu">as.list</span>(OR), <span class="fu">as.list</span>(OR.v)))</span>
+<span id="cb8-111"><a href="#cb8-111"></a><span class="in">```</span></span>
+<span id="cb8-112"><a href="#cb8-112"></a></span>
+<span id="cb8-113"><a href="#cb8-113"></a><span class="fu">### Pooled results for sex = 1</span></span>
+<span id="cb8-114"><a href="#cb8-114"></a></span>
+<span id="cb8-115"><a href="#cb8-115"></a><span class="in">```{r em4, cache=TRUE}</span></span>
+<span id="cb8-116"><a href="#cb8-116"></a><span class="co"># For sex = 1</span></span>
+<span id="cb8-117"><a href="#cb8-117"></a>ef.lev <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb8-118"><a href="#cb8-118"></a>est <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-119"><a href="#cb8-119"></a>         a2<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-120"><a href="#cb8-120"></a>         a3<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-121"><a href="#cb8-121"></a>         a4<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev],</span>
+<span id="cb8-122"><a href="#cb8-122"></a>         a5<span class="sc">$</span>slopes<span class="sc">$</span>Est.[ef.lev])</span>
+<span id="cb8-123"><a href="#cb8-123"></a>se <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-124"><a href="#cb8-124"></a>        a2<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-125"><a href="#cb8-125"></a>        a3<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-126"><a href="#cb8-126"></a>        a4<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev],</span>
+<span id="cb8-127"><a href="#cb8-127"></a>        a5<span class="sc">$</span>slopes<span class="sc">$</span>S.E.[ef.lev])</span>
+<span id="cb8-128"><a href="#cb8-128"></a>vr <span class="ot">&lt;-</span> se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb8-129"><a href="#cb8-129"></a>OR <span class="ot">&lt;-</span> <span class="fu">exp</span>(est)</span>
+<span id="cb8-130"><a href="#cb8-130"></a>OR.se <span class="ot">&lt;-</span> OR <span class="sc">*</span> se</span>
+<span id="cb8-131"><a href="#cb8-131"></a>OR.v <span class="ot">&lt;-</span> OR.se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb8-132"><a href="#cb8-132"></a></span>
+<span id="cb8-133"><a href="#cb8-133"></a>mod_pooled <span class="ot">&lt;-</span> miceadds<span class="sc">::</span><span class="fu">pool_mi</span>(<span class="at">qhat=</span>OR, <span class="at">u=</span>OR.v)</span>
+<span id="cb8-134"><a href="#cb8-134"></a><span class="fu">tidy.pool_mi</span>(mod_pooled)</span>
+<span id="cb8-135"><a href="#cb8-135"></a><span class="fu">summary</span>(<span class="fu">MIcombine</span>(<span class="fu">as.list</span>(OR), <span class="fu">as.list</span>(OR.v)))</span>
+<span id="cb8-136"><a href="#cb8-136"></a><span class="in">```</span></span>
+<span id="cb8-137"><a href="#cb8-137"></a></span>
+<span id="cb8-138"><a href="#cb8-138"></a></span>
+<span id="cb8-139"><a href="#cb8-139"></a><span class="in">```{r em5, include=FALSE, echo=FALSE, cache=TRUE}</span></span>
+<span id="cb8-140"><a href="#cb8-140"></a><span class="co"># (Optional) log-odds</span></span>
+<span id="cb8-141"><a href="#cb8-141"></a><span class="do">### Optional: Breakdown of results</span></span>
+<span id="cb8-142"><a href="#cb8-142"></a>mod_pooled <span class="ot">&lt;-</span> miceadds<span class="sc">::</span><span class="fu">pool_mi</span>(<span class="at">qhat=</span>est, <span class="at">u=</span>se)</span>
+<span id="cb8-143"><a href="#cb8-143"></a><span class="fu">tidy.pool_mi</span>(mod_pooled)</span>
+<span id="cb8-144"><a href="#cb8-144"></a><span class="fu">summary</span>(<span class="fu">pool</span>(models2, <span class="at">rule =</span> <span class="st">"rubin1987"</span>),<span class="at">conf.int =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span>,]</span>
+<span id="cb8-145"><a href="#cb8-145"></a><span class="fu">summary</span>(<span class="fu">MIcombine</span>(models2))[<span class="dv">2</span>,]</span>
+<span id="cb8-146"><a href="#cb8-146"></a><span class="co"># beta coef estimates</span></span>
+<span id="cb8-147"><a href="#cb8-147"></a>m.number <span class="ot">&lt;-</span> <span class="fu">length</span>(models)</span>
+<span id="cb8-148"><a href="#cb8-148"></a>estimate <span class="ot">&lt;-</span> <span class="fu">mean</span>(est)</span>
+<span id="cb8-149"><a href="#cb8-149"></a>estimate</span>
+<span id="cb8-150"><a href="#cb8-150"></a>ubar.var <span class="ot">&lt;-</span> <span class="fu">mean</span>(se<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb8-151"><a href="#cb8-151"></a>ubar.var</span>
+<span id="cb8-152"><a href="#cb8-152"></a>b.var <span class="ot">&lt;-</span> <span class="fu">var</span>(est)</span>
+<span id="cb8-153"><a href="#cb8-153"></a>b.var</span>
+<span id="cb8-154"><a href="#cb8-154"></a>t.var <span class="ot">&lt;-</span> ubar.var <span class="sc">+</span> b.var <span class="sc">+</span> b.var<span class="sc">/</span>m.number</span>
+<span id="cb8-155"><a href="#cb8-155"></a>t.var</span>
+<span id="cb8-156"><a href="#cb8-156"></a>riv <span class="ot">=</span> (b.var <span class="sc">+</span> b.var<span class="sc">/</span>m.number)<span class="sc">/</span>ubar.var</span>
+<span id="cb8-157"><a href="#cb8-157"></a>riv</span>
+<span id="cb8-158"><a href="#cb8-158"></a>lambda <span class="ot">=</span> (b.var <span class="sc">+</span> b.var<span class="sc">/</span>m.number)<span class="sc">/</span>t.var</span>
+<span id="cb8-159"><a href="#cb8-159"></a>lambda</span>
+<span id="cb8-160"><a href="#cb8-160"></a>dfcom <span class="ot">&lt;-</span> <span class="fu">nrow</span>(smi[[<span class="dv">1</span>]][[<span class="dv">1</span>]]) <span class="sc">-</span> <span class="dv">4</span></span>
+<span id="cb8-161"><a href="#cb8-161"></a>dfcom</span>
+<span id="cb8-162"><a href="#cb8-162"></a>df.large.sample <span class="ot">&lt;-</span> (m.number <span class="sc">-</span> <span class="dv">1</span>)<span class="sc">/</span>lambda<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb8-163"><a href="#cb8-163"></a>df.large.sample</span>
+<span id="cb8-164"><a href="#cb8-164"></a>df.obs <span class="ot">&lt;-</span> (dfcom <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">/</span>(dfcom <span class="sc">+</span> <span class="dv">3</span>) <span class="sc">*</span> dfcom <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> lambda)</span>
+<span id="cb8-165"><a href="#cb8-165"></a>df.c <span class="ot">&lt;-</span> df.large.sample <span class="sc">*</span> df.obs<span class="sc">/</span>(df.large.sample <span class="sc">+</span> df.obs)</span>
+<span id="cb8-166"><a href="#cb8-166"></a>df.c</span>
+<span id="cb8-167"><a href="#cb8-167"></a>fmi <span class="ot">=</span> (riv <span class="sc">+</span> <span class="dv">2</span><span class="sc">/</span>(df.c <span class="sc">+</span><span class="dv">3</span>)) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> riv)</span>
+<span id="cb8-168"><a href="#cb8-168"></a>fmi</span>
+<span id="cb8-169"><a href="#cb8-169"></a><span class="co"># p-values (correction needed)</span></span>
+<span id="cb8-170"><a href="#cb8-170"></a><span class="co"># https://stats.stackexchange.com/questions/69130/how-to-get-pooled-p-values-on-tests-done-in-multiple-imputed-datasets</span></span>
+<span id="cb8-171"><a href="#cb8-171"></a><span class="co"># Licht and Rubin for one-sided tests</span></span>
+<span id="cb8-172"><a href="#cb8-172"></a>pv <span class="ot">&lt;-</span> <span class="fu">c</span>(a1<span class="sc">$</span>slopes<span class="sc">$</span>p[<span class="dv">1</span>],a2<span class="sc">$</span>slopes<span class="sc">$</span>p[<span class="dv">1</span>],a3<span class="sc">$</span>slopes<span class="sc">$</span>p[<span class="dv">1</span>],a4<span class="sc">$</span>slopes<span class="sc">$</span>p[<span class="dv">1</span>],a5<span class="sc">$</span>slopes<span class="sc">$</span>p[<span class="dv">1</span>])</span>
+<span id="cb8-173"><a href="#cb8-173"></a>z <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(pv)  </span>
+<span id="cb8-174"><a href="#cb8-174"></a>num <span class="ot">&lt;-</span> <span class="fu">mean</span>(z)</span>
+<span id="cb8-175"><a href="#cb8-175"></a>den <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">var</span>(z))</span>
+<span id="cb8-176"><a href="#cb8-176"></a><span class="fu">pnorm</span>( num <span class="sc">/</span> den)</span>
+<span id="cb8-177"><a href="#cb8-177"></a><span class="fu">median</span>(pv) <span class="co"># Eekhout et al (2017) </span></span>
+<span id="cb8-178"><a href="#cb8-178"></a><span class="in">```</span></span>
+<span id="cb8-179"><a href="#cb8-179"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

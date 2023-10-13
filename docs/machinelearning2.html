@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - Data spliting</title>
 <style>
@@ -424,7 +424,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -716,7 +716,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Data spliting</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Data spliting</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -739,13 +739,13 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This tutorial is very similar to one of the <a href="redictivefactors5.html">previous tutorials</a>, but uses a different data (we used <a href="researchquestion1.html">RHC data</a> here). We are revisiting concepts related to <a href="predictivefactors.html">prediction</a> before introducing ideas related to machine learning.</p>
+<p>This tutorial is very similar to one of the <a href="predictivefactors5.html">previous tutorials</a>, but uses a different data (we used <a href="researchquestion1.html">RHC data</a> here). We are revisiting concepts related to <a href="predictivefactors.html">prediction</a> before introducing ideas related to machine learning.</p>
 </div>
 </div>
 <section id="load-dataset" class="level3"><h3 class="anchored" data-anchor-id="load-dataset">Load dataset</h3>
 <div class="cell" data-hash="machinelearning2_cache/html/data_4029984ad62665f1e1220819643211d4">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ObsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Data/machinelearning/rhcAnalytic.RDS"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">ObsData</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/rhcAnalytic.RDS"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">head</span>(ObsData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -757,100 +757,100 @@ Important
 </div>
 <p>See <span class="citation" data-cites="datasplit datasplit2">(<a href="#ref-datasplit" role="doc-biblioref">KDnuggets 2023</a>; <a href="#ref-datasplit2" role="doc-biblioref">Kuhn 2023</a>)</span></p>
 <div class="cell" data-hash="machinelearning2_cache/html/split1_10aff6bd56992ba0c8252af91540d140">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Using a seed to randomize in a reproducible way </span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span></span>
-<span><span class="va">split</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html">createDataPartition</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ObsData</span><span class="op">$</span><span class="va">Length.of.Stay</span>, </span>
-<span>                           p <span class="op">=</span> <span class="fl">0.7</span>, list <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">split</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  int [1:4017, 1] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
-<span><span class="co">#&gt;  - attr(*, "dimnames")=List of 2</span></span>
-<span><span class="co">#&gt;   ..$ : NULL</span></span>
-<span><span class="co">#&gt;   ..$ : chr "Resample1"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">split</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 4017    1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">ObsData</span><span class="op">)</span><span class="op">*</span><span class="fl">.7</span> <span class="co"># approximate train data</span></span>
-<span><span class="co">#&gt; [1] 4014.5   36.4</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">ObsData</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="fl">.7</span><span class="op">)</span> <span class="co"># approximate train data</span></span>
-<span><span class="co">#&gt; [1] 1720.5   15.6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Using a seed to randomize in a reproducible way </span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">require</span>(caret)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>split<span class="ot">&lt;-</span><span class="fu">createDataPartition</span>(<span class="at">y =</span> ObsData<span class="sc">$</span>Length.of.Stay, </span>
+<span id="cb2-5"><a href="#cb2-5"></a>                           <span class="at">p =</span> <span class="fl">0.7</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="fu">str</span>(split)</span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt;  int [1:4017, 1] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt;  - attr(*, "dimnames")=List of 2</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt;   ..$ : NULL</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;   ..$ : chr "Resample1"</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="fu">dim</span>(split)</span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; [1] 4017    1</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="fu">dim</span>(ObsData)<span class="sc">*</span>.<span class="dv">7</span> <span class="co"># approximate train data</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; [1] 4014.5   36.4</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="fu">dim</span>(ObsData)<span class="sc">*</span>(<span class="dv">1</span><span class="fl">-.7</span>) <span class="co"># approximate train data</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; [1] 1720.5   15.6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="split-the-data" class="level3"><h3 class="anchored" data-anchor-id="split-the-data">Split the data</h3>
 <div class="cell" data-hash="machinelearning2_cache/html/split2_0f2996e0b23ad085a00e942fcd291552">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># create train data</span></span>
-<span><span class="va">train.data</span><span class="op">&lt;-</span><span class="va">ObsData</span><span class="op">[</span><span class="va">split</span>,<span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">train.data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 4017   52</span></span>
-<span><span class="co"># create test data</span></span>
-<span><span class="va">test.data</span><span class="op">&lt;-</span><span class="va">ObsData</span><span class="op">[</span><span class="op">-</span><span class="va">split</span>,<span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">test.data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1718   52</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># create train data</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>train.data<span class="ot">&lt;-</span>ObsData[split,]</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="fu">dim</span>(train.data)</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; [1] 4017   52</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co"># create test data</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>test.data<span class="ot">&lt;-</span>ObsData[<span class="sc">-</span>split,]</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="fu">dim</span>(test.data)</span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; [1] 1718   52</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="train-the-model" class="level3"><h3 class="anchored" data-anchor-id="train-the-model">Train the model</h3>
 <div class="cell" data-hash="machinelearning2_cache/html/train_17448c7211e2cf4fb3309f3b073cde75">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">out.formula1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Data/machinelearning/form1.RDS"</span><span class="op">)</span></span>
-<span><span class="va">out.formula1</span></span>
-<span><span class="co">#&gt; Length.of.Stay ~ Disease.category + Cancer + Cardiovascular + </span></span>
-<span><span class="co">#&gt;     Congestive.HF + Dementia + Psychiatric + Pulmonary + Renal + </span></span>
-<span><span class="co">#&gt;     Hepatic + GI.Bleed + Tumor + Immunosupperssion + Transfer.hx + </span></span>
-<span><span class="co">#&gt;     MI + age + sex + edu + DASIndex + APACHE.score + Glasgow.Coma.Score + </span></span>
-<span><span class="co">#&gt;     blood.pressure + WBC + Heart.rate + Respiratory.rate + Temperature + </span></span>
-<span><span class="co">#&gt;     PaO2vs.FIO2 + Albumin + Hematocrit + Bilirubin + Creatinine + </span></span>
-<span><span class="co">#&gt;     Sodium + Potassium + PaCo2 + PH + Weight + DNR.status + Medical.insurance + </span></span>
-<span><span class="co">#&gt;     Respiratory.Diag + Cardiovascular.Diag + Neurological.Diag + </span></span>
-<span><span class="co">#&gt;     Gastrointestinal.Diag + Renal.Diag + Metabolic.Diag + Hematologic.Diag + </span></span>
-<span><span class="co">#&gt;     Sepsis.Diag + Trauma.Diag + Orthopedic.Diag + race + income + </span></span>
-<span><span class="co">#&gt;     RHC.use</span></span>
-<span><span class="va">fit.train1</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">out.formula1</span>, data <span class="op">=</span> <span class="va">train.data</span><span class="op">)</span></span>
-<span><span class="co"># summary(fit.train1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>out.formula1 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/form1.RDS"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>out.formula1</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; Length.of.Stay ~ Disease.category + Cancer + Cardiovascular + </span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt;     Congestive.HF + Dementia + Psychiatric + Pulmonary + Renal + </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt;     Hepatic + GI.Bleed + Tumor + Immunosupperssion + Transfer.hx + </span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt;     MI + age + sex + edu + DASIndex + APACHE.score + Glasgow.Coma.Score + </span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt;     blood.pressure + WBC + Heart.rate + Respiratory.rate + Temperature + </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt;     PaO2vs.FIO2 + Albumin + Hematocrit + Bilirubin + Creatinine + </span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt;     Sodium + Potassium + PaCo2 + PH + Weight + DNR.status + Medical.insurance + </span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt;     Respiratory.Diag + Cardiovascular.Diag + Neurological.Diag + </span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;     Gastrointestinal.Diag + Renal.Diag + Metabolic.Diag + Hematologic.Diag + </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt;     Sepsis.Diag + Trauma.Diag + Orthopedic.Diag + race + income + </span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt;     RHC.use</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>fit.train1<span class="ot">&lt;-</span><span class="fu">lm</span>(out.formula1, <span class="at">data =</span> train.data)</span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co"># summary(fit.train1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="function-that-gives-performance-measures" class="level3"><h3 class="anchored" data-anchor-id="function-that-gives-performance-measures">Function that gives performance measures</h3>
 <div class="cell" data-hash="machinelearning2_cache/html/func_2a267721fbba4cde5952e25261362da4">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">perform</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">new.data</span>,</span>
-<span>                    <span class="va">model.fit</span>,<span class="va">model.formula</span><span class="op">=</span><span class="cn">NULL</span>, </span>
-<span>                    <span class="va">y.name</span> <span class="op">=</span> <span class="st">"Y"</span>,</span>
-<span>                    <span class="va">digits</span><span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="co"># data dimension</span></span>
-<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="va">model.fit</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="co"># predicted value</span></span>
-<span>  <span class="va">pred.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">model.fit</span>, <span class="va">new.data</span><span class="op">)</span></span>
-<span>  <span class="co"># sample size</span></span>
-<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">pred.y</span><span class="op">)</span></span>
-<span>  <span class="co"># outcome</span></span>
-<span>  <span class="va">new.data.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">new.data</span><span class="op">[</span>,<span class="va">y.name</span><span class="op">]</span><span class="op">)</span></span>
-<span>  <span class="co"># R2</span></span>
-<span>  <span class="va">R2</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">R2</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">new.data.y</span><span class="op">)</span></span>
-<span>  <span class="co"># adj R2 using alternate formula</span></span>
-<span>  <span class="va">df.residual</span> <span class="op">&lt;-</span> <span class="va">n</span><span class="op">-</span><span class="va">p</span></span>
-<span>  <span class="va">adjR2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">R2</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">df.residual</span><span class="op">)</span></span>
-<span>  <span class="co"># RMSE</span></span>
-<span>  <span class="va">RMSE</span> <span class="op">&lt;-</span>  <span class="fu">caret</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">RMSE</a></span><span class="op">(</span><span class="va">pred.y</span>, <span class="va">new.data.y</span><span class="op">)</span></span>
-<span>  <span class="co"># combine all of the results</span></span>
-<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">n</span>,<span class="va">p</span>,<span class="va">R2</span>,<span class="va">adjR2</span>,<span class="va">RMSE</span><span class="op">)</span>,<span class="va">digits</span><span class="op">)</span></span>
-<span>  <span class="co"># returning object</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>perform <span class="ot">&lt;-</span> <span class="cf">function</span>(new.data,</span>
+<span id="cb5-2"><a href="#cb5-2"></a>                    model.fit,<span class="at">model.formula=</span><span class="cn">NULL</span>, </span>
+<span id="cb5-3"><a href="#cb5-3"></a>                    <span class="at">y.name =</span> <span class="st">"Y"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4"></a>                    <span class="at">digits=</span><span class="dv">3</span>){</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="co"># data dimension</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>  p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(model.fit))[<span class="dv">2</span>]</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  <span class="co"># predicted value</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>  pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(model.fit, new.data)</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  <span class="co"># sample size</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(pred.y)</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  <span class="co"># outcome</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a>  new.data.y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(new.data[,y.name])</span>
+<span id="cb5-13"><a href="#cb5-13"></a>  <span class="co"># R2</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a>  R2 <span class="ot">&lt;-</span> caret<span class="sc">:::</span><span class="fu">R2</span>(pred.y, new.data.y)</span>
+<span id="cb5-15"><a href="#cb5-15"></a>  <span class="co"># adj R2 using alternate formula</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a>  df.residual <span class="ot">&lt;-</span> n<span class="sc">-</span>p</span>
+<span id="cb5-17"><a href="#cb5-17"></a>  adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R2)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>df.residual)</span>
+<span id="cb5-18"><a href="#cb5-18"></a>  <span class="co"># RMSE</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a>  RMSE <span class="ot">&lt;-</span>  caret<span class="sc">:::</span><span class="fu">RMSE</span>(pred.y, new.data.y)</span>
+<span id="cb5-20"><a href="#cb5-20"></a>  <span class="co"># combine all of the results</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a>  res <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">cbind</span>(n,p,R2,adjR2,RMSE),digits)</span>
+<span id="cb5-22"><a href="#cb5-22"></a>  <span class="co"># returning object</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb5-24"><a href="#cb5-24"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="extract-performance-measures" class="level3"><h3 class="anchored" data-anchor-id="extract-performance-measures">Extract performance measures</h3>
 <div class="cell" data-hash="machinelearning2_cache/html/perf_f679ac896a936d6b6fca03822a254e89">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">perform</span><span class="op">(</span>new.data<span class="op">=</span><span class="va">train.data</span>,</span>
-<span>        y.name <span class="op">=</span> <span class="st">"Length.of.Stay"</span>,</span>
-<span>        model.fit<span class="op">=</span><span class="va">fit.train1</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
-<span><span class="co">#&gt; [1,] 4017 64 0.081 0.067 24.647</span></span>
-<span><span class="fu">perform</span><span class="op">(</span>new.data<span class="op">=</span><span class="va">test.data</span>,</span>
-<span>        y.name <span class="op">=</span> <span class="st">"Length.of.Stay"</span>,</span>
-<span>        model.fit<span class="op">=</span><span class="va">fit.train1</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
-<span><span class="co">#&gt; [1,] 1718 64 0.056  0.02 25.488</span></span>
-<span><span class="fu">perform</span><span class="op">(</span>new.data<span class="op">=</span><span class="va">ObsData</span>,</span>
-<span>        y.name <span class="op">=</span> <span class="st">"Length.of.Stay"</span>,</span>
-<span>        model.fit<span class="op">=</span><span class="va">fit.train1</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
-<span><span class="co">#&gt; [1,] 5735 64 0.073 0.063 24.902</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">perform</span>(<span class="at">new.data=</span>train.data,</span>
+<span id="cb6-2"><a href="#cb6-2"></a>        <span class="at">y.name =</span> <span class="st">"Length.of.Stay"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3"></a>        <span class="at">model.fit=</span>fit.train1)</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; [1,] 4017 64 0.081 0.067 24.647</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="fu">perform</span>(<span class="at">new.data=</span>test.data,</span>
+<span id="cb6-7"><a href="#cb6-7"></a>        <span class="at">y.name =</span> <span class="st">"Length.of.Stay"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8"></a>        <span class="at">model.fit=</span>fit.train1)</span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; [1,] 1718 64 0.056  0.02 25.488</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="fu">perform</span>(<span class="at">new.data=</span>ObsData,</span>
+<span id="cb6-12"><a href="#cb6-12"></a>        <span class="at">y.name =</span> <span class="st">"Length.of.Stay"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13"></a>        <span class="at">model.fit=</span>fit.train1)</span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;         n  p    R2 adjR2   RMSE</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; [1,] 5735 64 0.073 0.063 24.902</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
@@ -873,6 +873,8 @@ Tip
 </div>
 </section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
 
+
+<!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-datasplit" class="csl-entry" role="doc-biblioentry">
@@ -1075,7 +1077,117 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Cross-validation</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb7" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">## Data spliting {.unnumbered}</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>::: callout-important</span>
+<span id="cb7-4"><a href="#cb7-4"></a>This tutorial is very similar to one of the <span class="co">[</span><span class="ot">previous tutorials</span><span class="co">](predictivefactors5.html)</span>, but uses a different data (we used <span class="co">[</span><span class="ot">RHC data</span><span class="co">](researchquestion1.html)</span> here). We are revisiting concepts related to <span class="co">[</span><span class="ot">prediction</span><span class="co">](predictivefactors.html)</span> before introducing ideas related to machine learning. </span>
+<span id="cb7-5"><a href="#cb7-5"></a>:::</span>
+<span id="cb7-6"><a href="#cb7-6"></a></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co"># Load required packages</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="fu">require</span>(caret)</span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="fu">require</span>(DataExplorer)</span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="in">```</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="fu">### Load dataset</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="in">```{r data, cache=TRUE}</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/rhcAnalytic.RDS"</span>)</span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="fu">head</span>(ObsData)</span>
+<span id="cb7-18"><a href="#cb7-18"></a><span class="in">```</span></span>
+<span id="cb7-19"><a href="#cb7-19"></a></span>
+<span id="cb7-20"><a href="#cb7-20"></a>See <span class="co">[</span><span class="ot">@datasplit; @datasplit2</span><span class="co">]</span></span>
+<span id="cb7-21"><a href="#cb7-21"></a></span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="in">```{r split1, cache=TRUE}</span></span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="co"># Using a seed to randomize in a reproducible way </span></span>
+<span id="cb7-24"><a href="#cb7-24"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb7-25"><a href="#cb7-25"></a><span class="fu">require</span>(caret)</span>
+<span id="cb7-26"><a href="#cb7-26"></a>split<span class="ot">&lt;-</span><span class="fu">createDataPartition</span>(<span class="at">y =</span> ObsData<span class="sc">$</span>Length.of.Stay, </span>
+<span id="cb7-27"><a href="#cb7-27"></a>                           <span class="at">p =</span> <span class="fl">0.7</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-28"><a href="#cb7-28"></a><span class="fu">str</span>(split)</span>
+<span id="cb7-29"><a href="#cb7-29"></a><span class="fu">dim</span>(split)</span>
+<span id="cb7-30"><a href="#cb7-30"></a><span class="fu">dim</span>(ObsData)<span class="sc">*</span>.<span class="dv">7</span> <span class="co"># approximate train data</span></span>
+<span id="cb7-31"><a href="#cb7-31"></a><span class="fu">dim</span>(ObsData)<span class="sc">*</span>(<span class="dv">1</span><span class="fl">-.7</span>) <span class="co"># approximate train data</span></span>
+<span id="cb7-32"><a href="#cb7-32"></a><span class="in">```</span></span>
+<span id="cb7-33"><a href="#cb7-33"></a></span>
+<span id="cb7-34"><a href="#cb7-34"></a><span class="fu">### Split the data</span></span>
+<span id="cb7-35"><a href="#cb7-35"></a></span>
+<span id="cb7-36"><a href="#cb7-36"></a><span class="in">```{r split2, cache=TRUE}</span></span>
+<span id="cb7-37"><a href="#cb7-37"></a><span class="co"># create train data</span></span>
+<span id="cb7-38"><a href="#cb7-38"></a>train.data<span class="ot">&lt;-</span>ObsData[split,]</span>
+<span id="cb7-39"><a href="#cb7-39"></a><span class="fu">dim</span>(train.data)</span>
+<span id="cb7-40"><a href="#cb7-40"></a><span class="co"># create test data</span></span>
+<span id="cb7-41"><a href="#cb7-41"></a>test.data<span class="ot">&lt;-</span>ObsData[<span class="sc">-</span>split,]</span>
+<span id="cb7-42"><a href="#cb7-42"></a><span class="fu">dim</span>(test.data)</span>
+<span id="cb7-43"><a href="#cb7-43"></a><span class="in">```</span></span>
+<span id="cb7-44"><a href="#cb7-44"></a></span>
+<span id="cb7-45"><a href="#cb7-45"></a><span class="fu">### Train the model</span></span>
+<span id="cb7-46"><a href="#cb7-46"></a></span>
+<span id="cb7-47"><a href="#cb7-47"></a><span class="in">```{r train, cache=TRUE}</span></span>
+<span id="cb7-48"><a href="#cb7-48"></a>out.formula1 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/form1.RDS"</span>)</span>
+<span id="cb7-49"><a href="#cb7-49"></a>out.formula1</span>
+<span id="cb7-50"><a href="#cb7-50"></a>fit.train1<span class="ot">&lt;-</span><span class="fu">lm</span>(out.formula1, <span class="at">data =</span> train.data)</span>
+<span id="cb7-51"><a href="#cb7-51"></a><span class="co"># summary(fit.train1)</span></span>
+<span id="cb7-52"><a href="#cb7-52"></a><span class="in">```</span></span>
+<span id="cb7-53"><a href="#cb7-53"></a></span>
+<span id="cb7-54"><a href="#cb7-54"></a><span class="fu">### Function that gives performance measures</span></span>
+<span id="cb7-55"><a href="#cb7-55"></a></span>
+<span id="cb7-56"><a href="#cb7-56"></a><span class="in">```{r func, cache=TRUE}</span></span>
+<span id="cb7-57"><a href="#cb7-57"></a>perform <span class="ot">&lt;-</span> <span class="cf">function</span>(new.data,</span>
+<span id="cb7-58"><a href="#cb7-58"></a>                    model.fit,<span class="at">model.formula=</span><span class="cn">NULL</span>, </span>
+<span id="cb7-59"><a href="#cb7-59"></a>                    <span class="at">y.name =</span> <span class="st">"Y"</span>,</span>
+<span id="cb7-60"><a href="#cb7-60"></a>                    <span class="at">digits=</span><span class="dv">3</span>){</span>
+<span id="cb7-61"><a href="#cb7-61"></a>  <span class="co"># data dimension</span></span>
+<span id="cb7-62"><a href="#cb7-62"></a>  p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(model.fit))[<span class="dv">2</span>]</span>
+<span id="cb7-63"><a href="#cb7-63"></a>  <span class="co"># predicted value</span></span>
+<span id="cb7-64"><a href="#cb7-64"></a>  pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(model.fit, new.data)</span>
+<span id="cb7-65"><a href="#cb7-65"></a>  <span class="co"># sample size</span></span>
+<span id="cb7-66"><a href="#cb7-66"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(pred.y)</span>
+<span id="cb7-67"><a href="#cb7-67"></a>  <span class="co"># outcome</span></span>
+<span id="cb7-68"><a href="#cb7-68"></a>  new.data.y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(new.data[,y.name])</span>
+<span id="cb7-69"><a href="#cb7-69"></a>  <span class="co"># R2</span></span>
+<span id="cb7-70"><a href="#cb7-70"></a>  R2 <span class="ot">&lt;-</span> caret<span class="sc">:::</span><span class="fu">R2</span>(pred.y, new.data.y)</span>
+<span id="cb7-71"><a href="#cb7-71"></a>  <span class="co"># adj R2 using alternate formula</span></span>
+<span id="cb7-72"><a href="#cb7-72"></a>  df.residual <span class="ot">&lt;-</span> n<span class="sc">-</span>p</span>
+<span id="cb7-73"><a href="#cb7-73"></a>  adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R2)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>df.residual)</span>
+<span id="cb7-74"><a href="#cb7-74"></a>  <span class="co"># RMSE</span></span>
+<span id="cb7-75"><a href="#cb7-75"></a>  RMSE <span class="ot">&lt;-</span>  caret<span class="sc">:::</span><span class="fu">RMSE</span>(pred.y, new.data.y)</span>
+<span id="cb7-76"><a href="#cb7-76"></a>  <span class="co"># combine all of the results</span></span>
+<span id="cb7-77"><a href="#cb7-77"></a>  res <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">cbind</span>(n,p,R2,adjR2,RMSE),digits)</span>
+<span id="cb7-78"><a href="#cb7-78"></a>  <span class="co"># returning object</span></span>
+<span id="cb7-79"><a href="#cb7-79"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb7-80"><a href="#cb7-80"></a>}</span>
+<span id="cb7-81"><a href="#cb7-81"></a><span class="in">```</span></span>
+<span id="cb7-82"><a href="#cb7-82"></a></span>
+<span id="cb7-83"><a href="#cb7-83"></a><span class="fu">### Extract performance measures</span></span>
+<span id="cb7-84"><a href="#cb7-84"></a></span>
+<span id="cb7-85"><a href="#cb7-85"></a><span class="in">```{r perf, cache=TRUE}</span></span>
+<span id="cb7-86"><a href="#cb7-86"></a><span class="fu">perform</span>(<span class="at">new.data=</span>train.data,</span>
+<span id="cb7-87"><a href="#cb7-87"></a>        <span class="at">y.name =</span> <span class="st">"Length.of.Stay"</span>,</span>
+<span id="cb7-88"><a href="#cb7-88"></a>        <span class="at">model.fit=</span>fit.train1)</span>
+<span id="cb7-89"><a href="#cb7-89"></a><span class="fu">perform</span>(<span class="at">new.data=</span>test.data,</span>
+<span id="cb7-90"><a href="#cb7-90"></a>        <span class="at">y.name =</span> <span class="st">"Length.of.Stay"</span>,</span>
+<span id="cb7-91"><a href="#cb7-91"></a>        <span class="at">model.fit=</span>fit.train1)</span>
+<span id="cb7-92"><a href="#cb7-92"></a><span class="fu">perform</span>(<span class="at">new.data=</span>ObsData,</span>
+<span id="cb7-93"><a href="#cb7-93"></a>        <span class="at">y.name =</span> <span class="st">"Length.of.Stay"</span>,</span>
+<span id="cb7-94"><a href="#cb7-94"></a>        <span class="at">model.fit=</span>fit.train1)</span>
+<span id="cb7-95"><a href="#cb7-95"></a><span class="in">```</span></span>
+<span id="cb7-96"><a href="#cb7-96"></a></span>
+<span id="cb7-97"><a href="#cb7-97"></a><span class="fu">### Video content (optional)</span></span>
+<span id="cb7-98"><a href="#cb7-98"></a></span>
+<span id="cb7-99"><a href="#cb7-99"></a>::: callout-tip</span>
+<span id="cb7-100"><a href="#cb7-100"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
+<span id="cb7-101"><a href="#cb7-101"></a>:::</span>
+<span id="cb7-102"><a href="#cb7-102"></a></span>
+<span id="cb7-103"><a href="#cb7-103"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
+<span id="cb7-104"><a href="#cb7-104"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/PdrjcM_dTlw"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
+<span id="cb7-105"><a href="#cb7-105"></a></span>
+<span id="cb7-106"><a href="#cb7-106"></a><span class="kw">&lt;/iframe&gt;</span></span>
+<span id="cb7-107"><a href="#cb7-107"></a>:::</span>
+<span id="cb7-108"><a href="#cb7-108"></a></span>
+<span id="cb7-109"><a href="#cb7-109"></a><span class="fu">### References</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

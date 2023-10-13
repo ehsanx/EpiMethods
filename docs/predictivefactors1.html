@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>OER: Advanced Epidemiological Methods - Collinear predictors</title>
 <style>
@@ -405,7 +405,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-vaildation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -695,7 +695,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Collinear predictors</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Collinear predictors</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -710,352 +710,352 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 </header><p>In this tutorial, we’ll continue with the data analysis. We’ll focus on an analysis of an NHANES data. This data contains over 1200 observations and 33 variables. These variables come in various types: numeric, categorical, and binary. Our primary goal is to fit a linear regression model to predict cholesterol levels.</p>
 <div class="cell" data-hash="predictivefactors1_cache/html/setup_1e24782f1267b31ee9e8b54edd0b3c9b">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Load required packages</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://hbiostat.org/R/rms/">rms</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://hbiostat.org/R/Hmisc/">Hmisc</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(rms)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(Hmisc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>Let us load the dataset and see structure of the variables:</p>
 <div class="cell" data-hash="predictivefactors1_cache/html/load_bea8db69b0174b7b329c4ee3c60ab97f">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15.RData"</span><span class="op">)</span></span>
-<span><span class="co">#head(analytic)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">analytic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 'data.frame':    1267 obs. of  33 variables:</span></span>
-<span><span class="co">#&gt;  $ ID                   : num  83732 83733 83741 83747 83750 ...</span></span>
-<span><span class="co">#&gt;  $ gender               : chr  "Male" "Male" "Male" "Male" ...</span></span>
-<span><span class="co">#&gt;  $ age                  : num  62 53 22 46 45 30 60 69 24 70 ...</span></span>
-<span><span class="co">#&gt;  $ born                 : chr  "Born in 50 US states or Washingt" "Others" "Born in 50 US states or Washingt" "Others" ...</span></span>
-<span><span class="co">#&gt;  $ race                 : chr  "White" "White" "Black" "White" ...</span></span>
-<span><span class="co">#&gt;  $ education            : chr  "College" "High.School" "College" "College" ...</span></span>
-<span><span class="co">#&gt;  $ married              : chr  "Married" "Previously.married" "Never.married" "Married" ...</span></span>
-<span><span class="co">#&gt;  $ income               : chr  "Between.55kto99k" "&lt;25k" "Between.25kto54k" "&lt;25k" ...</span></span>
-<span><span class="co">#&gt;  $ weight               : num  135630 25282 39353 35674 97002 ...</span></span>
-<span><span class="co">#&gt;  $ psu                  : num  1 1 2 1 1 1 1 2 1 2 ...</span></span>
-<span><span class="co">#&gt;  $ strata               : num  125 125 128 121 125 124 128 120 130 132 ...</span></span>
-<span><span class="co">#&gt;  $ diastolicBP          : num  70 88 70 94 70 50 74 70 72 54 ...</span></span>
-<span><span class="co">#&gt;  $ systolicBP           : num  128 146 110 144 116 104 142 146 126 144 ...</span></span>
-<span><span class="co">#&gt;  $ bodyweight           : num  94.8 90.4 76.6 86.2 76.2 71.2 75.6 84 89.2 81.7 ...</span></span>
-<span><span class="co">#&gt;  $ bodyheight           : num  184 171 165 177 178 ...</span></span>
-<span><span class="co">#&gt;  $ bmi                  : num  27.8 30.8 28 27.6 24.1 26.6 35.9 31 26.9 27 ...</span></span>
-<span><span class="co">#&gt;  $ waist                : num  101.1 107.9 86.6 104.3 90.1 ...</span></span>
-<span><span class="co">#&gt;  $ smoke                : chr  "Not.at.all" "Every.day" "Some.days" "Every.day" ...</span></span>
-<span><span class="co">#&gt;  $ alcohol              : num  1 6 8 1 3 2 1 1 2 2 ...</span></span>
-<span><span class="co">#&gt;  $ cholesterol          : num  173 265 164 242 181 184 205 287 126 192 ...</span></span>
-<span><span class="co">#&gt;  $ cholesterolM2        : num  4.47 6.85 4.24 6.26 4.68 4.76 5.3 7.42 3.26 4.97 ...</span></span>
-<span><span class="co">#&gt;  $ triglycerides        : num  158 170 77 497 63 62 169 245 95 64 ...</span></span>
-<span><span class="co">#&gt;  $ uric.acid            : num  4.2 7 6 6.5 5.4 5.5 5.1 4.3 7.6 7.1 ...</span></span>
-<span><span class="co">#&gt;  $ protein              : num  7.5 7.4 7.4 6.8 7.4 6.7 7.4 6.8 7.3 7.2 ...</span></span>
-<span><span class="co">#&gt;  $ bilirubin            : num  0.5 0.6 0.2 0.5 0.7 0.8 0.4 0.6 1.2 1.2 ...</span></span>
-<span><span class="co">#&gt;  $ phosphorus           : num  4.7 4.4 5.3 3.6 3.9 3.4 3.9 4.4 3.2 3 ...</span></span>
-<span><span class="co">#&gt;  $ sodium               : num  136 140 139 138 138 136 139 140 140 139 ...</span></span>
-<span><span class="co">#&gt;  $ potassium            : num  4.3 4.55 4.16 4.27 3.91 3.97 3.99 4.25 3.8 4.63 ...</span></span>
-<span><span class="co">#&gt;  $ globulin             : num  2.9 2.9 3 2.6 2.8 2.5 3.2 2.3 2.7 2.6 ...</span></span>
-<span><span class="co">#&gt;  $ calcium              : num  9.8 9.8 9.3 9.3 9.3 9.4 9.6 9.6 9.6 9.6 ...</span></span>
-<span><span class="co">#&gt;  $ physical.work        : chr  "No" "No" "No" "No" ...</span></span>
-<span><span class="co">#&gt;  $ physical.recreational: chr  "No" "No" "Yes" "No" ...</span></span>
-<span><span class="co">#&gt;  $ diabetes             : chr  "Yes" "No" "No" "No" ...</span></span>
-<span><span class="co">#&gt;  - attr(*, "na.action")= 'omit' Named int [1:3739] 3 4 5 6 8 9 13 14 15 16 ...</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:3739] "3" "4" "5" "6" ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15.RData"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#head(analytic)</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">str</span>(analytic)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 'data.frame':    1267 obs. of  33 variables:</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt;  $ ID                   : num  83732 83733 83741 83747 83750 ...</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;  $ gender               : chr  "Male" "Male" "Male" "Male" ...</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt;  $ age                  : num  62 53 22 46 45 30 60 69 24 70 ...</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt;  $ born                 : chr  "Born in 50 US states or Washingt" "Others" "Born in 50 US states or Washingt" "Others" ...</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt;  $ race                 : chr  "White" "White" "Black" "White" ...</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;  $ education            : chr  "College" "High.School" "College" "College" ...</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt;  $ married              : chr  "Married" "Previously.married" "Never.married" "Married" ...</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt;  $ income               : chr  "Between.55kto99k" "&lt;25k" "Between.25kto54k" "&lt;25k" ...</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt;  $ weight               : num  135630 25282 39353 35674 97002 ...</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt;  $ psu                  : num  1 1 2 1 1 1 1 2 1 2 ...</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt;  $ strata               : num  125 125 128 121 125 124 128 120 130 132 ...</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt;  $ diastolicBP          : num  70 88 70 94 70 50 74 70 72 54 ...</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt;  $ systolicBP           : num  128 146 110 144 116 104 142 146 126 144 ...</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt;  $ bodyweight           : num  94.8 90.4 76.6 86.2 76.2 71.2 75.6 84 89.2 81.7 ...</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt;  $ bodyheight           : num  184 171 165 177 178 ...</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt;  $ bmi                  : num  27.8 30.8 28 27.6 24.1 26.6 35.9 31 26.9 27 ...</span></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt;  $ waist                : num  101.1 107.9 86.6 104.3 90.1 ...</span></span>
+<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt;  $ smoke                : chr  "Not.at.all" "Every.day" "Some.days" "Every.day" ...</span></span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt;  $ alcohol              : num  1 6 8 1 3 2 1 1 2 2 ...</span></span>
+<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt;  $ cholesterol          : num  173 265 164 242 181 184 205 287 126 192 ...</span></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt;  $ cholesterolM2        : num  4.47 6.85 4.24 6.26 4.68 4.76 5.3 7.42 3.26 4.97 ...</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt;  $ triglycerides        : num  158 170 77 497 63 62 169 245 95 64 ...</span></span>
+<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt;  $ uric.acid            : num  4.2 7 6 6.5 5.4 5.5 5.1 4.3 7.6 7.1 ...</span></span>
+<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt;  $ protein              : num  7.5 7.4 7.4 6.8 7.4 6.7 7.4 6.8 7.3 7.2 ...</span></span>
+<span id="cb2-29"><a href="#cb2-29"></a><span class="co">#&gt;  $ bilirubin            : num  0.5 0.6 0.2 0.5 0.7 0.8 0.4 0.6 1.2 1.2 ...</span></span>
+<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#&gt;  $ phosphorus           : num  4.7 4.4 5.3 3.6 3.9 3.4 3.9 4.4 3.2 3 ...</span></span>
+<span id="cb2-31"><a href="#cb2-31"></a><span class="co">#&gt;  $ sodium               : num  136 140 139 138 138 136 139 140 140 139 ...</span></span>
+<span id="cb2-32"><a href="#cb2-32"></a><span class="co">#&gt;  $ potassium            : num  4.3 4.55 4.16 4.27 3.91 3.97 3.99 4.25 3.8 4.63 ...</span></span>
+<span id="cb2-33"><a href="#cb2-33"></a><span class="co">#&gt;  $ globulin             : num  2.9 2.9 3 2.6 2.8 2.5 3.2 2.3 2.7 2.6 ...</span></span>
+<span id="cb2-34"><a href="#cb2-34"></a><span class="co">#&gt;  $ calcium              : num  9.8 9.8 9.3 9.3 9.3 9.4 9.6 9.6 9.6 9.6 ...</span></span>
+<span id="cb2-35"><a href="#cb2-35"></a><span class="co">#&gt;  $ physical.work        : chr  "No" "No" "No" "No" ...</span></span>
+<span id="cb2-36"><a href="#cb2-36"></a><span class="co">#&gt;  $ physical.recreational: chr  "No" "No" "Yes" "No" ...</span></span>
+<span id="cb2-37"><a href="#cb2-37"></a><span class="co">#&gt;  $ diabetes             : chr  "Yes" "No" "No" "No" ...</span></span>
+<span id="cb2-38"><a href="#cb2-38"></a><span class="co">#&gt;  - attr(*, "na.action")= 'omit' Named int [1:3739] 3 4 5 6 8 9 13 14 15 16 ...</span></span>
+<span id="cb2-39"><a href="#cb2-39"></a><span class="co">#&gt;   ..- attr(*, "names")= chr [1:3739] "3" "4" "5" "6" ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="describe-the-data" class="level3"><h3 class="anchored" data-anchor-id="describe-the-data">Describe the data</h3>
 <div class="cell" data-hash="predictivefactors1_cache/html/data_90826642f310018ca6ede7d1c0cb8039">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://hbiostat.org/R/rms/">rms</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/Hmisc/man/describe.html">describe</a></span><span class="op">(</span><span class="va">analytic</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; analytic </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  33  Variables      1267  Observations</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; ID </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0     1267        1    88660     3366    84250    84687 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    86019    88692    91252    92670    93089 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 83732 83733 83741 83747 83750, highest: 93617 93633 93643 93659 93685</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; gender </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        2 </span></span>
-<span><span class="co">#&gt;                         </span></span>
-<span><span class="co">#&gt; Value      Female   Male</span></span>
-<span><span class="co">#&gt; Frequency     496    771</span></span>
-<span><span class="co">#&gt; Proportion  0.391  0.609</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; age </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       61        1    49.91    19.18       24       27 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;       36       51       63       72       78 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 20 21 22 23 24, highest: 76 77 78 79 80</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; born </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        2 </span></span>
-<span><span class="co">#&gt;                                                                             </span></span>
-<span><span class="co">#&gt; Value      Born in 50 US states or Washingt                           Others</span></span>
-<span><span class="co">#&gt; Frequency                               991                              276</span></span>
-<span><span class="co">#&gt; Proportion                            0.782                            0.218</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; race </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        4 </span></span>
-<span><span class="co">#&gt;                                               </span></span>
-<span><span class="co">#&gt; Value         Black Hispanic    Other    White</span></span>
-<span><span class="co">#&gt; Frequency       246      337      132      552</span></span>
-<span><span class="co">#&gt; Proportion    0.194    0.266    0.104    0.436</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; education </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        3 </span></span>
-<span><span class="co">#&gt;                                               </span></span>
-<span><span class="co">#&gt; Value          College High.School      School</span></span>
-<span><span class="co">#&gt; Frequency          648         523          96</span></span>
-<span><span class="co">#&gt; Proportion       0.511       0.413       0.076</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; married </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        3 </span></span>
-<span><span class="co">#&gt;                                                                    </span></span>
-<span><span class="co">#&gt; Value                 Married      Never.married Previously.married</span></span>
-<span><span class="co">#&gt; Frequency                 751                226                290</span></span>
-<span><span class="co">#&gt; Proportion              0.593              0.178              0.229</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; income </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        4 </span></span>
-<span><span class="co">#&gt;                                                                               </span></span>
-<span><span class="co">#&gt; Value                  &lt;25k Between.25kto54k Between.55kto99k         Over100k</span></span>
-<span><span class="co">#&gt; Frequency               344              435              297              191</span></span>
-<span><span class="co">#&gt; Proportion            0.272            0.343            0.234            0.151</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; weight </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0     1184        1    48904    44337     9158    11549 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    19540    30335    63822   121803   151546 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :   5470.041   5948.955   6197.660   6480.947   6703.837</span></span>
-<span><span class="co">#&gt; highest: 203562.855 207197.232 213611.345 218138.797 224891.623</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; psu </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd </span></span>
-<span><span class="co">#&gt;     1267        0        2     0.75    1.493   0.5003 </span></span>
-<span><span class="co">#&gt;                       </span></span>
-<span><span class="co">#&gt; Value          1     2</span></span>
-<span><span class="co">#&gt; Frequency    642   625</span></span>
-<span><span class="co">#&gt; Proportion 0.507 0.493</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; strata </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       15    0.994    126.3    4.792      120      121 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;      123      126      130      132      133 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 119 120 121 122 123, highest: 129 130 131 132 133</span></span>
-<span><span class="co">#&gt;                                                                             </span></span>
-<span><span class="co">#&gt; Value        119   120   121   122   123   124   125   126   127   128   129</span></span>
-<span><span class="co">#&gt; Frequency     47    74   118    63    77    66   114   104   107    65    53</span></span>
-<span><span class="co">#&gt; Proportion 0.037 0.058 0.093 0.050 0.061 0.052 0.090 0.082 0.084 0.051 0.042</span></span>
-<span><span class="co">#&gt;                                   </span></span>
-<span><span class="co">#&gt; Value        130   131   132   133</span></span>
-<span><span class="co">#&gt; Frequency     99   120    95    65</span></span>
-<span><span class="co">#&gt; Proportion 0.078 0.095 0.075 0.051</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; diastolicBP </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       41    0.997    70.37    13.99       52       54 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;       62       70       78       86       92 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :   0  26  34  38  40, highest: 104 106 108 110 112</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; systolicBP </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       56    0.998    126.5     19.3    102.0    106.0 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    114.0    124.0    136.0    148.8    160.0 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  84  88  90  92  94, highest: 194 196 206 218 236</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; bodyweight </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      615        1    84.95    23.56    56.29    61.10 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    69.70    81.40    97.00   113.44   127.47 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  39.7  39.8  40.7  42.6  42.7, highest: 161.9 166.3 175.7 175.9 178.4</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; bodyheight </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      376        1    169.2    10.66    153.8    157.0 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    162.6    169.3    176.2    181.1    184.2 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 143.8 144.2 145.2 145.9 146.2, highest: 194.6 195.1 195.6 198.4 201.0</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; bmi </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      284        1    29.58    7.403    20.60    22.06 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    24.80    28.60    33.30    38.24    42.00 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 16.3 17.5 17.6 17.7 17.9, highest: 57.2 57.6 59.4 60.7 64.5</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; waist </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      544        1    101.8    18.47     77.1     81.4 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;     90.5    100.3    111.2    122.8    132.5 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  65.0  65.5  66.5  68.2  68.7, highest: 159.2 159.8 160.2 160.5 161.5</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; smoke </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        3 </span></span>
-<span><span class="co">#&gt;                                            </span></span>
-<span><span class="co">#&gt; Value       Every.day Not.at.all  Some.days</span></span>
-<span><span class="co">#&gt; Frequency         448        665        154</span></span>
-<span><span class="co">#&gt; Proportion      0.354      0.525      0.122</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; alcohol </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       14    0.952    3.109    2.419        1        1 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;        1        2        4        6        8 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  1  2  3  4  5, highest: 10 11 12 14 15</span></span>
-<span><span class="co">#&gt;                                                                             </span></span>
-<span><span class="co">#&gt; Value          1     2     3     4     5     6     7     8     9    10    11</span></span>
-<span><span class="co">#&gt; Frequency    336   371   189   106    79    95    10    26     4    20     1</span></span>
-<span><span class="co">#&gt; Proportion 0.265 0.293 0.149 0.084 0.062 0.075 0.008 0.021 0.003 0.016 0.001</span></span>
-<span><span class="co">#&gt;                             </span></span>
-<span><span class="co">#&gt; Value         12    14    15</span></span>
-<span><span class="co">#&gt; Frequency     23     1     6</span></span>
-<span><span class="co">#&gt; Proportion 0.018 0.001 0.005</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; cholesterol </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      203        1    193.1    47.47    132.0    142.0 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    162.5    191.0    217.0    248.0    268.0 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  81  93  97 100 101, highest: 345 348 349 358 545</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; cholesterolM2 </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      203        1    4.994    1.228    3.410    3.670 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;    4.205    4.940    5.610    6.410    6.930 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  2.09  2.40  2.51  2.59  2.61, highest:  8.92  9.00  9.03  9.26 14.09</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; triglycerides </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      361        1    165.8    124.1     48.0     59.0 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;     84.0    127.0    201.5    309.0    396.6 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :   18   21   24   25   31, highest:  964 1020 1157 1253 3061</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; uric.acid </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       84        1    5.598    1.626     3.43     3.80 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;     4.60     5.50     6.50     7.40     8.00 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  1.6  2.2  2.3  2.4  2.5, highest: 10.2 10.3 11.7 12.2 18.0</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; protein </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       32    0.995    7.126   0.5095      6.4      6.6 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;      6.8      7.1      7.4      7.7      7.9 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 5.7 5.8 5.9 6.0 6.1, highest: 8.4 8.5 8.6 8.8 9.0</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; bilirubin </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       31    0.984   0.5467   0.2949      0.2      0.2 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;      0.4      0.5      0.7      0.9      1.0 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 0.00 0.01 0.02 0.03 0.04, highest: 1.80 2.00 2.10 2.60 3.30</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; phosphorus </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       37    0.996    3.642    0.593      2.8      3.0 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;      3.3      3.6      4.0      4.3      4.5 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 1.8 2.0 2.2 2.3 2.4, highest: 5.2 5.3 5.4 5.6 6.1</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; sodium </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       20    0.977    138.5    2.383      135      136 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;      137      139      140      141      142 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 124 126 129 130 131, highest: 142 143 144 146 148</span></span>
-<span><span class="co">#&gt;                                                                             </span></span>
-<span><span class="co">#&gt; Value        124   126   129   130   131   132   133   134   135   136   137</span></span>
-<span><span class="co">#&gt; Frequency      1     1     1     1     5     4    11    23    46    93   176</span></span>
-<span><span class="co">#&gt; Proportion 0.001 0.001 0.001 0.001 0.004 0.003 0.009 0.018 0.036 0.073 0.139</span></span>
-<span><span class="co">#&gt;                                                                 </span></span>
-<span><span class="co">#&gt; Value        138   139   140   141   142   143   144   146   148</span></span>
-<span><span class="co">#&gt; Frequency    235   260   206   112    55    29     6     1     1</span></span>
-<span><span class="co">#&gt; Proportion 0.185 0.205 0.163 0.088 0.043 0.023 0.005 0.001 0.001</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; potassium </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0      175        1    3.985   0.3725     3.45     3.57 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;     3.78     3.98     4.19     4.40     4.54 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 2.60 2.92 2.96 3.07 3.09, highest: 5.15 5.21 5.36 5.37 5.51</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; globulin </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       29    0.994    2.799   0.4536      2.2      2.3 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;      2.5      2.8      3.0      3.3      3.5 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest : 1.6 1.8 1.9 2.0 2.1, highest: 4.1 4.2 4.3 4.5 5.5</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; calcium </span></span>
-<span><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
-<span><span class="co">#&gt;     1267        0       25    0.991    9.335   0.3786      8.8      8.9 </span></span>
-<span><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
-<span><span class="co">#&gt;      9.1      9.3      9.6      9.7      9.9 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; lowest :  8.4  8.5  8.6  8.7  8.8, highest: 10.4 10.5 10.7 11.0 11.1</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; physical.work </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        2 </span></span>
-<span><span class="co">#&gt;                       </span></span>
-<span><span class="co">#&gt; Value         No   Yes</span></span>
-<span><span class="co">#&gt; Frequency    895   372</span></span>
-<span><span class="co">#&gt; Proportion 0.706 0.294</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; physical.recreational </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        2 </span></span>
-<span><span class="co">#&gt;                       </span></span>
-<span><span class="co">#&gt; Value         No   Yes</span></span>
-<span><span class="co">#&gt; Frequency   1002   265</span></span>
-<span><span class="co">#&gt; Proportion 0.791 0.209</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; diabetes </span></span>
-<span><span class="co">#&gt;        n  missing distinct </span></span>
-<span><span class="co">#&gt;     1267        0        2 </span></span>
-<span><span class="co">#&gt;                     </span></span>
-<span><span class="co">#&gt; Value        No  Yes</span></span>
-<span><span class="co">#&gt; Frequency  1064  203</span></span>
-<span><span class="co">#&gt; Proportion 0.84 0.16</span></span>
-<span><span class="co">#&gt; --------------------------------------------------------------------------------</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">require</span>(rms)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">describe</span>(analytic) </span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; analytic </span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; </span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt;  33  Variables      1267  Observations</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; ID </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt;     1267        0     1267        1    88660     3366    84250    84687 </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;    86019    88692    91252    92670    93089 </span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt; </span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt; lowest : 83732 83733 83741 83747 83750, highest: 93617 93633 93643 93659 93685</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt; gender </span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt;     1267        0        2 </span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt;                         </span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt; Value      Female   Male</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; Frequency     496    771</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; Proportion  0.391  0.609</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; age </span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt;     1267        0       61        1    49.91    19.18       24       27 </span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt;       36       51       63       72       78 </span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt; </span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt; lowest : 20 21 22 23 24, highest: 76 77 78 79 80</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt; born </span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt;     1267        0        2 </span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt;                                                                             </span></span>
+<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt; Value      Born in 50 US states or Washingt                           Others</span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt; Frequency                               991                              276</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt; Proportion                            0.782                            0.218</span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt; race </span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt;     1267        0        4 </span></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="co">#&gt;                                               </span></span>
+<span id="cb3-43"><a href="#cb3-43"></a><span class="co">#&gt; Value         Black Hispanic    Other    White</span></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co">#&gt; Frequency       246      337      132      552</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a><span class="co">#&gt; Proportion    0.194    0.266    0.104    0.436</span></span>
+<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="co">#&gt; education </span></span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-49"><a href="#cb3-49"></a><span class="co">#&gt;     1267        0        3 </span></span>
+<span id="cb3-50"><a href="#cb3-50"></a><span class="co">#&gt;                                               </span></span>
+<span id="cb3-51"><a href="#cb3-51"></a><span class="co">#&gt; Value          College High.School      School</span></span>
+<span id="cb3-52"><a href="#cb3-52"></a><span class="co">#&gt; Frequency          648         523          96</span></span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co">#&gt; Proportion       0.511       0.413       0.076</span></span>
+<span id="cb3-54"><a href="#cb3-54"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-55"><a href="#cb3-55"></a><span class="co">#&gt; married </span></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-57"><a href="#cb3-57"></a><span class="co">#&gt;     1267        0        3 </span></span>
+<span id="cb3-58"><a href="#cb3-58"></a><span class="co">#&gt;                                                                    </span></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="co">#&gt; Value                 Married      Never.married Previously.married</span></span>
+<span id="cb3-60"><a href="#cb3-60"></a><span class="co">#&gt; Frequency                 751                226                290</span></span>
+<span id="cb3-61"><a href="#cb3-61"></a><span class="co">#&gt; Proportion              0.593              0.178              0.229</span></span>
+<span id="cb3-62"><a href="#cb3-62"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-63"><a href="#cb3-63"></a><span class="co">#&gt; income </span></span>
+<span id="cb3-64"><a href="#cb3-64"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-65"><a href="#cb3-65"></a><span class="co">#&gt;     1267        0        4 </span></span>
+<span id="cb3-66"><a href="#cb3-66"></a><span class="co">#&gt;                                                                               </span></span>
+<span id="cb3-67"><a href="#cb3-67"></a><span class="co">#&gt; Value                  &lt;25k Between.25kto54k Between.55kto99k         Over100k</span></span>
+<span id="cb3-68"><a href="#cb3-68"></a><span class="co">#&gt; Frequency               344              435              297              191</span></span>
+<span id="cb3-69"><a href="#cb3-69"></a><span class="co">#&gt; Proportion            0.272            0.343            0.234            0.151</span></span>
+<span id="cb3-70"><a href="#cb3-70"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-71"><a href="#cb3-71"></a><span class="co">#&gt; weight </span></span>
+<span id="cb3-72"><a href="#cb3-72"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-73"><a href="#cb3-73"></a><span class="co">#&gt;     1267        0     1184        1    48904    44337     9158    11549 </span></span>
+<span id="cb3-74"><a href="#cb3-74"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-75"><a href="#cb3-75"></a><span class="co">#&gt;    19540    30335    63822   121803   151546 </span></span>
+<span id="cb3-76"><a href="#cb3-76"></a><span class="co">#&gt; </span></span>
+<span id="cb3-77"><a href="#cb3-77"></a><span class="co">#&gt; lowest :   5470.041   5948.955   6197.660   6480.947   6703.837</span></span>
+<span id="cb3-78"><a href="#cb3-78"></a><span class="co">#&gt; highest: 203562.855 207197.232 213611.345 218138.797 224891.623</span></span>
+<span id="cb3-79"><a href="#cb3-79"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-80"><a href="#cb3-80"></a><span class="co">#&gt; psu </span></span>
+<span id="cb3-81"><a href="#cb3-81"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd </span></span>
+<span id="cb3-82"><a href="#cb3-82"></a><span class="co">#&gt;     1267        0        2     0.75    1.493   0.5003 </span></span>
+<span id="cb3-83"><a href="#cb3-83"></a><span class="co">#&gt;                       </span></span>
+<span id="cb3-84"><a href="#cb3-84"></a><span class="co">#&gt; Value          1     2</span></span>
+<span id="cb3-85"><a href="#cb3-85"></a><span class="co">#&gt; Frequency    642   625</span></span>
+<span id="cb3-86"><a href="#cb3-86"></a><span class="co">#&gt; Proportion 0.507 0.493</span></span>
+<span id="cb3-87"><a href="#cb3-87"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-88"><a href="#cb3-88"></a><span class="co">#&gt; strata </span></span>
+<span id="cb3-89"><a href="#cb3-89"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-90"><a href="#cb3-90"></a><span class="co">#&gt;     1267        0       15    0.994    126.3    4.792      120      121 </span></span>
+<span id="cb3-91"><a href="#cb3-91"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-92"><a href="#cb3-92"></a><span class="co">#&gt;      123      126      130      132      133 </span></span>
+<span id="cb3-93"><a href="#cb3-93"></a><span class="co">#&gt; </span></span>
+<span id="cb3-94"><a href="#cb3-94"></a><span class="co">#&gt; lowest : 119 120 121 122 123, highest: 129 130 131 132 133</span></span>
+<span id="cb3-95"><a href="#cb3-95"></a><span class="co">#&gt;                                                                             </span></span>
+<span id="cb3-96"><a href="#cb3-96"></a><span class="co">#&gt; Value        119   120   121   122   123   124   125   126   127   128   129</span></span>
+<span id="cb3-97"><a href="#cb3-97"></a><span class="co">#&gt; Frequency     47    74   118    63    77    66   114   104   107    65    53</span></span>
+<span id="cb3-98"><a href="#cb3-98"></a><span class="co">#&gt; Proportion 0.037 0.058 0.093 0.050 0.061 0.052 0.090 0.082 0.084 0.051 0.042</span></span>
+<span id="cb3-99"><a href="#cb3-99"></a><span class="co">#&gt;                                   </span></span>
+<span id="cb3-100"><a href="#cb3-100"></a><span class="co">#&gt; Value        130   131   132   133</span></span>
+<span id="cb3-101"><a href="#cb3-101"></a><span class="co">#&gt; Frequency     99   120    95    65</span></span>
+<span id="cb3-102"><a href="#cb3-102"></a><span class="co">#&gt; Proportion 0.078 0.095 0.075 0.051</span></span>
+<span id="cb3-103"><a href="#cb3-103"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-104"><a href="#cb3-104"></a><span class="co">#&gt; diastolicBP </span></span>
+<span id="cb3-105"><a href="#cb3-105"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-106"><a href="#cb3-106"></a><span class="co">#&gt;     1267        0       41    0.997    70.37    13.99       52       54 </span></span>
+<span id="cb3-107"><a href="#cb3-107"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-108"><a href="#cb3-108"></a><span class="co">#&gt;       62       70       78       86       92 </span></span>
+<span id="cb3-109"><a href="#cb3-109"></a><span class="co">#&gt; </span></span>
+<span id="cb3-110"><a href="#cb3-110"></a><span class="co">#&gt; lowest :   0  26  34  38  40, highest: 104 106 108 110 112</span></span>
+<span id="cb3-111"><a href="#cb3-111"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-112"><a href="#cb3-112"></a><span class="co">#&gt; systolicBP </span></span>
+<span id="cb3-113"><a href="#cb3-113"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-114"><a href="#cb3-114"></a><span class="co">#&gt;     1267        0       56    0.998    126.5     19.3    102.0    106.0 </span></span>
+<span id="cb3-115"><a href="#cb3-115"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-116"><a href="#cb3-116"></a><span class="co">#&gt;    114.0    124.0    136.0    148.8    160.0 </span></span>
+<span id="cb3-117"><a href="#cb3-117"></a><span class="co">#&gt; </span></span>
+<span id="cb3-118"><a href="#cb3-118"></a><span class="co">#&gt; lowest :  84  88  90  92  94, highest: 194 196 206 218 236</span></span>
+<span id="cb3-119"><a href="#cb3-119"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-120"><a href="#cb3-120"></a><span class="co">#&gt; bodyweight </span></span>
+<span id="cb3-121"><a href="#cb3-121"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-122"><a href="#cb3-122"></a><span class="co">#&gt;     1267        0      615        1    84.95    23.56    56.29    61.10 </span></span>
+<span id="cb3-123"><a href="#cb3-123"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-124"><a href="#cb3-124"></a><span class="co">#&gt;    69.70    81.40    97.00   113.44   127.47 </span></span>
+<span id="cb3-125"><a href="#cb3-125"></a><span class="co">#&gt; </span></span>
+<span id="cb3-126"><a href="#cb3-126"></a><span class="co">#&gt; lowest :  39.7  39.8  40.7  42.6  42.7, highest: 161.9 166.3 175.7 175.9 178.4</span></span>
+<span id="cb3-127"><a href="#cb3-127"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-128"><a href="#cb3-128"></a><span class="co">#&gt; bodyheight </span></span>
+<span id="cb3-129"><a href="#cb3-129"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-130"><a href="#cb3-130"></a><span class="co">#&gt;     1267        0      376        1    169.2    10.66    153.8    157.0 </span></span>
+<span id="cb3-131"><a href="#cb3-131"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-132"><a href="#cb3-132"></a><span class="co">#&gt;    162.6    169.3    176.2    181.1    184.2 </span></span>
+<span id="cb3-133"><a href="#cb3-133"></a><span class="co">#&gt; </span></span>
+<span id="cb3-134"><a href="#cb3-134"></a><span class="co">#&gt; lowest : 143.8 144.2 145.2 145.9 146.2, highest: 194.6 195.1 195.6 198.4 201.0</span></span>
+<span id="cb3-135"><a href="#cb3-135"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-136"><a href="#cb3-136"></a><span class="co">#&gt; bmi </span></span>
+<span id="cb3-137"><a href="#cb3-137"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-138"><a href="#cb3-138"></a><span class="co">#&gt;     1267        0      284        1    29.58    7.403    20.60    22.06 </span></span>
+<span id="cb3-139"><a href="#cb3-139"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-140"><a href="#cb3-140"></a><span class="co">#&gt;    24.80    28.60    33.30    38.24    42.00 </span></span>
+<span id="cb3-141"><a href="#cb3-141"></a><span class="co">#&gt; </span></span>
+<span id="cb3-142"><a href="#cb3-142"></a><span class="co">#&gt; lowest : 16.3 17.5 17.6 17.7 17.9, highest: 57.2 57.6 59.4 60.7 64.5</span></span>
+<span id="cb3-143"><a href="#cb3-143"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-144"><a href="#cb3-144"></a><span class="co">#&gt; waist </span></span>
+<span id="cb3-145"><a href="#cb3-145"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-146"><a href="#cb3-146"></a><span class="co">#&gt;     1267        0      544        1    101.8    18.47     77.1     81.4 </span></span>
+<span id="cb3-147"><a href="#cb3-147"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-148"><a href="#cb3-148"></a><span class="co">#&gt;     90.5    100.3    111.2    122.8    132.5 </span></span>
+<span id="cb3-149"><a href="#cb3-149"></a><span class="co">#&gt; </span></span>
+<span id="cb3-150"><a href="#cb3-150"></a><span class="co">#&gt; lowest :  65.0  65.5  66.5  68.2  68.7, highest: 159.2 159.8 160.2 160.5 161.5</span></span>
+<span id="cb3-151"><a href="#cb3-151"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-152"><a href="#cb3-152"></a><span class="co">#&gt; smoke </span></span>
+<span id="cb3-153"><a href="#cb3-153"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-154"><a href="#cb3-154"></a><span class="co">#&gt;     1267        0        3 </span></span>
+<span id="cb3-155"><a href="#cb3-155"></a><span class="co">#&gt;                                            </span></span>
+<span id="cb3-156"><a href="#cb3-156"></a><span class="co">#&gt; Value       Every.day Not.at.all  Some.days</span></span>
+<span id="cb3-157"><a href="#cb3-157"></a><span class="co">#&gt; Frequency         448        665        154</span></span>
+<span id="cb3-158"><a href="#cb3-158"></a><span class="co">#&gt; Proportion      0.354      0.525      0.122</span></span>
+<span id="cb3-159"><a href="#cb3-159"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-160"><a href="#cb3-160"></a><span class="co">#&gt; alcohol </span></span>
+<span id="cb3-161"><a href="#cb3-161"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-162"><a href="#cb3-162"></a><span class="co">#&gt;     1267        0       14    0.952    3.109    2.419        1        1 </span></span>
+<span id="cb3-163"><a href="#cb3-163"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-164"><a href="#cb3-164"></a><span class="co">#&gt;        1        2        4        6        8 </span></span>
+<span id="cb3-165"><a href="#cb3-165"></a><span class="co">#&gt; </span></span>
+<span id="cb3-166"><a href="#cb3-166"></a><span class="co">#&gt; lowest :  1  2  3  4  5, highest: 10 11 12 14 15</span></span>
+<span id="cb3-167"><a href="#cb3-167"></a><span class="co">#&gt;                                                                             </span></span>
+<span id="cb3-168"><a href="#cb3-168"></a><span class="co">#&gt; Value          1     2     3     4     5     6     7     8     9    10    11</span></span>
+<span id="cb3-169"><a href="#cb3-169"></a><span class="co">#&gt; Frequency    336   371   189   106    79    95    10    26     4    20     1</span></span>
+<span id="cb3-170"><a href="#cb3-170"></a><span class="co">#&gt; Proportion 0.265 0.293 0.149 0.084 0.062 0.075 0.008 0.021 0.003 0.016 0.001</span></span>
+<span id="cb3-171"><a href="#cb3-171"></a><span class="co">#&gt;                             </span></span>
+<span id="cb3-172"><a href="#cb3-172"></a><span class="co">#&gt; Value         12    14    15</span></span>
+<span id="cb3-173"><a href="#cb3-173"></a><span class="co">#&gt; Frequency     23     1     6</span></span>
+<span id="cb3-174"><a href="#cb3-174"></a><span class="co">#&gt; Proportion 0.018 0.001 0.005</span></span>
+<span id="cb3-175"><a href="#cb3-175"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-176"><a href="#cb3-176"></a><span class="co">#&gt; cholesterol </span></span>
+<span id="cb3-177"><a href="#cb3-177"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-178"><a href="#cb3-178"></a><span class="co">#&gt;     1267        0      203        1    193.1    47.47    132.0    142.0 </span></span>
+<span id="cb3-179"><a href="#cb3-179"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-180"><a href="#cb3-180"></a><span class="co">#&gt;    162.5    191.0    217.0    248.0    268.0 </span></span>
+<span id="cb3-181"><a href="#cb3-181"></a><span class="co">#&gt; </span></span>
+<span id="cb3-182"><a href="#cb3-182"></a><span class="co">#&gt; lowest :  81  93  97 100 101, highest: 345 348 349 358 545</span></span>
+<span id="cb3-183"><a href="#cb3-183"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-184"><a href="#cb3-184"></a><span class="co">#&gt; cholesterolM2 </span></span>
+<span id="cb3-185"><a href="#cb3-185"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-186"><a href="#cb3-186"></a><span class="co">#&gt;     1267        0      203        1    4.994    1.228    3.410    3.670 </span></span>
+<span id="cb3-187"><a href="#cb3-187"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-188"><a href="#cb3-188"></a><span class="co">#&gt;    4.205    4.940    5.610    6.410    6.930 </span></span>
+<span id="cb3-189"><a href="#cb3-189"></a><span class="co">#&gt; </span></span>
+<span id="cb3-190"><a href="#cb3-190"></a><span class="co">#&gt; lowest :  2.09  2.40  2.51  2.59  2.61, highest:  8.92  9.00  9.03  9.26 14.09</span></span>
+<span id="cb3-191"><a href="#cb3-191"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-192"><a href="#cb3-192"></a><span class="co">#&gt; triglycerides </span></span>
+<span id="cb3-193"><a href="#cb3-193"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-194"><a href="#cb3-194"></a><span class="co">#&gt;     1267        0      361        1    165.8    124.1     48.0     59.0 </span></span>
+<span id="cb3-195"><a href="#cb3-195"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-196"><a href="#cb3-196"></a><span class="co">#&gt;     84.0    127.0    201.5    309.0    396.6 </span></span>
+<span id="cb3-197"><a href="#cb3-197"></a><span class="co">#&gt; </span></span>
+<span id="cb3-198"><a href="#cb3-198"></a><span class="co">#&gt; lowest :   18   21   24   25   31, highest:  964 1020 1157 1253 3061</span></span>
+<span id="cb3-199"><a href="#cb3-199"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-200"><a href="#cb3-200"></a><span class="co">#&gt; uric.acid </span></span>
+<span id="cb3-201"><a href="#cb3-201"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-202"><a href="#cb3-202"></a><span class="co">#&gt;     1267        0       84        1    5.598    1.626     3.43     3.80 </span></span>
+<span id="cb3-203"><a href="#cb3-203"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-204"><a href="#cb3-204"></a><span class="co">#&gt;     4.60     5.50     6.50     7.40     8.00 </span></span>
+<span id="cb3-205"><a href="#cb3-205"></a><span class="co">#&gt; </span></span>
+<span id="cb3-206"><a href="#cb3-206"></a><span class="co">#&gt; lowest :  1.6  2.2  2.3  2.4  2.5, highest: 10.2 10.3 11.7 12.2 18.0</span></span>
+<span id="cb3-207"><a href="#cb3-207"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-208"><a href="#cb3-208"></a><span class="co">#&gt; protein </span></span>
+<span id="cb3-209"><a href="#cb3-209"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-210"><a href="#cb3-210"></a><span class="co">#&gt;     1267        0       32    0.995    7.126   0.5095      6.4      6.6 </span></span>
+<span id="cb3-211"><a href="#cb3-211"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-212"><a href="#cb3-212"></a><span class="co">#&gt;      6.8      7.1      7.4      7.7      7.9 </span></span>
+<span id="cb3-213"><a href="#cb3-213"></a><span class="co">#&gt; </span></span>
+<span id="cb3-214"><a href="#cb3-214"></a><span class="co">#&gt; lowest : 5.7 5.8 5.9 6.0 6.1, highest: 8.4 8.5 8.6 8.8 9.0</span></span>
+<span id="cb3-215"><a href="#cb3-215"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-216"><a href="#cb3-216"></a><span class="co">#&gt; bilirubin </span></span>
+<span id="cb3-217"><a href="#cb3-217"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-218"><a href="#cb3-218"></a><span class="co">#&gt;     1267        0       31    0.984   0.5467   0.2949      0.2      0.2 </span></span>
+<span id="cb3-219"><a href="#cb3-219"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-220"><a href="#cb3-220"></a><span class="co">#&gt;      0.4      0.5      0.7      0.9      1.0 </span></span>
+<span id="cb3-221"><a href="#cb3-221"></a><span class="co">#&gt; </span></span>
+<span id="cb3-222"><a href="#cb3-222"></a><span class="co">#&gt; lowest : 0.00 0.01 0.02 0.03 0.04, highest: 1.80 2.00 2.10 2.60 3.30</span></span>
+<span id="cb3-223"><a href="#cb3-223"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-224"><a href="#cb3-224"></a><span class="co">#&gt; phosphorus </span></span>
+<span id="cb3-225"><a href="#cb3-225"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-226"><a href="#cb3-226"></a><span class="co">#&gt;     1267        0       37    0.996    3.642    0.593      2.8      3.0 </span></span>
+<span id="cb3-227"><a href="#cb3-227"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-228"><a href="#cb3-228"></a><span class="co">#&gt;      3.3      3.6      4.0      4.3      4.5 </span></span>
+<span id="cb3-229"><a href="#cb3-229"></a><span class="co">#&gt; </span></span>
+<span id="cb3-230"><a href="#cb3-230"></a><span class="co">#&gt; lowest : 1.8 2.0 2.2 2.3 2.4, highest: 5.2 5.3 5.4 5.6 6.1</span></span>
+<span id="cb3-231"><a href="#cb3-231"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-232"><a href="#cb3-232"></a><span class="co">#&gt; sodium </span></span>
+<span id="cb3-233"><a href="#cb3-233"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-234"><a href="#cb3-234"></a><span class="co">#&gt;     1267        0       20    0.977    138.5    2.383      135      136 </span></span>
+<span id="cb3-235"><a href="#cb3-235"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-236"><a href="#cb3-236"></a><span class="co">#&gt;      137      139      140      141      142 </span></span>
+<span id="cb3-237"><a href="#cb3-237"></a><span class="co">#&gt; </span></span>
+<span id="cb3-238"><a href="#cb3-238"></a><span class="co">#&gt; lowest : 124 126 129 130 131, highest: 142 143 144 146 148</span></span>
+<span id="cb3-239"><a href="#cb3-239"></a><span class="co">#&gt;                                                                             </span></span>
+<span id="cb3-240"><a href="#cb3-240"></a><span class="co">#&gt; Value        124   126   129   130   131   132   133   134   135   136   137</span></span>
+<span id="cb3-241"><a href="#cb3-241"></a><span class="co">#&gt; Frequency      1     1     1     1     5     4    11    23    46    93   176</span></span>
+<span id="cb3-242"><a href="#cb3-242"></a><span class="co">#&gt; Proportion 0.001 0.001 0.001 0.001 0.004 0.003 0.009 0.018 0.036 0.073 0.139</span></span>
+<span id="cb3-243"><a href="#cb3-243"></a><span class="co">#&gt;                                                                 </span></span>
+<span id="cb3-244"><a href="#cb3-244"></a><span class="co">#&gt; Value        138   139   140   141   142   143   144   146   148</span></span>
+<span id="cb3-245"><a href="#cb3-245"></a><span class="co">#&gt; Frequency    235   260   206   112    55    29     6     1     1</span></span>
+<span id="cb3-246"><a href="#cb3-246"></a><span class="co">#&gt; Proportion 0.185 0.205 0.163 0.088 0.043 0.023 0.005 0.001 0.001</span></span>
+<span id="cb3-247"><a href="#cb3-247"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-248"><a href="#cb3-248"></a><span class="co">#&gt; potassium </span></span>
+<span id="cb3-249"><a href="#cb3-249"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-250"><a href="#cb3-250"></a><span class="co">#&gt;     1267        0      175        1    3.985   0.3725     3.45     3.57 </span></span>
+<span id="cb3-251"><a href="#cb3-251"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-252"><a href="#cb3-252"></a><span class="co">#&gt;     3.78     3.98     4.19     4.40     4.54 </span></span>
+<span id="cb3-253"><a href="#cb3-253"></a><span class="co">#&gt; </span></span>
+<span id="cb3-254"><a href="#cb3-254"></a><span class="co">#&gt; lowest : 2.60 2.92 2.96 3.07 3.09, highest: 5.15 5.21 5.36 5.37 5.51</span></span>
+<span id="cb3-255"><a href="#cb3-255"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-256"><a href="#cb3-256"></a><span class="co">#&gt; globulin </span></span>
+<span id="cb3-257"><a href="#cb3-257"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-258"><a href="#cb3-258"></a><span class="co">#&gt;     1267        0       29    0.994    2.799   0.4536      2.2      2.3 </span></span>
+<span id="cb3-259"><a href="#cb3-259"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-260"><a href="#cb3-260"></a><span class="co">#&gt;      2.5      2.8      3.0      3.3      3.5 </span></span>
+<span id="cb3-261"><a href="#cb3-261"></a><span class="co">#&gt; </span></span>
+<span id="cb3-262"><a href="#cb3-262"></a><span class="co">#&gt; lowest : 1.6 1.8 1.9 2.0 2.1, highest: 4.1 4.2 4.3 4.5 5.5</span></span>
+<span id="cb3-263"><a href="#cb3-263"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-264"><a href="#cb3-264"></a><span class="co">#&gt; calcium </span></span>
+<span id="cb3-265"><a href="#cb3-265"></a><span class="co">#&gt;        n  missing distinct     Info     Mean      Gmd      .05      .10 </span></span>
+<span id="cb3-266"><a href="#cb3-266"></a><span class="co">#&gt;     1267        0       25    0.991    9.335   0.3786      8.8      8.9 </span></span>
+<span id="cb3-267"><a href="#cb3-267"></a><span class="co">#&gt;      .25      .50      .75      .90      .95 </span></span>
+<span id="cb3-268"><a href="#cb3-268"></a><span class="co">#&gt;      9.1      9.3      9.6      9.7      9.9 </span></span>
+<span id="cb3-269"><a href="#cb3-269"></a><span class="co">#&gt; </span></span>
+<span id="cb3-270"><a href="#cb3-270"></a><span class="co">#&gt; lowest :  8.4  8.5  8.6  8.7  8.8, highest: 10.4 10.5 10.7 11.0 11.1</span></span>
+<span id="cb3-271"><a href="#cb3-271"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-272"><a href="#cb3-272"></a><span class="co">#&gt; physical.work </span></span>
+<span id="cb3-273"><a href="#cb3-273"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-274"><a href="#cb3-274"></a><span class="co">#&gt;     1267        0        2 </span></span>
+<span id="cb3-275"><a href="#cb3-275"></a><span class="co">#&gt;                       </span></span>
+<span id="cb3-276"><a href="#cb3-276"></a><span class="co">#&gt; Value         No   Yes</span></span>
+<span id="cb3-277"><a href="#cb3-277"></a><span class="co">#&gt; Frequency    895   372</span></span>
+<span id="cb3-278"><a href="#cb3-278"></a><span class="co">#&gt; Proportion 0.706 0.294</span></span>
+<span id="cb3-279"><a href="#cb3-279"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-280"><a href="#cb3-280"></a><span class="co">#&gt; physical.recreational </span></span>
+<span id="cb3-281"><a href="#cb3-281"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-282"><a href="#cb3-282"></a><span class="co">#&gt;     1267        0        2 </span></span>
+<span id="cb3-283"><a href="#cb3-283"></a><span class="co">#&gt;                       </span></span>
+<span id="cb3-284"><a href="#cb3-284"></a><span class="co">#&gt; Value         No   Yes</span></span>
+<span id="cb3-285"><a href="#cb3-285"></a><span class="co">#&gt; Frequency   1002   265</span></span>
+<span id="cb3-286"><a href="#cb3-286"></a><span class="co">#&gt; Proportion 0.791 0.209</span></span>
+<span id="cb3-287"><a href="#cb3-287"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span>
+<span id="cb3-288"><a href="#cb3-288"></a><span class="co">#&gt; diabetes </span></span>
+<span id="cb3-289"><a href="#cb3-289"></a><span class="co">#&gt;        n  missing distinct </span></span>
+<span id="cb3-290"><a href="#cb3-290"></a><span class="co">#&gt;     1267        0        2 </span></span>
+<span id="cb3-291"><a href="#cb3-291"></a><span class="co">#&gt;                     </span></span>
+<span id="cb3-292"><a href="#cb3-292"></a><span class="co">#&gt; Value        No  Yes</span></span>
+<span id="cb3-293"><a href="#cb3-293"></a><span class="co">#&gt; Frequency  1064  203</span></span>
+<span id="cb3-294"><a href="#cb3-294"></a><span class="co">#&gt; Proportion 0.84 0.16</span></span>
+<span id="cb3-295"><a href="#cb3-295"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section><section id="collinearity" class="level3"><h3 class="anchored" data-anchor-id="collinearity">Collinearity</h3>
@@ -1094,17 +1094,17 @@ Tip
 <div class="no-row-height column-margin column-container"><div class="">
 <p><code>hclust</code> is the hierarchical clustering function where default is squared Spearman correlation coefficients to detect monotonic but nonlinear relationships.</p>
 </div></div><div class="cell" data-hash="predictivefactors1_cache/html/collinear_c5c4bee26417c06697322eb867b4f16a">
-<details><summary>Show the code</summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://hbiostat.org/R/Hmisc/">Hmisc</a></span><span class="op">)</span></span>
-<span><span class="va">sel.names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, <span class="st">"married"</span>, </span>
-<span>               <span class="st">"income"</span>, <span class="st">"diastolicBP"</span>, <span class="st">"systolicBP"</span>, </span>
-<span>               <span class="st">"bodyweight"</span>, <span class="st">"bodyheight"</span>, <span class="st">"bmi"</span>, <span class="st">"waist"</span>, <span class="st">"smoke"</span>, <span class="st">"alcohol"</span>, </span>
-<span>               <span class="st">"cholesterol"</span>, <span class="st">"triglycerides"</span>, <span class="st">"uric.acid"</span>, </span>
-<span>               <span class="st">"protein"</span>, <span class="st">"bilirubin"</span>, <span class="st">"phosphorus"</span>, <span class="st">"sodium"</span>, <span class="st">"potassium"</span>, </span>
-<span>               <span class="st">"globulin"</span>, <span class="st">"calcium"</span>, <span class="st">"physical.work"</span>, <span class="st">"physical.recreational"</span>, </span>
-<span>               <span class="st">"diabetes"</span><span class="op">)</span></span>
-<span><span class="va">var.cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Hmisc/man/varclus.html">varclus</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span>, data <span class="op">=</span> <span class="va">analytic</span><span class="op">[</span><span class="va">sel.names</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co"># var.cluster</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">var.cluster</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(Hmisc)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>sel.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, <span class="st">"married"</span>, </span>
+<span id="cb4-3"><a href="#cb4-3"></a>               <span class="st">"income"</span>, <span class="st">"diastolicBP"</span>, <span class="st">"systolicBP"</span>, </span>
+<span id="cb4-4"><a href="#cb4-4"></a>               <span class="st">"bodyweight"</span>, <span class="st">"bodyheight"</span>, <span class="st">"bmi"</span>, <span class="st">"waist"</span>, <span class="st">"smoke"</span>, <span class="st">"alcohol"</span>, </span>
+<span id="cb4-5"><a href="#cb4-5"></a>               <span class="st">"cholesterol"</span>, <span class="st">"triglycerides"</span>, <span class="st">"uric.acid"</span>, </span>
+<span id="cb4-6"><a href="#cb4-6"></a>               <span class="st">"protein"</span>, <span class="st">"bilirubin"</span>, <span class="st">"phosphorus"</span>, <span class="st">"sodium"</span>, <span class="st">"potassium"</span>, </span>
+<span id="cb4-7"><a href="#cb4-7"></a>               <span class="st">"globulin"</span>, <span class="st">"calcium"</span>, <span class="st">"physical.work"</span>, <span class="st">"physical.recreational"</span>, </span>
+<span id="cb4-8"><a href="#cb4-8"></a>               <span class="st">"diabetes"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9"></a>var.cluster <span class="ot">&lt;-</span> <span class="fu">varclus</span>(<span class="sc">~</span>., <span class="at">data =</span> analytic[sel.names])</span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># var.cluster</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="fu">plot</span>(var.cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 <p><img src="predictivefactors1_files/figure-html/collinear-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1128,6 +1128,8 @@ Tip
 </iframe>
 </div>
 
+
+<!-- -->
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1322,7 +1324,102 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Continuous outcome</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">## Collinear predictors {.unnumbered}</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a>In this tutorial, we'll continue with the data analysis. We'll focus on an analysis of an NHANES data. This data contains over 1200 observations and 33 variables. These variables come in various types: numeric, categorical, and binary. Our primary goal is to fit a linear regression model to predict cholesterol levels.</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="in">```{r setup, warning=FALSE, cache=TRUE, message=FALSE}</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co"># Load required packages</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">library</span>(rms)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="fu">library</span>(Hmisc)</span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="in">```</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="fu">### Load data</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a></span>
+<span id="cb5-14"><a href="#cb5-14"></a>Let us load the dataset and see structure of the variables:</span>
+<span id="cb5-15"><a href="#cb5-15"></a></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="in">```{r load, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15.RData"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#head(analytic)</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="fu">str</span>(analytic)</span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="in">```</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="fu">### Describe the data</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="in">```{r data, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="fu">require</span>(rms)</span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="fu">describe</span>(analytic) </span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="in">```</span></span>
+<span id="cb5-28"><a href="#cb5-28"></a></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="fu">### Collinearity</span></span>
+<span id="cb5-30"><a href="#cb5-30"></a></span>
+<span id="cb5-31"><a href="#cb5-31"></a>Avoiding collinear variables can result in a more interpretable, stable, and efficient predictive model. Collinearity refers to a situation in which two or more predictor variables in a multiple regression model are highly correlated, meaning that one can be linearly predicted from the others with substantial accuracy. Collinearity poses several issues for predictive analysis:</span>
+<span id="cb5-32"><a href="#cb5-32"></a></span>
+<span id="cb5-33"><a href="#cb5-33"></a>**Reduced Interpretability**:</span>
+<span id="cb5-34"><a href="#cb5-34"></a>When predictor variables are highly correlated, it becomes challenging to isolate the impact of individual predictors on the response variable. In other words, it is difficult to determine which predictor is genuinely influential in explaining variance in the response variable. This reduces the interpretability of the model.</span>
+<span id="cb5-35"><a href="#cb5-35"></a></span>
+<span id="cb5-36"><a href="#cb5-36"></a>**Unstable Coefficients**:</span>
+<span id="cb5-37"><a href="#cb5-37"></a>Collinearity can lead to inflated standard errors of the regression coefficients. This means that the coefficients can be very sensitive to small changes in the data, making the model unstable and less generalizable to new, unseen data.</span>
+<span id="cb5-38"><a href="#cb5-38"></a></span>
+<span id="cb5-39"><a href="#cb5-39"></a>**Overfitting**:</span>
+<span id="cb5-40"><a href="#cb5-40"></a>When predictors are collinear, the model is more likely to fit to the noise in the data rather than the actual signal. This is a manifestation of overfitting, where the model becomes too complex and captures random noise. Overfit models will perform poorly on new, unseen data.</span>
+<span id="cb5-41"><a href="#cb5-41"></a></span>
+<span id="cb5-42"><a href="#cb5-42"></a>**Inefficiency**:</span>
+<span id="cb5-43"><a href="#cb5-43"></a>Including redundant variables (collinear variables) does not add additional information to the model. This could be inefficient, especially when dealing with large datasets, as it increases computational costs without improving model performance.</span>
+<span id="cb5-44"><a href="#cb5-44"></a></span>
+<span id="cb5-45"><a href="#cb5-45"></a><span class="fu">#### Multicollinearity Diagnostics</span></span>
+<span id="cb5-46"><a href="#cb5-46"></a>Several techniques are available for diagnosing multicollinearity, including:</span>
+<span id="cb5-47"><a href="#cb5-47"></a></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="ss">- </span>Variance Inflation Factor (VIF)</span>
+<span id="cb5-49"><a href="#cb5-49"></a><span class="ss">- </span>Eigenvalues and Eigenvectors of the correlation/covariance matrix</span>
+<span id="cb5-50"><a href="#cb5-50"></a><span class="ss">- </span>Pairwise correlation matrices</span>
+<span id="cb5-51"><a href="#cb5-51"></a></span>
+<span id="cb5-52"><a href="#cb5-52"></a><span class="fu">#### Remedies</span></span>
+<span id="cb5-53"><a href="#cb5-53"></a></span>
+<span id="cb5-54"><a href="#cb5-54"></a>Some common ways to handle collinearity include:</span>
+<span id="cb5-55"><a href="#cb5-55"></a></span>
+<span id="cb5-56"><a href="#cb5-56"></a><span class="ss">- </span>Removing one of the correlated predictors</span>
+<span id="cb5-57"><a href="#cb5-57"></a><span class="ss">- </span>Combining correlated predictors into a single composite predictor</span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="ss">- </span>Using regularization techniques like Ridge Regression, which can help handle collinearity by adding a penalty term</span>
+<span id="cb5-59"><a href="#cb5-59"></a></span>
+<span id="cb5-60"><a href="#cb5-60"></a><span class="fu">### Identify collinear predictors</span></span>
+<span id="cb5-61"><a href="#cb5-61"></a></span>
+<span id="cb5-62"><a href="#cb5-62"></a>::: callout-tip</span>
+<span id="cb5-63"><a href="#cb5-63"></a>We can also use <span class="in">`hclust`</span> and <span class="in">`varclus`</span> or variable clustering, i.e., to identify collinear predictors</span>
+<span id="cb5-64"><a href="#cb5-64"></a>:::</span>
+<span id="cb5-65"><a href="#cb5-65"></a></span>
+<span id="cb5-66"><a href="#cb5-66"></a>::: column-margin</span>
+<span id="cb5-67"><a href="#cb5-67"></a><span class="in">`hclust`</span> is the hierarchical clustering function where default is squared Spearman correlation coefficients to detect monotonic but nonlinear relationships.</span>
+<span id="cb5-68"><a href="#cb5-68"></a>:::</span>
+<span id="cb5-69"><a href="#cb5-69"></a></span>
+<span id="cb5-70"><a href="#cb5-70"></a><span class="in">```{r collinear, warning=FALSE, cache=TRUE}</span></span>
+<span id="cb5-71"><a href="#cb5-71"></a><span class="fu">require</span>(Hmisc)</span>
+<span id="cb5-72"><a href="#cb5-72"></a>sel.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, <span class="st">"married"</span>, </span>
+<span id="cb5-73"><a href="#cb5-73"></a>               <span class="st">"income"</span>, <span class="st">"diastolicBP"</span>, <span class="st">"systolicBP"</span>, </span>
+<span id="cb5-74"><a href="#cb5-74"></a>               <span class="st">"bodyweight"</span>, <span class="st">"bodyheight"</span>, <span class="st">"bmi"</span>, <span class="st">"waist"</span>, <span class="st">"smoke"</span>, <span class="st">"alcohol"</span>, </span>
+<span id="cb5-75"><a href="#cb5-75"></a>               <span class="st">"cholesterol"</span>, <span class="st">"triglycerides"</span>, <span class="st">"uric.acid"</span>, </span>
+<span id="cb5-76"><a href="#cb5-76"></a>               <span class="st">"protein"</span>, <span class="st">"bilirubin"</span>, <span class="st">"phosphorus"</span>, <span class="st">"sodium"</span>, <span class="st">"potassium"</span>, </span>
+<span id="cb5-77"><a href="#cb5-77"></a>               <span class="st">"globulin"</span>, <span class="st">"calcium"</span>, <span class="st">"physical.work"</span>, <span class="st">"physical.recreational"</span>, </span>
+<span id="cb5-78"><a href="#cb5-78"></a>               <span class="st">"diabetes"</span>)</span>
+<span id="cb5-79"><a href="#cb5-79"></a>var.cluster <span class="ot">&lt;-</span> <span class="fu">varclus</span>(<span class="sc">~</span>., <span class="at">data =</span> analytic[sel.names])</span>
+<span id="cb5-80"><a href="#cb5-80"></a><span class="co"># var.cluster</span></span>
+<span id="cb5-81"><a href="#cb5-81"></a><span class="fu">plot</span>(var.cluster)</span>
+<span id="cb5-82"><a href="#cb5-82"></a><span class="in">```</span></span>
+<span id="cb5-83"><a href="#cb5-83"></a></span>
+<span id="cb5-84"><a href="#cb5-84"></a><span class="fu">### Video content (optional)</span></span>
+<span id="cb5-85"><a href="#cb5-85"></a></span>
+<span id="cb5-86"><a href="#cb5-86"></a>::: callout-tip</span>
+<span id="cb5-87"><a href="#cb5-87"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
+<span id="cb5-88"><a href="#cb5-88"></a>:::</span>
+<span id="cb5-89"><a href="#cb5-89"></a></span>
+<span id="cb5-90"><a href="#cb5-90"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
+<span id="cb5-91"><a href="#cb5-91"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/5nNZpsuQ_Fg"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
+<span id="cb5-92"><a href="#cb5-92"></a></span>
+<span id="cb5-93"><a href="#cb5-93"></a><span class="kw">&lt;/iframe&gt;</span></span>
+<span id="cb5-94"><a href="#cb5-94"></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 
