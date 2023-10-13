@@ -2,9 +2,8 @@
 
 In this chapter, we will move beyond statistical regression, and introduce some of the popular machine learning methods.
 
--   Watch the video describing this chapter - I [![video 1](https://img.youtube.com/vi/lzr8GOq_Ph0/maxresdefault.jpg)](https://youtu.be/lzr8GOq_Ph0)
--   Watch the video describing this chapters -II [![video 2](https://img.youtube.com/vi/Q59yffGr8qI/maxresdefault.jpg)](https://youtu.be/Q59yffGr8qI)
 
+In the first code chunk, we load necessary R libraries that will be utilized throughout the chapter for various machine learning methods and data visualization. 
 ```{r setup06, include=FALSE, warning=FALSE}
 require(Publish)
 require(rpart)
@@ -16,6 +15,8 @@ require(caret)
 
 ### Read previously saved data
 
+
+The second chunk is dedicated to reading previously saved data and formulas from specified file paths, ensuring that the dataset and predefined formulas are available for subsequent analyses. 
 ```{r data, cache= TRUE}
 ObsData <- readRDS(file = "Data/machinelearning/rhcAnalytic.RDS")
 levels(ObsData$Death)=c("No","Yes")
@@ -31,6 +32,10 @@ out.formula2 <- readRDS(file = "Data/machinelearning/form2.RDS")
 knitr::include_graphics("Images/machinelearning/enet.png")
 ```
 
+In this code chunk, we implement a machine learning model training process with a focus on utilizing cross-validation and tuning parameters to optimize the model. Cross-validation is a technique used to assess how well the model will generalize to an independent dataset by partitioning the original dataset into a training set to train the model, and a test set to evaluate it. Here, we specify that we are using a particular type of cross-validation, denoted as "cv", and that we will be creating 5 folds (or partitions) of the data, as indicated by `number = 5`.
+
+The model being trained is specified to use a method known as "glmnet", which is capable of performing lasso, ridge, and elastic net regularization regressions. Tuning parameters are crucial in controlling the behavior of our learning algorithm. In this instance, we specify `lambda` and `alpha` as our tuning parameters, which control the amount of regularization applied to the model and the mixing percentage between lasso and ridge regression, respectively. The `tuneGrid` argument is used to specify the exact values of `alpha` and `lambda` that the model should consider during training. The `verbose = FALSE` argument ensures that additional model training details are not printed during the training process. Finally, the trained model is stored in an object for further examination and use.
+
 ```{r cvbinlasso22, cache = TRUE}
 ctrl <- trainControl(method = "cv", number = 5)
 fit.cv.con <- train(out.formula1, 
@@ -43,6 +48,8 @@ fit.cv.con
 ```
 
 #### Cross-validation Ridge
+
+Subsequent code chunks explore Ridge regression and Elastic Net, employing similar methodologies but adjusting tuning parameters accordingly. 
 
 ```{r cvbinridge22, cache = TRUE}
 ctrl <- trainControl(method = "cv", number = 5)
@@ -58,6 +65,8 @@ fit.cv.con
 ### Binary outcome
 
 #### Cross-validation LASSO
+
+We then shift to binary outcomes, exploring LASSO and Ridge regression with similar implementations but adjusting for the binary nature of the outcome variable. 
 
 ```{r cvbinlasso, cache= TRUE}
 ctrl<-trainControl(method = "cv", number = 5,
@@ -113,6 +122,8 @@ plot(fit.cv.bin)
 ```
 
 #### Decision tree
+
+Decision trees are then introduced and implemented, with visualizations and evaluation metrics provided to assess their performance. 
 
 -   Decision tree
     -   Referred to as Classification and regression trees or CART
@@ -199,6 +210,8 @@ summary.res
 
 ### Ensemble methods (Type I)
 
+We explore ensemble methods, specifically bagging and boosting, through implementation and evaluation in the context of binary outcomes. 
+
 Training same model to different samples (of the same data)
 
 #### Cross-validation bagging
@@ -262,6 +275,8 @@ plot(fit.cv.bin)
 
 ### Ensemble methods (Type II)
 
+We introduce the concept of Super Learner, providing external resources for further exploration. 
+
 Training different models on the same data
 
 #### Super Learner
@@ -276,3 +291,22 @@ Training different models on the same data
 #### Steps
 
 Refer to [this tutorial](https://ehsanx.github.io/TMLEworkshop/g-computation-using-ml.html#g-comp-using-superlearner) for steps and examples!
+
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/lzr8GOq_Ph0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/Q59yffGr8qI" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
