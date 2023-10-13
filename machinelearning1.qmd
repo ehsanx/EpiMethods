@@ -1,7 +1,7 @@
 ## Continuous outcome {.unnumbered}
 
 ::: callout-important
-This tutorial is very similar to one of the [previous tutorials](predictivefactors2.html), but uses a different data (we used [RHC data](researchquestion1.html) here). We are revisiting concepts related to [prediction](predictivefactors.html) before introducing ideas related to machine learning. 
+This tutorial is very similar to one of the [previous tutorials](predictivefactors2.html), but uses a different data (we used [RHC data](researchquestion1.html) here). We are revisiting concepts related to [prediction](predictivefactors.html) before introducing ideas related to machine learning.
 :::
 
 In this chapter, we will talk about Regression that deals with prediction of continuous outcomes. We will use multiple linear regression to build the first prediction model.
@@ -96,11 +96,24 @@ lines(lowess(obs.y,pred.y1), col = "red")
 
 #### R2
 
-[ref](https://en.wikipedia.org/wiki/Coefficient_of_determination)
 
-```{r ubc8, echo=FALSE, out.width = '90%'}
-knitr::include_graphics("Images/machinelearning/r2.png")
-```
+The provided information describes a statistical context involving a dataset of `n` values, $y_1, ..., y_n$ (referred to as $y_i$ or as a vector $y = [y_1,...,y_n]^T$), each paired with a fitted value $f_1,...,f_n$ (denoted as $f_i$ or sometimes $\hat{y_i}$, and as a vector $f$). The residuals, represented as $e_i$, are defined as the differences between the observed and the fitted values: 
+$ e_i = y_i − f_i$ 
+
+The mean of the observed data is denoted by 
+$$ \bar{y} = \frac{1}{n}\sum_{i=1}^{n}y_i $$
+
+The variability of the dataset can be quantified using two sums of squares formulas:
+1. **Residual Sum of Squares (SSres)** or `SSE`: It quantifies the variance remaining in the data after fitting a model, calculated as:
+$$ SS_{res} = \sum_{i}(y_i - f_i)^2 = \sum_{i}e_i^2 $$
+2. **Total Sum of Squares (SStot)** or `SST`: It represents the total variance in the observed data, calculated as:
+$$ SS_{tot} = \sum_{i}(y_i - \bar{y})^2 $$
+
+The **Coefficient of Determination (R²)** or `R.2`, which provides a measure of how well the model's predictions match the observed data, is defined as:
+$$ R^2 = 1 - \frac{SS_{res}}{SS_{tot}} $$
+
+In the ideal scenario where the model fits the data perfectly, we have $SS_{res} = 0$ and thus $R^2 = 1$. Conversely, a baseline model, which always predicts the mean $\bar{y}$ of the observed data, would yield $R^2 = 0$. Models performing worse than this baseline model would result in a negative R² value. This metric is widely utilized in regression analysis to evaluate model performance, where a higher R² indicates a better fit of the model to the data.
+
 
 ```{r r2, cache=TRUE}
 # Find SSE
@@ -117,13 +130,10 @@ require(caret)
 caret::R2(pred.y1, obs.y)
 ```
 
+[ref](https://en.wikipedia.org/wiki/Coefficient_of_determination)
+
+
 #### RMSE
-
-See [@anova]
-
-```{r ubc89, echo=FALSE, out.width = '90%'}
-knitr::include_graphics("Images/machinelearning/rmse.png")
-```
 
 ```{r rmse, cache=TRUE}
 # Find RMSE
@@ -132,19 +142,43 @@ Rmse
 caret::RMSE(pred.y1, obs.y)
 ```
 
+See [@anova]
+
+
 #### Adj R2
 
-See [@coefd]
+The **Adjusted R²** statistic modifies the $R^2$ value to counteract the automatic increase of $R^2$ when extra explanatory variables are added to a model, even if they do not improve the model fit. This adjustment is crucial for ensuring that the metric offers a reliable indication of the explanatory power of the model, especially in multiple regression where several predictors are involved.
 
-```{r ubc899, echo=FALSE, out.width = '30%'}
-knitr::include_graphics("Images/machinelearning/r2a.png")
-```
+The commonly used formula  is defined as:
+
+$$
+\bar{R}^{2} = 1 - \frac{SS_{\text{res}} / df_{\text{res}}}{SS_{\text{tot}} / df_{\text{tot}}}
+$$
+
+Where:
+
+- $SS_{\text{res}}$ and $SS_{\text{tot}}$ represent the residual and total sums of squares respectively.
+- $df_{\text{res}}$ and $df_{\text{tot}}$ refer to the degrees of freedom of the residual and total sums of squares. Usually, $df_{\text{res}} = n - p$ and $df_{\text{tot}} = n - 1$, where:
+  - $n$ signifies the sample size.
+  - $p$ denotes the number of variables in the model.
+
+This metric plays a vital role in model selection and safeguards against overfitting by penalizing the inclusion of non-informative variables
+
+The alternate formula is:
+
+$$
+\bar{R}^2 = 1 - (1 - R^2) \frac{n-1}{n-p-1}
+$$
+
+This formula modifies the $R^2$ value, accounting for the number of predictors and offering a more parsimonious model fit measure. 
 
 ```{r adjr2, cache=TRUE}
 # Find adj R2
-adjR2 <- 1-(1-R.2)*((n-1)/(n-p))
+adjR2 <- 1-(1-R.2)*((n-1)/(n-p-1))
 adjR2
 ```
+
+See [@coefd]
 
 ### Overfitting and Optimism
 
