@@ -1,0 +1,188 @@
+## Justification {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+require(survey)
+require(DiagrammeR)
+require(DiagrammeRsvg)
+require(rsvg)
+library(magrittr)
+library(svglite)
+library(png)
+```
+
+### Pre-processing
+
+#### Load saved data
+
+```{r loading, eval=TRUE, cache=TRUE }
+load("Data/mediation/cchs123pain.RData")
+```
+
+#### Prepared the data
+
+```{r prepare, eval=TRUE, cache=TRUE }
+analytic.miss$mediator <- ifelse(analytic.miss$painmed == "Yes", 1, 0)
+analytic.miss$exposure <- ifelse(analytic.miss$OA == "OA", 1, 0)
+analytic.miss$outcome <- ifelse(analytic.miss$CVD == "event", 1, 0)
+```
+
+### Analysis
+
+-   Outcome ($Y$): CVD
+-   Exposure ($A$): OA
+-   Mediator ($M$): Pain medication
+-   Adjustment covariates ($C$)
+
+#### Hypothesis
+
+1.  For total effect (TE): Is OA ($A$) associated with CVD ($Y$)?
+
+```{r h00, echo=FALSE,cache=TRUE}
+sampling0 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+	  node [shape = egg]
+    A [label = 'Osteoarthritis']
+    Y [label = 'Cardiovascular Disease']
+    #M [label = 'Pain medication']
+    node [shape = perpendicular]
+    C [label = 'Demographics, \n Important confounders, \n Relation with other diseases ']
+    
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  #rankdir = LR
+    #A -> M -> Y
+    A -> Y [label = 'TE']
+    C -> {A, Y}
+
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+sampling0 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("images/mediation/H00relation.png", dpi = 100)
+```
+
+```{r h00plot, echo=FALSE, out.width = '50%'}
+knitr::include_graphics("images/mediation/H00relation.png")
+```
+
+2.  For mediation analysis: Does pain-medication ($M$) play a mediating role in the causal payway between OA ($A$) and CVD ($Y$)? Here, we will decompose total effect (TE) to a natural direct effect (NDE) and a natural indirect effect (NIE).
+
+```{r h01, echo=FALSE,cache=TRUE}
+sampling0 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+	  node [shape = egg]
+    A [label = 'Osteoarthritis']
+    Y [label = 'Cardiovascular Disease']
+    node [shape = perpendicular]
+    C [label = 'Demographics, \n Important confounders, \n Relation with other diseases ']
+    M [label = 'Pain medication']
+    
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  #rankdir = LR
+    A -> M [label = 'NIE']
+    M -> Y   
+    A -> Y [label = 'NDE']
+    C -> {A, M, Y}
+
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+sampling0 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("Images/mediation/H01relation.png", dpi = 100)
+```
+
+```{r h01plot, echo=FALSE, out.width = '50%'}
+knitr::include_graphics("Images/mediation/H01relation.png")
+```
+
+Adjustment variables ($C$):
+
+-   Demographics
+    -   age
+    -   sex
+    -   income
+    -   race
+    -   education status
+-   Important confounders
+    -   BMI
+    -   physical activity
+    -   smoking status
+    -   fruit and vegetable consumption
+-   Relation with other diseases
+    -   hypertension
+    -   COPD
+    -   diabetes
+
+#### Total effect
+
+Outcome model (weighted) is
+
+$logit [P(Y_{a}=1 | C = c] = \theta_0 + \theta_1 a + \theta_3 c$
+
+#### Setting Design
+
+```{r design, cache=TRUE}
+require(survey)
+summary(analytic.miss$weight)
+w.design0 <- svydesign(id=~1, weights=~weight, 
+                      data=analytic.miss)
+summary(weights(w.design0))
+sd(weights(w.design0))
+w.design <- subset(w.design0, miss == 0)
+summary(weights(w.design))
+sd(weights(w.design))
+```
+
+```{r te, eval=TRUE, cache=TRUE}
+TE <- svyglm(outcome ~ exposure + 
+               age + sex + income + race + bmi + edu +
+               phyact + smoke + fruit + diab, 
+                    design = w.design, 
+                    family = quasibinomial("logit"))
+# painmed is mediator; not included here.
+TE.save <- exp(c(summary(TE)$coef["exposure",1], 
+                confint(TE)["exposure",]))
+TE.save
+```
+
+Exposure to OA has a detrimental effect on CVD risk (significant!).
+
+#### Effect on the mediators
+
+```{r mediator, eval=TRUE, cache=TRUE}
+fit.m = svyglm(mediator ~ exposure + 
+                 age + sex + income + race + bmi + edu +
+                 phyact + smoke + fruit + diab,
+                design = w.design, 
+                family = binomial("logit"))
+med.save <- exp(c(summary(fit.m)$coef["exposure",1], 
+                confint(fit.m)["exposure",]))
+med.save
+```
+
+Exposure to OA has a substantial effect on the mediator (Pain medication) as well (significant!). It will be interesting to explore a mediation analysis to assess the mediating role.
+
+### Save data
+
+```{r save, results='hide'}
+save(w.design, file = "Data/mediation/cchs123painW.RData")
+```
+
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/vh0TJV3aSi4" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

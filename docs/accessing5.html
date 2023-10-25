@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>OER: Advanced Epidemiological Methods - Importing NHIS to R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./accessingF.html" rel="next">
+<link href="./accessing4.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
+</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<meta name="twitter:title" content="OER: Advanced Epidemiological Methods - Importing NHIS to R">
+<meta name="twitter:description" content="This tutorial provides instructions on accessing the National Health Interview Survey (NHIS) dataset from the US Centers for Disease Control and Prevention (CDC) website and importing it into the…">
+<meta name="twitter:card" content="summary">
+</head>
+<body class="nav-sidebar docked slimcontent">
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Importing NHIS to R</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">OER: Advanced Epidemiological Methods</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Data accessing</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing results</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link active">Importing NHIS to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise (A)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">Imputation in NHANES</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">MCAR tests</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">Exact Matching (CCHS)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (CCHS)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (US)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">PSM in BMI-diabetes</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">PSM with MI</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">Quiz (S)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">Supervised learning</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">Unsupervised learning</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">Causal learning</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">Complex outcomes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">Polytomous and ordinal</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">Survival analysis</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">Poisson</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">R functions (N)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">Quiz (N)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">Longitudinal data</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">Mixed effects models</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">GEE</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">R functions (T)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">Quiz (T)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">Mediation analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">Baron and Kenny</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">Justification</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">Mediation Example</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">R functions (I)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">Quiz (I)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Writing Tools</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">Collaborative Writing</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">Formatting Tools</a>
+  </div>
+</li>
+      </ul>
+</li>
+    </ul>
+</div>
+</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#nhis-datafile-and-documents" id="toc-nhis-datafile-and-documents" class="nav-link" data-scroll-target="#nhis-datafile-and-documents">NHIS datafile and documents</a></li>
+  <li><a href="#accessing-nhis-data" id="toc-accessing-nhis-data" class="nav-link" data-scroll-target="#accessing-nhis-data">Accessing NHIS Data</a></li>
+  <li><a href="#merging-within-the-same-cycle" id="toc-merging-within-the-same-cycle" class="nav-link" data-scroll-target="#merging-within-the-same-cycle">Merging within the same cycle</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Importing NHIS to R</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header><p>This tutorial provides instructions on accessing the National Health Interview Survey (NHIS) dataset from the US Centers for Disease Control and Prevention (CDC) website and importing it into the RStudio environment.</p>
+<section id="overview" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="overview">Overview</h3>
+<p>Like NHANES, NHIS is supported by the CDC and is a large-scale multi-stage cross-sectional survey. The NHIS survey includes information on population disease prevalence, extent of disability, and use of health care services. In contrast to the NHANES that provides data every 2 years, NHIS provides data annually.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster)</p>
+</div></div></section><section id="nhis-datafile-and-documents" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="nhis-datafile-and-documents">NHIS datafile and documents</h3>
+<p>The NHIS files are stored in the NHIS website in different formats. You can import this data in any statistical package that supports these file formats, e.g., ASCII, CSV, SAS.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="https://www.cdc.gov/nchs/nhis/data-questionnaires-documentation.htm">NHIS Data, Questionnaires and Related Documentation</a></p>
+</div><div class="">
+<p>In the recent NHIS (2019 or later), data are available in 5 categories:</p>
+<ul>
+<li>Interview data for adults</li>
+<li>Interview data for children</li>
+<li>Imputed income for adults</li>
+<li>Imputed income for children</li>
+<li>Paradata</li>
+</ul>
+</div><div class="">
+<p>In the earlier NHIS (before 2019), data are available in 8 categories:</p>
+<ul>
+<li>Family file</li>
+<li>Household file</li>
+<li>Person file</li>
+<li>Child file</li>
+<li>Adult file</li>
+<li>Imputed income</li>
+<li>Functioning and disability</li>
+<li>Paradata</li>
+</ul>
+</div></div>
+
+<section id="combining-data" class="level4"><h4 class="anchored" data-anchor-id="combining-data">Combining data</h4>
+<section id="different-cycles" class="level5"><h5 class="anchored" data-anchor-id="different-cycles">Different cycles</h5>
+<p>It is possible to combine datasets from different years/cycles together in NHIS. Similar to NHANES, identification of the same person in NHIS across different cycles is not possible in the public release datasets. For appending data from different cycles, please make sure that the variable names/labels are the same/identical in years under consideration (in some years, names and labels do change).</p>
+</section><section id="within-the-same-cycle" class="level5"><h5 class="anchored" data-anchor-id="within-the-same-cycle">Within the same cycle</h5>
+<p>Within NHIS datasets in a given cycle, each sampled person has a household number (<code>HHX</code>), family number (<code>FMX</code>), and a person number within family (<code>FPX</code>). We can create a unique identifier based on these three variables and merge the datasets.</p>
+</section></section></section><section id="accessing-nhis-data" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="accessing-nhis-data">Accessing NHIS Data</h3>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>NHIS survey datasets are publicly available at <a href="https://www.cdc.gov/nchs/nhis/" class="uri">https://www.cdc.gov/nchs/nhis/</a></p>
+</div></div><p>Unlike NHANES where a R package is available to download the dataset, NHIS datasets need to be downloaded directly from the CDC website. In the following example, we will see how to download ‘Adult’ data from <a href="https://www.cdc.gov/nchs/nhis/2021nhis.htm">2021 NHIS</a>, and check associated variable in that dataset.</p>
+<div class="cell" data-hash="accessing5_cache/html/cdc1_47c782f09895130a412261d54cc5e97f">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis1.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+<ul>
+<li>
+<strong>Step 1</strong>: Say, for example, we are interested to download the adult dataset in the CSV format:</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/cdc2_764147c655fd06be22abca3b713fbd9b">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis2.png" class="img-fluid" style="width:65.0%"></p>
+</div>
+</div>
+<ul>
+<li>
+<strong>Step 2</strong>: We can download the data in the local PC folder, unzip it, and then read the data into R as as follows:</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/load_d2e85cc910f2ffa10488533069b1ff3e">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>adult21 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/accessing/adult21.csv"</span>, <span class="at">header =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-hash="accessing5_cache/html/loadMirror_0a01f16beee8a5d0b3ffe56be614392a">
+
+</div>
+<ul>
+<li>
+<strong>Step 3</strong>: Once data is imported in RStudio, we will see the <code>adult21</code> object listed under data window (see below):</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/cdc4_3c19cbd32fb7d687cd51c98baf48c3a9">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis3.png" class="img-fluid" style="width:65.0%"></p>
+</div>
+</div>
+<ul>
+<li>
+<strong>Step 4</strong>: We can check the variable names in this <code>adult21</code> dataset using the <code>names</code> function.</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/cdc5_a0ada100a9bb463b938093da28fde737">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">names</span>(adult21)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ul>
+<li>
+<strong>Step 5</strong>: We can check how many unique adults are in this <code>adult21</code> dataset. Note that the <code>HHX</code> variable in the dataset is the unique household identifier, where only one adult per household was selected for interview. We can use this <code>HHX</code> variable to merge adult datafile with other datafiles (e.g., child data).</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/uniquehh_e714c8949ca72ffec28be6288555526f">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(adult21<span class="sc">$</span>HHX))</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co">#&gt; [1] 29482</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ul>
+<li>
+<strong>Step 6</strong>: We can open the data in RStudio in the dataview window (by clicking the <code>adult21</code> data from the data window). The next Figure shows only a few columns and rows from this large dataset. Note that there are some values marked as “NA”, which represents missing values.</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/cdc6_6ca3610307043e6c135635056e22b4ad">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis4.png" class="img-fluid" style="width:99.0%"></p>
+</div>
+</div>
+<ul>
+<li>
+<strong>Step 7</strong>: To understand what the column names mean in this Figure, we need to take a look at the codebook, which is also available on the CDC website:</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/cdc7_b80916ccdecd09c956be907229a8c3f0">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis5.png" class="img-fluid" style="width:65.0%"></p>
+</div>
+</div>
+<ul>
+<li>
+<strong>Step 8</strong>: We can see a check for the column or variables, e.g., <code>REGION</code>, in the codebook:</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/cdc8_8f97509ff02ee8e1ed62a1e107531a46">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis6.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+<ul>
+<li>
+<strong>Step 9</strong>: We can assess if the numbers reported under count matches with what we get from the <code>adult21</code> data we just imported (particularly, for the <code>REGION</code> variable):</li>
+</ul>
+<div class="cell" data-hash="accessing5_cache/html/cdc9_60923f69e4e77dd6eb9aced9b1e60fac">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Frequency table</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="fu">table</span>(adult21<span class="sc">$</span>REGION, <span class="at">useNA =</span> <span class="st">"always"</span>) </span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; </span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt;     1     2     3     4  &lt;NA&gt; </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt;  4775  6327 10731  7649     0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Similarly, we can download the child data and open it in R:</p>
+<div class="cell" data-hash="accessing5_cache/html/loadchild_005844996cd327f91562d35a897f3ff6">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>child21 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/accessing/child21.csv"</span>, <span class="at">header =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-hash="accessing5_cache/html/loadchildMirror_5bb2958f2036b6aa097b9908cc79bf10">
+
+</div>
+<div class="cell" data-hash="accessing5_cache/html/nhisc1_4f143039b8f3176dcad5ffe2bbb25b58">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis_child1.png" class="img-fluid" style="width:65.0%"></p>
+</div>
+</div>
+<p>Let’s check how many unique children are in this <code>child21</code> dataset:</p>
+<div class="cell" data-hash="accessing5_cache/html/uniquehhc_069b2066b7673dc447f53ae917f2cb52">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(child21<span class="sc">$</span>HHX))</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt; [1] 8261</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now let’s check for the column or variables, e.g., <code>SEX_C</code>, in the codebook:</p>
+<div class="cell" data-hash="accessing5_cache/html/nhisc2_d81d43263b2ab3724b1cd048072a74c3">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis_child2.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+<p>We can assess if the numbers reported under count matches with what we get from the <code>child21</code> data we just imported:</p>
+<div class="cell" data-hash="accessing5_cache/html/nhisc3_95c525b2ac862bdc376d6ec4ffbf4cdc">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Frequency table</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">table</span>(child21<span class="sc">$</span>SEX_C, <span class="at">useNA =</span> <span class="st">"always"</span>) </span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; </span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt;    1    2    7 &lt;NA&gt; </span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; 4257 4002    2    0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="merging-within-the-same-cycle" class="level3"><h3 class="anchored" data-anchor-id="merging-within-the-same-cycle">Merging within the same cycle</h3>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We can use <code>HHX</code> variable to merge different datafiles within the same survey cycle.</p>
+</div>
+</div>
+<p>As mentioned earlier, <code>HHX</code> variable in the dataset is the unique household identifier. We can use this <code>HHX</code> variable to merge different datafiles within the same survey cycle. Say, we are interested in merging child age (AGEP_C) and sex (SEX_C) variables with the adult datafile. We can use the <code>merge</code> function as follows:</p>
+<div class="cell" data-hash="accessing5_cache/html/nhisc4_a415d8da8bd2b439a8df907b21b98aff">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">merge</span>(adult21, child21[,<span class="fu">c</span>(<span class="st">"HHX"</span>, <span class="st">"AGEP_C"</span>, <span class="st">"SEX_C"</span>)], <span class="at">by =</span> <span class="st">"HHX"</span>, <span class="at">all =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-hash="accessing5_cache/html/nhisc5_57ed64e1f38e04df6f827f66ccba47a1">
+<div class="cell-output-display">
+<p><img src="Images/accessing/nhis_child3.png" class="img-fluid" style="width:65.0%"></p>
+</div>
+</div>
+<p>As we can see, there are data from 30,673 unique households, suggesting that not all children are sampled from the same household of sampled adults.</p>
+<div class="cell" data-hash="accessing5_cache/html/uniquehhn_d1725a4a40077bec9d5d3db3e396a9ac">
+<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(dat<span class="sc">$</span>HHX))</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt; [1] 30673</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+
+
+<!-- -->
+
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./accessing4.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Reproducing results</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./accessingF.html" class="pagination-link">
+        <span class="nav-page-text">R Functions (A)</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb10" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">## Importing NHIS to R {.unnumbered}</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a>This tutorial provides instructions on accessing the National Health Interview Survey (NHIS) dataset from the US Centers for Disease Control and Prevention (CDC) website and importing it into the RStudio environment.</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="fu">### Overview</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a></span>
+<span id="cb10-7"><a href="#cb10-7"></a>Like NHANES, NHIS is supported by the CDC and is a large-scale multi-stage cross-sectional survey. The NHIS survey includes information on population disease prevalence, extent of disability, and use of health care services. In contrast to the NHANES that provides data every 2 years, NHIS provides data annually.</span>
+<span id="cb10-8"><a href="#cb10-8"></a></span>
+<span id="cb10-9"><a href="#cb10-9"></a>::: column-margin</span>
+<span id="cb10-10"><a href="#cb10-10"></a>To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster)</span>
+<span id="cb10-11"><a href="#cb10-11"></a>:::</span>
+<span id="cb10-12"><a href="#cb10-12"></a></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="fu">### NHIS datafile and documents</span></span>
+<span id="cb10-14"><a href="#cb10-14"></a></span>
+<span id="cb10-15"><a href="#cb10-15"></a>The NHIS files are stored in the NHIS website in different formats. You can import this data in any statistical package that supports these file formats, e.g., ASCII, CSV, SAS.</span>
+<span id="cb10-16"><a href="#cb10-16"></a></span>
+<span id="cb10-17"><a href="#cb10-17"></a>::: column-margin</span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="co">[</span><span class="ot">NHIS Data, Questionnaires and Related Documentation</span><span class="co">](https://www.cdc.gov/nchs/nhis/data-questionnaires-documentation.htm)</span></span>
+<span id="cb10-19"><a href="#cb10-19"></a>:::</span>
+<span id="cb10-20"><a href="#cb10-20"></a></span>
+<span id="cb10-21"><a href="#cb10-21"></a>::: column-margin</span>
+<span id="cb10-22"><a href="#cb10-22"></a>In the recent NHIS (2019 or later), data are available in 5 categories:</span>
+<span id="cb10-23"><a href="#cb10-23"></a></span>
+<span id="cb10-24"><a href="#cb10-24"></a><span class="ss">-   </span>Interview data for adults</span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="ss">-   </span>Interview data for children</span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="ss">-   </span>Imputed income for adults</span>
+<span id="cb10-27"><a href="#cb10-27"></a><span class="ss">-   </span>Imputed income for children</span>
+<span id="cb10-28"><a href="#cb10-28"></a><span class="ss">-   </span>Paradata</span>
+<span id="cb10-29"><a href="#cb10-29"></a>:::</span>
+<span id="cb10-30"><a href="#cb10-30"></a></span>
+<span id="cb10-31"><a href="#cb10-31"></a>::: column-margin</span>
+<span id="cb10-32"><a href="#cb10-32"></a>In the earlier NHIS (before 2019), data are available in 8 categories:</span>
+<span id="cb10-33"><a href="#cb10-33"></a></span>
+<span id="cb10-34"><a href="#cb10-34"></a><span class="ss">-   </span>Family file</span>
+<span id="cb10-35"><a href="#cb10-35"></a><span class="ss">-   </span>Household file</span>
+<span id="cb10-36"><a href="#cb10-36"></a><span class="ss">-   </span>Person file</span>
+<span id="cb10-37"><a href="#cb10-37"></a><span class="ss">-   </span>Child file</span>
+<span id="cb10-38"><a href="#cb10-38"></a><span class="ss">-   </span>Adult file</span>
+<span id="cb10-39"><a href="#cb10-39"></a><span class="ss">-   </span>Imputed income</span>
+<span id="cb10-40"><a href="#cb10-40"></a><span class="ss">-   </span>Functioning and disability</span>
+<span id="cb10-41"><a href="#cb10-41"></a><span class="ss">-   </span>Paradata</span>
+<span id="cb10-42"><a href="#cb10-42"></a>:::</span>
+<span id="cb10-43"><a href="#cb10-43"></a></span>
+<span id="cb10-44"><a href="#cb10-44"></a><span class="fu">#### Combining data</span></span>
+<span id="cb10-45"><a href="#cb10-45"></a></span>
+<span id="cb10-46"><a href="#cb10-46"></a><span class="fu">##### Different cycles</span></span>
+<span id="cb10-47"><a href="#cb10-47"></a></span>
+<span id="cb10-48"><a href="#cb10-48"></a>It is possible to combine datasets from different years/cycles together in NHIS. Similar to NHANES, identification of the same person in NHIS across different cycles is not possible in the public release datasets. For appending data from different cycles, please make sure that the variable names/labels are the same/identical in years under consideration (in some years, names and labels do change).</span>
+<span id="cb10-49"><a href="#cb10-49"></a></span>
+<span id="cb10-50"><a href="#cb10-50"></a><span class="fu">##### Within the same cycle</span></span>
+<span id="cb10-51"><a href="#cb10-51"></a></span>
+<span id="cb10-52"><a href="#cb10-52"></a>Within NHIS datasets in a given cycle, each sampled person has a household number (<span class="in">`HHX`</span>), family number (<span class="in">`FMX`</span>), and a person number within family (<span class="in">`FPX`</span>). We can create a unique identifier based on these three variables and merge the datasets.</span>
+<span id="cb10-53"><a href="#cb10-53"></a></span>
+<span id="cb10-54"><a href="#cb10-54"></a><span class="fu">### Accessing NHIS Data</span></span>
+<span id="cb10-55"><a href="#cb10-55"></a></span>
+<span id="cb10-56"><a href="#cb10-56"></a>::: column-margin</span>
+<span id="cb10-57"><a href="#cb10-57"></a>NHIS survey datasets are publicly available at <span class="ot">&lt;https://www.cdc.gov/nchs/nhis/&gt;</span></span>
+<span id="cb10-58"><a href="#cb10-58"></a>:::</span>
+<span id="cb10-59"><a href="#cb10-59"></a></span>
+<span id="cb10-60"><a href="#cb10-60"></a>Unlike NHANES where a R package is available to download the dataset, NHIS datasets need to be downloaded directly from the CDC website. In the following example, we will see how to download 'Adult' data from <span class="co">[</span><span class="ot">2021 NHIS</span><span class="co">](https://www.cdc.gov/nchs/nhis/2021nhis.htm)</span>, and check associated variable in that dataset.</span>
+<span id="cb10-61"><a href="#cb10-61"></a></span>
+<span id="cb10-62"><a href="#cb10-62"></a><span class="in">```{r cdc1, echo=FALSE, cache=TRUE, out.width = '100%'}</span></span>
+<span id="cb10-63"><a href="#cb10-63"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis1.png"</span>)</span>
+<span id="cb10-64"><a href="#cb10-64"></a><span class="in">```</span></span>
+<span id="cb10-65"><a href="#cb10-65"></a></span>
+<span id="cb10-66"><a href="#cb10-66"></a><span class="ss">-   </span>**Step 1**: Say, for example, we are interested to download the adult dataset in the CSV format:</span>
+<span id="cb10-67"><a href="#cb10-67"></a></span>
+<span id="cb10-68"><a href="#cb10-68"></a><span class="in">```{r cdc2, echo=FALSE, cache=TRUE, out.width = '65%'}</span></span>
+<span id="cb10-69"><a href="#cb10-69"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis2.png"</span>)</span>
+<span id="cb10-70"><a href="#cb10-70"></a><span class="in">```</span></span>
+<span id="cb10-71"><a href="#cb10-71"></a></span>
+<span id="cb10-72"><a href="#cb10-72"></a><span class="ss">-   </span>**Step 2**: We can download the data in the local PC folder, unzip it, and then read the data into R as as follows:</span>
+<span id="cb10-73"><a href="#cb10-73"></a></span>
+<span id="cb10-74"><a href="#cb10-74"></a><span class="in">```{r load, echo=TRUE, cache=TRUE, eval=FALSE}</span></span>
+<span id="cb10-75"><a href="#cb10-75"></a>adult21 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/accessing/adult21.csv"</span>, <span class="at">header =</span> T)</span>
+<span id="cb10-76"><a href="#cb10-76"></a><span class="in">```</span></span>
+<span id="cb10-77"><a href="#cb10-77"></a></span>
+<span id="cb10-78"><a href="#cb10-78"></a><span class="in">```{r loadMirror, echo=FALSE, cache=TRUE, eval=TRUE}</span></span>
+<span id="cb10-79"><a href="#cb10-79"></a>adult21 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/accessing/adult21.csv"</span>, <span class="at">header =</span> T)</span>
+<span id="cb10-80"><a href="#cb10-80"></a><span class="in">```</span></span>
+<span id="cb10-81"><a href="#cb10-81"></a></span>
+<span id="cb10-82"><a href="#cb10-82"></a><span class="ss">-   </span>**Step 3**: Once data is imported in RStudio, we will see the <span class="in">`adult21`</span> object listed under data window (see below):</span>
+<span id="cb10-83"><a href="#cb10-83"></a></span>
+<span id="cb10-84"><a href="#cb10-84"></a><span class="in">```{r cdc4, echo=FALSE, cache=TRUE, out.width = '65%'}</span></span>
+<span id="cb10-85"><a href="#cb10-85"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis3.png"</span>)</span>
+<span id="cb10-86"><a href="#cb10-86"></a><span class="in">```</span></span>
+<span id="cb10-87"><a href="#cb10-87"></a></span>
+<span id="cb10-88"><a href="#cb10-88"></a><span class="ss">-   </span>**Step 4**: We can check the variable names in this <span class="in">`adult21`</span> dataset using the <span class="in">`names`</span> function.</span>
+<span id="cb10-89"><a href="#cb10-89"></a></span>
+<span id="cb10-90"><a href="#cb10-90"></a><span class="in">```{r cdc5, echo=TRUE, eval=FALSE, cache=TRUE}</span></span>
+<span id="cb10-91"><a href="#cb10-91"></a><span class="fu">names</span>(adult21)</span>
+<span id="cb10-92"><a href="#cb10-92"></a><span class="in">```</span></span>
+<span id="cb10-93"><a href="#cb10-93"></a></span>
+<span id="cb10-94"><a href="#cb10-94"></a><span class="ss">-   </span>**Step 5**: We can check how many unique adults are in this <span class="in">`adult21`</span> dataset. Note that the <span class="in">`HHX`</span> variable in the dataset is the unique household identifier, where only one adult per household was selected for interview. We can use this <span class="in">`HHX`</span> variable to merge adult datafile with other datafiles (e.g., child data).</span>
+<span id="cb10-95"><a href="#cb10-95"></a></span>
+<span id="cb10-96"><a href="#cb10-96"></a><span class="in">```{r uniquehh, echo=TRUE, cache=TRUE}</span></span>
+<span id="cb10-97"><a href="#cb10-97"></a><span class="fu">length</span>(<span class="fu">unique</span>(adult21<span class="sc">$</span>HHX))</span>
+<span id="cb10-98"><a href="#cb10-98"></a><span class="in">```</span></span>
+<span id="cb10-99"><a href="#cb10-99"></a></span>
+<span id="cb10-100"><a href="#cb10-100"></a><span class="ss">-   </span>**Step 6**: We can open the data in RStudio in the dataview window (by clicking the <span class="in">`adult21`</span> data from the data window). The next Figure shows only a few columns and rows from this large dataset. Note that there are some values marked as "NA", which represents missing values.</span>
+<span id="cb10-101"><a href="#cb10-101"></a></span>
+<span id="cb10-102"><a href="#cb10-102"></a><span class="in">```{r cdc6, echo=FALSE, cache=TRUE, out.width = '99%'}</span></span>
+<span id="cb10-103"><a href="#cb10-103"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis4.png"</span>)</span>
+<span id="cb10-104"><a href="#cb10-104"></a><span class="in">```</span></span>
+<span id="cb10-105"><a href="#cb10-105"></a></span>
+<span id="cb10-106"><a href="#cb10-106"></a><span class="ss">-   </span>**Step 7**: To understand what the column names mean in this Figure, we need to take a look at the codebook, which is also available on the CDC website:</span>
+<span id="cb10-107"><a href="#cb10-107"></a></span>
+<span id="cb10-108"><a href="#cb10-108"></a><span class="in">```{r cdc7, echo=FALSE, cache=TRUE, out.width = '65%'}</span></span>
+<span id="cb10-109"><a href="#cb10-109"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis5.png"</span>)</span>
+<span id="cb10-110"><a href="#cb10-110"></a><span class="in">```</span></span>
+<span id="cb10-111"><a href="#cb10-111"></a></span>
+<span id="cb10-112"><a href="#cb10-112"></a><span class="ss">-   </span>**Step 8**: We can see a check for the column or variables, e.g., <span class="in">`REGION`</span>, in the codebook:</span>
+<span id="cb10-113"><a href="#cb10-113"></a></span>
+<span id="cb10-114"><a href="#cb10-114"></a><span class="in">```{r cdc8, echo=FALSE, cache=TRUE, out.width = '100%'}</span></span>
+<span id="cb10-115"><a href="#cb10-115"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis6.png"</span>)</span>
+<span id="cb10-116"><a href="#cb10-116"></a><span class="in">```</span></span>
+<span id="cb10-117"><a href="#cb10-117"></a></span>
+<span id="cb10-118"><a href="#cb10-118"></a><span class="ss">-   </span>**Step 9**: We can assess if the numbers reported under count matches with what we get from the <span class="in">`adult21`</span> data we just imported (particularly, for the <span class="in">`REGION`</span> variable):</span>
+<span id="cb10-119"><a href="#cb10-119"></a></span>
+<span id="cb10-120"><a href="#cb10-120"></a><span class="in">```{r cdc9, echo=TRUE, cache=TRUE}</span></span>
+<span id="cb10-121"><a href="#cb10-121"></a><span class="co"># Frequency table</span></span>
+<span id="cb10-122"><a href="#cb10-122"></a><span class="fu">table</span>(adult21<span class="sc">$</span>REGION, <span class="at">useNA =</span> <span class="st">"always"</span>) </span>
+<span id="cb10-123"><a href="#cb10-123"></a><span class="in">```</span></span>
+<span id="cb10-124"><a href="#cb10-124"></a></span>
+<span id="cb10-125"><a href="#cb10-125"></a>Similarly, we can download the child data and open it in R:</span>
+<span id="cb10-126"><a href="#cb10-126"></a></span>
+<span id="cb10-127"><a href="#cb10-127"></a><span class="in">```{r loadchild, echo=TRUE, cache=TRUE, eval=FALSE}</span></span>
+<span id="cb10-128"><a href="#cb10-128"></a>child21 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/accessing/child21.csv"</span>, <span class="at">header =</span> T)</span>
+<span id="cb10-129"><a href="#cb10-129"></a><span class="in">```</span></span>
+<span id="cb10-130"><a href="#cb10-130"></a></span>
+<span id="cb10-131"><a href="#cb10-131"></a><span class="in">```{r loadchildMirror, echo=FALSE, cache=TRUE, eval=TRUE}</span></span>
+<span id="cb10-132"><a href="#cb10-132"></a>child21 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/accessing/child21.csv"</span>, <span class="at">header =</span> T)</span>
+<span id="cb10-133"><a href="#cb10-133"></a><span class="in">```</span></span>
+<span id="cb10-134"><a href="#cb10-134"></a></span>
+<span id="cb10-135"><a href="#cb10-135"></a><span class="in">```{r nhisc1, echo=FALSE, cache=TRUE, out.width = '65%'}</span></span>
+<span id="cb10-136"><a href="#cb10-136"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis_child1.png"</span>)</span>
+<span id="cb10-137"><a href="#cb10-137"></a><span class="in">```</span></span>
+<span id="cb10-138"><a href="#cb10-138"></a></span>
+<span id="cb10-139"><a href="#cb10-139"></a>Let's check how many unique children are in this <span class="in">`child21`</span> dataset:</span>
+<span id="cb10-140"><a href="#cb10-140"></a></span>
+<span id="cb10-141"><a href="#cb10-141"></a><span class="in">```{r uniquehhc, echo=TRUE, cache=TRUE}</span></span>
+<span id="cb10-142"><a href="#cb10-142"></a><span class="fu">length</span>(<span class="fu">unique</span>(child21<span class="sc">$</span>HHX))</span>
+<span id="cb10-143"><a href="#cb10-143"></a><span class="in">```</span></span>
+<span id="cb10-144"><a href="#cb10-144"></a></span>
+<span id="cb10-145"><a href="#cb10-145"></a>Now let's check for the column or variables, e.g., <span class="in">`SEX_C`</span>, in the codebook:</span>
+<span id="cb10-146"><a href="#cb10-146"></a></span>
+<span id="cb10-147"><a href="#cb10-147"></a><span class="in">```{r nhisc2, echo=FALSE, cache=TRUE, out.width = '100%'}</span></span>
+<span id="cb10-148"><a href="#cb10-148"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis_child2.png"</span>)</span>
+<span id="cb10-149"><a href="#cb10-149"></a><span class="in">```</span></span>
+<span id="cb10-150"><a href="#cb10-150"></a></span>
+<span id="cb10-151"><a href="#cb10-151"></a>We can assess if the numbers reported under count matches with what we get from the <span class="in">`child21`</span> data we just imported:</span>
+<span id="cb10-152"><a href="#cb10-152"></a></span>
+<span id="cb10-153"><a href="#cb10-153"></a><span class="in">```{r nhisc3, echo=TRUE, cache=TRUE}</span></span>
+<span id="cb10-154"><a href="#cb10-154"></a><span class="co"># Frequency table</span></span>
+<span id="cb10-155"><a href="#cb10-155"></a><span class="fu">table</span>(child21<span class="sc">$</span>SEX_C, <span class="at">useNA =</span> <span class="st">"always"</span>) </span>
+<span id="cb10-156"><a href="#cb10-156"></a><span class="in">```</span></span>
+<span id="cb10-157"><a href="#cb10-157"></a></span>
+<span id="cb10-158"><a href="#cb10-158"></a><span class="fu">### Merging within the same cycle</span></span>
+<span id="cb10-159"><a href="#cb10-159"></a></span>
+<span id="cb10-160"><a href="#cb10-160"></a>::: callout-note</span>
+<span id="cb10-161"><a href="#cb10-161"></a>We can use <span class="in">`HHX`</span> variable to merge different datafiles within the same survey cycle.</span>
+<span id="cb10-162"><a href="#cb10-162"></a>:::</span>
+<span id="cb10-163"><a href="#cb10-163"></a></span>
+<span id="cb10-164"><a href="#cb10-164"></a>As mentioned earlier, <span class="in">`HHX`</span> variable in the dataset is the unique household identifier. We can use this <span class="in">`HHX`</span> variable to merge different datafiles within the same survey cycle. Say, we are interested in merging child age (AGEP_C) and sex (SEX_C) variables with the adult datafile. We can use the <span class="in">`merge`</span> function as follows:</span>
+<span id="cb10-165"><a href="#cb10-165"></a></span>
+<span id="cb10-166"><a href="#cb10-166"></a><span class="in">```{r nhisc4, echo=TRUE, cache=TRUE}</span></span>
+<span id="cb10-167"><a href="#cb10-167"></a>dat <span class="ot">&lt;-</span> <span class="fu">merge</span>(adult21, child21[,<span class="fu">c</span>(<span class="st">"HHX"</span>, <span class="st">"AGEP_C"</span>, <span class="st">"SEX_C"</span>)], <span class="at">by =</span> <span class="st">"HHX"</span>, <span class="at">all =</span> T)</span>
+<span id="cb10-168"><a href="#cb10-168"></a><span class="in">```</span></span>
+<span id="cb10-169"><a href="#cb10-169"></a></span>
+<span id="cb10-170"><a href="#cb10-170"></a><span class="in">```{r nhisc5, echo=FALSE, cache=TRUE, out.width = '65%'}</span></span>
+<span id="cb10-171"><a href="#cb10-171"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">"Images/accessing/nhis_child3.png"</span>)</span>
+<span id="cb10-172"><a href="#cb10-172"></a><span class="in">```</span></span>
+<span id="cb10-173"><a href="#cb10-173"></a></span>
+<span id="cb10-174"><a href="#cb10-174"></a>As we can see, there are data from 30,673 unique households, suggesting that not all children are sampled from the same household of sampled adults.</span>
+<span id="cb10-175"><a href="#cb10-175"></a></span>
+<span id="cb10-176"><a href="#cb10-176"></a><span class="in">```{r uniquehhn, echo=TRUE, cache=TRUE}</span></span>
+<span id="cb10-177"><a href="#cb10-177"></a><span class="fu">length</span>(<span class="fu">unique</span>(dat<span class="sc">$</span>HHX))</span>
+<span id="cb10-178"><a href="#cb10-178"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

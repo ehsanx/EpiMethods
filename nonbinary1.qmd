@@ -1,0 +1,160 @@
+## Polytomous and ordinal {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+require(Publish)
+require(survey)
+require(svyVGAM)
+require(car)
+library(knitr)
+
+
+# Function to exclude invalid responses
+invalid.exclude <- function(Data, Var){
+  subset.data <- subset(Data, eval(parse(text = Var)) != "DON'T KNOW" & 
+                          eval(parse(text = Var)) != "REFUSAL" & 
+                          eval(parse(text = Var)) != "NOT STATED")
+  x1 <- dim(Data)[1]
+  x2 <- dim(subset.data)[1]
+  cat( format(x1-x2, big.mark = ","),
+       "subjects deleted, and current N =" , format(x2, big.mark = ",") , "\n")
+  return(subset.data)
+}
+```
+
+### Data
+
+```{r load, cache=TRUE}
+require(car)
+require(survey)
+analytic <- readRDS("Data/nonbinary/cmh.Rds")
+str(analytic)
+```
+
+### Multinomial logistic
+
+#### Unweighted Tables
+
+```{r t1, cache=TRUE}
+require("tableone")
+tab1 <- CreateTableOne(vars = c("CommunityBelonging", "Age", "Sex", "RaceEthnicity", "MainIncome"),
+                       strata = "MHcondition", data = analytic)
+print(tab1, showAllLevels = TRUE)
+```
+
+#### Multinomial Model fitting
+
+```{r mm, cache=TRUE}
+require(nnet)
+analytic$MHcondition2=relevel(analytic$MHcondition, ref ="Poor or Fair")
+analytic$CommunityBelonging2=relevel(analytic$CommunityBelonging, ref="VERY WEAK")
+analytic$Age2=relevel(analytic$Age, ref="65 years or older")
+analytic$Sex2=relevel(analytic$Sex, ref="FEMALE")
+analytic$RaceEthnicity2=relevel(analytic$RaceEthnicity, ref="NON-WHITE")
+fit4 <- multinom(MHcondition2 ~CommunityBelonging2 + Sex2 + Age2 + RaceEthnicity2 + MainIncome, 
+                    data = analytic)
+kable(round(exp(cbind(coef(fit4), confint(fit4))),2))
+```
+
+### Multinomial logistic for complex survey
+
+#### Survey-weighted Tables
+
+```{r t1s, cache=TRUE}
+require(survey)
+svy.analytic <- svydesign(ids = ~ 1, weights = ~ Weight, data = analytic)
+svyCreateTableOne(vars = c("CommunityBelonging", "Age", "Sex", "RaceEthnicity", "MainIncome"), 
+                  data = svy.analytic)
+tab2 <- svyCreateTableOne(vars = c("CommunityBelonging", "Age", "Sex", "RaceEthnicity", 
+                                   "MainIncome"), strata = "MHcondition", data = svy.analytic)
+print(tab2, showAllLevels = TRUE)
+```
+
+#### Setting up the design
+
+```{r dd, cache=TRUE}
+w.design <- svydesign(id=~1, weights=~Weight, 
+                      data=analytic)
+w.design <- update(w.design , MHcondition2=relevel(MHcondition, ref ="Poor or Fair"),
+                  CommunityBelonging2=relevel(CommunityBelonging, ref="VERY WEAK"),
+                  Age2=relevel(Age, ref="65 years or older"),
+                  Sex2=relevel(Sex, ref="FEMALE"),
+                  RaceEthnicity2=relevel(RaceEthnicity, ref="NON-WHITE"))
+w.design2 <- as.svrepdesign(w.design, type="bootstrap" , replicates=50)
+```
+
+#### Multinomial Model fitting
+
+```{r mms, cache=TRUE, echo = TRUE, results = 'hide'}
+require(svyVGAM)
+fit5 <- svy_vglm(MHcondition2 ~CommunityBelonging2 + Sex2 + Age2 + RaceEthnicity2 + MainIncome,
+                    design = w.design2, family = multinomial)
+```
+
+```{r mmsprint, cache=TRUE}
+kable(round(exp(cbind(coef(fit5), confint(fit5))),2))
+```
+
+### Ordinal Regression
+
+#### Ordering outcome
+
+```{r ord, cache=TRUE}
+analytic$CommunityBelonging2=relevel(analytic$CommunityBelonging, ref="VERY WEAK")
+analytic$Age2=relevel(analytic$Age, ref="65 years or older")
+analytic$Sex2=relevel(analytic$Sex, ref="FEMALE")
+analytic$RaceEthnicity2=relevel(analytic$RaceEthnicity, ref="NON-WHITE")
+analytic$MHcondition3 = factor(analytic$MHcondition, levels=c("Poor or Fair", 
+                                            "Good", "Very good or excellent"), 
+                      ordered=TRUE)
+```
+
+#### Ordinal logistic
+
+```{r olr, cache=TRUE}
+require(MASS)
+fit5o1 <- polr(MHcondition3 ~CommunityBelonging2 + 
+                  Sex2 + Age2 + RaceEthnicity2 + MainIncome, 
+                data=analytic)
+kable(round(exp(cbind(coef(fit5o1), confint(fit5o1))),2))
+```
+
+#### Ordinal logistic for complex survey
+
+```{r olrs, cache=TRUE}
+w.design <- svydesign(id=~1, weights=~Weight, 
+                      data=analytic)
+w.design<-update(w.design , 
+                  CommunityBelonging2=relevel(CommunityBelonging, ref="VERY WEAK"),
+                  Age2=relevel(Age, ref="65 years or older"),
+                  Sex2=relevel(Sex, ref="FEMALE"),
+                  RaceEthnicity2=relevel(RaceEthnicity, ref="NON-WHITE"),
+                  MHcondition3 = factor(MHcondition, levels=c("Poor or Fair", "Good", 
+                                                              "Very good or excellent"), 
+                                        ordered=TRUE))
+fit5o <- svyolr(MHcondition3 ~CommunityBelonging2 + Sex2 + Age2 + RaceEthnicity2 + MainIncome, 
+                design=w.design)
+kable(round(exp(cbind(coef(fit5o), confint(fit5o))),2))
+```
+
+#### Assessing model fit
+
+```{r rolrsassess, cache=TRUE}
+regTermTest(fit5o, ~CommunityBelonging2 , df = Inf) 
+regTermTest(fit5o, ~Age2 , df = Inf) 
+regTermTest(fit5o, ~Sex2 , df = Inf)
+regTermTest(fit5o, ~RaceEthnicity2 , df = Inf)
+regTermTest(fit5o, ~MainIncome , df = Inf)
+```
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/x7VICDQRrD4" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

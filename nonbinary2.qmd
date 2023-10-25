@@ -1,0 +1,337 @@
+## Survival analysis {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+require(knitr)
+require(Publish)
+require(survey)
+library(broom)
+library(tidyverse)
+require(survminer)
+```
+
+### The lung dataset
+
+-   inst: Institution code
+-   time: Survival time in days
+-   status: censoring status
+    -   1=censored,
+    -   2=dead
+-   age: Age in years
+-   sex:
+    -   Male=1
+    -   Female=2
+-   ph.ecog: ECOG performance score (0=good 5=dead)
+-   ph.karno: Karnofsky performance score (bad=0-good=100) rated by physician
+-   pat.karno: Karnofsky performance score as rated by patient
+-   meal.cal: Calories consumed at meals
+-   wt.loss: Weight loss in last six months
+
+```{r load, cache=TRUE}
+library(survival)
+head(lung)
+kable(head(lung))
+# kable(lung)
+```
+
+### What is censoring?
+
+Censoring occurs if a subject leave the study without experiencing the event
+
+### Types of censoring
+
+#### Left censoring:
+
+The subject has experienced the event before enrollment
+
+#### Right censoring:
+
+-   Loss to follow-up
+-   Withdraw from the study
+-   Survive to the end of the study
+
+In this lab, we focus on right censoring
+
+### Components of survival data
+
+There are four components in survival data:
+
+For any individual i:
+
+-   Event time $T_i$
+-   Censoring time $C_i$
+-   Event indicator $\delta_i$
+-   Observed time $Y_i=min(T_i,C_i)$
+
+### Event indicator
+
+The event indicator $\delta_i$ was defined as a binary data
+
+-   $\delta_i=1$ if $T_i \leq C_i$
+-   $\delta_i=0$ if $T_i > C_i$
+
+### Survival function
+
+Survival function represents the probability that an individual will survival past time $t$
+
+$S(t) = Pr(T>t)=1-F(t)$, where $F(t)$ is the cumulative distribution function.
+
+### Survival probability
+
+Given that a subject is still alive just before time $t$, the survival probability $S(t)$ represents the probability of surviving beyond time $t$. We could plot survival probability in lung dataset
+
+### Creating survival objects
+
+A survival object is the survival time and can be used as the "response" in survival analysis. To estimate $S(t)$, we usually use the non-parametric method called Kaplan-Meier method. In R, we can use "Surv" in survival package to create survival objects. Let us take a look at the first 10 subjects in lung dataset. The numbers are the survival time for each individual, $+$ indicates that the observation has been censored
+
+```{r obj, cache=TRUE}
+Surv(lung$time, lung$status)[1:10]
+```
+
+### Estimating survival curves with the Kaplan-Meier method
+
+"survfit" in survival package can help us to estimate survival curves using KM method
+
+```{r fit, cache=TRUE}
+f1 <- survfit(Surv(time, status) ~ 1, data = lung)
+# Surv(time, status) is the survival object we just introduced
+# show the objects in the f1
+names(f1)
+```
+
+### Kaplan-Meier plot
+
+We could plot the above fitting to have a KM plot in R
+
+```{r km, cache=TRUE}
+plot(survfit(Surv(time, status) ~ 1, data = lung), 
+     xlab = "Days", 
+     ylab = "Overall survival probability")
+
+## We could also do KM by groups
+plot(survfit(Surv(time, status) ~ sex, data = lung), 
+     xlab = "Days", 
+     ylab = "Overall survival probability")
+## Adding legend
+fit0 <- survfit(Surv(time, status) ~ sex, data = lung)
+plot(fit0, 
+     xlab = "Days", 
+     ylab = "Overall survival probability",
+     lty = 1:2,col=1:2)
+Lab.x <- names(fit0$strata)
+legend("topright", legend=Lab.x,
+  col=1:2, lty=1:2,horiz=FALSE,bty='n')
+#library(survminer)
+# ggsurvplot(survfit(Surv(time, status) ~ sex, data = lung), data = lung,
+#            xlab="Days",
+#            ylab = "Survival probability")
+```
+
+### Estimating median survival time
+
+Usually, the survival time will not be normally (or symmetrically) distributed. Therefore, mean is not a good summary for survival time. Instead, we use median to estimate. "survfit" in survival package present the summary of median
+
+```{r median, cache=TRUE}
+survfit(Surv(time, status) ~ 1, data = lung)
+```
+
+### Comparing survival times between groups
+
+We could use log-rank test to test whether there exists significant difference in survival time between groups. The log-rank test put the same weights on every observation. It could be done in R use "survdiff" from survival package
+
+```{r stime, cache=TRUE}
+survdiff(Surv(time, status) ~ sex, data = lung)
+```
+
+The results indicated that the survival time depends on the sex (p-value = 0.001); e.g., associated with sex variable.
+
+### The Cox regression model
+
+The Cox regression model (aka Cox proportional-hazard model) is semi-parametric model to quantify the effect size in survival analysis.
+
+-   $h(t|X_i)=h_0(t)exp(\beta_0+\beta_1X_{i1}+\beta_2X_{i2}+\beta_3X_{i3}+...+\beta_pX_{ip})$, where
+    -   $h_0(t)$ is the baseline hazard and
+    -   $h(t)$ is the hazard at time $t$
+
+In R, we have "coxph" from survival package to fit a Cox PH model
+
+```{r coxph, cache=TRUE}
+fit <- coxph(Surv(time, status) ~ sex, data = lung) # add sex as covariate
+summary(fit)
+require(Publish)
+publish(fit)
+```
+
+More variables
+
+```{r coxph2, cache=TRUE}
+fit <- coxph(Surv(time, status) ~ sex + ph.ecog + 
+               ph.karno + pat.karno + meal.cal + wt.loss, 
+             data = lung) # add more covariates
+summary(fit)
+```
+
+### Formatting Cox regression results
+
+To format the Cox regression results into a nice table format, we could use "tidy" (broom package).
+
+```{r coxphres, cache=TRUE}
+library(broom)
+library(tidyverse)
+summary(fit)
+require(Publish)
+publish(fit)
+kable(broom::tidy(fit, exp = TRUE))
+kable(broom::tidy(fit, exp = TRUE), digits = 2)
+require(survminer)
+ggforest(fit, data = lung)
+```
+
+### Hazard ratios
+
+-   In Cox regression model, the quantity we interested is the **hazard ratio**, which is the ratio of hazards in two different groups (i.e., exposed vs unexposed).
+-   Hazard ratio at time $t$ is denoted by $HR=\frac{h_1(t)}{h_0(t)}$ where $h(t)$ is the hazard function representing the instantaneous rate that the first event may occur.
+-   Hazard ratio is **not** a risk, and it can estimated by exponatial the estimated coefficients (i.e., $exp(\beta)$).
+-   In the above Cox model, the HR is 0.59 which indicated that the hazard in Female is smaller than Male.
+-   In generally, a $HR>1$ indicates a higher hazard, and $HR<1$ indicated a reduced hazard.
+
+### Assessing proportional hazards
+
+-   As mentioned before, the Cox model is also called as Cox proportional hazard model.
+-   The assumption made here is the hazards in both group are proportional.
+-   The easiest way of assessing proportional hazard assumption is to use "cox.zph"
+-   This function uses the Schoenfeld residuals against the transformed time.
+-   Ideally, this checks if the hazard rate of an individual is relatively constant in time.
+
+```{r coxph3, cache=TRUE}
+f2 <- coxph(Surv(time, status) ~ sex, data = lung)
+test <- cox.zph(f2)
+test
+plot(test)
+```
+
+-   Here, p-value is greater than 0.05, there is no evidence against PH assumption.
+-   Having very small p values (say, 0.001) indicates that there may be time dependent coefficients which the modelling needs to take care of.
+
+### Time-dependent covariate
+
+Time-dependent covariate occurs when individual's covariate values are may be different at different time (measured repeatedly over time).
+
+#### Data setup
+
+```{r tdcov, cache=TRUE}
+# Create a simple data set for a time-dependent model
+# See ?coxph
+test.data <- list(start=c(1, 2, 5, 2, 1, 7, 3, 4, 8, 8),
+                  stop =c(2, 3, 6, 7, 8, 9, 9, 9,14,17),
+                  event=c(1, 1, 1, 1, 1, 1, 1, 0, 0, 0),
+                  tx  =c(1, 0, 0, 1, 0, 1, 1, 1, 0, 0) )
+test.data
+as.data.frame(test.data)
+```
+
+### Time-dependent covariate - Cox regression
+
+```{r tdcov2, cache=TRUE}
+fit.td <- coxph( Surv(start, stop, event) ~ tx, test.data)
+summary(fit.td)
+publish(fit.td)
+```
+
+### Survival analysis in Complex Survey data
+
+-   Example data from [GitHub](https://github.com/chiragjp/nhanes_scidata).
+-   Below we created the design
+
+## Data and Variables
+
+```{r complex, cache=TRUE}
+load("Data/nonbinary/nh_99-06.Rdata") # 
+analytic.miss <- as.data.frame(MainTable[c("SDMVPSU", "SDMVSTRA", "WTMEC2YR", "PERMTH_INT", "PERMTH_EXM", "MORTSTAT", "female", "RIDAGEYR", "white")])
+```
+
+-   MORTSTAT: Final Mortality Status
+    -   0 Assumed alive
+    -   1 Assumed deceased
+    -   Blank Ineligible for mortality follow-up or under age 17
+-   PERMTH_EXM: Person Months of Follow-up from MEC/Home Exam Date
+    -   0 - 217
+    -   Blank Ineligible
+-   PERMTH_INT: Person Months of Follow-up from Interview Date
+
+#### Data issues
+
+```{r complex2, cache=TRUE}
+with(analytic.miss[1:30,], 
+     Surv(PERMTH_EXM, MORTSTAT))
+summary(analytic.miss$WTMEC2YR)
+# avoiding 0 weight issues
+analytic.miss$WTMEC2YR[analytic.miss$WTMEC2YR == 0] <- 0.001
+require(DataExplorer)
+plot_missing(analytic.miss)
+```
+
+#### Design creation
+
+```{r complex3, cache=TRUE}
+analytic.miss$ID <- 1:nrow(analytic.miss)
+analytic.miss$miss <- 0
+analytic.cc <- as.data.frame(na.omit(analytic.miss))
+dim(analytic.cc)
+analytic.miss$miss[analytic.miss$ID %in% 
+                     analytic.cc$ID] <- 0
+w.design0 <- svydesign(id=~SDMVPSU, 
+                       strata=~SDMVSTRA, 
+                       weights=~WTMEC2YR, 
+                       nest=TRUE,
+                       data=analytic.miss)
+w.design <- subset(w.design0, 
+                   miss == 0)
+summary(weights(w.design))
+```
+
+### Survival Analysis within Complex Survey
+
+#### KM plot
+
+```{r complex4, cache=TRUE}
+fit0 <- svykm(Surv(PERMTH_EXM, MORTSTAT) ~ 1, 
+              design = w.design)
+plot(fit0)
+```
+
+#### Cox PH
+
+```{r complex5, cache=TRUE}
+fit <- svycoxph(Surv(PERMTH_EXM, MORTSTAT) ~ 
+                  white + female + RIDAGEYR, 
+                design = w.design) 
+publish(fit)
+```
+
+#### PH assumption
+
+```{r complex6, cache=TRUE}
+testPh <- cox.zph(fit) 
+print(testPh)
+plot(testPh) 
+```
+
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/WuY7BLmfEIk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/XpQW360Vkac" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

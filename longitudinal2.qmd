@@ -1,0 +1,347 @@
+## GEE {.unnumbered}
+
+In this section, we will learn about generalized estimating equation (GEE). GEE is another popular method for modeling longitudinal or clustered data. In contrast to the mixed effects models where we assume error term and beta coefficients for subject $i$ both follow normal distribution, GEE is distribution free. However, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+knitr::opts_chunk$set(echo = TRUE)
+require(HSAUR2)
+library(gee)
+library(MuMIn)
+library(geepack)
+library("lme4")
+require(afex)
+```
+
+### Data Description
+
+In addition to BtheB dataset in part 1, we used respiratory data from **HSAUR2** package to demonstrate the analysis with non-normal responses:
+
+-   The response variable in this dataset is **status** (the respiratory status), which is a binary response
+-   Other covariates are: treatment, age, gender, the study center
+-   The response has been measured at 0, 1, 2, 3, 4 mths for each subject
+
+```{r load, cache=TRUE}
+data("respiratory", package = "HSAUR2")
+head(respiratory)
+```
+
+### Methods for Non-normal Distributions
+
+-   ref: [@hothorn2014handbook] Section 13.2
+
+-   In addition to normally distributed response variables, the response variable can also follow non-normal distributions, such as binary or count responses.
+
+-   We have learned logistic regression or Poisson regression (glm) to analyze binary and count data but they are not considering the "repeated measurement" structure.
+
+-   The consequence of ignoring the longitudinal/repeated measurements structure is to have the wrong estimated standard errors for regression coefficients. Hence, our inference will be invalid. However, the glm still gives consistent estimated beta coefficients.
+
+-   There are many correlation structures in modelling GEE.
+
+-   With non-normal responses, different assumptions about these correlation structures can lead to different interpretations of the beta coefficients. Here, we will introduce two different GEE models: **marginal model** and **conditional model**.
+
+### Marginal Models
+
+-   ref: [@hothorn2014handbook] Section 13.2.1
+
+Repeated measurement and longitudinal data has responses taken at different time points. Therefore, we could simply review them as many series of cross-sectional data. Each cross-sectional data can be analyzed using glm introduced in previous lectures. Then a correlation structure can be assumed to connect different "cross-sections". The common correlation structures are:
+
+#### An independent structure
+
+An independent structure which assumes the repeated measures are independent. An example of independent structure is basically is an identity matrix:
+
+$$
+\left(\begin{array}{ccc} 
+1 & 0 & 0\\ 
+0 & 1 & 0\\
+0 & 0 & 1
+\end{array}\right)
+$$
+
+#### An exchangeable correlation
+
+An exchangeable correlation assumes that for the each individual, the correlation between each pair of repeated measurements is the same, i.e., $Cor(Y_{ij},Y_{ik})=\rho$. In the correlation matrix, only $\rho$ is unknown. Therefore, it is a single parameter working correlation matrix. An example of exchangeable correlation matrix is:
+
+$$
+\left(\begin{array}{ccc} 
+1 & \rho & \rho\\ 
+\rho & 1 & \rho\\
+\rho & \rho & 1
+\end{array}\right)
+$$
+
+#### An AR-1 autoregressive correlation
+
+Defined as $Cor(Y_{ij},Y_{ik})=\rho^{|k-j|}$. If two measurements are taken at two closer time points the correlation is higher than these taken at two farther apart time points. It is also a single parameter working correlation matrix. An example of AR-1 correlation matrix is:
+
+$$
+\left(\begin{array}{ccc} 
+1 & \rho & \rho^2\\ 
+\rho & 1 & \rho\\
+\rho^2 & \rho & 1
+\end{array}\right)
+$$
+
+#### An unstructured correlation
+
+Different pairs of observation for each individual have different correlations $Cor(Y_{ij},Y_{ik})=\rho_{jk}$. Assume that each individual has $K$ pairs of measurements, it is a $K(K-1)/2$ parameters working correlation matrix. An example of unstructured correlation matrix is:
+
+$$
+\left(\begin{array}{ccc} 
+1 & \rho_{12} & \rho_{13}\\ 
+\rho_{12} & 1 & \rho_{23}\\
+\rho_{13} & \rho_{23} & 1
+\end{array}\right)
+$$
+
+-   Sometimes, specifying a "right" correlation matrix is hard. However, the marginal model (usually we use GEE) gives us consistent estimated coefficients even with misspecified correlation structure.
+
+### Conditional Models
+
+-   ref: [@hothorn2014handbook] Section 13.2.2
+
+-   In GEE marginal models, the estimated regression coefficients are marginal (or population-averaged) effects. Therefore, the interpretation are at population-level. It is almost impossible to make inference on any specific individual or cluster.
+
+-   One solution is to do conditional models. The random effect approach in the part 1 can be extended to non-Gaussian response.
+
+### GEE models
+
+After the short introduction of two models, let's take a look at real examples
+
+-   ref: [@hothorn2014handbook] Section 13.3
+-   ref: [@faraway2016extending] Section 10.2
+
+#### Binary response
+
+We started with binary response using respiratory dataset:
+
+```{r gee1, cache=TRUE}
+library(gee)
+data("respiratory", package = "HSAUR2")
+## Data manipulation
+resp <- subset(respiratory, month > "0")
+resp$baseline <- rep(subset(respiratory, month == "0")$status, rep(4, 111))
+## Change the response to 0 and 1
+resp$nstat <- as.numeric(resp$status == "good")
+resp$month <- resp$month[, drop = TRUE]
+```
+
+Now we will fit a regular glm, i.e., model without random effect or any correlation structures. For binary outcomes, the estimated coefficients are log odds.
+
+```{r gee2, cache=TRUE}
+## Regular GLM 
+resp_glm <- glm(status ~ centre + treatment + gender + baseline+ age, 
+                data = resp, family = "binomial")
+summary(resp_glm)
+```
+
+Now we will fit GEE with independent correlation structure:
+
+```{r gee3, cache=TRUE}
+## GEE with identity matrix
+resp_gee.in <- gee(nstat ~ centre + treatment + gender + baseline + age, 
+                 data = resp, family = "binomial", 
+                 id = subject,corstr = "independence", 
+                 scale.fix = TRUE, scale.value = 1)
+summary(resp_gee.in)
+```
+
+-   This model assumes an independent correlation structure, the output will be equal to glm.
+
+-   The outputs started from a summary of residuals
+
+-   The estimated coefficients are the same as GLM. For binary outcome, you may still interpret them as log odds. Naive SE and z value are estimated directly from this model. Robust SE and z are sandwich estimates.
+
+-   The difference between naive and robust indicates that the correlation structure may not be good.
+
+-   Working Correlation is the correlation structure estimated from the data (identity matrix for independence).
+
+Let fit the GEE model with exchangeable correlation structure:
+
+```{r geeex, cache=TRUE}
+## GEE with exchangeable matrix
+resp_gee.ex <- gee(nstat ~ centre + treatment + gender + baseline+ age, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE, scale.value = 1)
+summary(resp_gee.ex)
+```
+
+-   This model assumes an exchangeable correlation structure.
+
+-   The outputs started from a summary of residuals
+
+-   The estimated coefficients are the same GLM. For binary outcome, you may still interpret them as log odds. Naive S.E and z value are estimated directly from this model. Robust SE and z are sandwich estimates
+
+-   The difference between naive and robust is smaller, which indicates that the correlation structure is better specified.
+
+-   Working Correlation is the correlation structure estimated from the data
+
+Let's check the estimated coefficients from all three models.
+
+```{r summ, cache=TRUE}
+summary(resp_glm)$coefficients
+summary(resp_gee.in)$coefficients
+summary(resp_gee.ex)$coefficients
+# Same estimated coefficients but different SEs
+```
+
+GEE with identity matrix is the same as GLM model. If we change the correlation structure to exchangeable does not change the beta estimates, but the naive SEs are closer to Robust SE, which indicates that the exchangeable correlation structure is a better reflection of the correlation structures.
+
+#### Gaussian response
+
+GEE can also be applied to Gaussian response
+
+```{r gaus, cache=TRUE}
+library(gee)
+library(HSAUR2)
+BtheB$subject <- factor(rownames(BtheB))
+nobs <- nrow(BtheB)
+BtheB_long <- reshape(BtheB, idvar = "subject", 
+                      varying = c("bdi.2m", "bdi.3m", "bdi.5m", "bdi.8m"), 
+                      direction = "long")
+BtheB_long$time <- rep(c(2, 3, 5, 8), rep(nobs, 4))
+osub <- order(as.integer(BtheB_long$subject))
+BtheB_long <- BtheB_long[osub,]
+btb_gee.ind <- gee(bdi ~ bdi.pre + treatment + length + drug, 
+               data = BtheB_long, id = subject, 
+               family = gaussian, corstr = "independence")
+summary(btb_gee.ind)
+# require(Publish)
+# publish(btb_gee.ind)
+```
+
+-   This model assumes an independent correlation structure.
+
+-   The outputs started from a summary of residuals
+
+-   The estimated coefficient will be interpreted the same way as linear model. Naive S.E and z value are estimated directly from this model. Robust SE and z are sandwich estimates
+
+-   Working Correlation is the correlation struture estimated from the data (identity matrix for indepedence)
+
+With exchangeable correlation matrix:
+
+```{r gausex,cache=TRUE}
+btb_gee.ex <- gee(bdi ~ bdi.pre + treatment + length + drug,
+                data = BtheB_long, id = subject, 
+                family = gaussian, corstr = "exchangeable")
+summary(btb_gee.ex)
+#publish(btb_gee.ex)
+```
+
+-   The interpretation of estimated coefficients are similar to LM. Naive S.E and z value are estimated directly from this model. Robust SE and z are sandwich estimates
+
+-   Working Correlation is the correlation structure estimated from the data
+
+-   When we change the structure of correlation, the estimates and naive SE and z changed. A closer naive SE to robust SE indicates that the correlation structure is better specified.
+
+### Compare with Random Effects
+
+-   ref: [@hothorn2014handbook] Section 13.4 We then use the conditional models (i.e., adding random effect) with non-normal response
+
+Let us compare the GEE models with the mixed effect models.
+
+```{r comp,cache=TRUE}
+## Generalized mixed effect model model
+library("lme4")
+resp_lmer <- glmer(nstat ~ baseline + month + treatment + 
+                   gender + age + centre + 
+                    (1 | subject), family = binomial(), 
+                  data = resp)
+```
+
+```{r comp2,cache=TRUE}
+require(afex)
+resp_afex <- mixed(nstat ~ baseline + month + treatment + 
+                   gender + age + centre + 
+                    (1 | subject), family = binomial(), 
+                  data = resp, method = "LRT")
+```
+
+```{r comp3,cache=TRUE}
+## GEE model
+resp_gee3 <- gee(nstat ~ baseline + month + treatment + 
+                   gender + age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE, scale.value = 1)
+library(MuMIn)
+library(geepack)
+resp_gee4 <- geeglm(nstat ~ baseline + month + treatment + 
+                   gender + age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE)
+resp_gee5 <- geeglm(nstat ~ baseline + month + treatment + 
+                   gender + age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "independence", 
+                 scale.fix = TRUE)
+resp_gee6 <- geeglm(nstat ~ baseline + month + treatment + 
+                   gender + age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "ar1", 
+                 scale.fix = TRUE)
+QIC(resp_gee4)
+QIC(resp_gee5)
+QIC(resp_gee6)
+# Smaller QIC values for correlation structure represents better models
+# i.e., "exchangeable" in our case
+
+resp_gee4a <- geeglm(nstat ~ month + treatment + gender + age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE)
+
+resp_gee4b <- geeglm(nstat ~ treatment + gender + age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE)
+
+resp_gee4c <- geeglm(nstat ~ gender + age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE)
+
+resp_gee4d <- geeglm(nstat ~ age + centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE)
+
+resp_gee4e <- geeglm(nstat ~ centre, 
+                 data = resp, family = "binomial", 
+                 id = subject, corstr = "exchangeable", 
+                 scale.fix = TRUE)
+QIC(resp_gee4)
+QIC(resp_gee4a)[2]
+QIC(resp_gee4b)[2]
+QIC(resp_gee4c)[2]
+QIC(resp_gee4d)[2]
+QIC(resp_gee4e)[2]
+QIC(resp_gee4d)[2]
+# Covariates are selected based on the QICu criteria
+```
+
+```{r compsumm,cache=TRUE}
+## compare estimates (conditional vs. marginal)
+summary(resp_lmer)$coefficients # Model failed to converge
+summary(resp_afex)$coefficients # Model failed to converge
+summary(resp_gee3)$coefficients # Marginalized model
+summary(resp_gee4)$coefficients # Marginalized model
+```
+
+The significance of variables are similar in both variables, but the estimated coefficients are larger in generalized mixed effect model. However, it does not mean the estimated coefficients are inconsistent. Instead, two models are estimating different parameters. Remember, the mixed effect model is conditional on random effects, while the GEE is a marginalized model.
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/qoqhPq_VILc" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+### Reference

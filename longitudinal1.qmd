@@ -1,0 +1,233 @@
+## Mixed effects models {.unnumbered}
+
+In this section, we will learn about mixed effects models. Mixed effects models are popular choices for modeling repeated measurements, such as longitudinal or clustered data. Examples of longitudinal data include blood pressure measurements taken over time from the same individuals and CD4 count over time from the same individuals. Examples of clustered data include students within schools and patients within hospitals. There are two components in a mixed effects model: fixed effects and random effects:
+
+-   Fixed effects refer to general trends that are applicable to all subjects/clusters. This implies that we might want to investigate how students perform (on average) in different subjects such as math and history. These effects are commonly observed, i.e., fixed, across all schools.
+
+-   Random Effects capture the unique characteristics of each subject/cluster that differentiate them from one another. For instance, some schools may have better resources, more experienced teachers, or a more supportive learning environment. These differences are specific to each school, and we use random effects to capture them.
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+knitr::opts_chunk$set(echo = TRUE)
+require(kableExtra)
+```
+
+### Repeated measures
+
+::: column-margin
+A useful reference on repeated measures is Section 9.2 of @faraway2016extending.
+:::
+
+In repeated measurement design, the response variable are measured multiple times for each individuals.
+
+### Linear Mixed Effects Models for Repeated Measures Data
+
+::: column-margin
+A useful reference on linear mixed effects models is Section 12.4 of @hothorn2014handbook.
+:::
+
+::: callout-important
+-   The linear mixed effect models are based on the idea that the correlation of an individual's responses depends on some unobserved individual characteristics.
+
+-   In linear mixed effect models, we treat these unobserved characteristics as random effects in our model. If we could conditional on the random effects, then the repeated measurements can be assumed to be independent.
+:::
+
+#### Data
+
+We are going to use the `BtheB` dataset from the `HSAUR2` package to explain the linear mixed effect model:
+
+```{r load, cache=TRUE, warning=FALSE}
+library(HSAUR2)
+data("BtheB")
+kable(head(BtheB))%>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+-   A typical form of repeated measurement data from a clinical trial data.
+
+-   The individuals are allocated to different treatments then the response Beck Depression Inventory II were taken at baseline, 2, 3, 5, and 8 months
+
+```{r data1, cache=TRUE}
+## Box-plot of responses at different time points in treatment and control groups
+data("BtheB", package = "HSAUR2")
+layout(matrix(1:2, nrow = 1))
+ylim <- range(BtheB[,grep("bdi", names(BtheB))],na.rm = TRUE)
+tau <- subset(BtheB, treatment == "TAU")[, grep("bdi", names(BtheB))]
+boxplot(tau, main = "Treated as Usual", ylab = "BDI",xlab = "Time (in months)", 
+        names = c(0, 2, 3, 5, 8),ylim = ylim)
+btheb <- subset(BtheB, treatment == "BtheB")[, grep("bdi", names(BtheB))]
+boxplot(btheb, main = "Beat the Blues", ylab = "BDI",xlab = "Time (in months)", 
+        names = c(0, 2, 3, 5, 8),ylim = ylim)
+
+```
+
+-   The side-by-side box plots show the distributions of BDI overtime between control (Treated as Usual) and intervention (Beat the Blues) groups.
+
+-   As time goes, drops in BDI are more obvious in intervention which may indicate the intervention is effective.
+
+#### Regular model fixed intercept and slope
+
+To compare, we start with fixed effect linear model, i.e., a regular linear model without any random effect:
+
+```{r fixed, cache=TRUE}
+## To analyze the data, we first need to convert the dataset to a analysis-ready form
+BtheB$subject <- factor(rownames(BtheB))
+nobs <- nrow(BtheB)
+BtheB_long <- reshape(BtheB, idvar = "subject", varying = c("bdi.2m", "bdi.3m", "bdi.5m", "bdi.8m"), 
+                      direction = "long")
+BtheB_long$time <- rep(c(2, 3, 5, 8), rep(nobs, 4))
+kable(head(BtheB_long))%>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+unique(BtheB_long$subject)
+kable(subset(BtheB_long,  subject == 2))%>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+kable(subset(BtheB_long,  subject == 99))%>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+
+lmfit <- lm(bdi ~ bdi.pre + time + treatment + drug +length, data = BtheB_long,
+                    na.action = na.omit)
+require(jtools)
+summ(lmfit)
+```
+
+#### Random intercept but fixed slope
+
+Let us start with a model with a random intercept but fixed slope. In this case, the resulting regression line for each individual is parallel (for fixed slope) but have different intercepts (for random intercept).
+
+```{r random, cache=TRUE}
+## Fit a random intercept model with lme4 package
+library("lme4")
+BtheB_lmer1 <- lmer(bdi ~ bdi.pre + time + treatment + drug +length 
+                    + (1 | subject), data = BtheB_long, REML = FALSE, 
+                    na.action = na.omit)
+
+summary(BtheB_lmer1)
+summ(BtheB_lmer1)
+```
+
+::: callout-important
+-   AIC, BIC, and -loglik etc are goodness-of-fit statistics, which tells you how well the model fits your data. Since there is no standard to tell what values of these statistics are good, without comparison with other models, they have little information to tell.
+
+-   Fixed effects: this is the standard output we will have in any fixed-effect model. The interpretation of estimated coefficients will be similar to a regular linear model.
+
+-   You may compare the outputs with the regular linear model, then you will find that **lm** tends to **underestimate** the SE for estimated coefficients.
+:::
+
+```{r random2, cache=TRUE}
+library(ggplot2)
+BtheB_longna <- na.omit(BtheB_long)
+dat <- data.frame(time=BtheB_longna$time,pred=fitted(BtheB_lmer1),Subject= BtheB_longna$subject)
+ggplot(data=dat,aes(x=time, y=pred, group=Subject, color=Subject)) + theme_classic() +
+    geom_line() 
+```
+
+As we can see, for each individual, we have different intercepts but the slope over follow-up time is the same. Next, we will fit the model with random intercept and random slope.
+
+#### Random intercept and random slope
+
+In the codes below, we fitted a mixed effects model with both random intercept and random slope:
+
+```{r random3, cache=TRUE}
+## We can fit a random slope and intercept model using lme4 package and treat variable time as random slope. 
+library("lme4")
+BtheB_lmer2 <- lmer(bdi ~ bdi.pre + time + treatment + drug +length + 
+                   (time | subject), data = BtheB_long, REML = FALSE, 
+                   na.action = na.omit)
+
+summ(BtheB_lmer2)
+```
+
+The interpretation of the model outputs will be similar to the model with only random intercepts. Let us plot the data:
+
+```{r random5, cache=TRUE}
+library(ggplot2)
+BtheB_longna <- na.omit(BtheB_long)
+dat <- data.frame(time=BtheB_longna$time,pred=fitted(BtheB_lmer2),Subject= BtheB_longna$subject)
+ggplot(data=dat,aes(x=time, y=pred, group=Subject, color=Subject)) + theme_classic() +
+    geom_line() 
+```
+
+From the figure, we can see, we have different intercepts and different slopes over follow-up time for each individual.
+
+#### Choice among models
+
+A common question is to ask should I add random slope to our model or random intercept is good enough. We may want to compare the models in terms of AIC and BIC. Smaller values indicate a better model.
+
+-   **lm** usually will not be considered as a competitor of **lme** as they basically apply to different types of data.
+
+-   When choosing between random intercept and random slope, a quick solution is to fit all possible models then do likelihood ratio tests.
+
+-   For example, I am not sure whether I should use random intercept only or random intercept + random slope. I could fit both model, then do a likelihood ratio test:
+
+```{r model, cache=TRUE}
+anova(BtheB_lmer1, BtheB_lmer2)
+## The non-significant p-value shows that the second model is not 
+## statistically different from the first model. Therefore, adding a 
+## random slope is not necessary
+```
+
+The p-value is greater than 0.05, which indicate that adding a random slope does not make the fitting significantly better. To keep the model simple, we may just use random intercept.
+
+### Prediction of Random Effects
+
+-   Ref: [@hothorn2014handbook] Section 12.5
+
+If you have noticed in the R output of linear mixed effect model. Random effects are not estimated in the model.
+
+-   We could use the fitted model to predict random effects.
+
+-   Also, the predicted random effects can be used to examine the assumptions we have for linear mixed effect model.
+
+The **ranef** function is used to predict the random effect in R
+
+```{r pred, cache=TRUE}
+qint <- ranef(BtheB_lmer1)$subject[["(Intercept)"]]
+qint
+## predict random effects using the fitted model
+```
+
+### Check assumptions
+
+Remember, we have two assumptions in the linear mixed effect model with random intercept:
+
+-   error term follows normal distribution
+-   beta for subject $i$ follows normal distribution
+
+We have predict the values of random effect and we could extract residuals from the fitted model. Therefore, we can use QQ-plot to check their normality
+
+```{r assumption, cache=TRUE}
+# Assumption 1
+qres <- residuals(BtheB_lmer1)
+qqnorm(qres, xlim = c(-3, 3), ylim = c(-20, 20), ylab = "Estimated residuals",
+       main = "Residuals")
+qqline(qres)
+
+# Assumption 2
+qint <- ranef(BtheB_lmer1)$subject[["(Intercept)"]]
+qqnorm(qint, ylab = "Estimated random intercepts", xlim = c(-3, 3), ylim = c(-20, 20),
+       main = "Random intercepts")
+qqline(qint)
+```
+
+Since points are almost on the lines, we can say that the normality assumption is met.
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/x7bTkZmyBkw" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/SqSjejvTtdk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::
+
+### Reference

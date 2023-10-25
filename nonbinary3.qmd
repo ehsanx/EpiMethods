@@ -1,0 +1,97 @@
+## Poisson  {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+knitr::opts_chunk$set(echo = TRUE)
+require(Publish)
+require(survey)
+```
+
+### Data
+
+```{r load, cache=TRUE}
+load("Data/nonbinary/OAcvd.RData")
+analytic2$weight <- analytic2$weight/3
+analytic2$fruit.cont <- as.numeric(as.character(analytic2$fruit.cont))
+var.names <- c("age", "sex", "income", "race", "bmicat", "phyact", "smoke",
+               "fruit", "painmed", "ht", "copd", "diab", "edu", "CVD", "OA")
+analytic2[var.names] <- lapply(analytic2[var.names] , factor)
+analytic2$fruit.cont <- floor(analytic2$fruit.cont) # round
+str(analytic2)
+```
+
+### Survey weighted summary
+
+```{r summary, cache=TRUE}
+w.design <- svydesign(id=~1, weights=~weight, 
+                      data=analytic2)
+xtabs(~fruit.cont, analytic2)
+svytable(~fruit.cont, w.design)
+svyhist(~fruit.cont, w.design)
+svyby(~fruit.cont, ~phyact, w.design, svymean, deff = TRUE)
+```
+
+### Poisson regression
+
+```{r pr, cache=TRUE}
+analytic2$phyact2=relevel(analytic2$phyact, ref ="Inactive")
+fit1<-glm(fruit.cont ~phyact2, data=analytic2, family=poisson)
+require(jtools)
+summ(fit1, confint = TRUE, digits = 3)
+fit2<-glm(fruit.cont ~phyact2 + age + sex + 
+               income + race + bmicat + 
+               smoke + edu, data=analytic2, family=poisson)
+summ(fit2, confint = TRUE, digits = 3, vifs = TRUE)
+```
+
+### Survey weighted Poisson regression
+
+```{r prs, cache=TRUE}
+w.design<-update (w.design , phyact2=relevel(phyact, ref ="Inactive"))
+fit1<-svyglm(fruit.cont ~phyact2, design=w.design, family=poisson)
+summ(fit1, confint = TRUE, digits = 3)
+fit2<-svyglm(fruit.cont ~phyact2 + age + sex + 
+               income + race + bmicat + 
+               smoke + edu, design=w.design, family=poisson)
+require(jtools)
+summ(fit2, confint = TRUE, digits = 3, vifs = TRUE)
+```
+
+### Negative binomial regression
+
+```{r nb, cache=TRUE}
+require(MASS)
+analytic2$phyact2=relevel(analytic2$phyact, ref ="Inactive")
+fit3<- glm(fruit.cont ~phyact2, data=analytic2,
+           family = negative.binomial(theta = 1))
+round(exp(cbind(coef(fit3), confint(fit3))),2)
+fit4<-glm(fruit.cont ~phyact2 + age + sex + 
+                  income + race + bmicat + 
+                  smoke + edu, data=analytic2,
+          family = negative.binomial(theta = 1))
+round(exp(cbind(coef(fit4), confint(fit4))),2)
+```
+
+### Survey weighted negative binomial regression
+
+```{r nbs, cache=TRUE}
+require(sjstats)
+fit3<- svyglm.nb(fruit.cont ~phyact2, design=w.design)
+round(exp(cbind(coef(fit3), confint(fit3))),2)
+fit4<-svyglm.nb(fruit.cont ~phyact2 + age + sex + 
+                  income + race + bmicat + 
+                  smoke + edu, design=w.design)
+round(exp(cbind(coef(fit4), confint(fit4))),2)
+```
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/p2r8N7tcXU8" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

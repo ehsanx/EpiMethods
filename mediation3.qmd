@@ -1,0 +1,313 @@
+## Mediation Example {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+knitr::opts_chunk$set(echo = TRUE)
+require(survey)
+require(DiagrammeR)
+require(DiagrammeRsvg)
+require(rsvg)
+library(magrittr)
+library(svglite)
+library(png)
+require(Publish)
+```
+
+We want to decompose of the "total effect" of a given exposure OA ($A$) on the outcome CVD ($Y$) into
+
+-   a natural direct effect (NDE; $A \rightarrow Y$) and
+-   a natural indirect effect (NIE) through a mediator pain medication ($M$) through ($A \rightarrow M \rightarrow Y$).
+
+### Step 0: Build data first
+
+```{r loading, eval=TRUE, cache=TRUE }
+load("Data/mediation/cchs123pain.RData")
+source("Data/mediation/medFunc.R")
+ls()
+varlist <- c("age", "sex", "income", "race", "bmi", "edu",
+               "phyact", "smoke", "fruit", "diab")
+analytic.miss$mediator <- ifelse(analytic.miss$painmed == "Yes", 1, 0)
+analytic.miss$exposure <- ifelse(analytic.miss$OA == "OA", 1, 0)
+analytic.miss$outcome <- ifelse(analytic.miss$CVD == "event", 1, 0)
+```
+
+### Pre-run step 3 model
+
+We will utilize this fit in step 3
+
+```{r mediatormodel, eval=TRUE, cache=TRUE}
+# A = actual exposure (without any change)
+analytic.miss$exposureTemp <- analytic.miss$exposure
+w.design0 <- svydesign(id=~1, weights=~weight, 
+                      data=analytic.miss)
+w.design <- subset(w.design0, miss == 0)
+# Replace exposure with exposureTemp
+# This will be necessary in step 3
+fit.m <- svyglm(mediator ~ exposureTemp + 
+                 age + sex + income + race + bmi + edu +
+                 phyact + smoke + fruit + diab,
+                design = w.design, 
+                family = binomial("logit"))
+publish(fit.m)
+```
+
+### Step 1 and 2: Replicate data with different exposures
+
+We manipulate and duplicate data here
+
+```{r duplicate, eval=TRUE, cache=TRUE}
+dim(analytic.miss)
+dim(analytic.cc)
+nrow(analytic.miss) - nrow(analytic.cc)
+d1 <- d2 <- analytic.miss
+# Create counterfactual data
+# This will be necessary in step 3
+# Exposed = Exposed
+d1$exposure.counterfactual <- d1$exposure
+# Exposed = Not exposed
+d2$exposure.counterfactual <- !d2$exposure 
+# duplicated data (double the amount)
+newd <- rbind(d1, d2)
+newd <- newd[order(newd$ID), ]
+dim(newd)
+```
+
+### Step 3: Compute weights for the mediation
+
+Weight is computed by
+
+$W^{M|C} = \frac{P(M|A^*, C)}{P(M|A, C)}$
+
+in all data `newd` (fact `d1` + alternative fact `d2`).
+
+-   $P(M|A, C)$ is computed from a logistic regression of $M$ on $A$ + $C$.
+    -   $logit [P(M=1 | C = c]) = \beta_0 + \beta_1 a + \beta_3 c$
+-   $P(M|A^{*}, C)$ is computed from a logistic regression of $M$ on $A^*$ + $C$.
+    -   $logit [P(M=1 | C = c]) = \beta_0 + \beta'_1 a^* + \beta'_3 c$
+
+```{r weight, eval=TRUE, cache=TRUE}
+# First, use original exposure (all A + all A):
+# A = actual exposure (without any change)
+# A = exposure
+newd$exposureTemp <- newd$exposure
+# Probability of M given A + C
+w <- predict(fit.m, newdata=newd, type='response') 
+direct <- ifelse(newd$mediator, w, 1-w)
+# Second, use counterfactual exposures (all A + all !A):
+# A* = Opposite (counterfactual) values of the exposure
+# A* = exposure.counterfactual
+newd$exposureTemp <- newd$exposure.counterfactual
+# Probability of M given A* + C
+w <- predict(fit.m, newdata=newd, type='response') 
+indirect <- ifelse(newd$mediator, w, 1-w)
+# Mediator weights
+newd$W.mediator <- indirect/direct
+summary(newd$W.mediator)
+hist(newd$W.mediator)
+```
+
+Incorporating the survey weights:
+
+Note: scaling can often be helpful if there exists extreme weights.
+
+```{r outcomeW, eval=TRUE, cache=TRUE}
+# scale survey weights
+#newd$S.w <- with(newd,(weight)/mean(weight))
+newd$S.w <- with(newd,weight)
+newd$S.w[is.na(newd$S.w)]
+summary(newd$S.w)
+# Multiply mediator weights with scaled survey weights
+newd$SM.w <- with(newd,(W.mediator * S.w))
+summary(newd$SM.w)
+table(newd$miss[is.na(newd$SM.w)])
+newd$SM.w[is.na(newd$SM.w)] <- 0
+summary(newd$SM.w)
+hist(newd$SM.w, main = "", xlab = "Combined weights", 
+     ylab = "Frequency", freq = TRUE)
+```
+
+Here all missing weights are associated with incomplete cases (`miss==1`)! Hence, doesn't matter if they are missing or other value (0) in them.
+
+### Step 4: Weighted outcome Model
+
+Outcome model is
+
+$logit [P(Y_{a,M(a^*)}=1 | C = c)] = \theta_0 + \theta_1 a + \theta_2 a^* + \theta_3 c$
+
+after weighting (combination of mediator weight + sampling weight).
+
+```{r outcome, eval=TRUE, cache=TRUE}
+# Outcome analysis
+w.design0 <- svydesign(id=~1, weights=~SM.w, 
+                      data=newd)
+w.design <- subset(w.design0, miss == 0)
+# Fit Y on (A + A* + C)
+fit <- svyglm(outcome ~ exposure + exposure.counterfactual + 
+               age + sex + income + race + bmi + edu +
+                 phyact + smoke + fruit + diab, 
+             design = w.design, 
+               family = binomial("logit"))
+```
+
+#### Point estimates
+
+Following are the conditional ORs:
+
+-   $OR_{TE}(C=c) = \exp(\theta_1 + \theta_2)$
+-   $OR_{NDE}(A=1,M=0,C=c) = \exp(\theta_1)$
+-   $OR_{NIE}(A^{*}=1,M=0,C=c) = \exp(\theta_2)$
+
+```{r outcomeextract, eval=TRUE, cache=TRUE}
+TE <- exp(sum(coef(fit)[c('exposure', 'exposure.counterfactual')])) 
+TE # total effect of A-> Y + A -> M -> Y
+DE <- exp(unname(coef(fit)['exposure']))
+DE # direct effect of A-> Y (not through M)
+IE <- exp(unname(coef(fit)[c('exposure.counterfactual')])) 
+IE # indirect effect of A-> Y (A -> M -> Y)
+DE * IE # Product of ORs; same as TE 
+PM <- log(IE) / log(TE)
+PM # Proportion mediated
+```
+
+#### Obtaining results fast
+
+User-written funtion `doEffectDecomp()` (specific to OA-CVD problem):
+
+```{r fastfnc, cache=TRUE}
+doEffectDecomp(analytic.miss, ind = NULL, varlist = varlist)
+# function is provided in the appendix
+```
+
+#### Confidence intervals
+
+Standard errors and confidence intervals are determined by bootstrap methods.
+
+```{r boot, eval=TRUE,  cache=TRUE, echo=TRUE, results= 'hide'}
+require(boot)
+# I ran the computation on a 24 core computer,
+# hence set ncpus = 5 (keep some free). 
+# If you have more / less cores, adjust accordingly. 
+# Try parallel package to find how many cores you have.
+# library(parallel)
+# detectCores()
+# doEffectDecomp is a user-written function
+# See appendix for the function
+set.seed(504)
+bootresBin <- boot(data=analytic.miss, statistic=doEffectDecomp, 
+                R = 5, parallel = "multicore", ncpus=5,
+                varlist = varlist)
+```
+
+R = 5 is not reliable for bootstrap. In real applications, try 250 at least.
+
+```{r bootresX, eval=TRUE,  cache=TRUE}
+bootci1b <- boot.ci(bootresBin,type = "perc",index=1)
+bootci2b <- boot.ci(bootresBin,type = "perc",index=2)
+bootci3b <- boot.ci(bootresBin,type = "perc",index=3)
+bootci4b <- boot.ci(bootresBin,type = "perc",index=4)
+```
+
+```{r bootres, cache=TRUE}
+# Number of bootstraps
+bootresBin$R
+# Total Effect
+c(bootresBin$t0[1], bootci1b$percent[4:5])
+# Direct Effect
+c(bootresBin$t0[2], bootci2b$percent[4:5])
+# Indirect Effect
+c(bootresBin$t0[3], bootci3b$percent[4:5])
+# Proportion Mediated
+c(bootresBin$t0[4], bootci4b$percent[4:5])
+```
+
+The proportion mediated through pain medication was about `r round(bootresBin$t0[4]*100,2)`% on the log odds ratio scale.
+
+#### Visualization for main effects
+
+```{r plotxy, cache=TRUE}
+require(plotrix)
+TEc <- c(bootresBin$t0[1], bootci1b$percent[4:5])
+DEc <- c(bootresBin$t0[2], bootci2b$percent[4:5])
+IEc <- c(bootresBin$t0[3], bootci3b$percent[4:5])
+mat<- rbind(TEc,DEc,IEc)
+colnames(mat) <- c("Point", "2.5%", "97.5%")
+mat
+plotCI(1:3, mat[,1], ui=mat[,3], li=mat[,2],
+       xlab = "Estimates", ylab = "", xaxt="n")
+axis(1, at=1:3,labels=c("TE","NDE","NIE"))
+abline(h=1, lty = 2)
+```
+
+#### Non-linearity
+
+Consider
+
+-   non-linear relationships (polynomials) and interactions between exposure, demographic/baseline covariates and mediators,
+-   Is misclassification of the mediators possible?
+
+Here we are again using a user-written funtion `doEffectDecomp.int()` (including interaction `phyact*diab` in the mediation model as well as the outcome model):
+
+```{r fast, cache=TRUE}
+# doEffectDecomp.int is a user-written function
+# See appendix for the function
+doEffectDecomp.int(analytic.miss, ind = NULL, varlist = varlist)
+# try bootstrap on it?
+```
+
+#### Visualization for main + interactions
+
+```{r test3, eval= TRUE, cache=TRUE, echo=TRUE, results= 'hide'}
+set.seed(504)
+bootresInt <- boot(data=analytic.miss, statistic=doEffectDecomp.int,
+                R = 5, parallel = "multicore", ncpus=5,
+                varlist = varlist)
+```
+
+R = 5 is not reliable for bootstrap. In real applications, try 250 at least.
+
+```{r test3X, eval= TRUE, cache=TRUE}
+bootci1i <- boot.ci(bootresInt,type = "perc",index=1)
+bootci2i <- boot.ci(bootresInt,type = "perc",index=2)
+bootci3i <- boot.ci(bootresInt,type = "perc",index=3)
+bootci4i <- boot.ci(bootresInt,type = "perc",index=4)
+```
+
+```{r plotxyint, cache=TRUE}
+bootresInt$R
+# from saved boostrap results: bootresInt 
+# (similar as before)
+TEc <- c(bootresInt$t0[1], bootci1i$percent[4:5])
+DEc <- c(bootresInt$t0[2], bootci2i$percent[4:5])
+IEc <- c(bootresInt$t0[3], bootci3i$percent[4:5])
+mat<- rbind(TEc,DEc,IEc)
+colnames(mat) <- c("Point", "2.5%", "97.5%")
+mat
+plotCI(1:3, mat[,1], ui=mat[,3], li=mat[,2],
+       xlab = "Estimates", ylab = "", xaxt="n")
+axis(1, at=1:3,labels=c("TE","NDE","NIE"))
+abline(h=1, lty = 2)
+```
+
+### Appendix: OA-CVD Functions for bootstrap
+
+These functions are written basically for performing bootstrap for the OA-CVD analysis. However, changing the covariates names/model-specifications should not be too hard, once you understand the basic steps.
+
+```{r 2fnc, cache=TRUE}
+# without interactions (binary mediator)
+doEffectDecomp
+
+# with interactions (binary mediator)
+doEffectDecomp.int
+```
+
+### Video content (optional)
+
+::: callout-tip
+For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+:::
+
+::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
+<iframe src="https://www.youtube.com/embed/SdFmiXLcpHw" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
+
+</iframe>
+:::

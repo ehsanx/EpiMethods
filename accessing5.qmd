@@ -1,0 +1,178 @@
+## Importing NHIS to R {.unnumbered}
+
+This tutorial provides instructions on accessing the National Health Interview Survey (NHIS) dataset from the US Centers for Disease Control and Prevention (CDC) website and importing it into the RStudio environment.
+
+### Overview
+
+Like NHANES, NHIS is supported by the CDC and is a large-scale multi-stage cross-sectional survey. The NHIS survey includes information on population disease prevalence, extent of disability, and use of health care services. In contrast to the NHANES that provides data every 2 years, NHIS provides data annually.
+
+::: column-margin
+To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster)
+:::
+
+### NHIS datafile and documents
+
+The NHIS files are stored in the NHIS website in different formats. You can import this data in any statistical package that supports these file formats, e.g., ASCII, CSV, SAS.
+
+::: column-margin
+[NHIS Data, Questionnaires and Related Documentation](https://www.cdc.gov/nchs/nhis/data-questionnaires-documentation.htm)
+:::
+
+::: column-margin
+In the recent NHIS (2019 or later), data are available in 5 categories:
+
+-   Interview data for adults
+-   Interview data for children
+-   Imputed income for adults
+-   Imputed income for children
+-   Paradata
+:::
+
+::: column-margin
+In the earlier NHIS (before 2019), data are available in 8 categories:
+
+-   Family file
+-   Household file
+-   Person file
+-   Child file
+-   Adult file
+-   Imputed income
+-   Functioning and disability
+-   Paradata
+:::
+
+#### Combining data
+
+##### Different cycles
+
+It is possible to combine datasets from different years/cycles together in NHIS. Similar to NHANES, identification of the same person in NHIS across different cycles is not possible in the public release datasets. For appending data from different cycles, please make sure that the variable names/labels are the same/identical in years under consideration (in some years, names and labels do change).
+
+##### Within the same cycle
+
+Within NHIS datasets in a given cycle, each sampled person has a household number (`HHX`), family number (`FMX`), and a person number within family (`FPX`). We can create a unique identifier based on these three variables and merge the datasets.
+
+### Accessing NHIS Data
+
+::: column-margin
+NHIS survey datasets are publicly available at <https://www.cdc.gov/nchs/nhis/>
+:::
+
+Unlike NHANES where a R package is available to download the dataset, NHIS datasets need to be downloaded directly from the CDC website. In the following example, we will see how to download 'Adult' data from [2021 NHIS](https://www.cdc.gov/nchs/nhis/2021nhis.htm), and check associated variable in that dataset.
+
+```{r cdc1, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/nhis1.png")
+```
+
+-   **Step 1**: Say, for example, we are interested to download the adult dataset in the CSV format:
+
+```{r cdc2, echo=FALSE, cache=TRUE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/nhis2.png")
+```
+
+-   **Step 2**: We can download the data in the local PC folder, unzip it, and then read the data into R as as follows:
+
+```{r load, echo=TRUE, cache=TRUE, eval=FALSE}
+adult21 <- read.csv("Data/accessing/adult21.csv", header = T)
+```
+
+```{r loadMirror, echo=FALSE, cache=TRUE, eval=TRUE}
+adult21 <- read.csv("Data/accessing/adult21.csv", header = T)
+```
+
+-   **Step 3**: Once data is imported in RStudio, we will see the `adult21` object listed under data window (see below):
+
+```{r cdc4, echo=FALSE, cache=TRUE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/nhis3.png")
+```
+
+-   **Step 4**: We can check the variable names in this `adult21` dataset using the `names` function.
+
+```{r cdc5, echo=TRUE, eval=FALSE, cache=TRUE}
+names(adult21)
+```
+
+-   **Step 5**: We can check how many unique adults are in this `adult21` dataset. Note that the `HHX` variable in the dataset is the unique household identifier, where only one adult per household was selected for interview. We can use this `HHX` variable to merge adult datafile with other datafiles (e.g., child data).
+
+```{r uniquehh, echo=TRUE, cache=TRUE}
+length(unique(adult21$HHX))
+```
+
+-   **Step 6**: We can open the data in RStudio in the dataview window (by clicking the `adult21` data from the data window). The next Figure shows only a few columns and rows from this large dataset. Note that there are some values marked as "NA", which represents missing values.
+
+```{r cdc6, echo=FALSE, cache=TRUE, out.width = '99%'}
+knitr::include_graphics("Images/accessing/nhis4.png")
+```
+
+-   **Step 7**: To understand what the column names mean in this Figure, we need to take a look at the codebook, which is also available on the CDC website:
+
+```{r cdc7, echo=FALSE, cache=TRUE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/nhis5.png")
+```
+
+-   **Step 8**: We can see a check for the column or variables, e.g., `REGION`, in the codebook:
+
+```{r cdc8, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/nhis6.png")
+```
+
+-   **Step 9**: We can assess if the numbers reported under count matches with what we get from the `adult21` data we just imported (particularly, for the `REGION` variable):
+
+```{r cdc9, echo=TRUE, cache=TRUE}
+# Frequency table
+table(adult21$REGION, useNA = "always") 
+```
+
+Similarly, we can download the child data and open it in R:
+
+```{r loadchild, echo=TRUE, cache=TRUE, eval=FALSE}
+child21 <- read.csv("Data/accessing/child21.csv", header = T)
+```
+
+```{r loadchildMirror, echo=FALSE, cache=TRUE, eval=TRUE}
+child21 <- read.csv("Data/accessing/child21.csv", header = T)
+```
+
+```{r nhisc1, echo=FALSE, cache=TRUE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/nhis_child1.png")
+```
+
+Let's check how many unique children are in this `child21` dataset:
+
+```{r uniquehhc, echo=TRUE, cache=TRUE}
+length(unique(child21$HHX))
+```
+
+Now let's check for the column or variables, e.g., `SEX_C`, in the codebook:
+
+```{r nhisc2, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/nhis_child2.png")
+```
+
+We can assess if the numbers reported under count matches with what we get from the `child21` data we just imported:
+
+```{r nhisc3, echo=TRUE, cache=TRUE}
+# Frequency table
+table(child21$SEX_C, useNA = "always") 
+```
+
+### Merging within the same cycle
+
+::: callout-note
+We can use `HHX` variable to merge different datafiles within the same survey cycle.
+:::
+
+As mentioned earlier, `HHX` variable in the dataset is the unique household identifier. We can use this `HHX` variable to merge different datafiles within the same survey cycle. Say, we are interested in merging child age (AGEP_C) and sex (SEX_C) variables with the adult datafile. We can use the `merge` function as follows:
+
+```{r nhisc4, echo=TRUE, cache=TRUE}
+dat <- merge(adult21, child21[,c("HHX", "AGEP_C", "SEX_C")], by = "HHX", all = T)
+```
+
+```{r nhisc5, echo=FALSE, cache=TRUE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/nhis_child3.png")
+```
+
+As we can see, there are data from 30,673 unique households, suggesting that not all children are sampled from the same household of sampled adults.
+
+```{r uniquehhn, echo=TRUE, cache=TRUE}
+length(unique(dat$HHX))
+```
