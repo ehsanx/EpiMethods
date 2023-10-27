@@ -1,0 +1,263 @@
+## Importing MICS to R {.unnumbered}
+
+This tutorial provides instructions on accessing the Multiple Indicator Cluster Surveys (MICS) dataset from the UNICEF website and importing it into the RStudio environment.
+
+### Overview
+
+MICS follows complex survey designs. The datasets are publicly available for 120 countries and can be used to analyze nutritional status by health, demographic, and geographic variables for a nationally representative sample of women and children.
+
+::: column-margin
+To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster). Usually, urban and rural areas are defined as the sampling strata, and PSUs/clusters are the enumeration areas.
+:::
+
+### Registration and log in
+
+The MICS files are stored in the [UNICEF website](https://mics.unicef.org/). Before downloading the dataset, we need to log in with a user name and password. Note that we must register for an account for the first time.
+
+```{r mics2, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/mics_registration.png")
+```
+
+Note that we must submit a brief `Research objective` when registering for an account.
+
+```{r mics3, echo=FALSE, cache=TRUE, out.width = '80%'}
+knitr::include_graphics("Images/accessing/mics_registration2.png")
+```
+
+Once we register, UNICEF usually takes three business days to review the request and grant access to download the dataset(s). Then, we can log in to download any dataset (not restricted to the dataset that was mentioned when registering) from the website:
+
+```{r mics4, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/mics_login.png")
+```
+
+### MICS datafile and documents
+
+::: column-margin
+MICS data are publicly available at <https://mics.unicef.org/surveys>
+:::
+
+The MICS data files can be downloaded from [UNICEF survey website](https://mics.unicef.org/surveys). After logging in, we can download any datasets. For example, Albania and Armenia 2024 MICS datasets are unavailable to download. But the Nigeria 2021 dataset is available. We can download the datasets just by clicking the `Available` option as shown below:
+
+```{r mics5, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsdata.png")
+```
+
+### Combining data
+
+#### Different cycles
+
+It is possible to combine datasets from different years/cycles together in MICS. For appending data from different cycles, please make sure that the variable names/labels are the same/identical in years under consideration (in some years, names and labels do change).
+
+#### Within the same cycle
+
+Within MICS datasets in a given cycle, each sampled person has a cluster number (`HH1`), household number (`HH2`), and a person line number within household (`LN`). We can create a unique identifier based on these three variables and merge the datasets.
+
+### Working with MICS Data
+
+In the following example, we will see how to work with the Nigeria 2021 MICS dataset and check some variables in that dataset.
+
+-   **Step 1**: We can download the data in the local PC folder, unzip it. We will see two items in the folder:
+
+```{r mics6, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsdata2.png")
+```
+
+The `Readme` file contains information on all datafiles in the Nigeria 2021 MICS, and the `Nigeria MICS6 SPSS Datasets` folder contains all the datafiles in SPPS format.
+
+```{r mics7, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsdata3.png")
+```
+
+```{r mics8, echo=FALSE, warning=FALSE,message=FALSE}
+# Load necessary libraries
+library(knitr)
+library(kableExtra)
+data2 <- data.frame(
+  Dataset = c("hh.sav", "hl.sav", "wm.sav", "bh.sav", "fg.sav", "ch.sav", "fs.sav", "mn.sav"),
+  Description = c("Households", "Household members",  "Women (age 15-49 years)",  
+                  "Fertility/Birth history module (administered to women age 15-49 years)",  
+                  "Female genital mutilation (administered to women age 15-49 years)",  
+                  "Children under five",  "Children age 5-17 years",  "Men (age 15-49 years)")
+)
+kable(data2, format = "html", escape = F, table.attr = 'class="table table-hover"') %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = F) %>%
+  column_spec(1, bold = F, color = "blue") %>%
+  column_spec(2, color = "black") %>% 
+  scroll_box(width = "100%")
+```
+
+Note that the names of the data files for different survey cycles and different countries are expected to be different. Some data files are also unavailable for some countries.
+
+-   **Step 2**: Let's we are interested in the `wm.sav` dataset. Now we will read the data into R as as follows:
+
+```{r load, echo=TRUE, cache=TRUE, eval=FALSE, warning=FALSE}
+library(foreign)
+dat.women <- read.spss("Data/accessing/Nigeria MICS6 SPSS Datasets/wm.sav", to.data.frame=TRUE)
+```
+
+```{r loadMirror, echo=FALSE, cache=TRUE, eval=TRUE, warning=FALSE}
+library(foreign)
+dat.women <- read.spss("Data/accessing/Nigeria MICS6 SPSS Datasets/wm.sav", to.data.frame=TRUE)
+```
+
+-   **Step 3**: Once data is imported in RStudio, we will see the `dat.women` object listed under data window (see below):
+
+```{r cdc4, echo=FALSE, cache=TRUE, out.width = '70%'}
+knitr::include_graphics("Images/accessing/micsdata4.png")
+```
+
+::: column-margin
+In Nigeria 2021 MICS, there were 40,236 women eligible for interviews and 38,806 interviews were completed.
+:::
+
+```{r mics9, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsreport.png")
+```
+
+In Nigeria 2021 MICS, there were 40,236 women eligible for interviews and 38,806 interviews were completed.
+
+```{r mics10, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsdata5.png")
+```
+
+-   **Step 4**: We can check the variable names in this `dat.women` dataset using the `names` function.
+
+```{r varnames, echo=TRUE, eval=FALSE, cache=TRUE}
+names(dat.women)
+```
+
+-   **Step 5**: We can open the data in RStudio in the dataview window (by clicking the `dat.women` data from the data window). The next Figure shows only a few columns and rows from this large dataset.
+
+```{r dataview, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsdataview.png")
+```
+
+-   **Step 6**: To understand what the column names mean in this Figure, we need to take a look at the codebook, which is also available on the **Appendix** of the survey report:
+
+```{r hhq, echo=FALSE, cache=TRUE, out.width = '90%'}
+knitr::include_graphics("Images/accessing/micsquestions.png")
+```
+
+-   **Step 7**: We can check how many unique women are in this `dat.women` dataset. Let's create a unique identifier based on the cluster number (HH1), household identifier (HH2) and individual line number (LN):
+
+```{r uniqueid, echo=TRUE, cache=TRUE,warning=FALSE}
+library(stringr)
+
+# Create equal width ids
+dat.women$HH1_new <- str_pad(dat.women$HH1, width = 4, side = "left", pad = "0")
+dat.women$HH2_new <- str_pad(dat.women$HH2, width = 2, side = "left", pad = "0")
+dat.women$LN_new <- str_pad(dat.women$LN, width = 2, side = "left", pad = "0")
+
+# Create a unique id
+dat.women$studyid <- with(dat.women, paste(HH1_new, HH2_new, LN_new, sep = ""))
+dat.women <- dat.women[order(dat.women$studyid),]
+
+# Unique ids
+length(unique(dat.women$studyid))
+
+# Head of ids
+head(dat.women$studyid)
+```
+
+Let's select the dataset for only those who completed the interview:
+
+```{r subset, echo=TRUE, cache=TRUE,warning=FALSE}
+dat.analytic <- subset(dat.women, WM17 == "COMPLETED")
+dim(dat.analytic)
+```
+
+-   **Step 8**: We can see a check for the column or variables, e.g., `HH6`, in the codebook:
+
+```{r q, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsquestion2.png")
+```
+
+```{r q2, echo=FALSE, cache=TRUE, out.width = '100%'}
+knitr::include_graphics("Images/accessing/micsfreq.png")
+```
+
+-   **Step 9**: We can assess if the numbers reported under count matches with what we get from the `dat.analytic` data we imported:
+
+```{r freq, echo=TRUE, cache=TRUE}
+# Frequency table
+table(dat.analytic$HH6, useNA = "always") 
+```
+
+::: callout-important
+To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster).
+
+-   Clusters: `HH1`
+-   Strata: `HH6`
+-   Weights: Specific to files, e.g., `wmweight` for women file
+:::
+
+
+### Table 1
+
+Now we will use the `dat.analytic` dataset to create Table 1 with utilizing survey features (i.e., psu, strata, and weights). For that, let us create/recode some variables:
+
+```{r recode, echo=TRUE, cache=TRUE, warning=FALSE,message=FALSE}
+library(dplyr)
+
+# Age
+dat.women$age <- car::recode(dat.women$WB4, "15:19 = '15-19'; 20:24 = '20-24'; 25:29 = '25-29';
+                             30:34 = '30-34'; 35:39 = '35-39'; 40:44 = '40-44'; 45:49 = '45-49'; 
+                             else = NA", as.factor = T)
+table(dat.women$age, useNA = "always")
+
+# Health insurance
+dat.women$insurance <- car::recode(dat.women$WB18, " 'NO' = 'Has no coverage'; 
+                                   'YES' = 'Has coverage'; else = NA", 
+                                   levels = c("Has coverage", "Has no coverage"), as.factor = T)
+table(dat.women$insurance, useNA = "always")
+
+# Drop the missing values associated with strata, psu, weights in the full data
+dat.women <- dat.women %>% 
+  filter(!is.na((HH1))) %>% 
+  filter(!is.na((HH6))) %>% 
+  filter(!is.na((wmweight))) 
+
+# Who completed the interview:
+dat.analytic <- subset(dat.women, WM17 == "COMPLETED")
+```
+
+First, we will create the survey design. Second, we will report Table 1 with heart attack and sex variable, stratified by diabetes.
+
+```{r tab1, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE}
+library(tableone)
+library(survey)
+
+# Indicator in the full data
+dat.women$indicator <- 1
+dat.women$indicator[dat.women$studyid %in% dat.analytic$studyid] <- 0
+table(dat.women$indicator)
+
+# Survey design
+w.design <- svydesign(id = ~HH1, strata = ~HH6, weights = ~wmweight, data = dat.women, nest = T)
+
+# Subset
+w.design0 <- subset(w.design, indicator == 0)
+
+# Table 1 - unweighted (matched with the numbers on page 36)
+tab1a <- CreateTableOne(var = c("HH6", "age", "insurance"), data = dat.analytic, 
+                        test = FALSE, includeNA = T)
+print(tab1a, showAllLevels = T)
+
+# Table 1 - weighted (matched with the numbers on page 36)
+tab1b <- svyCreateTableOne(var = c("HH6", "age", "insurance"), data = w.design0, 
+                           test = FALSE, includeNA = T)
+print(tab1b, showAllLevels = T)
+```
+
+### Regression analysis
+
+Let's run a regression analysis with utilizing survey features. 
+
+```{r regression, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE}
+library(Publish)
+
+# Design-adjusted logistic
+fit1 <- svyglm(I(insurance == "Has coverage") ~ age, design = w.design0, 
+               family = binomial)
+publish(fit1)
+```

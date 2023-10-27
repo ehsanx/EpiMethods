@@ -1,0 +1,346 @@
+## Replicate Results {.unnumbered}
+
+The tutorial aims to guide the users through fitting machine learning techniques with health survey data. We will replicate some of the results of this article by [Falasinnu et al. (2023)](https://doi.org/10.1016/j.jpain.2023.03.008). 
+
+::: column-margin
+Falasinnu T, Hossain MB, Weber II KA, Helmick CG, Karim ME, Mackey S. The Problem of Pain in the United States: A Population-Based Characterization of Biopsychosocial Correlates of High Impact Chronic Pain Using the National Health Interview Survey. The Journal of Pain. 2023;24(6):1094-103. DOI: [10.1016/j.jpain.2023.03.008](https://doi.org/10.1016/j.jpain.2023.03.008)
+:::
+
+The authors used the [National Health Interview Survey (NHIS) 2016](https://www.cdc.gov/nchs/nhis/nhis_2016_data_release.htm) dataset to develop prediction models for predicting high impact chronic pain (HICP). They also evaluated the predictive performances of the models within sociodemographic subgroups, such as sex (male, female), age ($<65$, $\ge 65$), and race/ethnicity (White, Black, Hispanic). They used LASSO and random forest models with 5-fold cross-validation as an internal validation. To obtain population-level predictions, they account for survey weights in both models. 
+
+::: column-margin
+For those interested in the National Health Interview Survey (NHIS) dataset, can review the [earlier tutorial](accessing5.html) about the dataset.
+:::
+
+::: {.callout-note}
+To handle [missing data](missingdata.html) in the predictors, they used multiple imputation technique. However, for simplicity, this tutorial focuses on a complete case dataset. We will also only focus on predicting HICP for people aged 65 years or older (a dataset of \~8,800 participants compared to the dataset of 33,000 participants aged 18 years or older).
+:::
+
+### Load necessary packages
+
+We load several R packages required for fitting LASSO and random forest models.
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(tableone)
+library(gtsummary)
+library(glmnet)
+library(WeightedROC)
+library(ranger)
+```
+
+### Analytic dataset
+
+#### Load
+
+We load the dataset into the R environment and lists all available variables and objects.
+
+```{r load, warning=FALSE, message=FALSE, cache = TRUE}
+load("Data/machinelearning/Falasinnu2023.RData")
+ls()
+```
+
+```{r dim, warning=FALSE, message=FALSE, cache = TRUE}
+dim(dat)
+```
+
+The dataset contains 8,881 participants aged 65 years or older with 49 variables:
+
+-   `studyid`: Unique identifier
+-   `psu`: Pseudo-PSU
+-   `strata`: Pseudo-stratum
+-   `weight`: Sampling weight
+-   `HICP`: HICP (binary outcome variable)
+-   `age`: Age - `sex`: Sex
+-   `hhsize`: Number of people in household
+-   `born`: Citizenship
+-   `marital`: Marital status
+-   `region`: Region
+-   `race`: Race/ethnicity
+-   `education`: Education
+-   `employment.status`: Employment status
+-   `poverty.status`: Poverty status
+-   `veteran`: Veteran
+-   `insurance`: Health insurance coverage
+-   `sex.orientation`: Sexual orientation
+-   `worried.money`: Worried about money
+-   `good.neighborhood`: Good neighborhood
+-   `psy.symptom`: Psychological symptoms
+-   `visit.ED`: Number of times in ER/ED
+-   `surgery`: Number of surgeries in past 12 months
+-   `dr.visit`: Time since doctor visits
+-   `cancer`: Cancer
+-   `asthma`: Asthma
+-   `htn`: Hypertension
+-   `liver.disease`: Liver disease
+-   `diabetes`: Diabetes
+-   `ulcer`: Ulcer - `stroke`: Stroke
+-   `emphysema`: Emphysema
+-   `copd`: COPD
+-   `high.cholesterol`: High cholesterol
+-   `coronary.heart.disease`: Coronary heart disease
+-   `angina`: Angina pectoris
+-   `heart.attack`: Heart attack
+-   `heart.disease`: Heart condition/disease
+-   `arthritis`: Arthritis and rheumatism
+-   `crohns.disease`: Crohn's disease
+-   `place.routine.care`: Usual place for routine care
+-   `trouble.asleep`: Trouble falling asleep
+-   `obese`: Obesity
+-   `current.smoker`: Current smoker
+-   `heavy.drinker`: Heavy drinker
+-   `hospitalization`: Hospital stay days
+-   `better.health.status`: Better health status
+-   `physical.activity`: Physical activity
+
+See the NHIS 2016 dataset and the article for better understanding of the variables.
+
+#### Complete case data
+
+```{r desc, warning=FALSE, message=FALSE, cache = TRUE}
+# Age
+table(dat$age, useNA = "always")
+```
+
+Let us consider a complete case dataset
+
+```{r completecase, warning=FALSE, message=FALSE, cache = TRUE}
+dat.complete <- na.omit(dat)
+dim(dat.complete)
+```
+
+As we can see, there are 7,280 participants with complete case information. Let's see the descriptive statistics of the predictors stratified by HICP.
+
+#### Descriptive statistics
+
+```{r tab1, warning=FALSE, message=FALSE, cache = TRUE}
+# Predictors
+predictors <- c("sex", "hhsize", "born", "marital", "region", "race", "education", 
+                "employment.status", "poverty.status", "veteran", "insurance", 
+                "sex.orientation", "worried.money", "good.neighborhood", "psy.symptom", 
+                "visit.ED", "surgery", "dr.visit", "cancer", "asthma", "htn", 
+                "liver.disease", "diabetes", "ulcer", "stroke", "emphysema", "copd", 
+                "high.cholesterol", "coronary.heart.disease", "angina", "heart.attack", 
+                "heart.disease", "arthritis", "crohns.disease", "place.routine.care",
+                "trouble.asleep", "obese", "current.smoker", "heavy.drinker", 
+                "hospitalization", "better.health.status", "physical.activity")
+
+# Table 1 - Unweighted 
+tbl_summary(data = dat.complete, include = predictors, by = HICP, missing = "no") %>% 
+  modify_spanning_header(c("stat_1", "stat_2") ~ "**HICP**")
+```
+
+### LASSO for survey data
+
+Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Note that we are not interested in the statistical significance of the $\beta$ coefficients. Hence, not utilizing PSU and strata should not be an issue in this prediction problem. However, we still need to use sampling weights to get population-level predictions. Large weights are usually problematic, particularly with random forest model. One way to solve the problem is weight normalization.
+
+```{r weight, warning=FALSE, message=FALSE, cache = TRUE}
+# Normalize weight
+dat.complete$wgt <- dat.complete$weight * nrow(dat.complete)/sum(dat.complete$weight)
+summary(dat.complete$weight)
+summary(dat.complete$wgt)
+```
+
+#### Folds
+
+Let's create five random folds and specify the regression formula.
+
+```{r folds, warning=FALSE, message=FALSE, cache = TRUE}
+k <- 5
+set.seed(604)
+nfolds <- sample(1:k, size = nrow(dat.complete), replace = T)
+table(nfolds)
+```
+
+#### Regression formula
+
+```{r formula, warning=FALSE, message=FALSE, cache = TRUE}
+Formula <- formula(paste("HICP ~ ", paste(predictors, collapse=" + ")))
+```
+
+#### LASSO with 5-fold CV
+
+Now, we will fit the LASSO model with 5-fold cross-validation (CV). Here are the steps:
+
+-   For fold 1, folds 2-5 is the training set and fold 1 is the test set
+-   Fit 5-fold cross-validation on the training set to find the value of lambda that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.
+-   Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey design.
+-   Calculate predictive performance (e.g., AUC) on the test set
+-   Repeat the analysis for all folds.
+
+```{r lassofit, warning=FALSE, message=FALSE, cache = TRUE}
+fit.lasso <- list(NULL); auc.lasso <- NULL
+for (fold in 1:k) {
+  # Training data
+  dat.train <- dat.complete[nfolds != fold, ]
+  X.train <- model.matrix(Formula, dat.train)[,-1]
+  y.train <- as.matrix(dat.train$HICP)
+  
+  # Test data
+  dat.test <- dat.complete[nfolds == fold, ]
+  X.test <- model.matrix(Formula, dat.test)[,-1]
+  y.test <- as.matrix(dat.test$HICP)
+  
+  # Find the optimum lambda using 5-fold CV
+  fit.cv.lasso <- cv.glmnet(x = X.train, y = y.train, nfolds = 5, alpha = 1, 
+                            family = "binomial", weights = dat.train$wgt)
+  
+  # Fit the model on the training set with optimum lambda
+  fit.lasso[[fold]] <- glmnet(x = X.train, y = y.train, alpha = 1, family = "binomial",
+                      lambda = fit.cv.lasso$lambda.min, weights = dat.train$wgt)
+  
+  # Prediction on the test set
+  dat.test$pred.lasso <- predict(fit.lasso[[fold]], newx = X.test, type = "response")
+  
+  # AUC on the test set with sampling weights
+  auc.lasso[fold] <- WeightedAUC(WeightedROC(dat.test$pred.lasso, dat.test$HICP, weight = dat.test$wgt))
+}
+```
+
+#### Model performance
+
+Let's check how prediction worked.
+
+```{r lassofit2, warning=FALSE, message=FALSE, cache = TRUE}
+# Fitted LASSO models
+fit.lasso[[1]]
+fit.lasso[[2]]
+fit.lasso[[3]]
+fit.lasso[[4]]
+fit.lasso[[5]]
+```
+
+```{r lassofit3, warning=FALSE, message=FALSE, cache = TRUE}
+# Intercept from the LASSO models in different folds
+fit.lasso[[1]]$a0
+fit.lasso[[2]]$a0
+fit.lasso[[3]]$a0
+fit.lasso[[4]]$a0
+fit.lasso[[5]]$a0
+```
+
+```{r lassofit4, warning=FALSE, message=FALSE, cache = TRUE}
+# Beta coefficients from the LASSO models in different folds
+fit.lasso[[1]]$beta
+fit.lasso[[2]]$beta
+fit.lasso[[3]]$beta
+fit.lasso[[4]]$beta
+fit.lasso[[5]]$beta
+```
+
+```{r lassoauc, warning=FALSE, message=FALSE, cache = TRUE}
+# AUCs from different folds
+auc.lasso
+```
+
+Now we will average out the AUC:
+
+```{r lassoaucmean, warning=FALSE, message=FALSE, cache = TRUE}
+# Average AUC
+mean(auc.lasso)
+```
+
+This AUC is approximately the same as reported by the authors in Table 2.
+
+### Random forest for survey data
+
+Now, we will fit the random forest model for predicting binary HICP with the listed predictors. Here are the steps for fitting the model with 5-fold CV:
+
+-   For fold 1, folds 2-5 is the training set and fold 1 is the test set
+-   Fit 5-fold cross-validation on the training set to find the value of lambda that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.
+-   Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey design.
+-   Calculate predictive performance (e.g., AUC) on the test set
+-   Repeat the analysis for all folds.
+
+#### Folds
+
+```{r foldsrf, warning=FALSE, message=FALSE, cache = TRUE}
+k <- 5
+table(nfolds)
+```
+
+#### Regression formula
+
+```{r formularf, warning=FALSE, message=FALSE, cache = TRUE}
+Formula
+```
+
+#### Random forst with 5-fold CV
+
+```{r rffit, warning=FALSE, message=FALSE, cache = TRUE}
+fit.rf <- list(NULL); auc.rf <- NULL
+for (fold in 1:k) {
+  # Training data
+  dat.train <- dat.complete[nfolds != fold, ]
+  
+  # Test data
+  dat.test <- dat.complete[nfolds == fold, ]
+  
+  # Tuning the hyperparameters 
+  ## Grid with 1000 models - huge time consuming
+  #grid.search <- expand.grid(mtry = 1:10, node.size = 1:10, 
+  #                           num.trees = seq(50,500,50), OOB_RMSE = 0)
+  
+  ## Grid with 36 models as an exercise
+  grid.search <- expand.grid(mtry = 5:7, node.size = 1:3, 
+                             num.trees = seq(200,500,100), OOB_RMSE = 0) 
+  
+  ## Model with grids 
+  for(ii in 1:nrow(grid.search)) {
+    # Model on training set with grid
+    fit.rf.tune <- ranger(formula = Formula, data = dat.train, 
+                          num.trees = grid.search$num.trees[ii],
+                          mtry = grid.search$mtry[ii], 
+                          min.node.size = grid.search$node.size[ii],
+                          importance = 'impurity', 
+                          case.weights = dat.train$wgt)
+    
+    # Add Out-of-bag (OOB) error to grid
+    grid.search$OOB_RMSE[ii] <- sqrt(fit.rf.tune$prediction.error)
+  }
+  # Position of the tuned hyperparameters
+  position <- which.min(grid.search$OOB_RMSE)
+  
+  # Fit the model on the training set with tuned hyperparameters
+  fit.rf[[fold]] <- ranger(formula = Formula, data = dat.train, 
+                           case.weights = dat.train$wgt, probability = T,
+                           num.trees = grid.search$num.trees[position], 
+                           min.node.size = grid.search$node.size[position], 
+                           mtry = grid.search$mtry[position], 
+                           importance = 'impurity')
+  
+  # Prediction on the test set
+  dat.test$pred.rf <- predict(fit.rf[[fold]], data = dat.test)$predictions[,2]
+  
+  # AUC on the test set with sampling weights
+  auc.rf[fold] <- WeightedAUC(WeightedROC(dat.test$pred.rf, dat.test$HICP, 
+                                          weight = dat.test$wgt))
+}
+```
+
+#### Model performance
+
+Let's check how prediction worked.
+
+```{r rffit2, warning=FALSE, message=FALSE, cache = TRUE}
+# Fitted random forest models
+fit.rf[[1]]
+fit.rf[[2]]
+fit.rf[[3]]
+fit.rf[[4]]
+fit.rf[[5]]
+```
+
+```{r rfauc, warning=FALSE, message=FALSE, cache = TRUE}
+# AUCs from different folds
+auc.rf
+```
+
+Now we will average out the AUC:
+
+```{r rfaucmean, warning=FALSE, message=FALSE, cache = TRUE}
+# Average AUC
+mean(auc.rf)
+```
+
+This AUC from random forest is approximately the same as obtained from the LASSO model.

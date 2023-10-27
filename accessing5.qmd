@@ -176,3 +176,79 @@ As we can see, there are data from 30,673 unique households, suggesting that not
 ```{r uniquehhn, echo=TRUE, cache=TRUE}
 length(unique(dat$HHX))
 ```
+
+### Table 1
+
+Now we will use the `adult21` dataset to create Table 1 with utilizing survey features (i.e., psu, strata, and weights). For that, let us create/recode some variables:
+
+```{r recode, echo=TRUE, cache=TRUE}
+# Heart attack
+adult21$heart.attack <- car::recode(adult21$MIEV_A, " 2 = 'No'; 1 = 'Yes'; else = NA", 
+                                levels = c("No", "Yes"), as.factor = T)
+table(adult21$heart.attack, useNA = "always")
+
+# Diabetes
+adult21$diabetes <- car::recode(adult21$DIBEV_A, " 2 = 'No'; 1 = 'Yes'; else = NA", 
+                            levels = c("No", "Yes"), as.factor = T)
+table(adult21$diabetes, useNA = "always")
+
+# Sex
+adult21$sex <- car::recode(adult21$SEX_A, " '1'='Male'; '2'='Female'; else=NA", 
+                       levels = c("Female", "Male"), as.factor = T)
+table(adult21$sex, useNA = "always")
+
+# Pseudo-PSU
+adult21$psu <- adult21$PPSU
+adult21$psu <- as.factor(adult21$psu)
+table(adult21$psu, useNA = "always")
+
+# Pseudo-stratum
+adult21$strata <- adult21$PSTRAT
+adult21$strata <- as.factor(adult21$strata)
+table(adult21$strata, useNA = "always")
+
+# Sampling weight
+adult21$sweight <- adult21$WTFA
+summary(adult21$sweight)
+
+# Drop the missing values associated with Heart attack, Diabetes, Sex
+dat.analytic <- adult21[complete.cases(adult21$heart.attack),]
+dat.analytic <- dat.analytic[complete.cases(dat.analytic$diabetes),]
+dat.analytic <- dat.analytic[complete.cases(dat.analytic$sex),]
+dim(dat.analytic)
+```
+
+First, we will create the survey design. Second, we will report Table 1 with heart attack and sex variable, stratified by diabetes.
+
+```{r tab1, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE}
+library(tableone)
+library(survey)
+
+# Indicator in the full data
+adult21$indicator <- 1
+adult21$indicator[adult21$HHX %in% dat.analytic$HHX] <- 0
+table(adult21$indicator)
+
+# Survey design
+w.design <- svydesign(id = ~psu, strata = ~strata, weights = ~sweight, data = adult21, nest = T)
+
+# Subset
+w.design0 <- subset(w.design, indicator == 0)
+
+# Table 1
+tab1 <- svyCreateTableOne(var = c("heart.attack", "sex"), strata= "diabetes", 
+                          data = w.design0, test = FALSE)
+print(tab1)
+```
+
+### Regression analysis
+
+Let's run a regression analysis with utilizing survey features.
+
+```{r regression, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE}
+library(Publish)
+
+# Design-adjusted logistic
+fit1 <- svyglm(I(heart.attack == "Yes") ~ diabetes + sex, design = w.design0, family = binomial)
+publish(fit1)
+```
