@@ -825,7 +825,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Continuous outcome</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">Continuous outcome</h1>
 </div>
 
 
@@ -854,9 +854,9 @@ Important
 <p>In this chapter, we will talk about Regression that deals with prediction of continuous outcomes. We will use multiple linear regression to build the first prediction model.</p>
 <section id="load-dataset" class="level3"><h3 class="anchored" data-anchor-id="load-dataset">Load dataset</h3>
 <div class="cell" data-hash="machinelearning1_cache/html/data_68c52dc471757b0299b6fc1fc56d5c88">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/rhcAnalytic.RDS"</span>)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/rhcAnalytic.RDS"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">head</span>(ObsData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -869,7 +869,7 @@ Important
 <p>Now, we show the regression fitting when outcome is continuous (length of stay).</p>
 <section id="variables" class="level4"><h4 class="anchored" data-anchor-id="variables">Variables</h4>
 <div class="cell" data-hash="machinelearning1_cache/html/vars2_20da7dd01978d298e4d228876710c7ed">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
 <span id="cb2-2"><a href="#cb2-2"></a>                         <span class="sc">!</span><span class="fu">c</span>(Length.of.Stay,Death)))</span>
 <span id="cb2-3"><a href="#cb2-3"></a>baselinevars</span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt;  [1] "Disease.category"      "Cancer"                "Cardiovascular"       </span></span>
@@ -889,11 +889,10 @@ Important
 <span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; [43] "Metabolic.Diag"        "Hematologic.Diag"      "Sepsis.Diag"          </span></span>
 <span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt; [46] "Trauma.Diag"           "Orthopedic.Diag"       "race"                 </span></span>
 <span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; [49] "income"                "RHC.use"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="model" class="level4"><h4 class="anchored" data-anchor-id="model">Model</h4>
 <div class="cell" data-hash="machinelearning1_cache/html/reg2_45fc74de6b5fa027b91b3129fb3410c9">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># adjust covariates</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># adjust covariates</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>out.formula1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">"Length.of.Stay~ "</span>, </span>
 <span id="cb3-3"><a href="#cb3-3"></a>                               <span class="fu">paste</span>(baselinevars, </span>
 <span id="cb3-4"><a href="#cb3-4"></a>                                     <span class="at">collapse =</span> <span class="st">"+"</span>)))</span>
@@ -901,10 +900,9 @@ Important
 <span id="cb3-6"><a href="#cb3-6"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(out.formula1, <span class="at">data =</span> ObsData)</span>
 <span id="cb3-7"><a href="#cb3-7"></a><span class="fu">require</span>(Publish)</span>
 <span id="cb3-8"><a href="#cb3-8"></a>adj.fit1 <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit1, <span class="at">digits=</span><span class="dv">1</span>)<span class="sc">$</span>regressionTable</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="machinelearning1_cache/html/reg2a_2fd21e0bc1bcdddf43f17b09b72c54f0">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>out.formula1</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>out.formula1</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; Length.of.Stay ~ Disease.category + Cancer + Cardiovascular + </span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;     Congestive.HF + Dementia + Psychiatric + Pulmonary + Renal + </span></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt;     Hepatic + GI.Bleed + Tumor + Immunosupperssion + Transfer.hx + </span></span>
@@ -917,7 +915,7 @@ Important
 <span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;     Sepsis.Diag + Trauma.Diag + Orthopedic.Diag + race + income + </span></span>
 <span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt;     RHC.use</span></span>
 <span id="cb4-13"><a href="#cb4-13"></a>adj.fit1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -937,14 +935,13 @@ Important
 </ul>
 <p>Expands factors to a set of dummy variables.</p>
 <div class="cell" data-hash="machinelearning1_cache/html/mat0_3d4beb2936507240554a80788c0e2d71">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">dim</span>(ObsData)</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">dim</span>(ObsData)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; [1] 5735   52</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="fu">length</span>(<span class="fu">attr</span>(<span class="fu">terms</span>(out.formula1), <span class="st">"term.labels"</span>))</span>
 <span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; [1] 50</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="machinelearning1_cache/html/mat1_2cb9e223c642f92171dc1f472ad8bd6a">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">head</span>(<span class="fu">model.matrix</span>(fit1))</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">head</span>(<span class="fu">model.matrix</span>(fit1))</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt;   (Intercept) Disease.categoryCHF Disease.categoryOther Disease.categoryMOSF</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; 1           1                   0                     1                    0</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; 2           1                   0                     0                    1</span></span>
@@ -1048,11 +1045,10 @@ Important
 <span id="cb6-102"><a href="#cb6-102"></a>p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(fit1))[<span class="dv">2</span>] <span class="co"># intercept + slopes</span></span>
 <span id="cb6-103"><a href="#cb6-103"></a>p</span>
 <span id="cb6-104"><a href="#cb6-104"></a><span class="co">#&gt; [1] 64</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="obtain-prediction" class="level4"><h4 class="anchored" data-anchor-id="obtain-prediction">Obtain prediction</h4>
 <div class="cell" data-hash="machinelearning1_cache/html/pred_164fbffa59fe9b31db91a627ade23036">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>obs.y <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Length.of.Stay</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>obs.y <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Length.of.Stay</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">summary</span>(obs.y)</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt;    2.00    7.00   14.00   21.56   25.00  394.00</span></span>
@@ -1066,7 +1062,7 @@ Important
 <span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; [1] 5735</span></span>
 <span id="cb7-13"><a href="#cb7-13"></a><span class="fu">plot</span>(obs.y,pred.y1)</span>
 <span id="cb7-14"><a href="#cb7-14"></a><span class="fu">lines</span>(<span class="fu">lowess</span>(obs.y,pred.y1), <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="machinelearning1_files/figure-html/pred-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
@@ -1084,7 +1080,7 @@ Important
 <p>The <strong>Coefficient of Determination (R²)</strong> or <code>R.2</code>, which provides a measure of how well the model’s predictions match the observed data, is defined as: <span class="math display">\[ R^2 = 1 - \frac{SS_{res}}{SS_{tot}} \]</span></p>
 <p>In the ideal scenario where the model fits the data perfectly, we have <span class="math inline">\(SS_{res} = 0\)</span> and thus <span class="math inline">\(R^2 = 1\)</span>. Conversely, a baseline model, which always predicts the mean <span class="math inline">\(\bar{y}\)</span> of the observed data, would yield <span class="math inline">\(R^2 = 0\)</span>. Models performing worse than this baseline model would result in a negative R² value. This metric is widely utilized in regression analysis to evaluate model performance, where a higher R² indicates a better fit of the model to the data.</p>
 <div class="cell" data-hash="machinelearning1_cache/html/r2_58f94f66577ba2599efec80392488986">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Find SSE</span></span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Find SSE</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> pred.y1)<span class="sc">^</span><span class="dv">2</span> )</span>
 <span id="cb8-3"><a href="#cb8-3"></a>SSE</span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; [1] 3536398</span></span>
@@ -1100,18 +1096,16 @@ Important
 <span id="cb8-14"><a href="#cb8-14"></a><span class="fu">require</span>(caret)</span>
 <span id="cb8-15"><a href="#cb8-15"></a>caret<span class="sc">::</span><span class="fu">R2</span>(pred.y1, obs.y)</span>
 <span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt; [1] 0.07826832</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p><a href="https://en.wikipedia.org/wiki/Coefficient_of_determination">ref</a></p>
 </section><section id="rmse" class="level4"><h4 class="anchored" data-anchor-id="rmse">RMSE</h4>
 <div class="cell" data-hash="machinelearning1_cache/html/rmse_d0eb1bab8e703e09b6ae5cd0562b8f40">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Find RMSE</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Find RMSE</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>Rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(SSE<span class="sc">/</span>(n<span class="sc">-</span>p)) </span>
 <span id="cb9-3"><a href="#cb9-3"></a>Rmse</span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; [1] 24.97185</span></span>
 <span id="cb9-5"><a href="#cb9-5"></a>caret<span class="sc">::</span><span class="fu">RMSE</span>(pred.y1, obs.y)</span>
 <span id="cb9-6"><a href="#cb9-6"></a><span class="co">#&gt; [1] 24.83212</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>See <span class="citation" data-cites="anova">(<a href="#ref-anova" role="doc-biblioref">Wikipedia 2023b</a>)</span></p>
 </section><section id="adj-r2" class="level4"><h4 class="anchored" data-anchor-id="adj-r2">Adj R2</h4>
@@ -1141,11 +1135,10 @@ Important
 \]</span></p>
 <p>This formula modifies the <span class="math inline">\(R^2\)</span> value, accounting for the number of predictors and offering a more parsimonious model fit measure.</p>
 <div class="cell" data-hash="machinelearning1_cache/html/adjr2_2d0461e43953c35e42187ca95bfedc50">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Find adj R2</span></span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Find adj R2</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R<span class="fl">.2</span>)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>(n<span class="sc">-</span>p<span class="dv">-1</span>))</span>
 <span id="cb10-3"><a href="#cb10-3"></a>adjR2</span>
 <span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt; [1] 0.06786429</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>See <span class="citation" data-cites="coefd">(<a href="#ref-coefd" role="doc-biblioref">Wikipedia 2023a</a>)</span></p>
 </section></section><section id="overfitting-and-optimism" class="level3"><h3 class="anchored" data-anchor-id="overfitting-and-optimism">Overfitting and Optimism</h3>
@@ -1200,8 +1193,6 @@ Tip
 </div>
 </section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
 
-
-<!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-coefd" class="csl-entry" role="doc-biblioentry">
@@ -1404,233 +1395,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Data spliting</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb11" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">## Continuous outcome {.unnumbered}</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a></span>
-<span id="cb11-3"><a href="#cb11-3"></a>::: callout-important</span>
-<span id="cb11-4"><a href="#cb11-4"></a>This tutorial is very similar to one of the <span class="co">[</span><span class="ot">previous tutorials</span><span class="co">](predictivefactors2.html)</span>, but uses a different data (we used <span class="co">[</span><span class="ot">RHC data</span><span class="co">](researchquestion1.html)</span> here). We are revisiting concepts related to <span class="co">[</span><span class="ot">prediction</span><span class="co">](predictivefactors.html)</span> before introducing ideas related to machine learning.</span>
-<span id="cb11-5"><a href="#cb11-5"></a>:::</span>
-<span id="cb11-6"><a href="#cb11-6"></a></span>
-<span id="cb11-7"><a href="#cb11-7"></a>In this chapter, we will talk about Regression that deals with prediction of continuous outcomes. We will use multiple linear regression to build the first prediction model.</span>
-<span id="cb11-8"><a href="#cb11-8"></a></span>
-<span id="cb11-9"><a href="#cb11-9"></a><span class="in">```{r setup02, include=FALSE, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
-<span id="cb11-10"><a href="#cb11-10"></a><span class="fu">require</span>(tableone)</span>
-<span id="cb11-11"><a href="#cb11-11"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb11-12"><a href="#cb11-12"></a><span class="fu">require</span>(MatchIt)</span>
-<span id="cb11-13"><a href="#cb11-13"></a><span class="fu">require</span>(cobalt)</span>
-<span id="cb11-14"><a href="#cb11-14"></a><span class="fu">require</span>(ggplot2)</span>
-<span id="cb11-15"><a href="#cb11-15"></a><span class="fu">require</span>(caret)</span>
-<span id="cb11-16"><a href="#cb11-16"></a><span class="in">```</span></span>
-<span id="cb11-17"><a href="#cb11-17"></a></span>
-<span id="cb11-18"><a href="#cb11-18"></a><span class="fu">### Load dataset</span></span>
-<span id="cb11-19"><a href="#cb11-19"></a></span>
-<span id="cb11-20"><a href="#cb11-20"></a><span class="in">```{r data, cache=TRUE}</span></span>
-<span id="cb11-21"><a href="#cb11-21"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/rhcAnalytic.RDS"</span>)</span>
-<span id="cb11-22"><a href="#cb11-22"></a><span class="fu">head</span>(ObsData)</span>
-<span id="cb11-23"><a href="#cb11-23"></a><span class="in">```</span></span>
-<span id="cb11-24"><a href="#cb11-24"></a></span>
-<span id="cb11-25"><a href="#cb11-25"></a><span class="fu">### Prediction for length of stay</span></span>
-<span id="cb11-26"><a href="#cb11-26"></a></span>
-<span id="cb11-27"><a href="#cb11-27"></a>Now, we show the regression fitting when outcome is continuous (length of stay).</span>
-<span id="cb11-28"><a href="#cb11-28"></a></span>
-<span id="cb11-29"><a href="#cb11-29"></a><span class="fu">#### Variables</span></span>
-<span id="cb11-30"><a href="#cb11-30"></a></span>
-<span id="cb11-31"><a href="#cb11-31"></a><span class="in">```{r vars2, cache=TRUE, echo = TRUE}</span></span>
-<span id="cb11-32"><a href="#cb11-32"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
-<span id="cb11-33"><a href="#cb11-33"></a>                         <span class="sc">!</span><span class="fu">c</span>(Length.of.Stay,Death)))</span>
-<span id="cb11-34"><a href="#cb11-34"></a>baselinevars</span>
-<span id="cb11-35"><a href="#cb11-35"></a><span class="in">```</span></span>
-<span id="cb11-36"><a href="#cb11-36"></a></span>
-<span id="cb11-37"><a href="#cb11-37"></a><span class="fu">#### Model</span></span>
-<span id="cb11-38"><a href="#cb11-38"></a></span>
-<span id="cb11-39"><a href="#cb11-39"></a><span class="in">```{r reg2, cache=TRUE, echo = TRUE, results='hide'}</span></span>
-<span id="cb11-40"><a href="#cb11-40"></a><span class="co"># adjust covariates</span></span>
-<span id="cb11-41"><a href="#cb11-41"></a>out.formula1 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">"Length.of.Stay~ "</span>, </span>
-<span id="cb11-42"><a href="#cb11-42"></a>                               <span class="fu">paste</span>(baselinevars, </span>
-<span id="cb11-43"><a href="#cb11-43"></a>                                     <span class="at">collapse =</span> <span class="st">"+"</span>)))</span>
-<span id="cb11-44"><a href="#cb11-44"></a><span class="fu">saveRDS</span>(out.formula1, <span class="at">file =</span> <span class="st">"Data/machinelearning/form1.RDS"</span>)</span>
-<span id="cb11-45"><a href="#cb11-45"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(out.formula1, <span class="at">data =</span> ObsData)</span>
-<span id="cb11-46"><a href="#cb11-46"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb11-47"><a href="#cb11-47"></a>adj.fit1 <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit1, <span class="at">digits=</span><span class="dv">1</span>)<span class="sc">$</span>regressionTable</span>
-<span id="cb11-48"><a href="#cb11-48"></a><span class="in">```</span></span>
-<span id="cb11-49"><a href="#cb11-49"></a></span>
-<span id="cb11-50"><a href="#cb11-50"></a><span class="in">```{r reg2a, cache=TRUE, echo = TRUE}</span></span>
-<span id="cb11-51"><a href="#cb11-51"></a>out.formula1</span>
-<span id="cb11-52"><a href="#cb11-52"></a>adj.fit1</span>
-<span id="cb11-53"><a href="#cb11-53"></a><span class="in">```</span></span>
-<span id="cb11-54"><a href="#cb11-54"></a></span>
-<span id="cb11-55"><a href="#cb11-55"></a><span class="fu">#### Design Matrix</span></span>
-<span id="cb11-56"><a href="#cb11-56"></a></span>
-<span id="cb11-57"><a href="#cb11-57"></a><span class="ss">-   </span>Notations</span>
-<span id="cb11-58"><a href="#cb11-58"></a><span class="ss">    -   </span>n is number of observations</span>
-<span id="cb11-59"><a href="#cb11-59"></a><span class="ss">    -   </span>p is number of covariates</span>
-<span id="cb11-60"><a href="#cb11-60"></a></span>
-<span id="cb11-61"><a href="#cb11-61"></a>Expands factors to a set of dummy variables.</span>
-<span id="cb11-62"><a href="#cb11-62"></a></span>
-<span id="cb11-63"><a href="#cb11-63"></a><span class="in">```{r mat0, cache=TRUE}</span></span>
-<span id="cb11-64"><a href="#cb11-64"></a><span class="fu">dim</span>(ObsData)</span>
-<span id="cb11-65"><a href="#cb11-65"></a><span class="fu">length</span>(<span class="fu">attr</span>(<span class="fu">terms</span>(out.formula1), <span class="st">"term.labels"</span>))</span>
-<span id="cb11-66"><a href="#cb11-66"></a><span class="in">```</span></span>
-<span id="cb11-67"><a href="#cb11-67"></a></span>
-<span id="cb11-68"><a href="#cb11-68"></a><span class="in">```{r mat1, cache=TRUE}</span></span>
-<span id="cb11-69"><a href="#cb11-69"></a><span class="fu">head</span>(<span class="fu">model.matrix</span>(fit1))</span>
-<span id="cb11-70"><a href="#cb11-70"></a><span class="fu">dim</span>(<span class="fu">model.matrix</span>(fit1))</span>
-<span id="cb11-71"><a href="#cb11-71"></a>p <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">model.matrix</span>(fit1))[<span class="dv">2</span>] <span class="co"># intercept + slopes</span></span>
-<span id="cb11-72"><a href="#cb11-72"></a>p</span>
-<span id="cb11-73"><a href="#cb11-73"></a><span class="in">```</span></span>
-<span id="cb11-74"><a href="#cb11-74"></a></span>
-<span id="cb11-75"><a href="#cb11-75"></a><span class="fu">#### Obtain prediction</span></span>
-<span id="cb11-76"><a href="#cb11-76"></a></span>
-<span id="cb11-77"><a href="#cb11-77"></a><span class="in">```{r pred, cache=TRUE}</span></span>
-<span id="cb11-78"><a href="#cb11-78"></a>obs.y <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Length.of.Stay</span>
-<span id="cb11-79"><a href="#cb11-79"></a><span class="fu">summary</span>(obs.y)</span>
-<span id="cb11-80"><a href="#cb11-80"></a><span class="co"># Predict the above fit on ObsData data</span></span>
-<span id="cb11-81"><a href="#cb11-81"></a>pred.y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, ObsData)</span>
-<span id="cb11-82"><a href="#cb11-82"></a><span class="fu">summary</span>(pred.y1)</span>
-<span id="cb11-83"><a href="#cb11-83"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(pred.y1)</span>
-<span id="cb11-84"><a href="#cb11-84"></a>n</span>
-<span id="cb11-85"><a href="#cb11-85"></a><span class="fu">plot</span>(obs.y,pred.y1)</span>
-<span id="cb11-86"><a href="#cb11-86"></a><span class="fu">lines</span>(<span class="fu">lowess</span>(obs.y,pred.y1), <span class="at">col =</span> <span class="st">"red"</span>)</span>
-<span id="cb11-87"><a href="#cb11-87"></a><span class="in">```</span></span>
-<span id="cb11-88"><a href="#cb11-88"></a></span>
-<span id="cb11-89"><a href="#cb11-89"></a><span class="fu">### Measuring prediction error</span></span>
-<span id="cb11-90"><a href="#cb11-90"></a></span>
-<span id="cb11-91"><a href="#cb11-91"></a>**Prediction error** measures how well the model can predict the outcome for new data that were **not** used in developing the prediction model.</span>
-<span id="cb11-92"><a href="#cb11-92"></a></span>
-<span id="cb11-93"><a href="#cb11-93"></a><span class="ss">-   </span>Bias reduced for models with more variables</span>
-<span id="cb11-94"><a href="#cb11-94"></a><span class="ss">-   </span>Unimportant variables lead to noise / variability</span>
-<span id="cb11-95"><a href="#cb11-95"></a><span class="ss">-   </span>Bias variance trade-off / need penalization</span>
-<span id="cb11-96"><a href="#cb11-96"></a></span>
-<span id="cb11-97"><a href="#cb11-97"></a><span class="fu">#### R2</span></span>
-<span id="cb11-98"><a href="#cb11-98"></a></span>
-<span id="cb11-99"><a href="#cb11-99"></a></span>
-<span id="cb11-100"><a href="#cb11-100"></a>The provided information describes a statistical context involving a dataset of <span class="in">`n`</span> values, $y_1, ..., y_n$ (referred to as $y_i$ or as a vector $y = <span class="co">[</span><span class="ot">y_1,...,y_n</span><span class="co">]</span>^T$), each paired with a fitted value $f_1,...,f_n$ (denoted as $f_i$ or sometimes $\hat{y_i}$, and as a vector $f$). The residuals, represented as $e_i$, are defined as the differences between the observed and the fitted values: </span>
-<span id="cb11-101"><a href="#cb11-101"></a>$ e_i = y_i − f_i$ </span>
-<span id="cb11-102"><a href="#cb11-102"></a></span>
-<span id="cb11-103"><a href="#cb11-103"></a>The mean of the observed data is denoted by </span>
-<span id="cb11-104"><a href="#cb11-104"></a>$$ \bar{y} = \frac{1}{n}\sum_{i=1}^{n}y_i $$</span>
-<span id="cb11-105"><a href="#cb11-105"></a></span>
-<span id="cb11-106"><a href="#cb11-106"></a>The variability of the dataset can be quantified using two sums of squares formulas:</span>
-<span id="cb11-107"><a href="#cb11-107"></a><span class="ss">1. </span>**Residual Sum of Squares (SSres)** or <span class="in">`SSE`</span>: It quantifies the variance remaining in the data after fitting a model, calculated as:</span>
-<span id="cb11-108"><a href="#cb11-108"></a>$$ SS_{res} = \sum_{i}(y_i - f_i)^2 = \sum_{i}e_i^2 $$</span>
-<span id="cb11-109"><a href="#cb11-109"></a><span class="ss">2. </span>**Total Sum of Squares (SStot)** or <span class="in">`SST`</span>: It represents the total variance in the observed data, calculated as:</span>
-<span id="cb11-110"><a href="#cb11-110"></a>$$ SS_{tot} = \sum_{i}(y_i - \bar{y})^2 $$</span>
-<span id="cb11-111"><a href="#cb11-111"></a></span>
-<span id="cb11-112"><a href="#cb11-112"></a>The **Coefficient of Determination (R²)** or <span class="in">`R.2`</span>, which provides a measure of how well the model's predictions match the observed data, is defined as:</span>
-<span id="cb11-113"><a href="#cb11-113"></a>$$ R^2 = 1 - \frac{SS_{res}}{SS_{tot}} $$</span>
-<span id="cb11-114"><a href="#cb11-114"></a></span>
-<span id="cb11-115"><a href="#cb11-115"></a>In the ideal scenario where the model fits the data perfectly, we have $SS_{res} = 0$ and thus $R^2 = 1$. Conversely, a baseline model, which always predicts the mean $\bar{y}$ of the observed data, would yield $R^2 = 0$. Models performing worse than this baseline model would result in a negative R² value. This metric is widely utilized in regression analysis to evaluate model performance, where a higher R² indicates a better fit of the model to the data.</span>
-<span id="cb11-116"><a href="#cb11-116"></a></span>
-<span id="cb11-117"><a href="#cb11-117"></a></span>
-<span id="cb11-118"><a href="#cb11-118"></a><span class="in">```{r r2, cache=TRUE}</span></span>
-<span id="cb11-119"><a href="#cb11-119"></a><span class="co"># Find SSE</span></span>
-<span id="cb11-120"><a href="#cb11-120"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> pred.y1)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb11-121"><a href="#cb11-121"></a>SSE</span>
-<span id="cb11-122"><a href="#cb11-122"></a><span class="co"># Find SST</span></span>
-<span id="cb11-123"><a href="#cb11-123"></a>mean.obs.y <span class="ot">&lt;-</span> <span class="fu">mean</span>(obs.y)</span>
-<span id="cb11-124"><a href="#cb11-124"></a>SST <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> mean.obs.y)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb11-125"><a href="#cb11-125"></a>SST</span>
-<span id="cb11-126"><a href="#cb11-126"></a><span class="co"># Find R2</span></span>
-<span id="cb11-127"><a href="#cb11-127"></a>R<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span> SSE<span class="sc">/</span>SST</span>
-<span id="cb11-128"><a href="#cb11-128"></a>R<span class="fl">.2</span></span>
-<span id="cb11-129"><a href="#cb11-129"></a><span class="fu">require</span>(caret)</span>
-<span id="cb11-130"><a href="#cb11-130"></a>caret<span class="sc">::</span><span class="fu">R2</span>(pred.y1, obs.y)</span>
-<span id="cb11-131"><a href="#cb11-131"></a><span class="in">```</span></span>
-<span id="cb11-132"><a href="#cb11-132"></a></span>
-<span id="cb11-133"><a href="#cb11-133"></a><span class="co">[</span><span class="ot">ref</span><span class="co">](https://en.wikipedia.org/wiki/Coefficient_of_determination)</span></span>
-<span id="cb11-134"><a href="#cb11-134"></a></span>
-<span id="cb11-135"><a href="#cb11-135"></a></span>
-<span id="cb11-136"><a href="#cb11-136"></a><span class="fu">#### RMSE</span></span>
-<span id="cb11-137"><a href="#cb11-137"></a></span>
-<span id="cb11-138"><a href="#cb11-138"></a><span class="in">```{r rmse, cache=TRUE}</span></span>
-<span id="cb11-139"><a href="#cb11-139"></a><span class="co"># Find RMSE</span></span>
-<span id="cb11-140"><a href="#cb11-140"></a>Rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(SSE<span class="sc">/</span>(n<span class="sc">-</span>p)) </span>
-<span id="cb11-141"><a href="#cb11-141"></a>Rmse</span>
-<span id="cb11-142"><a href="#cb11-142"></a>caret<span class="sc">::</span><span class="fu">RMSE</span>(pred.y1, obs.y)</span>
-<span id="cb11-143"><a href="#cb11-143"></a><span class="in">```</span></span>
-<span id="cb11-144"><a href="#cb11-144"></a></span>
-<span id="cb11-145"><a href="#cb11-145"></a>See <span class="co">[</span><span class="ot">@anova</span><span class="co">]</span></span>
-<span id="cb11-146"><a href="#cb11-146"></a></span>
-<span id="cb11-147"><a href="#cb11-147"></a></span>
-<span id="cb11-148"><a href="#cb11-148"></a><span class="fu">#### Adj R2</span></span>
-<span id="cb11-149"><a href="#cb11-149"></a></span>
-<span id="cb11-150"><a href="#cb11-150"></a>The **Adjusted R²** statistic modifies the $R^2$ value to counteract the automatic increase of $R^2$ when extra explanatory variables are added to a model, even if they do not improve the model fit. This adjustment is crucial for ensuring that the metric offers a reliable indication of the explanatory power of the model, especially in multiple regression where several predictors are involved.</span>
-<span id="cb11-151"><a href="#cb11-151"></a></span>
-<span id="cb11-152"><a href="#cb11-152"></a>The commonly used formula  is defined as:</span>
-<span id="cb11-153"><a href="#cb11-153"></a></span>
-<span id="cb11-154"><a href="#cb11-154"></a>$$</span>
-<span id="cb11-155"><a href="#cb11-155"></a>\bar{R}^{2} = 1 - \frac{SS_{\text{res}} / df_{\text{res}}}{SS_{\text{tot}} / df_{\text{tot}}}</span>
-<span id="cb11-156"><a href="#cb11-156"></a>$$</span>
-<span id="cb11-157"><a href="#cb11-157"></a></span>
-<span id="cb11-158"><a href="#cb11-158"></a>Where:</span>
-<span id="cb11-159"><a href="#cb11-159"></a></span>
-<span id="cb11-160"><a href="#cb11-160"></a><span class="ss">- </span>$SS_{\text{res}}$ and $SS_{\text{tot}}$ represent the residual and total sums of squares respectively.</span>
-<span id="cb11-161"><a href="#cb11-161"></a><span class="ss">- </span>$df_{\text{res}}$ and $df_{\text{tot}}$ refer to the degrees of freedom of the residual and total sums of squares. Usually, $df_{\text{res}} = n - p$ and $df_{\text{tot}} = n - 1$, where:</span>
-<span id="cb11-162"><a href="#cb11-162"></a><span class="ss">  - </span>$n$ signifies the sample size.</span>
-<span id="cb11-163"><a href="#cb11-163"></a><span class="ss">  - </span>$p$ denotes the number of variables in the model.</span>
-<span id="cb11-164"><a href="#cb11-164"></a></span>
-<span id="cb11-165"><a href="#cb11-165"></a>This metric plays a vital role in model selection and safeguards against overfitting by penalizing the inclusion of non-informative variables</span>
-<span id="cb11-166"><a href="#cb11-166"></a></span>
-<span id="cb11-167"><a href="#cb11-167"></a>The alternate formula is:</span>
-<span id="cb11-168"><a href="#cb11-168"></a></span>
-<span id="cb11-169"><a href="#cb11-169"></a>$$</span>
-<span id="cb11-170"><a href="#cb11-170"></a>\bar{R}^2 = 1 - (1 - R^2) \frac{n-1}{n-p-1}</span>
-<span id="cb11-171"><a href="#cb11-171"></a>$$</span>
-<span id="cb11-172"><a href="#cb11-172"></a></span>
-<span id="cb11-173"><a href="#cb11-173"></a>This formula modifies the $R^2$ value, accounting for the number of predictors and offering a more parsimonious model fit measure. </span>
-<span id="cb11-174"><a href="#cb11-174"></a></span>
-<span id="cb11-175"><a href="#cb11-175"></a><span class="in">```{r adjr2, cache=TRUE}</span></span>
-<span id="cb11-176"><a href="#cb11-176"></a><span class="co"># Find adj R2</span></span>
-<span id="cb11-177"><a href="#cb11-177"></a>adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R<span class="fl">.2</span>)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>(n<span class="sc">-</span>p<span class="dv">-1</span>))</span>
-<span id="cb11-178"><a href="#cb11-178"></a>adjR2</span>
-<span id="cb11-179"><a href="#cb11-179"></a><span class="in">```</span></span>
-<span id="cb11-180"><a href="#cb11-180"></a></span>
-<span id="cb11-181"><a href="#cb11-181"></a>See <span class="co">[</span><span class="ot">@coefd</span><span class="co">]</span></span>
-<span id="cb11-182"><a href="#cb11-182"></a></span>
-<span id="cb11-183"><a href="#cb11-183"></a><span class="fu">### Overfitting and Optimism</span></span>
-<span id="cb11-184"><a href="#cb11-184"></a></span>
-<span id="cb11-185"><a href="#cb11-185"></a><span class="ss">-   </span>Model usually performs very well in the empirical data where the model was fitted in the same data (optimistic)</span>
-<span id="cb11-186"><a href="#cb11-186"></a><span class="ss">-   </span>Model performs poorly in the new data (generalization is not as good)</span>
-<span id="cb11-187"><a href="#cb11-187"></a></span>
-<span id="cb11-188"><a href="#cb11-188"></a><span class="fu">#### Causes</span></span>
-<span id="cb11-189"><a href="#cb11-189"></a></span>
-<span id="cb11-190"><a href="#cb11-190"></a><span class="ss">-   </span>Model determined by data at hand without expert opinion</span>
-<span id="cb11-191"><a href="#cb11-191"></a><span class="ss">-   </span>Too many model parameters ($age$, $age^2$, $age^3$) / predictors</span>
-<span id="cb11-192"><a href="#cb11-192"></a><span class="ss">-   </span>Too small dataset (training) / data too noisy</span>
-<span id="cb11-193"><a href="#cb11-193"></a></span>
-<span id="cb11-194"><a href="#cb11-194"></a><span class="fu">#### Consequences</span></span>
-<span id="cb11-195"><a href="#cb11-195"></a></span>
-<span id="cb11-196"><a href="#cb11-196"></a><span class="ss">-   </span>Overestimation of effects of predictors</span>
-<span id="cb11-197"><a href="#cb11-197"></a><span class="ss">-   </span>Reduction in model performance in new observations</span>
-<span id="cb11-198"><a href="#cb11-198"></a></span>
-<span id="cb11-199"><a href="#cb11-199"></a><span class="fu">#### Proposed solutions</span></span>
-<span id="cb11-200"><a href="#cb11-200"></a></span>
-<span id="cb11-201"><a href="#cb11-201"></a>We generally use procedures such as</span>
-<span id="cb11-202"><a href="#cb11-202"></a></span>
-<span id="cb11-203"><a href="#cb11-203"></a><span class="ss">-   </span>Internal validation</span>
-<span id="cb11-204"><a href="#cb11-204"></a><span class="ss">    -   </span>sample splitting</span>
-<span id="cb11-205"><a href="#cb11-205"></a><span class="ss">    -   </span>cross-validation</span>
-<span id="cb11-206"><a href="#cb11-206"></a><span class="ss">    -   </span>bootstrap</span>
-<span id="cb11-207"><a href="#cb11-207"></a><span class="ss">-   </span>External validation</span>
-<span id="cb11-208"><a href="#cb11-208"></a><span class="ss">    -   </span>Temporal</span>
-<span id="cb11-209"><a href="#cb11-209"></a><span class="ss">    -   </span>Geographical</span>
-<span id="cb11-210"><a href="#cb11-210"></a><span class="ss">    -   </span>Different data source to calculate same variable</span>
-<span id="cb11-211"><a href="#cb11-211"></a><span class="ss">    -   </span>Different disease</span>
-<span id="cb11-212"><a href="#cb11-212"></a></span>
-<span id="cb11-213"><a href="#cb11-213"></a><span class="fu">### Video content (optional)</span></span>
-<span id="cb11-214"><a href="#cb11-214"></a></span>
-<span id="cb11-215"><a href="#cb11-215"></a>::: callout-tip</span>
-<span id="cb11-216"><a href="#cb11-216"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
-<span id="cb11-217"><a href="#cb11-217"></a>:::</span>
-<span id="cb11-218"><a href="#cb11-218"></a></span>
-<span id="cb11-219"><a href="#cb11-219"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
-<span id="cb11-220"><a href="#cb11-220"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/TmrG2ZbeJoY"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
-<span id="cb11-221"><a href="#cb11-221"></a></span>
-<span id="cb11-222"><a href="#cb11-222"></a><span class="kw">&lt;/iframe&gt;</span></span>
-<span id="cb11-223"><a href="#cb11-223"></a>:::</span>
-<span id="cb11-224"><a href="#cb11-224"></a></span>
-<span id="cb11-225"><a href="#cb11-225"></a><span class="fu">### References</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

@@ -827,7 +827,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">GEE</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">GEE</h1>
 </div>
 
 
@@ -842,7 +842,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 </header><p>In this section, we will learn about generalized estimating equation (GEE). GEE is another popular method for modeling longitudinal or clustered data. In contrast to the mixed effects models where we assume error term and beta coefficients for subject <span class="math inline">\(i\)</span> both follow normal distribution, GEE is distribution free. However, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.</p>
 <div class="cell" data-hash="longitudinal2_cache/html/setup_6333dae9ba0ceffab9d38e23af58751e">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(HSAUR2)</span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(gee)</span>
@@ -850,7 +850,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(geepack)</span>
 <span id="cb1-7"><a href="#cb1-7"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
 <span id="cb1-8"><a href="#cb1-8"></a><span class="fu">require</span>(afex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="data-description" class="level3"><h3 class="anchored" data-anchor-id="data-description">Data Description</h3>
 <p>In addition to BtheB dataset in part 1, we used respiratory data from <strong>HSAUR2</strong> package to demonstrate the analysis with non-normal responses:</p>
@@ -860,9 +859,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>The response has been measured at 0, 1, 2, 3, 4 mths for each subject</li>
 </ul>
 <div class="cell" data-hash="longitudinal2_cache/html/load_99283276f39b43df1ec4e1a3e99bf10d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">data</span>(<span class="st">"respiratory"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">data</span>(<span class="st">"respiratory"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">head</span>(respiratory)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -936,7 +935,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="binary-response" class="level4"><h4 class="anchored" data-anchor-id="binary-response">Binary response</h4>
 <p>We started with binary response using respiratory dataset:</p>
 <div class="cell" data-hash="longitudinal2_cache/html/gee1_7d5e1da0e27b26919d6a07d7e8de9e62">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(gee)</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(gee)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">data</span>(<span class="st">"respiratory"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="do">## Data manipulation</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a>resp <span class="ot">&lt;-</span> <span class="fu">subset</span>(respiratory, month <span class="sc">&gt;</span> <span class="st">"0"</span>)</span>
@@ -944,11 +943,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb3-6"><a href="#cb3-6"></a><span class="do">## Change the response to 0 and 1</span></span>
 <span id="cb3-7"><a href="#cb3-7"></a>resp<span class="sc">$</span>nstat <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(resp<span class="sc">$</span>status <span class="sc">==</span> <span class="st">"good"</span>)</span>
 <span id="cb3-8"><a href="#cb3-8"></a>resp<span class="sc">$</span>month <span class="ot">&lt;-</span> resp<span class="sc">$</span>month[, drop <span class="ot">=</span> <span class="cn">TRUE</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Now we will fit a regular glm, i.e., model without random effect or any correlation structures. For binary outcomes, the estimated coefficients are log odds.</p>
 <div class="cell" data-hash="longitudinal2_cache/html/gee2_a91915f6f777365d3b80b8b691ff3571">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="do">## Regular GLM </span></span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="do">## Regular GLM </span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>resp_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(status <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline<span class="sc">+</span> age, </span>
 <span id="cb4-3"><a href="#cb4-3"></a>                <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="fu">summary</span>(resp_glm)</span>
@@ -975,11 +973,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; AIC: 495.22</span></span>
 <span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; </span></span>
 <span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Now we will fit GEE with independent correlation structure:</p>
 <div class="cell" data-hash="longitudinal2_cache/html/gee3_4484726709f384097e6e9b1d85153a97">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="do">## GEE with identity matrix</span></span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="do">## GEE with identity matrix</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>resp_gee.in <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline <span class="sc">+</span> age, </span>
 <span id="cb5-3"><a href="#cb5-3"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
 <span id="cb5-4"><a href="#cb5-4"></a>                 <span class="at">id =</span> subject,<span class="at">corstr =</span> <span class="st">"independence"</span>, </span>
@@ -1028,7 +1025,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt; [2,]    0    1    0    0</span></span>
 <span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt; [3,]    0    0    1    0</span></span>
 <span id="cb5-49"><a href="#cb5-49"></a><span class="co">#&gt; [4,]    0    0    0    1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <ul>
 <li><p>This model assumes an independent correlation structure, the output will be equal to glm.</p></li>
@@ -1039,7 +1035,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <p>Let fit the GEE model with exchangeable correlation structure:</p>
 <div class="cell" data-hash="longitudinal2_cache/html/geeex_7bf08876572249e14a2686b9335f9230">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="do">## GEE with exchangeable matrix</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="do">## GEE with exchangeable matrix</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>resp_gee.ex <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline<span class="sc">+</span> age, </span>
 <span id="cb6-3"><a href="#cb6-3"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
 <span id="cb6-4"><a href="#cb6-4"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
@@ -1088,7 +1084,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb6-47"><a href="#cb6-47"></a><span class="co">#&gt; [2,] 0.3359883 1.0000000 0.3359883 0.3359883</span></span>
 <span id="cb6-48"><a href="#cb6-48"></a><span class="co">#&gt; [3,] 0.3359883 0.3359883 1.0000000 0.3359883</span></span>
 <span id="cb6-49"><a href="#cb6-49"></a><span class="co">#&gt; [4,] 0.3359883 0.3359883 0.3359883 1.0000000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <ul>
 <li><p>This model assumes an exchangeable correlation structure.</p></li>
@@ -1099,7 +1094,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <p>Let’s check the estimated coefficients from all three models.</p>
 <div class="cell" data-hash="longitudinal2_cache/html/summ_d40d8fc800fe119fd600a3e5b3cedefa">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">summary</span>(resp_glm)<span class="sc">$</span>coefficients</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">summary</span>(resp_glm)<span class="sc">$</span>coefficients</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt;                       Estimate  Std. Error    z value     Pr(&gt;|z|)</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; (Intercept)        -0.90017133 0.337652992 -2.6659658 7.676750e-03</span></span>
 <span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; centre2             0.67160098 0.239566555  2.8034004 5.056684e-03</span></span>
@@ -1124,13 +1119,12 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt; baselinegood        1.88202860  0.3419147  5.5043802  0.35005152  5.3764332</span></span>
 <span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt; age                -0.01816588  0.0125611 -1.4462014  0.01300426 -1.3969169</span></span>
 <span id="cb7-25"><a href="#cb7-25"></a><span class="co"># Same estimated coefficients but different SEs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>GEE with identity matrix is the same as GLM model. If we change the correlation structure to exchangeable does not change the beta estimates, but the naive SEs are closer to Robust SE, which indicates that the exchangeable correlation structure is a better reflection of the correlation structures.</p>
 </section><section id="gaussian-response" class="level4"><h4 class="anchored" data-anchor-id="gaussian-response">Gaussian response</h4>
 <p>GEE can also be applied to Gaussian response</p>
 <div class="cell" data-hash="longitudinal2_cache/html/gaus_14acb07d6181d1525ffd157f31545295">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">library</span>(gee)</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">library</span>(gee)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">library</span>(HSAUR2)</span>
 <span id="cb8-3"><a href="#cb8-3"></a>BtheB<span class="sc">$</span>subject <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rownames</span>(BtheB))</span>
 <span id="cb8-4"><a href="#cb8-4"></a>nobs <span class="ot">&lt;-</span> <span class="fu">nrow</span>(BtheB)</span>
@@ -1185,7 +1179,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb8-53"><a href="#cb8-53"></a><span class="co">#&gt; [4,]    0    0    0    1</span></span>
 <span id="cb8-54"><a href="#cb8-54"></a><span class="co"># require(Publish)</span></span>
 <span id="cb8-55"><a href="#cb8-55"></a><span class="co"># publish(btb_gee.ind)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <ul>
 <li><p>This model assumes an independent correlation structure.</p></li>
@@ -1195,7 +1188,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <p>With exchangeable correlation matrix:</p>
 <div class="cell" data-hash="longitudinal2_cache/html/gausex_66fe70cd53f1a5cf812e4a4231c968b6">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>btb_gee.ex <span class="ot">&lt;-</span> <span class="fu">gee</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> treatment <span class="sc">+</span> length <span class="sc">+</span> drug,</span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>btb_gee.ex <span class="ot">&lt;-</span> <span class="fu">gee</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> treatment <span class="sc">+</span> length <span class="sc">+</span> drug,</span>
 <span id="cb9-2"><a href="#cb9-2"></a>                <span class="at">data =</span> BtheB_long, <span class="at">id =</span> subject, </span>
 <span id="cb9-3"><a href="#cb9-3"></a>                <span class="at">family =</span> gaussian, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>)</span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; Beginning Cgee S-function, @(#) geeformula.q 4.13 98/01/27</span></span>
@@ -1239,7 +1232,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb9-42"><a href="#cb9-42"></a><span class="co">#&gt; [3,] 0.6757951 0.6757951 1.0000000 0.6757951</span></span>
 <span id="cb9-43"><a href="#cb9-43"></a><span class="co">#&gt; [4,] 0.6757951 0.6757951 0.6757951 1.0000000</span></span>
 <span id="cb9-44"><a href="#cb9-44"></a><span class="co">#publish(btb_gee.ex)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <ul>
 <li><p>The interpretation of estimated coefficients are similar to LM. Naive S.E and z value are estimated directly from this model. Robust SE and z are sandwich estimates</p></li>
@@ -1251,7 +1243,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <p>Let us compare the GEE models with the mixed effect models.</p>
 <div class="cell" data-hash="longitudinal2_cache/html/comp_0f4b290426cd8cb2ce71d619cab31e5d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="do">## Generalized mixed effect model model</span></span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="do">## Generalized mixed effect model model</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3"></a>resp_lmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
 <span id="cb10-4"><a href="#cb10-4"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span> </span>
@@ -1259,10 +1251,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-6"><a href="#cb10-6"></a>                  <span class="at">data =</span> resp)</span>
 <span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
 <span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.197453 (tol = 0.002, component 1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="longitudinal2_cache/html/comp2_f531cf739ce75ef04e849a7d92ac98c3">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">require</span>(afex)</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">require</span>(afex)</span>
 <span id="cb11-2"><a href="#cb11-2"></a>resp_afex <span class="ot">&lt;-</span> <span class="fu">mixed</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
 <span id="cb11-3"><a href="#cb11-3"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span> </span>
 <span id="cb11-4"><a href="#cb11-4"></a>                    (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">family =</span> <span class="fu">binomial</span>(), </span>
@@ -1280,10 +1271,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb11-16"><a href="#cb11-16"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0949357 (tol = 0.002, component 1)</span></span>
 <span id="cb11-17"><a href="#cb11-17"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
 <span id="cb11-18"><a href="#cb11-18"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.041661 (tol = 0.002, component 1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="longitudinal2_cache/html/comp3_affe3a131cd5439e5e0f9b5164f917c9">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="do">## GEE model</span></span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="do">## GEE model</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>resp_gee3 <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
 <span id="cb12-3"><a href="#cb12-3"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
 <span id="cb12-4"><a href="#cb12-4"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
@@ -1372,10 +1362,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb12-87"><a href="#cb12-87"></a><span class="co">#&gt;     QICu </span></span>
 <span id="cb12-88"><a href="#cb12-88"></a><span class="co">#&gt; 586.1581</span></span>
 <span id="cb12-89"><a href="#cb12-89"></a><span class="co"># Covariates are selected based on the QICu criteria</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="longitudinal2_cache/html/compsumm_9fd0a47cf7d4c1361464409d4736fa38">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="do">## compare estimates (conditional vs. marginal)</span></span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="do">## compare estimates (conditional vs. marginal)</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="fu">summary</span>(resp_lmer)<span class="sc">$</span>coefficients <span class="co"># Model failed to converge</span></span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt;                       Estimate Std. Error    z value     Pr(&gt;|z|)</span></span>
 <span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; (Intercept)        -1.65464822 0.77621551 -2.1316866 3.303262e-02</span></span>
@@ -1410,7 +1399,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb13-33"><a href="#cb13-33"></a><span class="co">#&gt; age                -0.01785399 0.01258158 -1.4190585  0.01299686 -1.3737157</span></span>
 <span id="cb13-34"><a href="#cb13-34"></a><span class="co">#&gt; centre2             0.68481139 0.34010911  2.0135050  0.35681635  1.9192265</span></span>
 <span id="cb13-35"><a href="#cb13-35"></a><span class="fu">summary</span>(resp_gee4)<span class="sc">$</span>coefficients <span class="co"># Marginalized model</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1440,8 +1429,6 @@ Tip
 </div>
 </section><section id="reference" class="level3"><h3 class="anchored" data-anchor-id="reference">Reference</h3>
 
-
-<!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-faraway2016extending" class="csl-entry" role="doc-biblioentry">
@@ -1644,355 +1631,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">R functions (T)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">## GEE {.unnumbered}</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a></span>
-<span id="cb14-3"><a href="#cb14-3"></a>In this section, we will learn about generalized estimating equation (GEE). GEE is another popular method for modeling longitudinal or clustered data. In contrast to the mixed effects models where we assume error term and beta coefficients for subject $i$ both follow normal distribution, GEE is distribution free. However, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.</span>
-<span id="cb14-4"><a href="#cb14-4"></a></span>
-<span id="cb14-5"><a href="#cb14-5"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
-<span id="cb14-6"><a href="#cb14-6"></a><span class="co"># Load required packages</span></span>
-<span id="cb14-7"><a href="#cb14-7"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-8"><a href="#cb14-8"></a><span class="fu">require</span>(HSAUR2)</span>
-<span id="cb14-9"><a href="#cb14-9"></a><span class="fu">library</span>(gee)</span>
-<span id="cb14-10"><a href="#cb14-10"></a><span class="fu">library</span>(MuMIn)</span>
-<span id="cb14-11"><a href="#cb14-11"></a><span class="fu">library</span>(geepack)</span>
-<span id="cb14-12"><a href="#cb14-12"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
-<span id="cb14-13"><a href="#cb14-13"></a><span class="fu">require</span>(afex)</span>
-<span id="cb14-14"><a href="#cb14-14"></a><span class="in">```</span></span>
-<span id="cb14-15"><a href="#cb14-15"></a></span>
-<span id="cb14-16"><a href="#cb14-16"></a><span class="fu">### Data Description</span></span>
-<span id="cb14-17"><a href="#cb14-17"></a></span>
-<span id="cb14-18"><a href="#cb14-18"></a>In addition to BtheB dataset in part 1, we used respiratory data from **HSAUR2** package to demonstrate the analysis with non-normal responses:</span>
-<span id="cb14-19"><a href="#cb14-19"></a></span>
-<span id="cb14-20"><a href="#cb14-20"></a><span class="ss">-   </span>The response variable in this dataset is **status** (the respiratory status), which is a binary response</span>
-<span id="cb14-21"><a href="#cb14-21"></a><span class="ss">-   </span>Other covariates are: treatment, age, gender, the study center</span>
-<span id="cb14-22"><a href="#cb14-22"></a><span class="ss">-   </span>The response has been measured at 0, 1, 2, 3, 4 mths for each subject</span>
-<span id="cb14-23"><a href="#cb14-23"></a></span>
-<span id="cb14-24"><a href="#cb14-24"></a><span class="in">```{r load, cache=TRUE}</span></span>
-<span id="cb14-25"><a href="#cb14-25"></a><span class="fu">data</span>(<span class="st">"respiratory"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
-<span id="cb14-26"><a href="#cb14-26"></a><span class="fu">head</span>(respiratory)</span>
-<span id="cb14-27"><a href="#cb14-27"></a><span class="in">```</span></span>
-<span id="cb14-28"><a href="#cb14-28"></a></span>
-<span id="cb14-29"><a href="#cb14-29"></a><span class="fu">### Methods for Non-normal Distributions</span></span>
-<span id="cb14-30"><a href="#cb14-30"></a></span>
-<span id="cb14-31"><a href="#cb14-31"></a><span class="ss">-   </span>ref: <span class="co">[</span><span class="ot">@hothorn2014handbook</span><span class="co">]</span> Section 13.2</span>
-<span id="cb14-32"><a href="#cb14-32"></a></span>
-<span id="cb14-33"><a href="#cb14-33"></a><span class="ss">-   </span>In addition to normally distributed response variables, the response variable can also follow non-normal distributions, such as binary or count responses.</span>
-<span id="cb14-34"><a href="#cb14-34"></a></span>
-<span id="cb14-35"><a href="#cb14-35"></a><span class="ss">-   </span>We have learned logistic regression or Poisson regression (glm) to analyze binary and count data but they are not considering the "repeated measurement" structure.</span>
-<span id="cb14-36"><a href="#cb14-36"></a></span>
-<span id="cb14-37"><a href="#cb14-37"></a><span class="ss">-   </span>The consequence of ignoring the longitudinal/repeated measurements structure is to have the wrong estimated standard errors for regression coefficients. Hence, our inference will be invalid. However, the glm still gives consistent estimated beta coefficients.</span>
-<span id="cb14-38"><a href="#cb14-38"></a></span>
-<span id="cb14-39"><a href="#cb14-39"></a><span class="ss">-   </span>There are many correlation structures in modelling GEE.</span>
-<span id="cb14-40"><a href="#cb14-40"></a></span>
-<span id="cb14-41"><a href="#cb14-41"></a><span class="ss">-   </span>With non-normal responses, different assumptions about these correlation structures can lead to different interpretations of the beta coefficients. Here, we will introduce two different GEE models: **marginal model** and **conditional model**.</span>
-<span id="cb14-42"><a href="#cb14-42"></a></span>
-<span id="cb14-43"><a href="#cb14-43"></a><span class="fu">### Marginal Models</span></span>
-<span id="cb14-44"><a href="#cb14-44"></a></span>
-<span id="cb14-45"><a href="#cb14-45"></a><span class="ss">-   </span>ref: <span class="co">[</span><span class="ot">@hothorn2014handbook</span><span class="co">]</span> Section 13.2.1</span>
-<span id="cb14-46"><a href="#cb14-46"></a></span>
-<span id="cb14-47"><a href="#cb14-47"></a>Repeated measurement and longitudinal data has responses taken at different time points. Therefore, we could simply review them as many series of cross-sectional data. Each cross-sectional data can be analyzed using glm introduced in previous lectures. Then a correlation structure can be assumed to connect different "cross-sections". The common correlation structures are:</span>
-<span id="cb14-48"><a href="#cb14-48"></a></span>
-<span id="cb14-49"><a href="#cb14-49"></a><span class="fu">#### An independent structure</span></span>
-<span id="cb14-50"><a href="#cb14-50"></a></span>
-<span id="cb14-51"><a href="#cb14-51"></a>An independent structure which assumes the repeated measures are independent. An example of independent structure is basically is an identity matrix:</span>
-<span id="cb14-52"><a href="#cb14-52"></a></span>
-<span id="cb14-53"><a href="#cb14-53"></a>$$</span>
-<span id="cb14-54"><a href="#cb14-54"></a>\left(\begin{array}{ccc} </span>
-<span id="cb14-55"><a href="#cb14-55"></a>1 &amp; 0 &amp; 0<span class="sc">\\</span> </span>
-<span id="cb14-56"><a href="#cb14-56"></a>0 &amp; 1 &amp; 0<span class="sc">\\</span></span>
-<span id="cb14-57"><a href="#cb14-57"></a>0 &amp; 0 &amp; 1</span>
-<span id="cb14-58"><a href="#cb14-58"></a>\end{array}\right)</span>
-<span id="cb14-59"><a href="#cb14-59"></a>$$</span>
-<span id="cb14-60"><a href="#cb14-60"></a></span>
-<span id="cb14-61"><a href="#cb14-61"></a><span class="fu">#### An exchangeable correlation</span></span>
-<span id="cb14-62"><a href="#cb14-62"></a></span>
-<span id="cb14-63"><a href="#cb14-63"></a>An exchangeable correlation assumes that for the each individual, the correlation between each pair of repeated measurements is the same, i.e., $Cor(Y_{ij},Y_{ik})=\rho$. In the correlation matrix, only $\rho$ is unknown. Therefore, it is a single parameter working correlation matrix. An example of exchangeable correlation matrix is:</span>
-<span id="cb14-64"><a href="#cb14-64"></a></span>
-<span id="cb14-65"><a href="#cb14-65"></a>$$</span>
-<span id="cb14-66"><a href="#cb14-66"></a>\left(\begin{array}{ccc} </span>
-<span id="cb14-67"><a href="#cb14-67"></a>1 &amp; \rho &amp; \rho<span class="sc">\\</span> </span>
-<span id="cb14-68"><a href="#cb14-68"></a>\rho &amp; 1 &amp; \rho<span class="sc">\\</span></span>
-<span id="cb14-69"><a href="#cb14-69"></a>\rho &amp; \rho &amp; 1</span>
-<span id="cb14-70"><a href="#cb14-70"></a>\end{array}\right)</span>
-<span id="cb14-71"><a href="#cb14-71"></a>$$</span>
-<span id="cb14-72"><a href="#cb14-72"></a></span>
-<span id="cb14-73"><a href="#cb14-73"></a><span class="fu">#### An AR-1 autoregressive correlation</span></span>
-<span id="cb14-74"><a href="#cb14-74"></a></span>
-<span id="cb14-75"><a href="#cb14-75"></a>Defined as $Cor(Y_{ij},Y_{ik})=\rho^{|k-j|}$. If two measurements are taken at two closer time points the correlation is higher than these taken at two farther apart time points. It is also a single parameter working correlation matrix. An example of AR-1 correlation matrix is:</span>
-<span id="cb14-76"><a href="#cb14-76"></a></span>
-<span id="cb14-77"><a href="#cb14-77"></a>$$</span>
-<span id="cb14-78"><a href="#cb14-78"></a>\left(\begin{array}{ccc} </span>
-<span id="cb14-79"><a href="#cb14-79"></a>1 &amp; \rho &amp; \rho^2<span class="sc">\\</span> </span>
-<span id="cb14-80"><a href="#cb14-80"></a>\rho &amp; 1 &amp; \rho<span class="sc">\\</span></span>
-<span id="cb14-81"><a href="#cb14-81"></a>\rho^2 &amp; \rho &amp; 1</span>
-<span id="cb14-82"><a href="#cb14-82"></a>\end{array}\right)</span>
-<span id="cb14-83"><a href="#cb14-83"></a>$$</span>
-<span id="cb14-84"><a href="#cb14-84"></a></span>
-<span id="cb14-85"><a href="#cb14-85"></a><span class="fu">#### An unstructured correlation</span></span>
-<span id="cb14-86"><a href="#cb14-86"></a></span>
-<span id="cb14-87"><a href="#cb14-87"></a>Different pairs of observation for each individual have different correlations $Cor(Y_{ij},Y_{ik})=\rho_{jk}$. Assume that each individual has $K$ pairs of measurements, it is a $K(K-1)/2$ parameters working correlation matrix. An example of unstructured correlation matrix is:</span>
-<span id="cb14-88"><a href="#cb14-88"></a></span>
-<span id="cb14-89"><a href="#cb14-89"></a>$$</span>
-<span id="cb14-90"><a href="#cb14-90"></a>\left(\begin{array}{ccc} </span>
-<span id="cb14-91"><a href="#cb14-91"></a>1 &amp; \rho_{12} &amp; \rho_{13}<span class="sc">\\</span> </span>
-<span id="cb14-92"><a href="#cb14-92"></a>\rho_{12} &amp; 1 &amp; \rho_{23}<span class="sc">\\</span></span>
-<span id="cb14-93"><a href="#cb14-93"></a>\rho_{13} &amp; \rho_{23} &amp; 1</span>
-<span id="cb14-94"><a href="#cb14-94"></a>\end{array}\right)</span>
-<span id="cb14-95"><a href="#cb14-95"></a>$$</span>
-<span id="cb14-96"><a href="#cb14-96"></a></span>
-<span id="cb14-97"><a href="#cb14-97"></a><span class="ss">-   </span>Sometimes, specifying a "right" correlation matrix is hard. However, the marginal model (usually we use GEE) gives us consistent estimated coefficients even with misspecified correlation structure.</span>
-<span id="cb14-98"><a href="#cb14-98"></a></span>
-<span id="cb14-99"><a href="#cb14-99"></a><span class="fu">### Conditional Models</span></span>
-<span id="cb14-100"><a href="#cb14-100"></a></span>
-<span id="cb14-101"><a href="#cb14-101"></a><span class="ss">-   </span>ref: <span class="co">[</span><span class="ot">@hothorn2014handbook</span><span class="co">]</span> Section 13.2.2</span>
-<span id="cb14-102"><a href="#cb14-102"></a></span>
-<span id="cb14-103"><a href="#cb14-103"></a><span class="ss">-   </span>In GEE marginal models, the estimated regression coefficients are marginal (or population-averaged) effects. Therefore, the interpretation are at population-level. It is almost impossible to make inference on any specific individual or cluster.</span>
-<span id="cb14-104"><a href="#cb14-104"></a></span>
-<span id="cb14-105"><a href="#cb14-105"></a><span class="ss">-   </span>One solution is to do conditional models. The random effect approach in the part 1 can be extended to non-Gaussian response.</span>
-<span id="cb14-106"><a href="#cb14-106"></a></span>
-<span id="cb14-107"><a href="#cb14-107"></a><span class="fu">### GEE models</span></span>
-<span id="cb14-108"><a href="#cb14-108"></a></span>
-<span id="cb14-109"><a href="#cb14-109"></a>After the short introduction of two models, let's take a look at real examples</span>
-<span id="cb14-110"><a href="#cb14-110"></a></span>
-<span id="cb14-111"><a href="#cb14-111"></a><span class="ss">-   </span>ref: <span class="co">[</span><span class="ot">@hothorn2014handbook</span><span class="co">]</span> Section 13.3</span>
-<span id="cb14-112"><a href="#cb14-112"></a><span class="ss">-   </span>ref: <span class="co">[</span><span class="ot">@faraway2016extending</span><span class="co">]</span> Section 10.2</span>
-<span id="cb14-113"><a href="#cb14-113"></a></span>
-<span id="cb14-114"><a href="#cb14-114"></a><span class="fu">#### Binary response</span></span>
-<span id="cb14-115"><a href="#cb14-115"></a></span>
-<span id="cb14-116"><a href="#cb14-116"></a>We started with binary response using respiratory dataset:</span>
-<span id="cb14-117"><a href="#cb14-117"></a></span>
-<span id="cb14-118"><a href="#cb14-118"></a><span class="in">```{r gee1, cache=TRUE}</span></span>
-<span id="cb14-119"><a href="#cb14-119"></a><span class="fu">library</span>(gee)</span>
-<span id="cb14-120"><a href="#cb14-120"></a><span class="fu">data</span>(<span class="st">"respiratory"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
-<span id="cb14-121"><a href="#cb14-121"></a><span class="do">## Data manipulation</span></span>
-<span id="cb14-122"><a href="#cb14-122"></a>resp <span class="ot">&lt;-</span> <span class="fu">subset</span>(respiratory, month <span class="sc">&gt;</span> <span class="st">"0"</span>)</span>
-<span id="cb14-123"><a href="#cb14-123"></a>resp<span class="sc">$</span>baseline <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">subset</span>(respiratory, month <span class="sc">==</span> <span class="st">"0"</span>)<span class="sc">$</span>status, <span class="fu">rep</span>(<span class="dv">4</span>, <span class="dv">111</span>))</span>
-<span id="cb14-124"><a href="#cb14-124"></a><span class="do">## Change the response to 0 and 1</span></span>
-<span id="cb14-125"><a href="#cb14-125"></a>resp<span class="sc">$</span>nstat <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(resp<span class="sc">$</span>status <span class="sc">==</span> <span class="st">"good"</span>)</span>
-<span id="cb14-126"><a href="#cb14-126"></a>resp<span class="sc">$</span>month <span class="ot">&lt;-</span> resp<span class="sc">$</span>month[, drop <span class="ot">=</span> <span class="cn">TRUE</span>]</span>
-<span id="cb14-127"><a href="#cb14-127"></a><span class="in">```</span></span>
-<span id="cb14-128"><a href="#cb14-128"></a></span>
-<span id="cb14-129"><a href="#cb14-129"></a>Now we will fit a regular glm, i.e., model without random effect or any correlation structures. For binary outcomes, the estimated coefficients are log odds.</span>
-<span id="cb14-130"><a href="#cb14-130"></a></span>
-<span id="cb14-131"><a href="#cb14-131"></a><span class="in">```{r gee2, cache=TRUE}</span></span>
-<span id="cb14-132"><a href="#cb14-132"></a><span class="do">## Regular GLM </span></span>
-<span id="cb14-133"><a href="#cb14-133"></a>resp_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(status <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline<span class="sc">+</span> age, </span>
-<span id="cb14-134"><a href="#cb14-134"></a>                <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
-<span id="cb14-135"><a href="#cb14-135"></a><span class="fu">summary</span>(resp_glm)</span>
-<span id="cb14-136"><a href="#cb14-136"></a><span class="in">```</span></span>
-<span id="cb14-137"><a href="#cb14-137"></a></span>
-<span id="cb14-138"><a href="#cb14-138"></a>Now we will fit GEE with independent correlation structure:</span>
-<span id="cb14-139"><a href="#cb14-139"></a></span>
-<span id="cb14-140"><a href="#cb14-140"></a><span class="in">```{r gee3, cache=TRUE}</span></span>
-<span id="cb14-141"><a href="#cb14-141"></a><span class="do">## GEE with identity matrix</span></span>
-<span id="cb14-142"><a href="#cb14-142"></a>resp_gee.in <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline <span class="sc">+</span> age, </span>
-<span id="cb14-143"><a href="#cb14-143"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-144"><a href="#cb14-144"></a>                 <span class="at">id =</span> subject,<span class="at">corstr =</span> <span class="st">"independence"</span>, </span>
-<span id="cb14-145"><a href="#cb14-145"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>, <span class="at">scale.value =</span> <span class="dv">1</span>)</span>
-<span id="cb14-146"><a href="#cb14-146"></a><span class="fu">summary</span>(resp_gee.in)</span>
-<span id="cb14-147"><a href="#cb14-147"></a><span class="in">```</span></span>
-<span id="cb14-148"><a href="#cb14-148"></a></span>
-<span id="cb14-149"><a href="#cb14-149"></a><span class="ss">-   </span>This model assumes an independent correlation structure, the output will be equal to glm.</span>
-<span id="cb14-150"><a href="#cb14-150"></a></span>
-<span id="cb14-151"><a href="#cb14-151"></a><span class="ss">-   </span>The outputs started from a summary of residuals</span>
-<span id="cb14-152"><a href="#cb14-152"></a></span>
-<span id="cb14-153"><a href="#cb14-153"></a><span class="ss">-   </span>The estimated coefficients are the same as GLM. For binary outcome, you may still interpret them as log odds. Naive SE and z value are estimated directly from this model. Robust SE and z are sandwich estimates.</span>
-<span id="cb14-154"><a href="#cb14-154"></a></span>
-<span id="cb14-155"><a href="#cb14-155"></a><span class="ss">-   </span>The difference between naive and robust indicates that the correlation structure may not be good.</span>
-<span id="cb14-156"><a href="#cb14-156"></a></span>
-<span id="cb14-157"><a href="#cb14-157"></a><span class="ss">-   </span>Working Correlation is the correlation structure estimated from the data (identity matrix for independence).</span>
-<span id="cb14-158"><a href="#cb14-158"></a></span>
-<span id="cb14-159"><a href="#cb14-159"></a>Let fit the GEE model with exchangeable correlation structure:</span>
-<span id="cb14-160"><a href="#cb14-160"></a></span>
-<span id="cb14-161"><a href="#cb14-161"></a><span class="in">```{r geeex, cache=TRUE}</span></span>
-<span id="cb14-162"><a href="#cb14-162"></a><span class="do">## GEE with exchangeable matrix</span></span>
-<span id="cb14-163"><a href="#cb14-163"></a>resp_gee.ex <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline<span class="sc">+</span> age, </span>
-<span id="cb14-164"><a href="#cb14-164"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-165"><a href="#cb14-165"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-166"><a href="#cb14-166"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>, <span class="at">scale.value =</span> <span class="dv">1</span>)</span>
-<span id="cb14-167"><a href="#cb14-167"></a><span class="fu">summary</span>(resp_gee.ex)</span>
-<span id="cb14-168"><a href="#cb14-168"></a><span class="in">```</span></span>
-<span id="cb14-169"><a href="#cb14-169"></a></span>
-<span id="cb14-170"><a href="#cb14-170"></a><span class="ss">-   </span>This model assumes an exchangeable correlation structure.</span>
-<span id="cb14-171"><a href="#cb14-171"></a></span>
-<span id="cb14-172"><a href="#cb14-172"></a><span class="ss">-   </span>The outputs started from a summary of residuals</span>
-<span id="cb14-173"><a href="#cb14-173"></a></span>
-<span id="cb14-174"><a href="#cb14-174"></a><span class="ss">-   </span>The estimated coefficients are the same GLM. For binary outcome, you may still interpret them as log odds. Naive S.E and z value are estimated directly from this model. Robust SE and z are sandwich estimates</span>
-<span id="cb14-175"><a href="#cb14-175"></a></span>
-<span id="cb14-176"><a href="#cb14-176"></a><span class="ss">-   </span>The difference between naive and robust is smaller, which indicates that the correlation structure is better specified.</span>
-<span id="cb14-177"><a href="#cb14-177"></a></span>
-<span id="cb14-178"><a href="#cb14-178"></a><span class="ss">-   </span>Working Correlation is the correlation structure estimated from the data</span>
-<span id="cb14-179"><a href="#cb14-179"></a></span>
-<span id="cb14-180"><a href="#cb14-180"></a>Let's check the estimated coefficients from all three models.</span>
-<span id="cb14-181"><a href="#cb14-181"></a></span>
-<span id="cb14-182"><a href="#cb14-182"></a><span class="in">```{r summ, cache=TRUE}</span></span>
-<span id="cb14-183"><a href="#cb14-183"></a><span class="fu">summary</span>(resp_glm)<span class="sc">$</span>coefficients</span>
-<span id="cb14-184"><a href="#cb14-184"></a><span class="fu">summary</span>(resp_gee.in)<span class="sc">$</span>coefficients</span>
-<span id="cb14-185"><a href="#cb14-185"></a><span class="fu">summary</span>(resp_gee.ex)<span class="sc">$</span>coefficients</span>
-<span id="cb14-186"><a href="#cb14-186"></a><span class="co"># Same estimated coefficients but different SEs</span></span>
-<span id="cb14-187"><a href="#cb14-187"></a><span class="in">```</span></span>
-<span id="cb14-188"><a href="#cb14-188"></a></span>
-<span id="cb14-189"><a href="#cb14-189"></a>GEE with identity matrix is the same as GLM model. If we change the correlation structure to exchangeable does not change the beta estimates, but the naive SEs are closer to Robust SE, which indicates that the exchangeable correlation structure is a better reflection of the correlation structures.</span>
-<span id="cb14-190"><a href="#cb14-190"></a></span>
-<span id="cb14-191"><a href="#cb14-191"></a><span class="fu">#### Gaussian response</span></span>
-<span id="cb14-192"><a href="#cb14-192"></a></span>
-<span id="cb14-193"><a href="#cb14-193"></a>GEE can also be applied to Gaussian response</span>
-<span id="cb14-194"><a href="#cb14-194"></a></span>
-<span id="cb14-195"><a href="#cb14-195"></a><span class="in">```{r gaus, cache=TRUE}</span></span>
-<span id="cb14-196"><a href="#cb14-196"></a><span class="fu">library</span>(gee)</span>
-<span id="cb14-197"><a href="#cb14-197"></a><span class="fu">library</span>(HSAUR2)</span>
-<span id="cb14-198"><a href="#cb14-198"></a>BtheB<span class="sc">$</span>subject <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rownames</span>(BtheB))</span>
-<span id="cb14-199"><a href="#cb14-199"></a>nobs <span class="ot">&lt;-</span> <span class="fu">nrow</span>(BtheB)</span>
-<span id="cb14-200"><a href="#cb14-200"></a>BtheB_long <span class="ot">&lt;-</span> <span class="fu">reshape</span>(BtheB, <span class="at">idvar =</span> <span class="st">"subject"</span>, </span>
-<span id="cb14-201"><a href="#cb14-201"></a>                      <span class="at">varying =</span> <span class="fu">c</span>(<span class="st">"bdi.2m"</span>, <span class="st">"bdi.3m"</span>, <span class="st">"bdi.5m"</span>, <span class="st">"bdi.8m"</span>), </span>
-<span id="cb14-202"><a href="#cb14-202"></a>                      <span class="at">direction =</span> <span class="st">"long"</span>)</span>
-<span id="cb14-203"><a href="#cb14-203"></a>BtheB_long<span class="sc">$</span>time <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>), <span class="fu">rep</span>(nobs, <span class="dv">4</span>))</span>
-<span id="cb14-204"><a href="#cb14-204"></a>osub <span class="ot">&lt;-</span> <span class="fu">order</span>(<span class="fu">as.integer</span>(BtheB_long<span class="sc">$</span>subject))</span>
-<span id="cb14-205"><a href="#cb14-205"></a>BtheB_long <span class="ot">&lt;-</span> BtheB_long[osub,]</span>
-<span id="cb14-206"><a href="#cb14-206"></a>btb_gee.ind <span class="ot">&lt;-</span> <span class="fu">gee</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> treatment <span class="sc">+</span> length <span class="sc">+</span> drug, </span>
-<span id="cb14-207"><a href="#cb14-207"></a>               <span class="at">data =</span> BtheB_long, <span class="at">id =</span> subject, </span>
-<span id="cb14-208"><a href="#cb14-208"></a>               <span class="at">family =</span> gaussian, <span class="at">corstr =</span> <span class="st">"independence"</span>)</span>
-<span id="cb14-209"><a href="#cb14-209"></a><span class="fu">summary</span>(btb_gee.ind)</span>
-<span id="cb14-210"><a href="#cb14-210"></a><span class="co"># require(Publish)</span></span>
-<span id="cb14-211"><a href="#cb14-211"></a><span class="co"># publish(btb_gee.ind)</span></span>
-<span id="cb14-212"><a href="#cb14-212"></a><span class="in">```</span></span>
-<span id="cb14-213"><a href="#cb14-213"></a></span>
-<span id="cb14-214"><a href="#cb14-214"></a><span class="ss">-   </span>This model assumes an independent correlation structure.</span>
-<span id="cb14-215"><a href="#cb14-215"></a></span>
-<span id="cb14-216"><a href="#cb14-216"></a><span class="ss">-   </span>The outputs started from a summary of residuals</span>
-<span id="cb14-217"><a href="#cb14-217"></a></span>
-<span id="cb14-218"><a href="#cb14-218"></a><span class="ss">-   </span>The estimated coefficient will be interpreted the same way as linear model. Naive S.E and z value are estimated directly from this model. Robust SE and z are sandwich estimates</span>
-<span id="cb14-219"><a href="#cb14-219"></a></span>
-<span id="cb14-220"><a href="#cb14-220"></a><span class="ss">-   </span>Working Correlation is the correlation struture estimated from the data (identity matrix for indepedence)</span>
-<span id="cb14-221"><a href="#cb14-221"></a></span>
-<span id="cb14-222"><a href="#cb14-222"></a>With exchangeable correlation matrix:</span>
-<span id="cb14-223"><a href="#cb14-223"></a></span>
-<span id="cb14-224"><a href="#cb14-224"></a><span class="in">```{r gausex,cache=TRUE}</span></span>
-<span id="cb14-225"><a href="#cb14-225"></a>btb_gee.ex <span class="ot">&lt;-</span> <span class="fu">gee</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> treatment <span class="sc">+</span> length <span class="sc">+</span> drug,</span>
-<span id="cb14-226"><a href="#cb14-226"></a>                <span class="at">data =</span> BtheB_long, <span class="at">id =</span> subject, </span>
-<span id="cb14-227"><a href="#cb14-227"></a>                <span class="at">family =</span> gaussian, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>)</span>
-<span id="cb14-228"><a href="#cb14-228"></a><span class="fu">summary</span>(btb_gee.ex)</span>
-<span id="cb14-229"><a href="#cb14-229"></a><span class="co">#publish(btb_gee.ex)</span></span>
-<span id="cb14-230"><a href="#cb14-230"></a><span class="in">```</span></span>
-<span id="cb14-231"><a href="#cb14-231"></a></span>
-<span id="cb14-232"><a href="#cb14-232"></a><span class="ss">-   </span>The interpretation of estimated coefficients are similar to LM. Naive S.E and z value are estimated directly from this model. Robust SE and z are sandwich estimates</span>
-<span id="cb14-233"><a href="#cb14-233"></a></span>
-<span id="cb14-234"><a href="#cb14-234"></a><span class="ss">-   </span>Working Correlation is the correlation structure estimated from the data</span>
-<span id="cb14-235"><a href="#cb14-235"></a></span>
-<span id="cb14-236"><a href="#cb14-236"></a><span class="ss">-   </span>When we change the structure of correlation, the estimates and naive SE and z changed. A closer naive SE to robust SE indicates that the correlation structure is better specified.</span>
-<span id="cb14-237"><a href="#cb14-237"></a></span>
-<span id="cb14-238"><a href="#cb14-238"></a><span class="fu">### Compare with Random Effects</span></span>
-<span id="cb14-239"><a href="#cb14-239"></a></span>
-<span id="cb14-240"><a href="#cb14-240"></a><span class="ss">-   </span>ref: <span class="co">[</span><span class="ot">@hothorn2014handbook</span><span class="co">]</span> Section 13.4 We then use the conditional models (i.e., adding random effect) with non-normal response</span>
-<span id="cb14-241"><a href="#cb14-241"></a></span>
-<span id="cb14-242"><a href="#cb14-242"></a>Let us compare the GEE models with the mixed effect models.</span>
-<span id="cb14-243"><a href="#cb14-243"></a></span>
-<span id="cb14-244"><a href="#cb14-244"></a><span class="in">```{r comp,cache=TRUE}</span></span>
-<span id="cb14-245"><a href="#cb14-245"></a><span class="do">## Generalized mixed effect model model</span></span>
-<span id="cb14-246"><a href="#cb14-246"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
-<span id="cb14-247"><a href="#cb14-247"></a>resp_lmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb14-248"><a href="#cb14-248"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span> </span>
-<span id="cb14-249"><a href="#cb14-249"></a>                    (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">family =</span> <span class="fu">binomial</span>(), </span>
-<span id="cb14-250"><a href="#cb14-250"></a>                  <span class="at">data =</span> resp)</span>
-<span id="cb14-251"><a href="#cb14-251"></a><span class="in">```</span></span>
-<span id="cb14-252"><a href="#cb14-252"></a></span>
-<span id="cb14-253"><a href="#cb14-253"></a><span class="in">```{r comp2,cache=TRUE}</span></span>
-<span id="cb14-254"><a href="#cb14-254"></a><span class="fu">require</span>(afex)</span>
-<span id="cb14-255"><a href="#cb14-255"></a>resp_afex <span class="ot">&lt;-</span> <span class="fu">mixed</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb14-256"><a href="#cb14-256"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span> </span>
-<span id="cb14-257"><a href="#cb14-257"></a>                    (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">family =</span> <span class="fu">binomial</span>(), </span>
-<span id="cb14-258"><a href="#cb14-258"></a>                  <span class="at">data =</span> resp, <span class="at">method =</span> <span class="st">"LRT"</span>)</span>
-<span id="cb14-259"><a href="#cb14-259"></a><span class="in">```</span></span>
-<span id="cb14-260"><a href="#cb14-260"></a></span>
-<span id="cb14-261"><a href="#cb14-261"></a><span class="in">```{r comp3,cache=TRUE}</span></span>
-<span id="cb14-262"><a href="#cb14-262"></a><span class="do">## GEE model</span></span>
-<span id="cb14-263"><a href="#cb14-263"></a>resp_gee3 <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb14-264"><a href="#cb14-264"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-265"><a href="#cb14-265"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-266"><a href="#cb14-266"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-267"><a href="#cb14-267"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>, <span class="at">scale.value =</span> <span class="dv">1</span>)</span>
-<span id="cb14-268"><a href="#cb14-268"></a><span class="fu">library</span>(MuMIn)</span>
-<span id="cb14-269"><a href="#cb14-269"></a><span class="fu">library</span>(geepack)</span>
-<span id="cb14-270"><a href="#cb14-270"></a>resp_gee4 <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb14-271"><a href="#cb14-271"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-272"><a href="#cb14-272"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-273"><a href="#cb14-273"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-274"><a href="#cb14-274"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-275"><a href="#cb14-275"></a>resp_gee5 <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb14-276"><a href="#cb14-276"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-277"><a href="#cb14-277"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-278"><a href="#cb14-278"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"independence"</span>, </span>
-<span id="cb14-279"><a href="#cb14-279"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-280"><a href="#cb14-280"></a>resp_gee6 <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb14-281"><a href="#cb14-281"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-282"><a href="#cb14-282"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-283"><a href="#cb14-283"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"ar1"</span>, </span>
-<span id="cb14-284"><a href="#cb14-284"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-285"><a href="#cb14-285"></a><span class="fu">QIC</span>(resp_gee4)</span>
-<span id="cb14-286"><a href="#cb14-286"></a><span class="fu">QIC</span>(resp_gee5)</span>
-<span id="cb14-287"><a href="#cb14-287"></a><span class="fu">QIC</span>(resp_gee6)</span>
-<span id="cb14-288"><a href="#cb14-288"></a><span class="co"># Smaller QIC values for correlation structure represents better models</span></span>
-<span id="cb14-289"><a href="#cb14-289"></a><span class="co"># i.e., "exchangeable" in our case</span></span>
-<span id="cb14-290"><a href="#cb14-290"></a></span>
-<span id="cb14-291"><a href="#cb14-291"></a>resp_gee4a <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> month <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-292"><a href="#cb14-292"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-293"><a href="#cb14-293"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-294"><a href="#cb14-294"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-295"><a href="#cb14-295"></a></span>
-<span id="cb14-296"><a href="#cb14-296"></a>resp_gee4b <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-297"><a href="#cb14-297"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-298"><a href="#cb14-298"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-299"><a href="#cb14-299"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-300"><a href="#cb14-300"></a></span>
-<span id="cb14-301"><a href="#cb14-301"></a>resp_gee4c <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-302"><a href="#cb14-302"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-303"><a href="#cb14-303"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-304"><a href="#cb14-304"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-305"><a href="#cb14-305"></a></span>
-<span id="cb14-306"><a href="#cb14-306"></a>resp_gee4d <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> age <span class="sc">+</span> centre, </span>
-<span id="cb14-307"><a href="#cb14-307"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-308"><a href="#cb14-308"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-309"><a href="#cb14-309"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-310"><a href="#cb14-310"></a></span>
-<span id="cb14-311"><a href="#cb14-311"></a>resp_gee4e <span class="ot">&lt;-</span> <span class="fu">geeglm</span>(nstat <span class="sc">~</span> centre, </span>
-<span id="cb14-312"><a href="#cb14-312"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb14-313"><a href="#cb14-313"></a>                 <span class="at">id =</span> subject, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>, </span>
-<span id="cb14-314"><a href="#cb14-314"></a>                 <span class="at">scale.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-315"><a href="#cb14-315"></a><span class="fu">QIC</span>(resp_gee4)</span>
-<span id="cb14-316"><a href="#cb14-316"></a><span class="fu">QIC</span>(resp_gee4a)[<span class="dv">2</span>]</span>
-<span id="cb14-317"><a href="#cb14-317"></a><span class="fu">QIC</span>(resp_gee4b)[<span class="dv">2</span>]</span>
-<span id="cb14-318"><a href="#cb14-318"></a><span class="fu">QIC</span>(resp_gee4c)[<span class="dv">2</span>]</span>
-<span id="cb14-319"><a href="#cb14-319"></a><span class="fu">QIC</span>(resp_gee4d)[<span class="dv">2</span>]</span>
-<span id="cb14-320"><a href="#cb14-320"></a><span class="fu">QIC</span>(resp_gee4e)[<span class="dv">2</span>]</span>
-<span id="cb14-321"><a href="#cb14-321"></a><span class="fu">QIC</span>(resp_gee4d)[<span class="dv">2</span>]</span>
-<span id="cb14-322"><a href="#cb14-322"></a><span class="co"># Covariates are selected based on the QICu criteria</span></span>
-<span id="cb14-323"><a href="#cb14-323"></a><span class="in">```</span></span>
-<span id="cb14-324"><a href="#cb14-324"></a></span>
-<span id="cb14-325"><a href="#cb14-325"></a><span class="in">```{r compsumm,cache=TRUE}</span></span>
-<span id="cb14-326"><a href="#cb14-326"></a><span class="do">## compare estimates (conditional vs. marginal)</span></span>
-<span id="cb14-327"><a href="#cb14-327"></a><span class="fu">summary</span>(resp_lmer)<span class="sc">$</span>coefficients <span class="co"># Model failed to converge</span></span>
-<span id="cb14-328"><a href="#cb14-328"></a><span class="fu">summary</span>(resp_afex)<span class="sc">$</span>coefficients <span class="co"># Model failed to converge</span></span>
-<span id="cb14-329"><a href="#cb14-329"></a><span class="fu">summary</span>(resp_gee3)<span class="sc">$</span>coefficients <span class="co"># Marginalized model</span></span>
-<span id="cb14-330"><a href="#cb14-330"></a><span class="fu">summary</span>(resp_gee4)<span class="sc">$</span>coefficients <span class="co"># Marginalized model</span></span>
-<span id="cb14-331"><a href="#cb14-331"></a><span class="in">```</span></span>
-<span id="cb14-332"><a href="#cb14-332"></a></span>
-<span id="cb14-333"><a href="#cb14-333"></a>The significance of variables are similar in both variables, but the estimated coefficients are larger in generalized mixed effect model. However, it does not mean the estimated coefficients are inconsistent. Instead, two models are estimating different parameters. Remember, the mixed effect model is conditional on random effects, while the GEE is a marginalized model.</span>
-<span id="cb14-334"><a href="#cb14-334"></a></span>
-<span id="cb14-335"><a href="#cb14-335"></a><span class="fu">### Video content (optional)</span></span>
-<span id="cb14-336"><a href="#cb14-336"></a></span>
-<span id="cb14-337"><a href="#cb14-337"></a>::: callout-tip</span>
-<span id="cb14-338"><a href="#cb14-338"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
-<span id="cb14-339"><a href="#cb14-339"></a>:::</span>
-<span id="cb14-340"><a href="#cb14-340"></a></span>
-<span id="cb14-341"><a href="#cb14-341"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
-<span id="cb14-342"><a href="#cb14-342"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/qoqhPq_VILc"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
-<span id="cb14-343"><a href="#cb14-343"></a></span>
-<span id="cb14-344"><a href="#cb14-344"></a><span class="kw">&lt;/iframe&gt;</span></span>
-<span id="cb14-345"><a href="#cb14-345"></a>:::</span>
-<span id="cb14-346"><a href="#cb14-346"></a></span>
-<span id="cb14-347"><a href="#cb14-347"></a><span class="fu">### Reference</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

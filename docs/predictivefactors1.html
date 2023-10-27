@@ -805,7 +805,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Collinear predictors</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">Collinear predictors</h1>
 </div>
 
 
@@ -820,15 +820,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 </header><p>In this tutorial, we’ll continue with the data analysis. We’ll focus on an analysis of an NHANES data. This data contains over 1200 observations and 33 variables. These variables come in various types: numeric, categorical, and binary. Our primary goal is to fit a linear regression model to predict cholesterol levels.</p>
 <div class="cell" data-hash="predictivefactors1_cache/html/setup_1e24782f1267b31ee9e8b54edd0b3c9b">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(rms)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(Hmisc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>Let us load the dataset and see structure of the variables:</p>
 <div class="cell" data-hash="predictivefactors1_cache/html/load_bea8db69b0174b7b329c4ee3c60ab97f">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15.RData"</span>)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="co">#head(analytic)</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="fu">str</span>(analytic)</span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 'data.frame':    1267 obs. of  33 variables:</span></span>
@@ -867,11 +866,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-37"><a href="#cb2-37"></a><span class="co">#&gt;  $ diabetes             : chr  "Yes" "No" "No" "No" ...</span></span>
 <span id="cb2-38"><a href="#cb2-38"></a><span class="co">#&gt;  - attr(*, "na.action")= 'omit' Named int [1:3739] 3 4 5 6 8 9 13 14 15 16 ...</span></span>
 <span id="cb2-39"><a href="#cb2-39"></a><span class="co">#&gt;   ..- attr(*, "names")= chr [1:3739] "3" "4" "5" "6" ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="describe-the-data" class="level3"><h3 class="anchored" data-anchor-id="describe-the-data">Describe the data</h3>
 <div class="cell" data-hash="predictivefactors1_cache/html/data_90826642f310018ca6ede7d1c0cb8039">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">require</span>(rms)</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">require</span>(rms)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">describe</span>(analytic) </span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; analytic </span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; </span></span>
@@ -1166,7 +1164,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb3-293"><a href="#cb3-293"></a><span class="co">#&gt; Frequency  1064  203</span></span>
 <span id="cb3-294"><a href="#cb3-294"></a><span class="co">#&gt; Proportion 0.84 0.16</span></span>
 <span id="cb3-295"><a href="#cb3-295"></a><span class="co">#&gt; --------------------------------------------------------------------------------</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="collinearity" class="level3"><h3 class="anchored" data-anchor-id="collinearity">Collinearity</h3>
 <p>Avoiding collinear variables can result in a more interpretable, stable, and efficient predictive model. Collinearity refers to a situation in which two or more predictor variables in a multiple regression model are highly correlated, meaning that one can be linearly predicted from the others with substantial accuracy. Collinearity poses several issues for predictive analysis:</p>
@@ -1204,7 +1201,7 @@ Tip
 <div class="no-row-height column-margin column-container"><div class="">
 <p><code>hclust</code> is the hierarchical clustering function where default is squared Spearman correlation coefficients to detect monotonic but nonlinear relationships.</p>
 </div></div><div class="cell" data-hash="predictivefactors1_cache/html/collinear_c5c4bee26417c06697322eb867b4f16a">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(Hmisc)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(Hmisc)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>sel.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, <span class="st">"married"</span>, </span>
 <span id="cb4-3"><a href="#cb4-3"></a>               <span class="st">"income"</span>, <span class="st">"diastolicBP"</span>, <span class="st">"systolicBP"</span>, </span>
 <span id="cb4-4"><a href="#cb4-4"></a>               <span class="st">"bodyweight"</span>, <span class="st">"bodyheight"</span>, <span class="st">"bmi"</span>, <span class="st">"waist"</span>, <span class="st">"smoke"</span>, <span class="st">"alcohol"</span>, </span>
@@ -1215,7 +1212,7 @@ Tip
 <span id="cb4-9"><a href="#cb4-9"></a>var.cluster <span class="ot">&lt;-</span> <span class="fu">varclus</span>(<span class="sc">~</span>., <span class="at">data =</span> analytic[sel.names])</span>
 <span id="cb4-10"><a href="#cb4-10"></a><span class="co"># var.cluster</span></span>
 <span id="cb4-11"><a href="#cb4-11"></a><span class="fu">plot</span>(var.cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="predictivefactors1_files/figure-html/collinear-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
@@ -1238,8 +1235,6 @@ Tip
 </iframe>
 </div>
 
-
-<!-- -->
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1434,102 +1429,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Continuous outcome</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">## Collinear predictors {.unnumbered}</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3"></a>In this tutorial, we'll continue with the data analysis. We'll focus on an analysis of an NHANES data. This data contains over 1200 observations and 33 variables. These variables come in various types: numeric, categorical, and binary. Our primary goal is to fit a linear regression model to predict cholesterol levels.</span>
-<span id="cb5-4"><a href="#cb5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5"></a></span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="in">```{r setup, warning=FALSE, cache=TRUE, message=FALSE}</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="co"># Load required packages</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">library</span>(rms)</span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="fu">library</span>(Hmisc)</span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="in">```</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a></span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="fu">### Load data</span></span>
-<span id="cb5-13"><a href="#cb5-13"></a></span>
-<span id="cb5-14"><a href="#cb5-14"></a>Let us load the dataset and see structure of the variables:</span>
-<span id="cb5-15"><a href="#cb5-15"></a></span>
-<span id="cb5-16"><a href="#cb5-16"></a><span class="in">```{r load, warning=FALSE, cache=TRUE}</span></span>
-<span id="cb5-17"><a href="#cb5-17"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15.RData"</span>)</span>
-<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#head(analytic)</span></span>
-<span id="cb5-19"><a href="#cb5-19"></a><span class="fu">str</span>(analytic)</span>
-<span id="cb5-20"><a href="#cb5-20"></a><span class="in">```</span></span>
-<span id="cb5-21"><a href="#cb5-21"></a></span>
-<span id="cb5-22"><a href="#cb5-22"></a><span class="fu">### Describe the data</span></span>
-<span id="cb5-23"><a href="#cb5-23"></a></span>
-<span id="cb5-24"><a href="#cb5-24"></a><span class="in">```{r data, warning=FALSE, cache=TRUE}</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="fu">require</span>(rms)</span>
-<span id="cb5-26"><a href="#cb5-26"></a><span class="fu">describe</span>(analytic) </span>
-<span id="cb5-27"><a href="#cb5-27"></a><span class="in">```</span></span>
-<span id="cb5-28"><a href="#cb5-28"></a></span>
-<span id="cb5-29"><a href="#cb5-29"></a><span class="fu">### Collinearity</span></span>
-<span id="cb5-30"><a href="#cb5-30"></a></span>
-<span id="cb5-31"><a href="#cb5-31"></a>Avoiding collinear variables can result in a more interpretable, stable, and efficient predictive model. Collinearity refers to a situation in which two or more predictor variables in a multiple regression model are highly correlated, meaning that one can be linearly predicted from the others with substantial accuracy. Collinearity poses several issues for predictive analysis:</span>
-<span id="cb5-32"><a href="#cb5-32"></a></span>
-<span id="cb5-33"><a href="#cb5-33"></a>**Reduced Interpretability**:</span>
-<span id="cb5-34"><a href="#cb5-34"></a>When predictor variables are highly correlated, it becomes challenging to isolate the impact of individual predictors on the response variable. In other words, it is difficult to determine which predictor is genuinely influential in explaining variance in the response variable. This reduces the interpretability of the model.</span>
-<span id="cb5-35"><a href="#cb5-35"></a></span>
-<span id="cb5-36"><a href="#cb5-36"></a>**Unstable Coefficients**:</span>
-<span id="cb5-37"><a href="#cb5-37"></a>Collinearity can lead to inflated standard errors of the regression coefficients. This means that the coefficients can be very sensitive to small changes in the data, making the model unstable and less generalizable to new, unseen data.</span>
-<span id="cb5-38"><a href="#cb5-38"></a></span>
-<span id="cb5-39"><a href="#cb5-39"></a>**Overfitting**:</span>
-<span id="cb5-40"><a href="#cb5-40"></a>When predictors are collinear, the model is more likely to fit to the noise in the data rather than the actual signal. This is a manifestation of overfitting, where the model becomes too complex and captures random noise. Overfit models will perform poorly on new, unseen data.</span>
-<span id="cb5-41"><a href="#cb5-41"></a></span>
-<span id="cb5-42"><a href="#cb5-42"></a>**Inefficiency**:</span>
-<span id="cb5-43"><a href="#cb5-43"></a>Including redundant variables (collinear variables) does not add additional information to the model. This could be inefficient, especially when dealing with large datasets, as it increases computational costs without improving model performance.</span>
-<span id="cb5-44"><a href="#cb5-44"></a></span>
-<span id="cb5-45"><a href="#cb5-45"></a><span class="fu">#### Multicollinearity Diagnostics</span></span>
-<span id="cb5-46"><a href="#cb5-46"></a>Several techniques are available for diagnosing multicollinearity, including:</span>
-<span id="cb5-47"><a href="#cb5-47"></a></span>
-<span id="cb5-48"><a href="#cb5-48"></a><span class="ss">- </span>Variance Inflation Factor (VIF)</span>
-<span id="cb5-49"><a href="#cb5-49"></a><span class="ss">- </span>Eigenvalues and Eigenvectors of the correlation/covariance matrix</span>
-<span id="cb5-50"><a href="#cb5-50"></a><span class="ss">- </span>Pairwise correlation matrices</span>
-<span id="cb5-51"><a href="#cb5-51"></a></span>
-<span id="cb5-52"><a href="#cb5-52"></a><span class="fu">#### Remedies</span></span>
-<span id="cb5-53"><a href="#cb5-53"></a></span>
-<span id="cb5-54"><a href="#cb5-54"></a>Some common ways to handle collinearity include:</span>
-<span id="cb5-55"><a href="#cb5-55"></a></span>
-<span id="cb5-56"><a href="#cb5-56"></a><span class="ss">- </span>Removing one of the correlated predictors</span>
-<span id="cb5-57"><a href="#cb5-57"></a><span class="ss">- </span>Combining correlated predictors into a single composite predictor</span>
-<span id="cb5-58"><a href="#cb5-58"></a><span class="ss">- </span>Using regularization techniques like Ridge Regression, which can help handle collinearity by adding a penalty term</span>
-<span id="cb5-59"><a href="#cb5-59"></a></span>
-<span id="cb5-60"><a href="#cb5-60"></a><span class="fu">### Identify collinear predictors</span></span>
-<span id="cb5-61"><a href="#cb5-61"></a></span>
-<span id="cb5-62"><a href="#cb5-62"></a>::: callout-tip</span>
-<span id="cb5-63"><a href="#cb5-63"></a>We can also use <span class="in">`hclust`</span> and <span class="in">`varclus`</span> or variable clustering, i.e., to identify collinear predictors</span>
-<span id="cb5-64"><a href="#cb5-64"></a>:::</span>
-<span id="cb5-65"><a href="#cb5-65"></a></span>
-<span id="cb5-66"><a href="#cb5-66"></a>::: column-margin</span>
-<span id="cb5-67"><a href="#cb5-67"></a><span class="in">`hclust`</span> is the hierarchical clustering function where default is squared Spearman correlation coefficients to detect monotonic but nonlinear relationships.</span>
-<span id="cb5-68"><a href="#cb5-68"></a>:::</span>
-<span id="cb5-69"><a href="#cb5-69"></a></span>
-<span id="cb5-70"><a href="#cb5-70"></a><span class="in">```{r collinear, warning=FALSE, cache=TRUE}</span></span>
-<span id="cb5-71"><a href="#cb5-71"></a><span class="fu">require</span>(Hmisc)</span>
-<span id="cb5-72"><a href="#cb5-72"></a>sel.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, <span class="st">"married"</span>, </span>
-<span id="cb5-73"><a href="#cb5-73"></a>               <span class="st">"income"</span>, <span class="st">"diastolicBP"</span>, <span class="st">"systolicBP"</span>, </span>
-<span id="cb5-74"><a href="#cb5-74"></a>               <span class="st">"bodyweight"</span>, <span class="st">"bodyheight"</span>, <span class="st">"bmi"</span>, <span class="st">"waist"</span>, <span class="st">"smoke"</span>, <span class="st">"alcohol"</span>, </span>
-<span id="cb5-75"><a href="#cb5-75"></a>               <span class="st">"cholesterol"</span>, <span class="st">"triglycerides"</span>, <span class="st">"uric.acid"</span>, </span>
-<span id="cb5-76"><a href="#cb5-76"></a>               <span class="st">"protein"</span>, <span class="st">"bilirubin"</span>, <span class="st">"phosphorus"</span>, <span class="st">"sodium"</span>, <span class="st">"potassium"</span>, </span>
-<span id="cb5-77"><a href="#cb5-77"></a>               <span class="st">"globulin"</span>, <span class="st">"calcium"</span>, <span class="st">"physical.work"</span>, <span class="st">"physical.recreational"</span>, </span>
-<span id="cb5-78"><a href="#cb5-78"></a>               <span class="st">"diabetes"</span>)</span>
-<span id="cb5-79"><a href="#cb5-79"></a>var.cluster <span class="ot">&lt;-</span> <span class="fu">varclus</span>(<span class="sc">~</span>., <span class="at">data =</span> analytic[sel.names])</span>
-<span id="cb5-80"><a href="#cb5-80"></a><span class="co"># var.cluster</span></span>
-<span id="cb5-81"><a href="#cb5-81"></a><span class="fu">plot</span>(var.cluster)</span>
-<span id="cb5-82"><a href="#cb5-82"></a><span class="in">```</span></span>
-<span id="cb5-83"><a href="#cb5-83"></a></span>
-<span id="cb5-84"><a href="#cb5-84"></a><span class="fu">### Video content (optional)</span></span>
-<span id="cb5-85"><a href="#cb5-85"></a></span>
-<span id="cb5-86"><a href="#cb5-86"></a>::: callout-tip</span>
-<span id="cb5-87"><a href="#cb5-87"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
-<span id="cb5-88"><a href="#cb5-88"></a>:::</span>
-<span id="cb5-89"><a href="#cb5-89"></a></span>
-<span id="cb5-90"><a href="#cb5-90"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
-<span id="cb5-91"><a href="#cb5-91"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/5nNZpsuQ_Fg"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
-<span id="cb5-92"><a href="#cb5-92"></a></span>
-<span id="cb5-93"><a href="#cb5-93"></a><span class="kw">&lt;/iframe&gt;</span></span>
-<span id="cb5-94"><a href="#cb5-94"></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

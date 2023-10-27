@@ -804,7 +804,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Replicate Results</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">Replicate Results</h1>
 </div>
 
 
@@ -841,27 +841,24 @@ Note
 <section id="load-necessary-packages" class="level3"><h3 class="anchored" data-anchor-id="load-necessary-packages">Load necessary packages</h3>
 <p>We load several R packages required for fitting LASSO and random forest models.</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/setup_e838eecde37d4eee65bf8f6d43a104ec">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(tableone)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(gtsummary)</span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(glmnet)</span>
 <span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(WeightedROC)</span>
 <span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(ranger)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="analytic-dataset" class="level3"><h3 class="anchored" data-anchor-id="analytic-dataset">Analytic dataset</h3>
 <section id="load" class="level4"><h4 class="anchored" data-anchor-id="load">Load</h4>
 <p>We load the dataset into the R environment and lists all available variables and objects.</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/load_22c5714dd23cb5e51dfe1798543d87c3">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/machinelearning/Falasinnu2023.RData"</span>)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/machinelearning/Falasinnu2023.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "dat"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="machinelearning6a_cache/html/dim_3ddbb8230a3825ac666f8fbc8bf429fd">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">dim</span>(dat)</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">dim</span>(dat)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co">#&gt; [1] 8881   49</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>The dataset contains 8,881 participants aged 65 years or older with 49 variables:</p>
 <ul>
@@ -961,24 +958,22 @@ Note
 <p>See the NHIS 2016 dataset and the article for better understanding of the variables.</p>
 </section><section id="complete-case-data" class="level4"><h4 class="anchored" data-anchor-id="complete-case-data">Complete case data</h4>
 <div class="cell" data-hash="machinelearning6a_cache/html/desc_15ebc172be643403115a908e9b8bbfdb">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Age</span></span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Age</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="fu">table</span>(dat<span class="sc">$</span>age, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; </span></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt;  &lt;65  65+ &lt;NA&gt; </span></span>
 <span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt;    0 8881    0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Let us consider a complete case dataset</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/completecase_689373df9c96460a912b69c7c15d9fa1">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dat.complete <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(dat)</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dat.complete <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(dat)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="fu">dim</span>(dat.complete)</span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; [1] 7280   49</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>As we can see, there are 7,280 participants with complete case information. Let’s see the descriptive statistics of the predictors stratified by HICP.</p>
 </section><section id="descriptive-statistics" class="level4"><h4 class="anchored" data-anchor-id="descriptive-statistics">Descriptive statistics</h4>
 <div class="cell" data-hash="machinelearning6a_cache/html/tab1_44e54b1dcc536a14485771b76939fe95">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Predictors</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Predictors</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>predictors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"hhsize"</span>, <span class="st">"born"</span>, <span class="st">"marital"</span>, <span class="st">"region"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, </span>
 <span id="cb6-3"><a href="#cb6-3"></a>                <span class="st">"employment.status"</span>, <span class="st">"poverty.status"</span>, <span class="st">"veteran"</span>, <span class="st">"insurance"</span>, </span>
 <span id="cb6-4"><a href="#cb6-4"></a>                <span class="st">"sex.orientation"</span>, <span class="st">"worried.money"</span>, <span class="st">"good.neighborhood"</span>, <span class="st">"psy.symptom"</span>, </span>
@@ -992,7 +987,7 @@ Note
 <span id="cb6-12"><a href="#cb6-12"></a><span class="co"># Table 1 - Unweighted </span></span>
 <span id="cb6-13"><a href="#cb6-13"></a><span class="fu">tbl_summary</span>(<span class="at">data =</span> dat.complete, <span class="at">include =</span> predictors, <span class="at">by =</span> HICP, <span class="at">missing =</span> <span class="st">"no"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb6-14"><a href="#cb6-14"></a>  <span class="fu">modify_spanning_header</span>(<span class="fu">c</span>(<span class="st">"stat_1"</span>, <span class="st">"stat_2"</span>) <span class="sc">~</span> <span class="st">"**HICP**"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div id="hrxigfgpic" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#hrxigfgpic table {
@@ -1959,7 +1954,7 @@ Note
 </section></section><section id="lasso-for-survey-data" class="level3"><h3 class="anchored" data-anchor-id="lasso-for-survey-data">LASSO for survey data</h3>
 <p>Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Note that we are not interested in the statistical significance of the <span class="math inline">\(\beta\)</span> coefficients. Hence, not utilizing PSU and strata should not be an issue in this prediction problem. However, we still need to use sampling weights to get population-level predictions. Large weights are usually problematic, particularly with random forest model. One way to solve the problem is weight normalization.</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/weight_06881ae79b661638fffddfa71488401d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Normalize weight</span></span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Normalize weight</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>dat.complete<span class="sc">$</span>wgt <span class="ot">&lt;-</span> dat.complete<span class="sc">$</span>weight <span class="sc">*</span> <span class="fu">nrow</span>(dat.complete)<span class="sc">/</span><span class="fu">sum</span>(dat.complete<span class="sc">$</span>weight)</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="fu">summary</span>(dat.complete<span class="sc">$</span>weight)</span>
 <span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
@@ -1967,24 +1962,21 @@ Note
 <span id="cb7-6"><a href="#cb7-6"></a><span class="fu">summary</span>(dat.complete<span class="sc">$</span>wgt)</span>
 <span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt;  0.0842  0.5208  0.8950  1.0000  1.2983  5.0804</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="folds" class="level4"><h4 class="anchored" data-anchor-id="folds">Folds</h4>
 <p>Let’s create five random folds and specify the regression formula.</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/folds_6c821edb0a6ff4238a736e7f7f0b0e13">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">set.seed</span>(<span class="dv">604</span>)</span>
 <span id="cb8-3"><a href="#cb8-3"></a>nfolds <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>k, <span class="at">size =</span> <span class="fu">nrow</span>(dat.complete), <span class="at">replace =</span> T)</span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="fu">table</span>(nfolds)</span>
 <span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt; nfolds</span></span>
 <span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt;    1    2    3    4    5 </span></span>
 <span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt; 1451 1457 1496 1468 1408</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="regression-formula" class="level4"><h4 class="anchored" data-anchor-id="regression-formula">Regression formula</h4>
 <div class="cell" data-hash="machinelearning6a_cache/html/formula_487a95079c501780ce1509cd0eb22ee4">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>Formula <span class="ot">&lt;-</span> <span class="fu">formula</span>(<span class="fu">paste</span>(<span class="st">"HICP ~ "</span>, <span class="fu">paste</span>(predictors, <span class="at">collapse=</span><span class="st">" + "</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>Formula <span class="ot">&lt;-</span> <span class="fu">formula</span>(<span class="fu">paste</span>(<span class="st">"HICP ~ "</span>, <span class="fu">paste</span>(predictors, <span class="at">collapse=</span><span class="st">" + "</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="lasso-with-5-fold-cv" class="level4"><h4 class="anchored" data-anchor-id="lasso-with-5-fold-cv">LASSO with 5-fold CV</h4>
 <p>Now, we will fit the LASSO model with 5-fold cross-validation (CV). Here are the steps:</p>
@@ -1996,7 +1988,7 @@ Note
 <li>Repeat the analysis for all folds.</li>
 </ul>
 <div class="cell" data-hash="machinelearning6a_cache/html/lassofit_ea6b32166f91710cf7e09340c45d4a3e">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>fit.lasso <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>); auc.lasso <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>fit.lasso <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>); auc.lasso <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="cf">for</span> (fold <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>k) {</span>
 <span id="cb10-3"><a href="#cb10-3"></a>  <span class="co"># Training data</span></span>
 <span id="cb10-4"><a href="#cb10-4"></a>  dat.train <span class="ot">&lt;-</span> dat.complete[nfolds <span class="sc">!=</span> fold, ]</span>
@@ -2022,12 +2014,11 @@ Note
 <span id="cb10-24"><a href="#cb10-24"></a>  <span class="co"># AUC on the test set with sampling weights</span></span>
 <span id="cb10-25"><a href="#cb10-25"></a>  auc.lasso[fold] <span class="ot">&lt;-</span> <span class="fu">WeightedAUC</span>(<span class="fu">WeightedROC</span>(dat.test<span class="sc">$</span>pred.lasso, dat.test<span class="sc">$</span>HICP, <span class="at">weight =</span> dat.test<span class="sc">$</span>wgt))</span>
 <span id="cb10-26"><a href="#cb10-26"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="model-performance" class="level4"><h4 class="anchored" data-anchor-id="model-performance">Model performance</h4>
 <p>Let’s check how prediction worked.</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/lassofit2_a213ac2d07801c551547ba7d44967a01">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Fitted LASSO models</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Fitted LASSO models</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>fit.lasso[[<span class="dv">1</span>]]</span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt; </span></span>
 <span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt; Call:  glmnet(x = X.train, y = y.train, family = "binomial", weights = dat.train$wgt,      alpha = 1, lambda = fit.cv.lasso$lambda.min) </span></span>
@@ -2058,10 +2049,9 @@ Note
 <span id="cb11-29"><a href="#cb11-29"></a><span class="co">#&gt; </span></span>
 <span id="cb11-30"><a href="#cb11-30"></a><span class="co">#&gt;   Df  %Dev   Lambda</span></span>
 <span id="cb11-31"><a href="#cb11-31"></a><span class="co">#&gt; 1 39 24.32 0.003525</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="machinelearning6a_cache/html/lassofit3_189ef7b151b76f23d963654594999443">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Intercept from the LASSO models in different folds</span></span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Intercept from the LASSO models in different folds</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>fit.lasso[[<span class="dv">1</span>]]<span class="sc">$</span>a0</span>
 <span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt;        s0 </span></span>
 <span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt; -3.733405</span></span>
@@ -2077,10 +2067,9 @@ Note
 <span id="cb12-14"><a href="#cb12-14"></a>fit.lasso[[<span class="dv">5</span>]]<span class="sc">$</span>a0</span>
 <span id="cb12-15"><a href="#cb12-15"></a><span class="co">#&gt;       s0 </span></span>
 <span id="cb12-16"><a href="#cb12-16"></a><span class="co">#&gt; -3.68776</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="machinelearning6a_cache/html/lassofit4_72824950b79bca8fbb90d117c2e55c4b">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Beta coefficients from the LASSO models in different folds</span></span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Beta coefficients from the LASSO models in different folds</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>fit.lasso[[<span class="dv">1</span>]]<span class="sc">$</span>beta</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; 67 x 1 sparse Matrix of class "dgCMatrix"</span></span>
 <span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt;                                                 s0</span></span>
@@ -2431,20 +2420,17 @@ Note
 <span id="cb13-349"><a href="#cb13-349"></a><span class="co">#&gt; better.health.statusYes               .         </span></span>
 <span id="cb13-350"><a href="#cb13-350"></a><span class="co">#&gt; physical.activityModerate            -0.76639891</span></span>
 <span id="cb13-351"><a href="#cb13-351"></a><span class="co">#&gt; physical.activityHigh                -0.38546251</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="machinelearning6a_cache/html/lassoauc_b4a75dfd5d2b598bda9cd00fd72098be">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># AUCs from different folds</span></span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># AUCs from different folds</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a>auc.lasso</span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; [1] 0.8396619 0.8129805 0.8465035 0.7896878 0.8342721</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Now we will average out the AUC:</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/lassoaucmean_a9ba14e7de833e6a3821b962996b1442">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Average AUC</span></span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Average AUC</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a><span class="fu">mean</span>(auc.lasso)</span>
 <span id="cb15-3"><a href="#cb15-3"></a><span class="co">#&gt; [1] 0.8246212</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>This AUC is approximately the same as reported by the authors in Table 2.</p>
 </section></section><section id="random-forest-for-survey-data" class="level3"><h3 class="anchored" data-anchor-id="random-forest-for-survey-data">Random forest for survey data</h3>
@@ -2458,16 +2444,15 @@ Note
 </ul>
 <section id="folds-1" class="level4"><h4 class="anchored" data-anchor-id="folds-1">Folds</h4>
 <div class="cell" data-hash="machinelearning6a_cache/html/foldsrf_83f496f7cf91089f23445c08966b5924">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a><span class="fu">table</span>(nfolds)</span>
 <span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt; nfolds</span></span>
 <span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt;    1    2    3    4    5 </span></span>
 <span id="cb16-5"><a href="#cb16-5"></a><span class="co">#&gt; 1451 1457 1496 1468 1408</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="regression-formula-1" class="level4"><h4 class="anchored" data-anchor-id="regression-formula-1">Regression formula</h4>
 <div class="cell" data-hash="machinelearning6a_cache/html/formularf_35f615f0b10e9e6fb9d730b4006e3e1b">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>Formula</span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>Formula</span>
 <span id="cb17-2"><a href="#cb17-2"></a><span class="co">#&gt; HICP ~ sex + hhsize + born + marital + region + race + education + </span></span>
 <span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt;     employment.status + poverty.status + veteran + insurance + </span></span>
 <span id="cb17-4"><a href="#cb17-4"></a><span class="co">#&gt;     sex.orientation + worried.money + good.neighborhood + psy.symptom + </span></span>
@@ -2477,11 +2462,10 @@ Note
 <span id="cb17-8"><a href="#cb17-8"></a><span class="co">#&gt;     arthritis + crohns.disease + place.routine.care + trouble.asleep + </span></span>
 <span id="cb17-9"><a href="#cb17-9"></a><span class="co">#&gt;     obese + current.smoker + heavy.drinker + hospitalization + </span></span>
 <span id="cb17-10"><a href="#cb17-10"></a><span class="co">#&gt;     better.health.status + physical.activity</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="random-forst-with-5-fold-cv" class="level4"><h4 class="anchored" data-anchor-id="random-forst-with-5-fold-cv">Random forst with 5-fold CV</h4>
 <div class="cell" data-hash="machinelearning6a_cache/html/rffit_54ab072f2ad2c19c2031f7338960b3b0">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>fit.rf <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>); auc.rf <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>fit.rf <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>); auc.rf <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb18-2"><a href="#cb18-2"></a><span class="cf">for</span> (fold <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>k) {</span>
 <span id="cb18-3"><a href="#cb18-3"></a>  <span class="co"># Training data</span></span>
 <span id="cb18-4"><a href="#cb18-4"></a>  dat.train <span class="ot">&lt;-</span> dat.complete[nfolds <span class="sc">!=</span> fold, ]</span>
@@ -2529,12 +2513,11 @@ Note
 <span id="cb18-46"><a href="#cb18-46"></a>  auc.rf[fold] <span class="ot">&lt;-</span> <span class="fu">WeightedAUC</span>(<span class="fu">WeightedROC</span>(dat.test<span class="sc">$</span>pred.rf, dat.test<span class="sc">$</span>HICP, </span>
 <span id="cb18-47"><a href="#cb18-47"></a>                                          <span class="at">weight =</span> dat.test<span class="sc">$</span>wgt))</span>
 <span id="cb18-48"><a href="#cb18-48"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="model-performance-1" class="level4"><h4 class="anchored" data-anchor-id="model-performance-1">Model performance</h4>
 <p>Let’s check how prediction worked.</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/rffit2_db3bbffb2984a490710ebfd83cf0d433">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Fitted random forest models</span></span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Fitted random forest models</span></span>
 <span id="cb19-2"><a href="#cb19-2"></a>fit.rf[[<span class="dv">1</span>]]</span>
 <span id="cb19-3"><a href="#cb19-3"></a><span class="co">#&gt; Ranger result</span></span>
 <span id="cb19-4"><a href="#cb19-4"></a><span class="co">#&gt; </span></span>
@@ -2610,25 +2593,20 @@ Note
 <span id="cb19-74"><a href="#cb19-74"></a><span class="co">#&gt; Variable importance mode:         impurity </span></span>
 <span id="cb19-75"><a href="#cb19-75"></a><span class="co">#&gt; Splitrule:                        gini </span></span>
 <span id="cb19-76"><a href="#cb19-76"></a><span class="co">#&gt; OOB prediction error (Brier s.):  0.08929408</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="machinelearning6a_cache/html/rfauc_79d46c5c3098e5cac2075ef8d01fdc8c">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># AUCs from different folds</span></span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># AUCs from different folds</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a>auc.rf</span>
 <span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt; [1] 0.8393204 0.7905715 0.8244523 0.7811141 0.8301950</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Now we will average out the AUC:</p>
 <div class="cell" data-hash="machinelearning6a_cache/html/rfaucmean_aa1b0bf53c93114b604d4624d917501d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Average AUC</span></span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Average AUC</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="fu">mean</span>(auc.rf)</span>
 <span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; [1] 0.8131307</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>This AUC from random forest is approximately the same as obtained from the LASSO model.</p>
 
-
-<!-- -->
 
 </section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -2823,354 +2801,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">R functions (L)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb22" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">## Replicate Results {.unnumbered}</span></span>
-<span id="cb22-2"><a href="#cb22-2"></a></span>
-<span id="cb22-3"><a href="#cb22-3"></a>The tutorial aims to guide the users through fitting machine learning techniques with health survey data. We will replicate some of the results of this article by <span class="co">[</span><span class="ot">Falasinnu et al. (2023)</span><span class="co">](https://doi.org/10.1016/j.jpain.2023.03.008)</span>. </span>
-<span id="cb22-4"><a href="#cb22-4"></a></span>
-<span id="cb22-5"><a href="#cb22-5"></a>::: column-margin</span>
-<span id="cb22-6"><a href="#cb22-6"></a>Falasinnu T, Hossain MB, Weber II KA, Helmick CG, Karim ME, Mackey S. The Problem of Pain in the United States: A Population-Based Characterization of Biopsychosocial Correlates of High Impact Chronic Pain Using the National Health Interview Survey. The Journal of Pain. 2023;24(6):1094-103. DOI: <span class="co">[</span><span class="ot">10.1016/j.jpain.2023.03.008</span><span class="co">](https://doi.org/10.1016/j.jpain.2023.03.008)</span></span>
-<span id="cb22-7"><a href="#cb22-7"></a>:::</span>
-<span id="cb22-8"><a href="#cb22-8"></a></span>
-<span id="cb22-9"><a href="#cb22-9"></a>The authors used the <span class="co">[</span><span class="ot">National Health Interview Survey (NHIS) 2016</span><span class="co">](https://www.cdc.gov/nchs/nhis/nhis_2016_data_release.htm)</span> dataset to develop prediction models for predicting high impact chronic pain (HICP). They also evaluated the predictive performances of the models within sociodemographic subgroups, such as sex (male, female), age ($&lt;65$, $\ge 65$), and race/ethnicity (White, Black, Hispanic). They used LASSO and random forest models with 5-fold cross-validation as an internal validation. To obtain population-level predictions, they account for survey weights in both models. </span>
-<span id="cb22-10"><a href="#cb22-10"></a></span>
-<span id="cb22-11"><a href="#cb22-11"></a>::: column-margin</span>
-<span id="cb22-12"><a href="#cb22-12"></a>For those interested in the National Health Interview Survey (NHIS) dataset, can review the <span class="co">[</span><span class="ot">earlier tutorial</span><span class="co">](accessing5.html)</span> about the dataset.</span>
-<span id="cb22-13"><a href="#cb22-13"></a>:::</span>
-<span id="cb22-14"><a href="#cb22-14"></a></span>
-<span id="cb22-15"><a href="#cb22-15"></a>::: {.callout-note}</span>
-<span id="cb22-16"><a href="#cb22-16"></a>To handle <span class="co">[</span><span class="ot">missing data</span><span class="co">](missingdata.html)</span> in the predictors, they used multiple imputation technique. However, for simplicity, this tutorial focuses on a complete case dataset. We will also only focus on predicting HICP for people aged 65 years or older (a dataset of \~8,800 participants compared to the dataset of 33,000 participants aged 18 years or older).</span>
-<span id="cb22-17"><a href="#cb22-17"></a>:::</span>
-<span id="cb22-18"><a href="#cb22-18"></a></span>
-<span id="cb22-19"><a href="#cb22-19"></a><span class="fu">### Load necessary packages</span></span>
-<span id="cb22-20"><a href="#cb22-20"></a></span>
-<span id="cb22-21"><a href="#cb22-21"></a>We load several R packages required for fitting LASSO and random forest models.</span>
-<span id="cb22-22"><a href="#cb22-22"></a></span>
-<span id="cb22-23"><a href="#cb22-23"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
-<span id="cb22-24"><a href="#cb22-24"></a><span class="co"># Load required packages</span></span>
-<span id="cb22-25"><a href="#cb22-25"></a><span class="fu">library</span>(tableone)</span>
-<span id="cb22-26"><a href="#cb22-26"></a><span class="fu">library</span>(gtsummary)</span>
-<span id="cb22-27"><a href="#cb22-27"></a><span class="fu">library</span>(glmnet)</span>
-<span id="cb22-28"><a href="#cb22-28"></a><span class="fu">library</span>(WeightedROC)</span>
-<span id="cb22-29"><a href="#cb22-29"></a><span class="fu">library</span>(ranger)</span>
-<span id="cb22-30"><a href="#cb22-30"></a><span class="in">```</span></span>
-<span id="cb22-31"><a href="#cb22-31"></a></span>
-<span id="cb22-32"><a href="#cb22-32"></a><span class="fu">### Analytic dataset</span></span>
-<span id="cb22-33"><a href="#cb22-33"></a></span>
-<span id="cb22-34"><a href="#cb22-34"></a><span class="fu">#### Load</span></span>
-<span id="cb22-35"><a href="#cb22-35"></a></span>
-<span id="cb22-36"><a href="#cb22-36"></a>We load the dataset into the R environment and lists all available variables and objects.</span>
-<span id="cb22-37"><a href="#cb22-37"></a></span>
-<span id="cb22-38"><a href="#cb22-38"></a><span class="in">```{r load, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-39"><a href="#cb22-39"></a><span class="fu">load</span>(<span class="st">"Data/machinelearning/Falasinnu2023.RData"</span>)</span>
-<span id="cb22-40"><a href="#cb22-40"></a><span class="fu">ls</span>()</span>
-<span id="cb22-41"><a href="#cb22-41"></a><span class="in">```</span></span>
-<span id="cb22-42"><a href="#cb22-42"></a></span>
-<span id="cb22-43"><a href="#cb22-43"></a><span class="in">```{r dim, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-44"><a href="#cb22-44"></a><span class="fu">dim</span>(dat)</span>
-<span id="cb22-45"><a href="#cb22-45"></a><span class="in">```</span></span>
-<span id="cb22-46"><a href="#cb22-46"></a></span>
-<span id="cb22-47"><a href="#cb22-47"></a>The dataset contains 8,881 participants aged 65 years or older with 49 variables:</span>
-<span id="cb22-48"><a href="#cb22-48"></a></span>
-<span id="cb22-49"><a href="#cb22-49"></a><span class="ss">-   </span><span class="in">`studyid`</span>: Unique identifier</span>
-<span id="cb22-50"><a href="#cb22-50"></a><span class="ss">-   </span><span class="in">`psu`</span>: Pseudo-PSU</span>
-<span id="cb22-51"><a href="#cb22-51"></a><span class="ss">-   </span><span class="in">`strata`</span>: Pseudo-stratum</span>
-<span id="cb22-52"><a href="#cb22-52"></a><span class="ss">-   </span><span class="in">`weight`</span>: Sampling weight</span>
-<span id="cb22-53"><a href="#cb22-53"></a><span class="ss">-   </span><span class="in">`HICP`</span>: HICP (binary outcome variable)</span>
-<span id="cb22-54"><a href="#cb22-54"></a><span class="ss">-   </span><span class="in">`age`</span>: Age - <span class="in">`sex`</span>: Sex</span>
-<span id="cb22-55"><a href="#cb22-55"></a><span class="ss">-   </span><span class="in">`hhsize`</span>: Number of people in household</span>
-<span id="cb22-56"><a href="#cb22-56"></a><span class="ss">-   </span><span class="in">`born`</span>: Citizenship</span>
-<span id="cb22-57"><a href="#cb22-57"></a><span class="ss">-   </span><span class="in">`marital`</span>: Marital status</span>
-<span id="cb22-58"><a href="#cb22-58"></a><span class="ss">-   </span><span class="in">`region`</span>: Region</span>
-<span id="cb22-59"><a href="#cb22-59"></a><span class="ss">-   </span><span class="in">`race`</span>: Race/ethnicity</span>
-<span id="cb22-60"><a href="#cb22-60"></a><span class="ss">-   </span><span class="in">`education`</span>: Education</span>
-<span id="cb22-61"><a href="#cb22-61"></a><span class="ss">-   </span><span class="in">`employment.status`</span>: Employment status</span>
-<span id="cb22-62"><a href="#cb22-62"></a><span class="ss">-   </span><span class="in">`poverty.status`</span>: Poverty status</span>
-<span id="cb22-63"><a href="#cb22-63"></a><span class="ss">-   </span><span class="in">`veteran`</span>: Veteran</span>
-<span id="cb22-64"><a href="#cb22-64"></a><span class="ss">-   </span><span class="in">`insurance`</span>: Health insurance coverage</span>
-<span id="cb22-65"><a href="#cb22-65"></a><span class="ss">-   </span><span class="in">`sex.orientation`</span>: Sexual orientation</span>
-<span id="cb22-66"><a href="#cb22-66"></a><span class="ss">-   </span><span class="in">`worried.money`</span>: Worried about money</span>
-<span id="cb22-67"><a href="#cb22-67"></a><span class="ss">-   </span><span class="in">`good.neighborhood`</span>: Good neighborhood</span>
-<span id="cb22-68"><a href="#cb22-68"></a><span class="ss">-   </span><span class="in">`psy.symptom`</span>: Psychological symptoms</span>
-<span id="cb22-69"><a href="#cb22-69"></a><span class="ss">-   </span><span class="in">`visit.ED`</span>: Number of times in ER/ED</span>
-<span id="cb22-70"><a href="#cb22-70"></a><span class="ss">-   </span><span class="in">`surgery`</span>: Number of surgeries in past 12 months</span>
-<span id="cb22-71"><a href="#cb22-71"></a><span class="ss">-   </span><span class="in">`dr.visit`</span>: Time since doctor visits</span>
-<span id="cb22-72"><a href="#cb22-72"></a><span class="ss">-   </span><span class="in">`cancer`</span>: Cancer</span>
-<span id="cb22-73"><a href="#cb22-73"></a><span class="ss">-   </span><span class="in">`asthma`</span>: Asthma</span>
-<span id="cb22-74"><a href="#cb22-74"></a><span class="ss">-   </span><span class="in">`htn`</span>: Hypertension</span>
-<span id="cb22-75"><a href="#cb22-75"></a><span class="ss">-   </span><span class="in">`liver.disease`</span>: Liver disease</span>
-<span id="cb22-76"><a href="#cb22-76"></a><span class="ss">-   </span><span class="in">`diabetes`</span>: Diabetes</span>
-<span id="cb22-77"><a href="#cb22-77"></a><span class="ss">-   </span><span class="in">`ulcer`</span>: Ulcer - <span class="in">`stroke`</span>: Stroke</span>
-<span id="cb22-78"><a href="#cb22-78"></a><span class="ss">-   </span><span class="in">`emphysema`</span>: Emphysema</span>
-<span id="cb22-79"><a href="#cb22-79"></a><span class="ss">-   </span><span class="in">`copd`</span>: COPD</span>
-<span id="cb22-80"><a href="#cb22-80"></a><span class="ss">-   </span><span class="in">`high.cholesterol`</span>: High cholesterol</span>
-<span id="cb22-81"><a href="#cb22-81"></a><span class="ss">-   </span><span class="in">`coronary.heart.disease`</span>: Coronary heart disease</span>
-<span id="cb22-82"><a href="#cb22-82"></a><span class="ss">-   </span><span class="in">`angina`</span>: Angina pectoris</span>
-<span id="cb22-83"><a href="#cb22-83"></a><span class="ss">-   </span><span class="in">`heart.attack`</span>: Heart attack</span>
-<span id="cb22-84"><a href="#cb22-84"></a><span class="ss">-   </span><span class="in">`heart.disease`</span>: Heart condition/disease</span>
-<span id="cb22-85"><a href="#cb22-85"></a><span class="ss">-   </span><span class="in">`arthritis`</span>: Arthritis and rheumatism</span>
-<span id="cb22-86"><a href="#cb22-86"></a><span class="ss">-   </span><span class="in">`crohns.disease`</span>: Crohn's disease</span>
-<span id="cb22-87"><a href="#cb22-87"></a><span class="ss">-   </span><span class="in">`place.routine.care`</span>: Usual place for routine care</span>
-<span id="cb22-88"><a href="#cb22-88"></a><span class="ss">-   </span><span class="in">`trouble.asleep`</span>: Trouble falling asleep</span>
-<span id="cb22-89"><a href="#cb22-89"></a><span class="ss">-   </span><span class="in">`obese`</span>: Obesity</span>
-<span id="cb22-90"><a href="#cb22-90"></a><span class="ss">-   </span><span class="in">`current.smoker`</span>: Current smoker</span>
-<span id="cb22-91"><a href="#cb22-91"></a><span class="ss">-   </span><span class="in">`heavy.drinker`</span>: Heavy drinker</span>
-<span id="cb22-92"><a href="#cb22-92"></a><span class="ss">-   </span><span class="in">`hospitalization`</span>: Hospital stay days</span>
-<span id="cb22-93"><a href="#cb22-93"></a><span class="ss">-   </span><span class="in">`better.health.status`</span>: Better health status</span>
-<span id="cb22-94"><a href="#cb22-94"></a><span class="ss">-   </span><span class="in">`physical.activity`</span>: Physical activity</span>
-<span id="cb22-95"><a href="#cb22-95"></a></span>
-<span id="cb22-96"><a href="#cb22-96"></a>See the NHIS 2016 dataset and the article for better understanding of the variables.</span>
-<span id="cb22-97"><a href="#cb22-97"></a></span>
-<span id="cb22-98"><a href="#cb22-98"></a><span class="fu">#### Complete case data</span></span>
-<span id="cb22-99"><a href="#cb22-99"></a></span>
-<span id="cb22-100"><a href="#cb22-100"></a><span class="in">```{r desc, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-101"><a href="#cb22-101"></a><span class="co"># Age</span></span>
-<span id="cb22-102"><a href="#cb22-102"></a><span class="fu">table</span>(dat<span class="sc">$</span>age, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb22-103"><a href="#cb22-103"></a><span class="in">```</span></span>
-<span id="cb22-104"><a href="#cb22-104"></a></span>
-<span id="cb22-105"><a href="#cb22-105"></a>Let us consider a complete case dataset</span>
-<span id="cb22-106"><a href="#cb22-106"></a></span>
-<span id="cb22-107"><a href="#cb22-107"></a><span class="in">```{r completecase, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-108"><a href="#cb22-108"></a>dat.complete <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(dat)</span>
-<span id="cb22-109"><a href="#cb22-109"></a><span class="fu">dim</span>(dat.complete)</span>
-<span id="cb22-110"><a href="#cb22-110"></a><span class="in">```</span></span>
-<span id="cb22-111"><a href="#cb22-111"></a></span>
-<span id="cb22-112"><a href="#cb22-112"></a>As we can see, there are 7,280 participants with complete case information. Let's see the descriptive statistics of the predictors stratified by HICP.</span>
-<span id="cb22-113"><a href="#cb22-113"></a></span>
-<span id="cb22-114"><a href="#cb22-114"></a><span class="fu">#### Descriptive statistics</span></span>
-<span id="cb22-115"><a href="#cb22-115"></a></span>
-<span id="cb22-116"><a href="#cb22-116"></a><span class="in">```{r tab1, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-117"><a href="#cb22-117"></a><span class="co"># Predictors</span></span>
-<span id="cb22-118"><a href="#cb22-118"></a>predictors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"hhsize"</span>, <span class="st">"born"</span>, <span class="st">"marital"</span>, <span class="st">"region"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, </span>
-<span id="cb22-119"><a href="#cb22-119"></a>                <span class="st">"employment.status"</span>, <span class="st">"poverty.status"</span>, <span class="st">"veteran"</span>, <span class="st">"insurance"</span>, </span>
-<span id="cb22-120"><a href="#cb22-120"></a>                <span class="st">"sex.orientation"</span>, <span class="st">"worried.money"</span>, <span class="st">"good.neighborhood"</span>, <span class="st">"psy.symptom"</span>, </span>
-<span id="cb22-121"><a href="#cb22-121"></a>                <span class="st">"visit.ED"</span>, <span class="st">"surgery"</span>, <span class="st">"dr.visit"</span>, <span class="st">"cancer"</span>, <span class="st">"asthma"</span>, <span class="st">"htn"</span>, </span>
-<span id="cb22-122"><a href="#cb22-122"></a>                <span class="st">"liver.disease"</span>, <span class="st">"diabetes"</span>, <span class="st">"ulcer"</span>, <span class="st">"stroke"</span>, <span class="st">"emphysema"</span>, <span class="st">"copd"</span>, </span>
-<span id="cb22-123"><a href="#cb22-123"></a>                <span class="st">"high.cholesterol"</span>, <span class="st">"coronary.heart.disease"</span>, <span class="st">"angina"</span>, <span class="st">"heart.attack"</span>, </span>
-<span id="cb22-124"><a href="#cb22-124"></a>                <span class="st">"heart.disease"</span>, <span class="st">"arthritis"</span>, <span class="st">"crohns.disease"</span>, <span class="st">"place.routine.care"</span>,</span>
-<span id="cb22-125"><a href="#cb22-125"></a>                <span class="st">"trouble.asleep"</span>, <span class="st">"obese"</span>, <span class="st">"current.smoker"</span>, <span class="st">"heavy.drinker"</span>, </span>
-<span id="cb22-126"><a href="#cb22-126"></a>                <span class="st">"hospitalization"</span>, <span class="st">"better.health.status"</span>, <span class="st">"physical.activity"</span>)</span>
-<span id="cb22-127"><a href="#cb22-127"></a></span>
-<span id="cb22-128"><a href="#cb22-128"></a><span class="co"># Table 1 - Unweighted </span></span>
-<span id="cb22-129"><a href="#cb22-129"></a><span class="fu">tbl_summary</span>(<span class="at">data =</span> dat.complete, <span class="at">include =</span> predictors, <span class="at">by =</span> HICP, <span class="at">missing =</span> <span class="st">"no"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-130"><a href="#cb22-130"></a>  <span class="fu">modify_spanning_header</span>(<span class="fu">c</span>(<span class="st">"stat_1"</span>, <span class="st">"stat_2"</span>) <span class="sc">~</span> <span class="st">"**HICP**"</span>)</span>
-<span id="cb22-131"><a href="#cb22-131"></a><span class="in">```</span></span>
-<span id="cb22-132"><a href="#cb22-132"></a></span>
-<span id="cb22-133"><a href="#cb22-133"></a><span class="fu">### LASSO for survey data</span></span>
-<span id="cb22-134"><a href="#cb22-134"></a></span>
-<span id="cb22-135"><a href="#cb22-135"></a>Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Note that we are not interested in the statistical significance of the $\beta$ coefficients. Hence, not utilizing PSU and strata should not be an issue in this prediction problem. However, we still need to use sampling weights to get population-level predictions. Large weights are usually problematic, particularly with random forest model. One way to solve the problem is weight normalization.</span>
-<span id="cb22-136"><a href="#cb22-136"></a></span>
-<span id="cb22-137"><a href="#cb22-137"></a><span class="in">```{r weight, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-138"><a href="#cb22-138"></a><span class="co"># Normalize weight</span></span>
-<span id="cb22-139"><a href="#cb22-139"></a>dat.complete<span class="sc">$</span>wgt <span class="ot">&lt;-</span> dat.complete<span class="sc">$</span>weight <span class="sc">*</span> <span class="fu">nrow</span>(dat.complete)<span class="sc">/</span><span class="fu">sum</span>(dat.complete<span class="sc">$</span>weight)</span>
-<span id="cb22-140"><a href="#cb22-140"></a><span class="fu">summary</span>(dat.complete<span class="sc">$</span>weight)</span>
-<span id="cb22-141"><a href="#cb22-141"></a><span class="fu">summary</span>(dat.complete<span class="sc">$</span>wgt)</span>
-<span id="cb22-142"><a href="#cb22-142"></a><span class="in">```</span></span>
-<span id="cb22-143"><a href="#cb22-143"></a></span>
-<span id="cb22-144"><a href="#cb22-144"></a><span class="fu">#### Folds</span></span>
-<span id="cb22-145"><a href="#cb22-145"></a></span>
-<span id="cb22-146"><a href="#cb22-146"></a>Let's create five random folds and specify the regression formula.</span>
-<span id="cb22-147"><a href="#cb22-147"></a></span>
-<span id="cb22-148"><a href="#cb22-148"></a><span class="in">```{r folds, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-149"><a href="#cb22-149"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb22-150"><a href="#cb22-150"></a><span class="fu">set.seed</span>(<span class="dv">604</span>)</span>
-<span id="cb22-151"><a href="#cb22-151"></a>nfolds <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>k, <span class="at">size =</span> <span class="fu">nrow</span>(dat.complete), <span class="at">replace =</span> T)</span>
-<span id="cb22-152"><a href="#cb22-152"></a><span class="fu">table</span>(nfolds)</span>
-<span id="cb22-153"><a href="#cb22-153"></a><span class="in">```</span></span>
-<span id="cb22-154"><a href="#cb22-154"></a></span>
-<span id="cb22-155"><a href="#cb22-155"></a><span class="fu">#### Regression formula</span></span>
-<span id="cb22-156"><a href="#cb22-156"></a></span>
-<span id="cb22-157"><a href="#cb22-157"></a><span class="in">```{r formula, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-158"><a href="#cb22-158"></a>Formula <span class="ot">&lt;-</span> <span class="fu">formula</span>(<span class="fu">paste</span>(<span class="st">"HICP ~ "</span>, <span class="fu">paste</span>(predictors, <span class="at">collapse=</span><span class="st">" + "</span>)))</span>
-<span id="cb22-159"><a href="#cb22-159"></a><span class="in">```</span></span>
-<span id="cb22-160"><a href="#cb22-160"></a></span>
-<span id="cb22-161"><a href="#cb22-161"></a><span class="fu">#### LASSO with 5-fold CV</span></span>
-<span id="cb22-162"><a href="#cb22-162"></a></span>
-<span id="cb22-163"><a href="#cb22-163"></a>Now, we will fit the LASSO model with 5-fold cross-validation (CV). Here are the steps:</span>
-<span id="cb22-164"><a href="#cb22-164"></a></span>
-<span id="cb22-165"><a href="#cb22-165"></a><span class="ss">-   </span>For fold 1, folds 2-5 is the training set and fold 1 is the test set</span>
-<span id="cb22-166"><a href="#cb22-166"></a><span class="ss">-   </span>Fit 5-fold cross-validation on the training set to find the value of lambda that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.</span>
-<span id="cb22-167"><a href="#cb22-167"></a><span class="ss">-   </span>Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey design.</span>
-<span id="cb22-168"><a href="#cb22-168"></a><span class="ss">-   </span>Calculate predictive performance (e.g., AUC) on the test set</span>
-<span id="cb22-169"><a href="#cb22-169"></a><span class="ss">-   </span>Repeat the analysis for all folds.</span>
-<span id="cb22-170"><a href="#cb22-170"></a></span>
-<span id="cb22-171"><a href="#cb22-171"></a><span class="in">```{r lassofit, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-172"><a href="#cb22-172"></a>fit.lasso <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>); auc.lasso <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb22-173"><a href="#cb22-173"></a><span class="cf">for</span> (fold <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>k) {</span>
-<span id="cb22-174"><a href="#cb22-174"></a>  <span class="co"># Training data</span></span>
-<span id="cb22-175"><a href="#cb22-175"></a>  dat.train <span class="ot">&lt;-</span> dat.complete[nfolds <span class="sc">!=</span> fold, ]</span>
-<span id="cb22-176"><a href="#cb22-176"></a>  X.train <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(Formula, dat.train)[,<span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb22-177"><a href="#cb22-177"></a>  y.train <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(dat.train<span class="sc">$</span>HICP)</span>
-<span id="cb22-178"><a href="#cb22-178"></a>  </span>
-<span id="cb22-179"><a href="#cb22-179"></a>  <span class="co"># Test data</span></span>
-<span id="cb22-180"><a href="#cb22-180"></a>  dat.test <span class="ot">&lt;-</span> dat.complete[nfolds <span class="sc">==</span> fold, ]</span>
-<span id="cb22-181"><a href="#cb22-181"></a>  X.test <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(Formula, dat.test)[,<span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb22-182"><a href="#cb22-182"></a>  y.test <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(dat.test<span class="sc">$</span>HICP)</span>
-<span id="cb22-183"><a href="#cb22-183"></a>  </span>
-<span id="cb22-184"><a href="#cb22-184"></a>  <span class="co"># Find the optimum lambda using 5-fold CV</span></span>
-<span id="cb22-185"><a href="#cb22-185"></a>  fit.cv.lasso <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(<span class="at">x =</span> X.train, <span class="at">y =</span> y.train, <span class="at">nfolds =</span> <span class="dv">5</span>, <span class="at">alpha =</span> <span class="dv">1</span>, </span>
-<span id="cb22-186"><a href="#cb22-186"></a>                            <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">weights =</span> dat.train<span class="sc">$</span>wgt)</span>
-<span id="cb22-187"><a href="#cb22-187"></a>  </span>
-<span id="cb22-188"><a href="#cb22-188"></a>  <span class="co"># Fit the model on the training set with optimum lambda</span></span>
-<span id="cb22-189"><a href="#cb22-189"></a>  fit.lasso[[fold]] <span class="ot">&lt;-</span> <span class="fu">glmnet</span>(<span class="at">x =</span> X.train, <span class="at">y =</span> y.train, <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
-<span id="cb22-190"><a href="#cb22-190"></a>                      <span class="at">lambda =</span> fit.cv.lasso<span class="sc">$</span>lambda.min, <span class="at">weights =</span> dat.train<span class="sc">$</span>wgt)</span>
-<span id="cb22-191"><a href="#cb22-191"></a>  </span>
-<span id="cb22-192"><a href="#cb22-192"></a>  <span class="co"># Prediction on the test set</span></span>
-<span id="cb22-193"><a href="#cb22-193"></a>  dat.test<span class="sc">$</span>pred.lasso <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.lasso[[fold]], <span class="at">newx =</span> X.test, <span class="at">type =</span> <span class="st">"response"</span>)</span>
-<span id="cb22-194"><a href="#cb22-194"></a>  </span>
-<span id="cb22-195"><a href="#cb22-195"></a>  <span class="co"># AUC on the test set with sampling weights</span></span>
-<span id="cb22-196"><a href="#cb22-196"></a>  auc.lasso[fold] <span class="ot">&lt;-</span> <span class="fu">WeightedAUC</span>(<span class="fu">WeightedROC</span>(dat.test<span class="sc">$</span>pred.lasso, dat.test<span class="sc">$</span>HICP, <span class="at">weight =</span> dat.test<span class="sc">$</span>wgt))</span>
-<span id="cb22-197"><a href="#cb22-197"></a>}</span>
-<span id="cb22-198"><a href="#cb22-198"></a><span class="in">```</span></span>
-<span id="cb22-199"><a href="#cb22-199"></a></span>
-<span id="cb22-200"><a href="#cb22-200"></a><span class="fu">#### Model performance</span></span>
-<span id="cb22-201"><a href="#cb22-201"></a></span>
-<span id="cb22-202"><a href="#cb22-202"></a>Let's check how prediction worked.</span>
-<span id="cb22-203"><a href="#cb22-203"></a></span>
-<span id="cb22-204"><a href="#cb22-204"></a><span class="in">```{r lassofit2, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-205"><a href="#cb22-205"></a><span class="co"># Fitted LASSO models</span></span>
-<span id="cb22-206"><a href="#cb22-206"></a>fit.lasso[[<span class="dv">1</span>]]</span>
-<span id="cb22-207"><a href="#cb22-207"></a>fit.lasso[[<span class="dv">2</span>]]</span>
-<span id="cb22-208"><a href="#cb22-208"></a>fit.lasso[[<span class="dv">3</span>]]</span>
-<span id="cb22-209"><a href="#cb22-209"></a>fit.lasso[[<span class="dv">4</span>]]</span>
-<span id="cb22-210"><a href="#cb22-210"></a>fit.lasso[[<span class="dv">5</span>]]</span>
-<span id="cb22-211"><a href="#cb22-211"></a><span class="in">```</span></span>
-<span id="cb22-212"><a href="#cb22-212"></a></span>
-<span id="cb22-213"><a href="#cb22-213"></a><span class="in">```{r lassofit3, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-214"><a href="#cb22-214"></a><span class="co"># Intercept from the LASSO models in different folds</span></span>
-<span id="cb22-215"><a href="#cb22-215"></a>fit.lasso[[<span class="dv">1</span>]]<span class="sc">$</span>a0</span>
-<span id="cb22-216"><a href="#cb22-216"></a>fit.lasso[[<span class="dv">2</span>]]<span class="sc">$</span>a0</span>
-<span id="cb22-217"><a href="#cb22-217"></a>fit.lasso[[<span class="dv">3</span>]]<span class="sc">$</span>a0</span>
-<span id="cb22-218"><a href="#cb22-218"></a>fit.lasso[[<span class="dv">4</span>]]<span class="sc">$</span>a0</span>
-<span id="cb22-219"><a href="#cb22-219"></a>fit.lasso[[<span class="dv">5</span>]]<span class="sc">$</span>a0</span>
-<span id="cb22-220"><a href="#cb22-220"></a><span class="in">```</span></span>
-<span id="cb22-221"><a href="#cb22-221"></a></span>
-<span id="cb22-222"><a href="#cb22-222"></a><span class="in">```{r lassofit4, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-223"><a href="#cb22-223"></a><span class="co"># Beta coefficients from the LASSO models in different folds</span></span>
-<span id="cb22-224"><a href="#cb22-224"></a>fit.lasso[[<span class="dv">1</span>]]<span class="sc">$</span>beta</span>
-<span id="cb22-225"><a href="#cb22-225"></a>fit.lasso[[<span class="dv">2</span>]]<span class="sc">$</span>beta</span>
-<span id="cb22-226"><a href="#cb22-226"></a>fit.lasso[[<span class="dv">3</span>]]<span class="sc">$</span>beta</span>
-<span id="cb22-227"><a href="#cb22-227"></a>fit.lasso[[<span class="dv">4</span>]]<span class="sc">$</span>beta</span>
-<span id="cb22-228"><a href="#cb22-228"></a>fit.lasso[[<span class="dv">5</span>]]<span class="sc">$</span>beta</span>
-<span id="cb22-229"><a href="#cb22-229"></a><span class="in">```</span></span>
-<span id="cb22-230"><a href="#cb22-230"></a></span>
-<span id="cb22-231"><a href="#cb22-231"></a><span class="in">```{r lassoauc, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-232"><a href="#cb22-232"></a><span class="co"># AUCs from different folds</span></span>
-<span id="cb22-233"><a href="#cb22-233"></a>auc.lasso</span>
-<span id="cb22-234"><a href="#cb22-234"></a><span class="in">```</span></span>
-<span id="cb22-235"><a href="#cb22-235"></a></span>
-<span id="cb22-236"><a href="#cb22-236"></a>Now we will average out the AUC:</span>
-<span id="cb22-237"><a href="#cb22-237"></a></span>
-<span id="cb22-238"><a href="#cb22-238"></a><span class="in">```{r lassoaucmean, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-239"><a href="#cb22-239"></a><span class="co"># Average AUC</span></span>
-<span id="cb22-240"><a href="#cb22-240"></a><span class="fu">mean</span>(auc.lasso)</span>
-<span id="cb22-241"><a href="#cb22-241"></a><span class="in">```</span></span>
-<span id="cb22-242"><a href="#cb22-242"></a></span>
-<span id="cb22-243"><a href="#cb22-243"></a>This AUC is approximately the same as reported by the authors in Table 2.</span>
-<span id="cb22-244"><a href="#cb22-244"></a></span>
-<span id="cb22-245"><a href="#cb22-245"></a><span class="fu">### Random forest for survey data</span></span>
-<span id="cb22-246"><a href="#cb22-246"></a></span>
-<span id="cb22-247"><a href="#cb22-247"></a>Now, we will fit the random forest model for predicting binary HICP with the listed predictors. Here are the steps for fitting the model with 5-fold CV:</span>
-<span id="cb22-248"><a href="#cb22-248"></a></span>
-<span id="cb22-249"><a href="#cb22-249"></a><span class="ss">-   </span>For fold 1, folds 2-5 is the training set and fold 1 is the test set</span>
-<span id="cb22-250"><a href="#cb22-250"></a><span class="ss">-   </span>Fit 5-fold cross-validation on the training set to find the value of lambda that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.</span>
-<span id="cb22-251"><a href="#cb22-251"></a><span class="ss">-   </span>Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey design.</span>
-<span id="cb22-252"><a href="#cb22-252"></a><span class="ss">-   </span>Calculate predictive performance (e.g., AUC) on the test set</span>
-<span id="cb22-253"><a href="#cb22-253"></a><span class="ss">-   </span>Repeat the analysis for all folds.</span>
-<span id="cb22-254"><a href="#cb22-254"></a></span>
-<span id="cb22-255"><a href="#cb22-255"></a><span class="fu">#### Folds</span></span>
-<span id="cb22-256"><a href="#cb22-256"></a></span>
-<span id="cb22-257"><a href="#cb22-257"></a><span class="in">```{r foldsrf, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-258"><a href="#cb22-258"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb22-259"><a href="#cb22-259"></a><span class="fu">table</span>(nfolds)</span>
-<span id="cb22-260"><a href="#cb22-260"></a><span class="in">```</span></span>
-<span id="cb22-261"><a href="#cb22-261"></a></span>
-<span id="cb22-262"><a href="#cb22-262"></a><span class="fu">#### Regression formula</span></span>
-<span id="cb22-263"><a href="#cb22-263"></a></span>
-<span id="cb22-264"><a href="#cb22-264"></a><span class="in">```{r formularf, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-265"><a href="#cb22-265"></a>Formula</span>
-<span id="cb22-266"><a href="#cb22-266"></a><span class="in">```</span></span>
-<span id="cb22-267"><a href="#cb22-267"></a></span>
-<span id="cb22-268"><a href="#cb22-268"></a><span class="fu">#### Random forst with 5-fold CV</span></span>
-<span id="cb22-269"><a href="#cb22-269"></a></span>
-<span id="cb22-270"><a href="#cb22-270"></a><span class="in">```{r rffit, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-271"><a href="#cb22-271"></a>fit.rf <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>); auc.rf <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb22-272"><a href="#cb22-272"></a><span class="cf">for</span> (fold <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>k) {</span>
-<span id="cb22-273"><a href="#cb22-273"></a>  <span class="co"># Training data</span></span>
-<span id="cb22-274"><a href="#cb22-274"></a>  dat.train <span class="ot">&lt;-</span> dat.complete[nfolds <span class="sc">!=</span> fold, ]</span>
-<span id="cb22-275"><a href="#cb22-275"></a>  </span>
-<span id="cb22-276"><a href="#cb22-276"></a>  <span class="co"># Test data</span></span>
-<span id="cb22-277"><a href="#cb22-277"></a>  dat.test <span class="ot">&lt;-</span> dat.complete[nfolds <span class="sc">==</span> fold, ]</span>
-<span id="cb22-278"><a href="#cb22-278"></a>  </span>
-<span id="cb22-279"><a href="#cb22-279"></a>  <span class="co"># Tuning the hyperparameters </span></span>
-<span id="cb22-280"><a href="#cb22-280"></a>  <span class="do">## Grid with 1000 models - huge time consuming</span></span>
-<span id="cb22-281"><a href="#cb22-281"></a>  <span class="co">#grid.search &lt;- expand.grid(mtry = 1:10, node.size = 1:10, </span></span>
-<span id="cb22-282"><a href="#cb22-282"></a>  <span class="co">#                           num.trees = seq(50,500,50), OOB_RMSE = 0)</span></span>
-<span id="cb22-283"><a href="#cb22-283"></a>  </span>
-<span id="cb22-284"><a href="#cb22-284"></a>  <span class="do">## Grid with 36 models as an exercise</span></span>
-<span id="cb22-285"><a href="#cb22-285"></a>  grid.search <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">mtry =</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>, <span class="at">node.size =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, </span>
-<span id="cb22-286"><a href="#cb22-286"></a>                             <span class="at">num.trees =</span> <span class="fu">seq</span>(<span class="dv">200</span>,<span class="dv">500</span>,<span class="dv">100</span>), <span class="at">OOB_RMSE =</span> <span class="dv">0</span>) </span>
-<span id="cb22-287"><a href="#cb22-287"></a>  </span>
-<span id="cb22-288"><a href="#cb22-288"></a>  <span class="do">## Model with grids </span></span>
-<span id="cb22-289"><a href="#cb22-289"></a>  <span class="cf">for</span>(ii <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(grid.search)) {</span>
-<span id="cb22-290"><a href="#cb22-290"></a>    <span class="co"># Model on training set with grid</span></span>
-<span id="cb22-291"><a href="#cb22-291"></a>    fit.rf.tune <span class="ot">&lt;-</span> <span class="fu">ranger</span>(<span class="at">formula =</span> Formula, <span class="at">data =</span> dat.train, </span>
-<span id="cb22-292"><a href="#cb22-292"></a>                          <span class="at">num.trees =</span> grid.search<span class="sc">$</span>num.trees[ii],</span>
-<span id="cb22-293"><a href="#cb22-293"></a>                          <span class="at">mtry =</span> grid.search<span class="sc">$</span>mtry[ii], </span>
-<span id="cb22-294"><a href="#cb22-294"></a>                          <span class="at">min.node.size =</span> grid.search<span class="sc">$</span>node.size[ii],</span>
-<span id="cb22-295"><a href="#cb22-295"></a>                          <span class="at">importance =</span> <span class="st">'impurity'</span>, </span>
-<span id="cb22-296"><a href="#cb22-296"></a>                          <span class="at">case.weights =</span> dat.train<span class="sc">$</span>wgt)</span>
-<span id="cb22-297"><a href="#cb22-297"></a>    </span>
-<span id="cb22-298"><a href="#cb22-298"></a>    <span class="co"># Add Out-of-bag (OOB) error to grid</span></span>
-<span id="cb22-299"><a href="#cb22-299"></a>    grid.search<span class="sc">$</span>OOB_RMSE[ii] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(fit.rf.tune<span class="sc">$</span>prediction.error)</span>
-<span id="cb22-300"><a href="#cb22-300"></a>  }</span>
-<span id="cb22-301"><a href="#cb22-301"></a>  <span class="co"># Position of the tuned hyperparameters</span></span>
-<span id="cb22-302"><a href="#cb22-302"></a>  position <span class="ot">&lt;-</span> <span class="fu">which.min</span>(grid.search<span class="sc">$</span>OOB_RMSE)</span>
-<span id="cb22-303"><a href="#cb22-303"></a>  </span>
-<span id="cb22-304"><a href="#cb22-304"></a>  <span class="co"># Fit the model on the training set with tuned hyperparameters</span></span>
-<span id="cb22-305"><a href="#cb22-305"></a>  fit.rf[[fold]] <span class="ot">&lt;-</span> <span class="fu">ranger</span>(<span class="at">formula =</span> Formula, <span class="at">data =</span> dat.train, </span>
-<span id="cb22-306"><a href="#cb22-306"></a>                           <span class="at">case.weights =</span> dat.train<span class="sc">$</span>wgt, <span class="at">probability =</span> T,</span>
-<span id="cb22-307"><a href="#cb22-307"></a>                           <span class="at">num.trees =</span> grid.search<span class="sc">$</span>num.trees[position], </span>
-<span id="cb22-308"><a href="#cb22-308"></a>                           <span class="at">min.node.size =</span> grid.search<span class="sc">$</span>node.size[position], </span>
-<span id="cb22-309"><a href="#cb22-309"></a>                           <span class="at">mtry =</span> grid.search<span class="sc">$</span>mtry[position], </span>
-<span id="cb22-310"><a href="#cb22-310"></a>                           <span class="at">importance =</span> <span class="st">'impurity'</span>)</span>
-<span id="cb22-311"><a href="#cb22-311"></a>  </span>
-<span id="cb22-312"><a href="#cb22-312"></a>  <span class="co"># Prediction on the test set</span></span>
-<span id="cb22-313"><a href="#cb22-313"></a>  dat.test<span class="sc">$</span>pred.rf <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.rf[[fold]], <span class="at">data =</span> dat.test)<span class="sc">$</span>predictions[,<span class="dv">2</span>]</span>
-<span id="cb22-314"><a href="#cb22-314"></a>  </span>
-<span id="cb22-315"><a href="#cb22-315"></a>  <span class="co"># AUC on the test set with sampling weights</span></span>
-<span id="cb22-316"><a href="#cb22-316"></a>  auc.rf[fold] <span class="ot">&lt;-</span> <span class="fu">WeightedAUC</span>(<span class="fu">WeightedROC</span>(dat.test<span class="sc">$</span>pred.rf, dat.test<span class="sc">$</span>HICP, </span>
-<span id="cb22-317"><a href="#cb22-317"></a>                                          <span class="at">weight =</span> dat.test<span class="sc">$</span>wgt))</span>
-<span id="cb22-318"><a href="#cb22-318"></a>}</span>
-<span id="cb22-319"><a href="#cb22-319"></a><span class="in">```</span></span>
-<span id="cb22-320"><a href="#cb22-320"></a></span>
-<span id="cb22-321"><a href="#cb22-321"></a><span class="fu">#### Model performance</span></span>
-<span id="cb22-322"><a href="#cb22-322"></a></span>
-<span id="cb22-323"><a href="#cb22-323"></a>Let's check how prediction worked.</span>
-<span id="cb22-324"><a href="#cb22-324"></a></span>
-<span id="cb22-325"><a href="#cb22-325"></a><span class="in">```{r rffit2, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-326"><a href="#cb22-326"></a><span class="co"># Fitted random forest models</span></span>
-<span id="cb22-327"><a href="#cb22-327"></a>fit.rf[[<span class="dv">1</span>]]</span>
-<span id="cb22-328"><a href="#cb22-328"></a>fit.rf[[<span class="dv">2</span>]]</span>
-<span id="cb22-329"><a href="#cb22-329"></a>fit.rf[[<span class="dv">3</span>]]</span>
-<span id="cb22-330"><a href="#cb22-330"></a>fit.rf[[<span class="dv">4</span>]]</span>
-<span id="cb22-331"><a href="#cb22-331"></a>fit.rf[[<span class="dv">5</span>]]</span>
-<span id="cb22-332"><a href="#cb22-332"></a><span class="in">```</span></span>
-<span id="cb22-333"><a href="#cb22-333"></a></span>
-<span id="cb22-334"><a href="#cb22-334"></a><span class="in">```{r rfauc, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-335"><a href="#cb22-335"></a><span class="co"># AUCs from different folds</span></span>
-<span id="cb22-336"><a href="#cb22-336"></a>auc.rf</span>
-<span id="cb22-337"><a href="#cb22-337"></a><span class="in">```</span></span>
-<span id="cb22-338"><a href="#cb22-338"></a></span>
-<span id="cb22-339"><a href="#cb22-339"></a>Now we will average out the AUC:</span>
-<span id="cb22-340"><a href="#cb22-340"></a></span>
-<span id="cb22-341"><a href="#cb22-341"></a><span class="in">```{r rfaucmean, warning=FALSE, message=FALSE, cache = TRUE}</span></span>
-<span id="cb22-342"><a href="#cb22-342"></a><span class="co"># Average AUC</span></span>
-<span id="cb22-343"><a href="#cb22-343"></a><span class="fu">mean</span>(auc.rf)</span>
-<span id="cb22-344"><a href="#cb22-344"></a><span class="in">```</span></span>
-<span id="cb22-345"><a href="#cb22-345"></a></span>
-<span id="cb22-346"><a href="#cb22-346"></a>This AUC from random forest is approximately the same as obtained from the LASSO model.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

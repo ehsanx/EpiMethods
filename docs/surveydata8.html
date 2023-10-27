@@ -826,7 +826,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">NHANES: Subsetting</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">NHANES: Subsetting</h1>
 </div>
 
 
@@ -842,24 +842,22 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><p>The tutorial demonstrates how to work with subset of complex survey data, specifically focusing on an NHANES example.</p>
 <p>The required packages are loaded.</p>
 <div class="cell" data-hash="surveydata8_cache/html/setup_65219d4021707a44053af5074afd8d7c">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(survey)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(Publish)</span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(DataExplorer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>Survey data is loaded into the R environment.</p>
 <div class="cell" data-hash="surveydata8_cache/html/load_87677f3c45caed34675fcce5033d3d4d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/surveydata/NHANES17.RData"</span>)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/surveydata/NHANES17.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic"           "analytic.with.miss"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="check-missingness" class="level3"><h3 class="anchored" data-anchor-id="check-missingness">Check missingness</h3>
 <p>A subset of variables is selected, and the presence of missing data is visualized.</p>
 <div class="cell" data-hash="surveydata8_cache/html/miss0_d93a411ae965fcde0d07160f972dfd6f">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>Vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ID"</span>, </span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>Vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ID"</span>, </span>
 <span id="cb3-2"><a href="#cb3-2"></a>          <span class="st">"weight"</span>, </span>
 <span id="cb3-3"><a href="#cb3-3"></a>          <span class="st">"psu"</span>, </span>
 <span id="cb3-4"><a href="#cb3-4"></a>          <span class="st">"strata"</span>, </span>
@@ -870,23 +868,22 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb3-9"><a href="#cb3-9"></a>          <span class="st">"cholesterol"</span>, </span>
 <span id="cb3-10"><a href="#cb3-10"></a>          <span class="st">"diabetes"</span>)</span>
 <span id="cb3-11"><a href="#cb3-11"></a>analytic.full.data <span class="ot">&lt;-</span> analytic.with.miss[,Vars]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>A new variable is also created to categorize cholesterol levels as “healthy” or “unhealthy.”</p>
 <div class="cell" data-hash="surveydata8_cache/html/miss02jkfh_a9d74ed4987e74d7ee8ef9f6ccac95c5">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>analytic.full.data<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(analytic.full.data<span class="sc">$</span>cholesterol <span class="sc">&lt;</span><span class="dv">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span>)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>analytic.full.data<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(analytic.full.data<span class="sc">$</span>cholesterol <span class="sc">&lt;</span><span class="dv">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>analytic.full.data<span class="sc">$</span>cholesterol <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="fu">require</span>(DataExplorer)</span>
 <span id="cb4-5"><a href="#cb4-5"></a><span class="fu">plot_missing</span>(analytic.full.data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="surveydata8_files/figure-html/miss02jkfh-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="subsetting-complex-survey-data" class="level3"><h3 class="anchored" data-anchor-id="subsetting-complex-survey-data">Subsetting Complex Survey data</h3>
 <p>We are subsetting based on whether the subjects have missing observation (e.g., only retaining those with complete information). This is often an eligibility criteria in studies. In missing data analysis, we will learn more about more appropriate approaches.</p>
 <div class="cell" data-hash="surveydata8_cache/html/subset0_e1cf903c1f6b9658ac1dd10f6f9a1800">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">dim</span>(analytic.full.data)</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">dim</span>(analytic.full.data)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; [1] 9254   10</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="fu">head</span>(analytic.full.data<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; [1] 93703 93704 93705 93706 93707 93708</span></span>
@@ -897,7 +894,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; [1] 93705 93706 93707 93708 93709 93711</span></span>
 <span id="cb5-10"><a href="#cb5-10"></a><span class="fu">head</span>(analytic.full.data<span class="sc">$</span>ID[analytic.full.data<span class="sc">$</span>ID <span class="sc">%in%</span> analytic.complete.case.only<span class="sc">$</span>ID])</span>
 <span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; [1] 93705 93706 93707 93708 93709 93711</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Below we show how to identify who has missing observations vs not based on full (<code>analytic.full.data</code>) and complete case (<code>analytic.complete.case.only</code>) data. See Heeringa et al (2010) book page 114 (section 4.5.3 “Preparation for Subclass analyses”) and also page 218 (section 7.5.4 “appropriate analysis: incorporating all Sample Design Features”). This is done for 2 reasons:</p>
 <ul>
@@ -905,14 +901,13 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>size of sub-population (here, those with complete cases) is recognized as a random variable; not just a fixed size.</li>
 </ul>
 <div class="cell" data-hash="surveydata8_cache/html/subset1_b2cf8dc6ae2e4aae19c81b0cba0064d7">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># assign missing indicator</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># assign missing indicator</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>analytic.full.data<span class="sc">$</span>miss <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co"># assign missing indicator = 0 if the observation is available</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a>analytic.full.data<span class="sc">$</span>miss[analytic.full.data<span class="sc">$</span>ID <span class="sc">%in%</span> analytic.complete.case.only<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="surveydata8_cache/html/subset2_eab74238185497f9e4e1e9ba4f587b50">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">table</span>(analytic.full.data<span class="sc">$</span>miss)</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">table</span>(analytic.full.data<span class="sc">$</span>miss)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt; </span></span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;    0    1 </span></span>
 <span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; 6636 2618</span></span>
@@ -922,29 +917,26 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb7-8"><a href="#cb7-8"></a><span class="co"># IDs in complete case data</span></span>
 <span id="cb7-9"><a href="#cb7-9"></a><span class="fu">head</span>(analytic.full.data<span class="sc">$</span>ID[analytic.full.data<span class="sc">$</span>miss<span class="sc">==</span><span class="dv">0</span>])</span>
 <span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt; [1] 93705 93706 93707 93708 93709 93711</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="logistic-regression-on-sub-population" class="level3"><h3 class="anchored" data-anchor-id="logistic-regression-on-sub-population">Logistic regression on sub-population</h3>
 <p>A logistic regression model is run on the subset of data that has no missing values. Here, it distinguishes between correct and incorrect approaches to account for the complex survey design.</p>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">require</span>(survey)</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">require</span>(Publish)</span>
 <span id="cb8-3"><a href="#cb8-3"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"I(cholesterol.bin=='healthy')~</span></span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="st">                            diabetes+gender+born+race+bmi"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="wrong-approach" class="level4"><h4 class="anchored" data-anchor-id="wrong-approach">Wrong approach</h4>
 <div class="cell" data-hash="surveydata8_cache/html/wrong1_cf163c922b80ef1b34d6acc63f1b911e">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>w.design.wrong <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids=</span><span class="sc">~</span>psu, </span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>w.design.wrong <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids=</span><span class="sc">~</span>psu, </span>
 <span id="cb9-2"><a href="#cb9-2"></a>                       <span class="at">weights=</span><span class="sc">~</span>weight, </span>
 <span id="cb9-3"><a href="#cb9-3"></a>                       <span class="at">strata=</span><span class="sc">~</span>strata,</span>
 <span id="cb9-4"><a href="#cb9-4"></a>                       <span class="at">data =</span> analytic.complete.case.only, <span class="co">#wrong!!</span></span>
 <span id="cb9-5"><a href="#cb9-5"></a>                       <span class="at">nest =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="correct-approach" class="level4"><h4 class="anchored" data-anchor-id="correct-approach">Correct approach</h4>
 <div class="cell" data-hash="surveydata8_cache/html/correct1_c8ade7f553a7e0095f8020da34ea0a84">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids=</span><span class="sc">~</span>psu, </span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids=</span><span class="sc">~</span>psu, </span>
 <span id="cb10-2"><a href="#cb10-2"></a>                       <span class="at">weights=</span><span class="sc">~</span>weight, </span>
 <span id="cb10-3"><a href="#cb10-3"></a>                       <span class="at">strata=</span><span class="sc">~</span>strata,</span>
 <span id="cb10-4"><a href="#cb10-4"></a>                       <span class="at">data =</span> analytic.full.data, </span>
@@ -952,11 +944,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-6"><a href="#cb10-6"></a></span>
 <span id="cb10-7"><a href="#cb10-7"></a><span class="co"># retain only those that have complete observation / no missing</span></span>
 <span id="cb10-8"><a href="#cb10-8"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, miss <span class="sc">==</span> <span class="dv">0</span>)<span class="co"># this is the subset design</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="full-model" class="level4"><h4 class="anchored" data-anchor-id="full-model">Full model</h4>
 <div class="cell" data-hash="surveydata8_cache/html/full_ad002bfa3f1b1fd196f39c6481c0cc92">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(model.formula, <span class="at">family =</span> quasibinomial, </span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(model.formula, <span class="at">family =</span> quasibinomial, </span>
 <span id="cb11-2"><a href="#cb11-2"></a>              <span class="at">design =</span> w.design) <span class="co"># subset design</span></span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="fu">publish</span>(fit)</span>
 <span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt;  Variable                            Units Coefficient           CI.95     p-value </span></span>
@@ -972,12 +963,11 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb11-14"><a href="#cb11-14"></a><span class="co">#&gt;                                      Other       -0.17    [-0.38;0.03]   0.1439474 </span></span>
 <span id="cb11-15"><a href="#cb11-15"></a><span class="co">#&gt;                                      White       -0.37   [-0.66;-0.09]   0.0355030 </span></span>
 <span id="cb11-16"><a href="#cb11-16"></a><span class="co">#&gt;       bmi                                        -0.04   [-0.05;-0.02]   0.0007697</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section></section><section id="variable-selection" class="level3"><h3 class="anchored" data-anchor-id="variable-selection">Variable selection</h3>
 <p>Finally, we discuss variable selection methods. We employ backward elimination to determine which variables are significant predictors while retaining an important variable in the model. If unsure about usefulness of some (gender, born, race, bmi) variables in predicting the outcome, check via backward elimination while keeping important variable (diabetes, say, that has been established in the literature) in the model</p>
 <div class="cell" data-hash="surveydata8_cache/html/varselect_ad868120588db44709c90da4724ab1e6">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"I(cholesterol.bin=='healthy')~</span></span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"I(cholesterol.bin=='healthy')~</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="st">                            diabetes+gender+born+race+bmi"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3"></a></span>
 <span id="cb12-4"><a href="#cb12-4"></a>scope <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">upper =</span> <span class="sc">~</span> diabetes<span class="sc">+</span>gender<span class="sc">+</span>born<span class="sc">+</span>race<span class="sc">+</span>bmi, <span class="at">lower =</span> <span class="sc">~</span> diabetes)</span>
@@ -1000,7 +990,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb12-21"><a href="#cb12-21"></a><span class="co">#&gt;                                      Other       -0.17    [-0.38;0.03]   0.1439474 </span></span>
 <span id="cb12-22"><a href="#cb12-22"></a><span class="co">#&gt;                                      White       -0.37   [-0.66;-0.09]   0.0355030 </span></span>
 <span id="cb12-23"><a href="#cb12-23"></a><span class="co">#&gt;       bmi                                        -0.04   [-0.05;-0.02]   0.0007697</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Also see <span class="citation" data-cites="subpopulation">(<a href="#ref-subpopulation" role="doc-biblioref">Stata 2023</a>)</span> for further details.</p>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
@@ -1023,8 +1012,6 @@ Tip
 </div>
 </section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
 
-
-<!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-subpopulation" class="csl-entry" role="doc-biblioentry">
@@ -1224,165 +1211,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">R functions (D)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb13" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">## NHANES: Subsetting {.unnumbered}</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a></span>
-<span id="cb13-3"><a href="#cb13-3"></a>The tutorial demonstrates how to work with subset of complex survey data, specifically focusing on an NHANES example.</span>
-<span id="cb13-4"><a href="#cb13-4"></a></span>
-<span id="cb13-5"><a href="#cb13-5"></a>The required packages are loaded.</span>
-<span id="cb13-6"><a href="#cb13-6"></a></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
-<span id="cb13-8"><a href="#cb13-8"></a><span class="co"># Load required packages</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a><span class="fu">library</span>(survey)</span>
-<span id="cb13-10"><a href="#cb13-10"></a><span class="fu">library</span>(Publish)</span>
-<span id="cb13-11"><a href="#cb13-11"></a><span class="fu">library</span>(DataExplorer)</span>
-<span id="cb13-12"><a href="#cb13-12"></a><span class="in">```</span></span>
-<span id="cb13-13"><a href="#cb13-13"></a></span>
-<span id="cb13-14"><a href="#cb13-14"></a><span class="fu">### Load data</span></span>
-<span id="cb13-15"><a href="#cb13-15"></a></span>
-<span id="cb13-16"><a href="#cb13-16"></a>Survey data is loaded into the R environment.</span>
-<span id="cb13-17"><a href="#cb13-17"></a></span>
-<span id="cb13-18"><a href="#cb13-18"></a><span class="in">```{r load, cache=TRUE}</span></span>
-<span id="cb13-19"><a href="#cb13-19"></a><span class="fu">load</span>(<span class="st">"Data/surveydata/NHANES17.RData"</span>)</span>
-<span id="cb13-20"><a href="#cb13-20"></a><span class="fu">ls</span>()</span>
-<span id="cb13-21"><a href="#cb13-21"></a><span class="in">```</span></span>
-<span id="cb13-22"><a href="#cb13-22"></a></span>
-<span id="cb13-23"><a href="#cb13-23"></a><span class="fu">### Check missingness</span></span>
-<span id="cb13-24"><a href="#cb13-24"></a></span>
-<span id="cb13-25"><a href="#cb13-25"></a>A subset of variables is selected, and the presence of missing data is visualized. </span>
-<span id="cb13-26"><a href="#cb13-26"></a></span>
-<span id="cb13-27"><a href="#cb13-27"></a><span class="in">```{r miss0, cache=TRUE}</span></span>
-<span id="cb13-28"><a href="#cb13-28"></a>Vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ID"</span>, </span>
-<span id="cb13-29"><a href="#cb13-29"></a>          <span class="st">"weight"</span>, </span>
-<span id="cb13-30"><a href="#cb13-30"></a>          <span class="st">"psu"</span>, </span>
-<span id="cb13-31"><a href="#cb13-31"></a>          <span class="st">"strata"</span>, </span>
-<span id="cb13-32"><a href="#cb13-32"></a>          <span class="st">"gender"</span>, </span>
-<span id="cb13-33"><a href="#cb13-33"></a>          <span class="st">"born"</span>, </span>
-<span id="cb13-34"><a href="#cb13-34"></a>          <span class="st">"race"</span>, </span>
-<span id="cb13-35"><a href="#cb13-35"></a>          <span class="st">"bmi"</span>, </span>
-<span id="cb13-36"><a href="#cb13-36"></a>          <span class="st">"cholesterol"</span>, </span>
-<span id="cb13-37"><a href="#cb13-37"></a>          <span class="st">"diabetes"</span>)</span>
-<span id="cb13-38"><a href="#cb13-38"></a>analytic.full.data <span class="ot">&lt;-</span> analytic.with.miss[,Vars]</span>
-<span id="cb13-39"><a href="#cb13-39"></a><span class="in">```</span></span>
-<span id="cb13-40"><a href="#cb13-40"></a></span>
-<span id="cb13-41"><a href="#cb13-41"></a>A new variable is also created to categorize cholesterol levels as "healthy" or "unhealthy."</span>
-<span id="cb13-42"><a href="#cb13-42"></a></span>
-<span id="cb13-43"><a href="#cb13-43"></a><span class="in">```{r miss02jkfh, cache=TRUE}</span></span>
-<span id="cb13-44"><a href="#cb13-44"></a>analytic.full.data<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(analytic.full.data<span class="sc">$</span>cholesterol <span class="sc">&lt;</span><span class="dv">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span>)</span>
-<span id="cb13-45"><a href="#cb13-45"></a>analytic.full.data<span class="sc">$</span>cholesterol <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb13-46"><a href="#cb13-46"></a></span>
-<span id="cb13-47"><a href="#cb13-47"></a><span class="fu">require</span>(DataExplorer)</span>
-<span id="cb13-48"><a href="#cb13-48"></a><span class="fu">plot_missing</span>(analytic.full.data)</span>
-<span id="cb13-49"><a href="#cb13-49"></a><span class="in">```</span></span>
-<span id="cb13-50"><a href="#cb13-50"></a></span>
-<span id="cb13-51"><a href="#cb13-51"></a><span class="fu">### Subsetting Complex Survey data</span></span>
-<span id="cb13-52"><a href="#cb13-52"></a></span>
-<span id="cb13-53"><a href="#cb13-53"></a>We are subsetting based on whether the subjects have missing observation (e.g., only retaining those with complete information). This is often an eligibility criteria in studies. In missing data analysis, we will learn more about more appropriate approaches.</span>
-<span id="cb13-54"><a href="#cb13-54"></a></span>
-<span id="cb13-55"><a href="#cb13-55"></a><span class="in">```{r subset0, cache=TRUE}</span></span>
-<span id="cb13-56"><a href="#cb13-56"></a><span class="fu">dim</span>(analytic.full.data)</span>
-<span id="cb13-57"><a href="#cb13-57"></a><span class="fu">head</span>(analytic.full.data<span class="sc">$</span>ID) <span class="co"># full data</span></span>
-<span id="cb13-58"><a href="#cb13-58"></a>analytic.complete.case.only <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">na.omit</span>(analytic.full.data))</span>
-<span id="cb13-59"><a href="#cb13-59"></a><span class="fu">dim</span>(analytic.complete.case.only)</span>
-<span id="cb13-60"><a href="#cb13-60"></a><span class="fu">head</span>(analytic.complete.case.only<span class="sc">$</span>ID) <span class="co"># complete case</span></span>
-<span id="cb13-61"><a href="#cb13-61"></a><span class="fu">head</span>(analytic.full.data<span class="sc">$</span>ID[analytic.full.data<span class="sc">$</span>ID <span class="sc">%in%</span> analytic.complete.case.only<span class="sc">$</span>ID])</span>
-<span id="cb13-62"><a href="#cb13-62"></a><span class="in">```</span></span>
-<span id="cb13-63"><a href="#cb13-63"></a></span>
-<span id="cb13-64"><a href="#cb13-64"></a>Below we show how to identify who has missing observations vs not based on full (<span class="in">`analytic.full.data`</span>) and complete case (<span class="in">`analytic.complete.case.only`</span>) data. See Heeringa et al (2010) book page 114 (section 4.5.3 "Preparation for Subclass analyses") and also page 218 (section 7.5.4 "appropriate analysis: incorporating all Sample Design Features"). This is done for 2 reasons:</span>
-<span id="cb13-65"><a href="#cb13-65"></a></span>
-<span id="cb13-66"><a href="#cb13-66"></a><span class="ss">-   </span>full complex survey design structure is taken into account, so that variance estimation is done correctly. If one or more PSU were excluded because none of the complete cases were observed in those PSU, the sub-population (complete cases) will not have complete information of how many PSU were actually present in the original complex design. Then in the population, a reduced number of PSUs would be used to calculate variance (number of SPU is a component of the variance calculation formula, see equation (5.2) in Heeringa et al (2010) textbook. Same is true for strata.), and will result in a wrong/biased variance estimate. Also see West et al. doi: 10.1177/1536867X0800800404</span>
-<span id="cb13-67"><a href="#cb13-67"></a><span class="ss">-   </span>size of sub-population (here, those with complete cases) is recognized as a random variable; not just a fixed size.</span>
-<span id="cb13-68"><a href="#cb13-68"></a></span>
-<span id="cb13-69"><a href="#cb13-69"></a><span class="in">```{r subset1, cache=TRUE}</span></span>
-<span id="cb13-70"><a href="#cb13-70"></a><span class="co"># assign missing indicator</span></span>
-<span id="cb13-71"><a href="#cb13-71"></a>analytic.full.data<span class="sc">$</span>miss <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
-<span id="cb13-72"><a href="#cb13-72"></a><span class="co"># assign missing indicator = 0 if the observation is available</span></span>
-<span id="cb13-73"><a href="#cb13-73"></a>analytic.full.data<span class="sc">$</span>miss[analytic.full.data<span class="sc">$</span>ID <span class="sc">%in%</span> analytic.complete.case.only<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb13-74"><a href="#cb13-74"></a><span class="in">```</span></span>
-<span id="cb13-75"><a href="#cb13-75"></a></span>
-<span id="cb13-76"><a href="#cb13-76"></a><span class="in">```{r subset2, cache=TRUE}</span></span>
-<span id="cb13-77"><a href="#cb13-77"></a><span class="fu">table</span>(analytic.full.data<span class="sc">$</span>miss)</span>
-<span id="cb13-78"><a href="#cb13-78"></a><span class="co"># IDs not in complete case data</span></span>
-<span id="cb13-79"><a href="#cb13-79"></a><span class="fu">head</span>(analytic.full.data<span class="sc">$</span>ID[analytic.full.data<span class="sc">$</span>miss<span class="sc">==</span><span class="dv">1</span>])</span>
-<span id="cb13-80"><a href="#cb13-80"></a><span class="co"># IDs in complete case data</span></span>
-<span id="cb13-81"><a href="#cb13-81"></a><span class="fu">head</span>(analytic.full.data<span class="sc">$</span>ID[analytic.full.data<span class="sc">$</span>miss<span class="sc">==</span><span class="dv">0</span>])</span>
-<span id="cb13-82"><a href="#cb13-82"></a><span class="in">```</span></span>
-<span id="cb13-83"><a href="#cb13-83"></a></span>
-<span id="cb13-84"><a href="#cb13-84"></a><span class="fu">### Logistic regression on sub-population</span></span>
-<span id="cb13-85"><a href="#cb13-85"></a></span>
-<span id="cb13-86"><a href="#cb13-86"></a>A logistic regression model is run on the subset of data that has no missing values. Here, it distinguishes between correct and incorrect approaches to account for the complex survey design.</span>
-<span id="cb13-87"><a href="#cb13-87"></a></span>
-<span id="cb13-88"><a href="#cb13-88"></a><span class="in">```{r logis, warning=FALSE, message=FALSE}</span></span>
-<span id="cb13-89"><a href="#cb13-89"></a><span class="fu">require</span>(survey)</span>
-<span id="cb13-90"><a href="#cb13-90"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb13-91"><a href="#cb13-91"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"I(cholesterol.bin=='healthy')~</span></span>
-<span id="cb13-92"><a href="#cb13-92"></a><span class="st">                            diabetes+gender+born+race+bmi"</span>)</span>
-<span id="cb13-93"><a href="#cb13-93"></a><span class="in">```</span></span>
-<span id="cb13-94"><a href="#cb13-94"></a></span>
-<span id="cb13-95"><a href="#cb13-95"></a><span class="fu">#### Wrong approach</span></span>
-<span id="cb13-96"><a href="#cb13-96"></a></span>
-<span id="cb13-97"><a href="#cb13-97"></a><span class="in">```{r wrong1, cache=TRUE}</span></span>
-<span id="cb13-98"><a href="#cb13-98"></a>w.design.wrong <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids=</span><span class="sc">~</span>psu, </span>
-<span id="cb13-99"><a href="#cb13-99"></a>                       <span class="at">weights=</span><span class="sc">~</span>weight, </span>
-<span id="cb13-100"><a href="#cb13-100"></a>                       <span class="at">strata=</span><span class="sc">~</span>strata,</span>
-<span id="cb13-101"><a href="#cb13-101"></a>                       <span class="at">data =</span> analytic.complete.case.only, <span class="co">#wrong!!</span></span>
-<span id="cb13-102"><a href="#cb13-102"></a>                       <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb13-103"><a href="#cb13-103"></a><span class="in">```</span></span>
-<span id="cb13-104"><a href="#cb13-104"></a></span>
-<span id="cb13-105"><a href="#cb13-105"></a><span class="fu">#### Correct approach</span></span>
-<span id="cb13-106"><a href="#cb13-106"></a></span>
-<span id="cb13-107"><a href="#cb13-107"></a><span class="in">```{r correct1, cache=TRUE}</span></span>
-<span id="cb13-108"><a href="#cb13-108"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids=</span><span class="sc">~</span>psu, </span>
-<span id="cb13-109"><a href="#cb13-109"></a>                       <span class="at">weights=</span><span class="sc">~</span>weight, </span>
-<span id="cb13-110"><a href="#cb13-110"></a>                       <span class="at">strata=</span><span class="sc">~</span>strata,</span>
-<span id="cb13-111"><a href="#cb13-111"></a>                       <span class="at">data =</span> analytic.full.data, </span>
-<span id="cb13-112"><a href="#cb13-112"></a>                       <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb13-113"><a href="#cb13-113"></a></span>
-<span id="cb13-114"><a href="#cb13-114"></a><span class="co"># retain only those that have complete observation / no missing</span></span>
-<span id="cb13-115"><a href="#cb13-115"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, miss <span class="sc">==</span> <span class="dv">0</span>)<span class="co"># this is the subset design</span></span>
-<span id="cb13-116"><a href="#cb13-116"></a><span class="in">```</span></span>
-<span id="cb13-117"><a href="#cb13-117"></a></span>
-<span id="cb13-118"><a href="#cb13-118"></a><span class="fu">#### Full model</span></span>
-<span id="cb13-119"><a href="#cb13-119"></a></span>
-<span id="cb13-120"><a href="#cb13-120"></a><span class="in">```{r full, cache=TRUE}</span></span>
-<span id="cb13-121"><a href="#cb13-121"></a>fit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(model.formula, <span class="at">family =</span> quasibinomial, </span>
-<span id="cb13-122"><a href="#cb13-122"></a>              <span class="at">design =</span> w.design) <span class="co"># subset design</span></span>
-<span id="cb13-123"><a href="#cb13-123"></a><span class="fu">publish</span>(fit)</span>
-<span id="cb13-124"><a href="#cb13-124"></a><span class="in">```</span></span>
-<span id="cb13-125"><a href="#cb13-125"></a></span>
-<span id="cb13-126"><a href="#cb13-126"></a><span class="fu">### Variable selection</span></span>
-<span id="cb13-127"><a href="#cb13-127"></a></span>
-<span id="cb13-128"><a href="#cb13-128"></a>Finally, we discuss variable selection methods. We employ backward elimination to determine which variables are significant predictors while retaining an important variable in the model. If unsure about usefulness of some (gender, born, race, bmi) variables in predicting the outcome, check via backward elimination while keeping important variable (diabetes, say, that has been established in the literature) in the model</span>
-<span id="cb13-129"><a href="#cb13-129"></a></span>
-<span id="cb13-130"><a href="#cb13-130"></a><span class="in">```{r varselect, cache=TRUE}</span></span>
-<span id="cb13-131"><a href="#cb13-131"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"I(cholesterol.bin=='healthy')~</span></span>
-<span id="cb13-132"><a href="#cb13-132"></a><span class="st">                            diabetes+gender+born+race+bmi"</span>)</span>
-<span id="cb13-133"><a href="#cb13-133"></a></span>
-<span id="cb13-134"><a href="#cb13-134"></a>scope <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">upper =</span> <span class="sc">~</span> diabetes<span class="sc">+</span>gender<span class="sc">+</span>born<span class="sc">+</span>race<span class="sc">+</span>bmi, <span class="at">lower =</span> <span class="sc">~</span> diabetes)</span>
-<span id="cb13-135"><a href="#cb13-135"></a></span>
-<span id="cb13-136"><a href="#cb13-136"></a>fit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(model.formula, <span class="at">design=</span>w.design, <span class="co"># subset design</span></span>
-<span id="cb13-137"><a href="#cb13-137"></a>              <span class="at">family=</span>quasibinomial)</span>
-<span id="cb13-138"><a href="#cb13-138"></a></span>
-<span id="cb13-139"><a href="#cb13-139"></a>fitstep <span class="ot">&lt;-</span> <span class="fu">step</span>(fit,  <span class="at">scope =</span> scope, <span class="at">trace =</span> <span class="cn">FALSE</span>, <span class="at">direction =</span> <span class="st">"backward"</span>)</span>
-<span id="cb13-140"><a href="#cb13-140"></a><span class="fu">publish</span>(fitstep) <span class="co"># final model</span></span>
-<span id="cb13-141"><a href="#cb13-141"></a><span class="in">```</span></span>
-<span id="cb13-142"><a href="#cb13-142"></a></span>
-<span id="cb13-143"><a href="#cb13-143"></a>Also see <span class="co">[</span><span class="ot">@subpopulation</span><span class="co">]</span> for further details.</span>
-<span id="cb13-144"><a href="#cb13-144"></a></span>
-<span id="cb13-145"><a href="#cb13-145"></a><span class="fu">### Video content (optional)</span></span>
-<span id="cb13-146"><a href="#cb13-146"></a></span>
-<span id="cb13-147"><a href="#cb13-147"></a>::: callout-tip</span>
-<span id="cb13-148"><a href="#cb13-148"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
-<span id="cb13-149"><a href="#cb13-149"></a>:::</span>
-<span id="cb13-150"><a href="#cb13-150"></a></span>
-<span id="cb13-151"><a href="#cb13-151"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
-<span id="cb13-152"><a href="#cb13-152"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/A8p2zu-JlBU"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
-<span id="cb13-153"><a href="#cb13-153"></a></span>
-<span id="cb13-154"><a href="#cb13-154"></a><span class="kw">&lt;/iframe&gt;</span></span>
-<span id="cb13-155"><a href="#cb13-155"></a>:::</span>
-<span id="cb13-156"><a href="#cb13-156"></a></span>
-<span id="cb13-157"><a href="#cb13-157"></a><span class="fu">### References</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

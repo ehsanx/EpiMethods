@@ -829,7 +829,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">PSM in OA-CVD (CCHS)</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">PSM in OA-CVD (CCHS)</h1>
 </div>
 
 
@@ -846,21 +846,20 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="load-packages" class="level3"><h3 class="anchored" data-anchor-id="load-packages">Load packages</h3>
 <p>At first, various R packages are loaded to utilize their functions for data manipulation, statistical analysis, and visualization.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/setup_41fc00b48777f01a707bb5d0e5747c10">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(MatchIt)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(tableone)</span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="fu">require</span>(survey)</span>
 <span id="cb1-5"><a href="#cb1-5"></a><span class="fu">require</span>(cobalt)</span>
 <span id="cb1-6"><a href="#cb1-6"></a><span class="fu">require</span>(Publish)</span>
 <span id="cb1-7"><a href="#cb1-7"></a><span class="fu">require</span>(optmatch)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>The dataset is loaded into the R environment. Variables are renamed to avoid conflicts in subsequent analyses.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/data_77164924df979c43b937ca8d40f2710c">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/cchs123c.RData"</span>)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/cchs123c.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">head</span>(analytic11n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -868,14 +867,13 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </script>
 </div>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co"># later we will create another variable called weights</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co"># hence to avoid any conflict/ambiguity,</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co"># renaming weight variable to survey.weight</span></span>
 <span id="cb3-5"><a href="#cb3-5"></a>analytic.miss<span class="sc">$</span>survey.weight <span class="ot">&lt;-</span> analytic.miss<span class="sc">$</span>weight</span>
 <span id="cb3-6"><a href="#cb3-6"></a>analytic11n<span class="sc">$</span>survey.weight <span class="ot">&lt;-</span> analytic11n<span class="sc">$</span>weight</span>
 <span id="cb3-7"><a href="#cb3-7"></a>analytic.miss<span class="sc">$</span>weight <span class="ot">&lt;-</span> analytic11n<span class="sc">$</span>weight <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="analysis" class="level3"><h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
 <p>We are going to apply propensity score analysis (Matching) in our OA - CVD problem from CCHS. For computation considerations, we will only work with cycle 1.1, and the people from Northern provinces in Canada (<code>analytic11n</code> data).</p>
@@ -883,7 +881,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="specify-ps" class="level4"><h4 class="anchored" data-anchor-id="specify-ps">Specify PS</h4>
 <p>A logistic regression model formula is specified to calculate the propensity scores (PS), which is the probability of receiving the treatment given the observed covariates.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step1_bd33865d210bb860a3bf87a9d4d60fd0">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age + sex + stress + married + </span></span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age + sex + stress + married + </span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="st">                         income + race + bmi + phyact + smoke +</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="st">                        doctor + drink + bp + </span></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="st">                         immigrate + fruit + diab + edu"</span>)</span>
@@ -891,16 +889,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-6"><a href="#cb4-6"></a>               <span class="st">"income"</span>, <span class="st">"race"</span>, <span class="st">"bmi"</span>, <span class="st">"phyact"</span>, <span class="st">"smoke"</span>, </span>
 <span id="cb4-7"><a href="#cb4-7"></a>               <span class="st">"doctor"</span>, <span class="st">"drink"</span>, <span class="st">"bp"</span>, </span>
 <span id="cb4-8"><a href="#cb4-8"></a>               <span class="st">"immigrate"</span>, <span class="st">"fruit"</span>, <span class="st">"diab"</span>, <span class="st">"edu"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="fit-model" class="level4"><h4 class="anchored" data-anchor-id="fit-model">Fit model</h4>
 <p>The software fits the PS model using a logistic regression by default. This package actually performs step 1 and 2 with one command <code>matchit</code>.</p>
 <p>Look at the website for arguments of matchit <span class="citation" data-cites="Matchit">(<a href="#ref-Matchit" role="doc-biblioref">RDocumentation 2023</a>)</span>]. It looks like this</p>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">matchit</span>(formula, data, <span class="at">model=</span><span class="st">"logit"</span>, <span class="at">discard=</span><span class="dv">0</span>, <span class="at">reestimate=</span><span class="cn">FALSE</span>, <span class="at">nearest=</span><span class="cn">TRUE</span>,</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">matchit</span>(formula, data, <span class="at">model=</span><span class="st">"logit"</span>, <span class="at">discard=</span><span class="dv">0</span>, <span class="at">reestimate=</span><span class="cn">FALSE</span>, <span class="at">nearest=</span><span class="cn">TRUE</span>,</span>
 <span id="cb5-2"><a href="#cb5-2"></a>                 <span class="at">replace=</span><span class="cn">FALSE</span>, <span class="at">m.order=</span><span class="dv">2</span>, <span class="at">ratio=</span><span class="dv">1</span>, <span class="at">caliper=</span><span class="dv">0</span>, <span class="at">calclosest=</span><span class="cn">FALSE</span>,</span>
 <span id="cb5-3"><a href="#cb5-3"></a>                 <span class="at">subclass=</span><span class="dv">0</span>, <span class="at">sub.by=</span><span class="st">"treat"</span>, <span class="at">mahvars=</span><span class="cn">NULL</span>, <span class="at">exact=</span><span class="cn">FALSE</span>, <span class="at">counter=</span><span class="cn">TRUE</span>, <span class="at">full=</span><span class="cn">FALSE</span>, <span class="at">full.options=</span><span class="fu">list</span>(),...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -934,7 +930,7 @@ Tip
 </div>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/step2_a38ac165127c1bef7c99cb15b7d7bfc6">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># set seed</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># set seed</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co"># match</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
@@ -957,12 +953,11 @@ Tip
 <span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; [1] 1424   23</span></span>
 <span id="cb6-22"><a href="#cb6-22"></a><span class="fu">dim</span>(OACVD.match)</span>
 <span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt; [1] 134  26</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Let’s try to understand how this is working.</p>
 </section><section id="extract-matched-ids" class="level4"><h4 class="anchored" data-anchor-id="extract-matched-ids">Extract matched IDs</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/matchitstrata2_acc3f982d008eba89095ec0d4538fc93">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>m.mat<span class="ot">&lt;-</span>matching.obj<span class="sc">$</span>match.matrix</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>m.mat<span class="ot">&lt;-</span>matching.obj<span class="sc">$</span>match.matrix</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">head</span>(m.mat)</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;       [,1]    </span></span>
 <span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; 17864 "96719" </span></span>
@@ -971,11 +966,10 @@ Tip
 <span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; 18256 "111999"</span></span>
 <span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; 18264 "17989" </span></span>
 <span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; 18383 "108197"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="extract-the-matched-treated-ids" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-treated-ids">Extract the matched treated IDs</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step2b_59ed09bd750b88161146a794acc8c5db">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>treated.id<span class="ot">&lt;-</span><span class="fu">as.numeric</span>(<span class="fu">row.names</span>(m.mat))</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>treated.id<span class="ot">&lt;-</span><span class="fu">as.numeric</span>(<span class="fu">row.names</span>(m.mat))</span>
 <span id="cb8-2"><a href="#cb8-2"></a>treated.id <span class="co"># basically row names</span></span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt;  [1]  17864  17921  18191  18256  18264  18383  18389  18475  39105  96344</span></span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; [11]  96364  96407  96424  96460  96484  96571  96582  96625  96632  96641</span></span>
@@ -984,11 +978,10 @@ Tip
 <span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt; [41] 111895 111896 111920 111942 112014 112026 112046 112083 112086 112114</span></span>
 <span id="cb8-8"><a href="#cb8-8"></a><span class="co">#&gt; [51] 112122 112151 112167 112189 112197 112215 112232 112245 112275 112284</span></span>
 <span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt; [61] 112289 112290 112300 112325 112375 126477 126522</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="extract-the-matched-untreated-ids" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-untreated-ids">Extract the matched untreated IDs</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step2c_566083270d85bdd554067a769d40d57c">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>untreated.id <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(m.mat)</span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>untreated.id <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(m.mat)</span>
 <span id="cb9-2"><a href="#cb9-2"></a>untreated.id <span class="co"># basically row names</span></span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt;  [1]  96719  17846  97168 111999  17989 108197 112384  17909 126561 111880</span></span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; [11] 112184  18117  96865  18120  97023 112379  97017 126562  96356 126470</span></span>
@@ -997,13 +990,12 @@ Tip
 <span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; [41] 126539  18315  96665  18225 112052 112324 112165  18329  96609 126376</span></span>
 <span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; [51]  96474 126570 126547 126343  96680  96558 111931  96718  96533 111823</span></span>
 <span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt; [61] 112177  17953  17904 111908 111962  96644  96576</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="extract-the-matched-treated-data" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-treated-data">Extract the matched treated data</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step2d_606e2043348ec4e6eadadc6600734af5">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>tx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> treated.id,]</span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>tx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> treated.id,]</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">head</span>(tx[<span class="fu">c</span>(<span class="st">"OA"</span>, <span class="st">"CVD"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1014,9 +1006,9 @@ Tip
 </div>
 </section><section id="extract-the-matched-untreated-data" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-untreated-data">Extract the matched untreated data</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step2e_8f53b110824b1fa36f2ecde24978966c">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>utx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> untreated.id,]</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>utx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> untreated.id,]</span>
 <span id="cb11-2"><a href="#cb11-2"></a><span class="fu">head</span>(utx[<span class="fu">c</span>(<span class="st">"OA"</span>, <span class="st">"CVD"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1028,12 +1020,11 @@ Tip
 </section><section id="extract-the-matched-data-altogether" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-data-altogether">Extract the matched data altogether</h4>
 <p>Simply using <code>match.data</code> is enough (as done earlier).</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step2f_bf97749361e21174c16b0348f6faa25f">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="assign-match-id" class="level4"><h4 class="anchored" data-anchor-id="assign-match-id">Assign match ID</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step2g_ac9c99a3cb09a34774ce3f7d7348bb99">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>OACVD.match<span class="sc">$</span>match.ID <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>OACVD.match<span class="sc">$</span>match.ID <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>OACVD.match<span class="sc">$</span>match.ID[<span class="fu">rownames</span>(OACVD.match) <span class="sc">%in%</span> treated.id] <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(treated.id)</span>
 <span id="cb13-3"><a href="#cb13-3"></a>OACVD.match<span class="sc">$</span>match.ID[<span class="fu">rownames</span>(OACVD.match) <span class="sc">%in%</span> untreated.id] <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(untreated.id)</span>
 <span id="cb13-4"><a href="#cb13-4"></a><span class="fu">table</span>(OACVD.match<span class="sc">$</span>match.ID)</span>
@@ -1044,12 +1035,11 @@ Tip
 <span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt;  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2 </span></span>
 <span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 </span></span>
 <span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt;  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Take a look at individual matches for the first match</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step2h_387b628a12476e0af902753a25f43631">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">1</span>,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">1</span>,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1060,8 +1050,8 @@ Tip
 </div>
 <p>Take a look at individual matches for the second match</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step2i_fbfbad05b3c5660ff100df497f9704f2">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">2</span>,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">2</span>,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1076,9 +1066,9 @@ Tip
 <p>Visually inspect the PS and assess the balance of covariates in the matched sample. Various plots are generated to visualize the distribution of PS across treatment groups and to check the balance of covariates before and after matching.</p>
 </section><section id="matchit-package" class="level4"><h4 class="anchored" data-anchor-id="matchit-package">matchit package</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step3_eaebbead8a9ff44754817e38a7fb0d5c">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># plot(matching.obj) # covariate balance</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># plot(matching.obj) # covariate balance</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a><span class="fu">plot</span>(matching.obj, <span class="at">type =</span> <span class="st">"jitter"</span>) <span class="co"># propensity score locations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3-1.png" class="img-fluid" width="672"></p>
 </div>
 <pre><code>#&gt; To identify the units, use first mouse button; to stop, use second.
@@ -1086,39 +1076,39 @@ plot(matching.obj, type = "hist") #check matched treated vs matched control</cod
 <div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3-2.png" class="img-fluid" width="672"></p>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>summrize.output <span class="ot">&lt;-</span> <span class="fu">summary</span>(matching.obj, <span class="at">standardize =</span> <span class="cn">TRUE</span>)</span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>summrize.output <span class="ot">&lt;-</span> <span class="fu">summary</span>(matching.obj, <span class="at">standardize =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb18-2"><a href="#cb18-2"></a><span class="fu">plot</span>(summrize.output)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3-3.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="overalp-check" class="level4"><h4 class="anchored" data-anchor-id="overalp-check">Overalp check</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step3b_a04c8692aa9cca9244ea4bd5744c0328">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># plot propensity scores by exposure group</span></span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># plot propensity scores by exposure group</span></span>
 <span id="cb19-2"><a href="#cb19-2"></a><span class="fu">plot</span>(<span class="fu">density</span>(OACVD.match<span class="sc">$</span>distance[OACVD.match<span class="sc">$</span>OA<span class="sc">==</span><span class="dv">1</span>]), </span>
 <span id="cb19-3"><a href="#cb19-3"></a>     <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">main =</span> <span class="st">""</span>)</span>
 <span id="cb19-4"><a href="#cb19-4"></a><span class="fu">lines</span>(<span class="fu">density</span>(OACVD.match<span class="sc">$</span>distance[OACVD.match<span class="sc">$</span>OA<span class="sc">==</span><span class="dv">0</span>]), </span>
 <span id="cb19-5"><a href="#cb19-5"></a>      <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
 <span id="cb19-6"><a href="#cb19-6"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"Non-arthritis"</span>,<span class="st">"OA"</span>), </span>
 <span id="cb19-7"><a href="#cb19-7"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"blue"</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3b-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="cobalt-package" class="level4"><h4 class="anchored" data-anchor-id="cobalt-package">cobalt package</h4>
 <p>Overlap check in a more convenient way</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step3c_bb6c1fc10e90ea17d67ad6946fef1591">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># different badwidth</span></span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># different badwidth</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"distance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3c-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="look-at-the-data" class="level4"><h4 class="anchored" data-anchor-id="look-at-the-data">Look at the data</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step3d_6010a159df2ab6e9342a198e69daddc3">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># what is distance variable here?</span></span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># what is distance variable here?</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1129,7 +1119,7 @@ plot(matching.obj, type = "hist") #check matched treated vs matched control</cod
 </div>
 </section><section id="numerical-values-of-ps" class="level4"><h4 class="anchored" data-anchor-id="numerical-values-of-ps">Numerical values of PS</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step3e_d8803c9224dca3d6d0d92a10c67db4ac">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>distance)</span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>distance)</span>
 <span id="cb22-2"><a href="#cb22-2"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt; 0.004671 0.044834 0.099094 0.138969 0.200576 0.611166</span></span>
 <span id="cb22-4"><a href="#cb22-4"></a><span class="fu">by</span>(OACVD.match<span class="sc">$</span>distance, OACVD.match<span class="sc">$</span>OA, summary)</span>
@@ -1140,7 +1130,6 @@ plot(matching.obj, type = "hist") #check matched treated vs matched control</cod
 <span id="cb22-9"><a href="#cb22-9"></a><span class="co">#&gt; OACVD.match$OA: 1</span></span>
 <span id="cb22-10"><a href="#cb22-10"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span id="cb22-11"><a href="#cb22-11"></a><span class="co">#&gt; 0.004671 0.047346 0.098973 0.142897 0.198741 0.611166</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="question-for-the-students" class="level4"><h4 class="anchored" data-anchor-id="question-for-the-students">Question for the students</h4>
 <ul>
@@ -1166,7 +1155,7 @@ Tip
 </div>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/step3f_b3e0aad2d6204b6704142d05de21d8a0">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> OACVD.match, </span>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> OACVD.match, </span>
 <span id="cb23-2"><a href="#cb23-2"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
 <span id="cb23-3"><a href="#cb23-3"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb23-4"><a href="#cb23-4"></a><span class="co">#&gt;                        Stratified by OA</span></span>
@@ -1221,7 +1210,6 @@ Tip
 <span id="cb23-53"><a href="#cb23-53"></a><span class="co">#&gt;      2nd grad.           1 ( 1.5)   2 ( 3.0)        </span></span>
 <span id="cb23-54"><a href="#cb23-54"></a><span class="co">#&gt;      Other 2nd grad.     1 ( 1.5)   1 ( 1.5)        </span></span>
 <span id="cb23-55"><a href="#cb23-55"></a><span class="co">#&gt;      Post-2nd grad.     51 (76.1)  51 (76.1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="question-for-the-students-1" class="level4"><h4 class="anchored" data-anchor-id="question-for-the-students-1">Question for the students</h4>
 <ul>
@@ -1230,7 +1218,7 @@ Tip
 <section id="individual-categories" class="level5"><h5 class="anchored" data-anchor-id="individual-categories">Individual categories</h5>
 <p>If you want to check balance at each category (not very useful in general situations). We are generally interested if the variables are balanced or not (not categories).</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step3g_efa8b3a85a452eed2c2bdbb3c06ba8b1">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>baltab <span class="ot">&lt;-</span> <span class="fu">bal.tab</span>(matching.obj)</span>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>baltab <span class="ot">&lt;-</span> <span class="fu">bal.tab</span>(matching.obj)</span>
 <span id="cb24-2"><a href="#cb24-2"></a>baltab</span>
 <span id="cb24-3"><a href="#cb24-3"></a><span class="co">#&gt; Balance Measures</span></span>
 <span id="cb24-4"><a href="#cb24-4"></a><span class="co">#&gt;                             Type Diff.Adj</span></span>
@@ -1279,41 +1267,40 @@ Tip
 <span id="cb24-47"><a href="#cb24-47"></a><span class="co">#&gt; All          1357      67</span></span>
 <span id="cb24-48"><a href="#cb24-48"></a><span class="co">#&gt; Matched        67      67</span></span>
 <span id="cb24-49"><a href="#cb24-49"></a><span class="co">#&gt; Unmatched    1290       0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="individual-plots" class="level5"><h5 class="anchored" data-anchor-id="individual-plots">Individual plots</h5>
 <p>You could plot each variables individually</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step3h_2d0d2774a69b9c76e9d218722ccfeeb6">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"income"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"income"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3h-1.png" class="img-fluid" width="672"></p>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3h-2.png" class="img-fluid" width="672"></p>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"race"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"race"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3h-3.png" class="img-fluid" width="672"></p>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"diab"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"diab"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3h-4.png" class="img-fluid" width="672"></p>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"immigrate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"immigrate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3h-5.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="love-plot" class="level5"><h5 class="anchored" data-anchor-id="love-plot">Love plot</h5>
 <div class="cell" data-hash="propensityscore2_cache/html/loveplot_0a47658a80b3082fdb25de43e4f2fa80">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co"># Individual categories again</span></span>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co"># Individual categories again</span></span>
 <span id="cb30-2"><a href="#cb30-2"></a><span class="fu">love.plot</span>(baltab, <span class="at">threshold =</span> .<span class="dv">2</span>)</span>
 <span id="cb30-3"><a href="#cb30-3"></a><span class="co">#&gt; Warning: Unadjusted values are missing. This can occur when `un = FALSE` and</span></span>
 <span id="cb30-4"><a href="#cb30-4"></a><span class="co">#&gt; `quick = TRUE` in the original call to `bal.tab()`.</span></span>
 <span id="cb30-5"><a href="#cb30-5"></a><span class="co">#&gt; Warning: Standardized mean differences and raw mean differences are present in the same plot. </span></span>
 <span id="cb30-6"><a href="#cb30-6"></a><span class="co">#&gt; Use the `stars` argument to distinguish between them and appropriately label the x-axis.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/loveplot-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
@@ -1322,7 +1309,7 @@ Tip
 <section id="add-caliper" class="level4"><h4 class="anchored" data-anchor-id="add-caliper">Add caliper</h4>
 <p>The matching process is repeated, this time introducing a caliper to ensure that matches are only made within a specified range of PS.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step3i_8d227fbf633ac580edc4e8952ddd0e1d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>logitPS <span class="ot">&lt;-</span>  <span class="sc">-</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">/</span>OACVD.match<span class="sc">$</span>distance <span class="sc">-</span> <span class="dv">1</span>) </span>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>logitPS <span class="ot">&lt;-</span>  <span class="sc">-</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">/</span>OACVD.match<span class="sc">$</span>distance <span class="sc">-</span> <span class="dv">1</span>) </span>
 <span id="cb31-2"><a href="#cb31-2"></a><span class="co"># logit of the propensity score</span></span>
 <span id="cb31-3"><a href="#cb31-3"></a>.<span class="dv">2</span><span class="sc">*</span><span class="fu">sd</span>(logitPS) <span class="co"># suggested in the literature</span></span>
 <span id="cb31-4"><a href="#cb31-4"></a><span class="co">#&gt; [1] 0.2334615</span></span>
@@ -1345,10 +1332,9 @@ Tip
 <span id="cb31-21"><a href="#cb31-21"></a><span class="co">#&gt;  - target estimand: ATT</span></span>
 <span id="cb31-22"><a href="#cb31-22"></a><span class="co">#&gt;  - covariates: age, sex, stress, married, income, race, bmi, phyact, smoke, doctor, drink, bp, immigrate, fruit, diab, edu</span></span>
 <span id="cb31-23"><a href="#cb31-23"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/step3j_4df312b8b00d1c451d4572156071c5ef">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># Step 3</span></span>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># Step 3</span></span>
 <span id="cb32-2"><a href="#cb32-2"></a><span class="fu">by</span>(OACVD.match<span class="sc">$</span>distance, OACVD.match<span class="sc">$</span>OA, summary)</span>
 <span id="cb32-3"><a href="#cb32-3"></a><span class="co">#&gt; OACVD.match$OA: 0</span></span>
 <span id="cb32-4"><a href="#cb32-4"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
@@ -1412,16 +1398,15 @@ Tip
 <span id="cb32-62"><a href="#cb32-62"></a><span class="co">#&gt;      2nd grad.           1 ( 1.6)   2 ( 3.1)        </span></span>
 <span id="cb32-63"><a href="#cb32-63"></a><span class="co">#&gt;      Other 2nd grad.     1 ( 1.6)   1 ( 1.6)        </span></span>
 <span id="cb32-64"><a href="#cb32-64"></a><span class="co">#&gt;      Post-2nd grad.     48 (75.0)  48 (75.0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="question-for-the-students-2" class="level4"><h4 class="anchored" data-anchor-id="question-for-the-students-2">Question for the students</h4>
 <ul>
 <li>Did all of the SMDs decrease?</li>
 </ul></section><section id="look-at-the-data-1" class="level4"><h4 class="anchored" data-anchor-id="look-at-the-data-1">Look at the data</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step3k_722e2d8c4e1d3c189500dbd2e2f6f80d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># what is weights variable for pair matching?</span></span>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># what is weights variable for pair matching?</span></span>
 <span id="cb33-2"><a href="#cb33-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1429,28 +1414,26 @@ Tip
   </script>
 </div>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
 <span id="cb34-2"><a href="#cb34-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb34-3"><a href="#cb34-3"></a><span class="co">#&gt;       1       1       1       1       1       1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section></section><section id="step-4" class="level3"><h3 class="anchored" data-anchor-id="step-4">Step 4</h3>
 <section id="estimate-treatment-effect-for-matched-data" class="level4"><h4 class="anchored" data-anchor-id="estimate-treatment-effect-for-matched-data">Estimate treatment effect for matched data</h4>
 <p>Different models (e.g., unconditional logistic regression, survey design) are fitted to estimate the treatment effect in the matched sample.</p>
 </section><section id="unconditional-logistic" class="level4"><h4 class="anchored" data-anchor-id="unconditional-logistic">Unconditional logistic</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/step4_a5241f6f63352a012705249257394c92">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># Wrong model for population!!</span></span>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># Wrong model for population!!</span></span>
 <span id="cb35-2"><a href="#cb35-2"></a>outcome.model <span class="ot">&lt;-</span> <span class="fu">glm</span>(CVD <span class="sc">~</span> OA, <span class="at">data =</span> OACVD.match, <span class="at">family =</span> <span class="fu">binomial</span>())</span>
 <span id="cb35-3"><a href="#cb35-3"></a><span class="fu">publish</span>(outcome.model)</span>
 <span id="cb35-4"><a href="#cb35-4"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95  p-value </span></span>
 <span id="cb35-5"><a href="#cb35-5"></a><span class="co">#&gt;        OA            0.48 [0.09;2.74]   0.4119</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="survey-design" class="level4"><h4 class="anchored" data-anchor-id="survey-design">Survey design</h4>
 <section id="convert-data-to-design" class="level5"><h5 class="anchored" data-anchor-id="convert-data-to-design">Convert data to design</h5>
 <p>The matched data is converted to a survey design object to account for the matched pairs in the analysis.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/step4b_19891cf6266acf9e360b30359ff0fd20">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb36-2"><a href="#cb36-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb36-3"><a href="#cb36-3"></a><span class="co">#&gt; [1] 397173</span></span>
 <span id="cb36-4"><a href="#cb36-4"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
@@ -1465,11 +1448,10 @@ Tip
 <span id="cb36-13"><a href="#cb36-13"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>survey.weight, </span>
 <span id="cb36-14"><a href="#cb36-14"></a>                      <span class="at">data=</span>analytic.miss)</span>
 <span id="cb36-15"><a href="#cb36-15"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="balance-in-matched-population" class="level5"><h5 class="anchored" data-anchor-id="balance-in-matched-population">Balance in matched population?</h5>
 <div class="cell" data-hash="propensityscore2_cache/html/step4c_209be743b31bba1ac8514610d8b3d6ca">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">svyCreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> w.design.m, </span>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">svyCreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> w.design.m, </span>
 <span id="cb37-2"><a href="#cb37-2"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
 <span id="cb37-3"><a href="#cb37-3"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb37-4"><a href="#cb37-4"></a><span class="co">#&gt;                        Stratified by OA</span></span>
@@ -1524,22 +1506,20 @@ Tip
 <span id="cb37-53"><a href="#cb37-53"></a><span class="co">#&gt;      2nd grad.            18.8 ( 1.1)    47.6 ( 2.4)        </span></span>
 <span id="cb37-54"><a href="#cb37-54"></a><span class="co">#&gt;      Other 2nd grad.      15.2 ( 0.9)    52.2 ( 2.6)        </span></span>
 <span id="cb37-55"><a href="#cb37-55"></a><span class="co">#&gt;      Post-2nd grad.     1424.7 (79.9)  1559.4 (77.9)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="outcome-analysis" class="level5"><h5 class="anchored" data-anchor-id="outcome-analysis">Outcome analysis</h5>
 <div class="cell" data-hash="propensityscore2_cache/html/step4d_a070e67d36187dab8e9f06d991c7933c">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb38-2"><a href="#cb38-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb38-3"><a href="#cb38-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb38-4"><a href="#cb38-4"></a><span class="fu">publish</span>(fit.design)</span>
 <span id="cb38-5"><a href="#cb38-5"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95  p-value </span></span>
 <span id="cb38-6"><a href="#cb38-6"></a><span class="co">#&gt;        OA            0.50 [0.08;3.09]   0.4535</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section></section></section><section id="matched-data-with-increase-ratio" class="level3"><h3 class="anchored" data-anchor-id="matched-data-with-increase-ratio">Matched data with increase ratio</h3>
 <p>The matching process is repeated with a different ratio (e.g., 1:5) to explore how changing the ratio affects the covariate balance and treatment effect estimation.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio_7e9a7035395a25a5f32e875635e03a46">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="co"># Step 1 and 2</span></span>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="co"># Step 1 and 2</span></span>
 <span id="cb39-2"><a href="#cb39-2"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
 <span id="cb39-3"><a href="#cb39-3"></a>                        <span class="at">data =</span> analytic11n,</span>
 <span id="cb39-4"><a href="#cb39-4"></a>                        <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
@@ -1620,16 +1600,15 @@ Tip
 <span id="cb39-79"><a href="#cb39-79"></a><span class="co">#&gt;      2nd grad.            9 ( 3.2)   2 ( 3.1)        </span></span>
 <span id="cb39-80"><a href="#cb39-80"></a><span class="co">#&gt;      Other 2nd grad.      9 ( 3.2)   1 ( 1.6)        </span></span>
 <span id="cb39-81"><a href="#cb39-81"></a><span class="co">#&gt;      Post-2nd grad.     200 (70.2)  48 (75.0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="question-for-the-students-3" class="level5"><h5 class="anchored" data-anchor-id="question-for-the-students-3">Question for the students</h5>
 <ul>
 <li>Did all of the SMDs decrease?</li>
 </ul></section><section id="look-at-the-data-2" class="level5"><h5 class="anchored" data-anchor-id="look-at-the-data-2">Look at the data</h5>
 <div class="cell" data-hash="propensityscore2_cache/html/summdata_a83fddff664a38be2a71add01d451a45">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
 <span id="cb40-2"><a href="#cb40-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1637,16 +1616,15 @@ Tip
   </script>
 </div>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
 <span id="cb41-2"><a href="#cb41-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb41-3"><a href="#cb41-3"></a><span class="co">#&gt;  0.8906  0.8906  0.8906  1.0000  0.8906  4.4531</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="combining-matching-weights" class="level4"><h4 class="anchored" data-anchor-id="combining-matching-weights">Combining matching weights</h4>
 <p>Different approaches to incorporating weights (e.g., matching weights, survey weights) are explored.</p>
 </section><section id="not-incorporating-matching-weights" class="level4"><h4 class="anchored" data-anchor-id="not-incorporating-matching-weights">Not incorporating matching weights</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio1_b771797a4aa55606c6004bea2cbf5223">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb42-2"><a href="#cb42-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb42-3"><a href="#cb42-3"></a><span class="co">#&gt; [1] 397173</span></span>
 <span id="cb42-4"><a href="#cb42-4"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
@@ -1661,20 +1639,18 @@ Tip
 <span id="cb42-13"><a href="#cb42-13"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>survey.weight, </span>
 <span id="cb42-14"><a href="#cb42-14"></a>                      <span class="at">data=</span>analytic.miss)</span>
 <span id="cb42-15"><a href="#cb42-15"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio2_a59f0948c31866ba55ea66b33d02be0d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb43-2"><a href="#cb43-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb43-3"><a href="#cb43-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb43-4"><a href="#cb43-4"></a><span class="fu">publish</span>(fit.design)</span>
 <span id="cb43-5"><a href="#cb43-5"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95 p-value </span></span>
 <span id="cb43-6"><a href="#cb43-6"></a><span class="co">#&gt;        OA            0.80 [0.23;2.80]   0.722</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="incorporating-matching-weights" class="level5"><h5 class="anchored" data-anchor-id="incorporating-matching-weights">Incorporating matching weights</h5>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio3_6dd5224418323a88792ee30434b73c06">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb44-2"><a href="#cb44-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb44-3"><a href="#cb44-3"></a><span class="co">#&gt; [1] 397173</span></span>
 <span id="cb44-4"><a href="#cb44-4"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
@@ -1686,31 +1662,28 @@ Tip
 <span id="cb44-10"><a href="#cb44-10"></a><span class="co">#&gt; </span></span>
 <span id="cb44-11"><a href="#cb44-11"></a><span class="co">#&gt;      0      1 </span></span>
 <span id="cb44-12"><a href="#cb44-12"></a><span class="co">#&gt; 396824    349</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio4_ca8cfa47adb7021c072aa3a48fdc22bf">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
 <span id="cb45-2"><a href="#cb45-2"></a>analytic.miss<span class="sc">$</span>combined.weight <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb45-3"><a href="#cb45-3"></a>analytic.miss<span class="sc">$</span>combined.weight[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span></span>
 <span id="cb45-4"><a href="#cb45-4"></a>  OACVD.match<span class="sc">$</span>weights<span class="sc">*</span>OACVD.match<span class="sc">$</span>survey.weight</span>
 <span id="cb45-5"><a href="#cb45-5"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>combined.weight, </span>
 <span id="cb45-6"><a href="#cb45-6"></a>                      <span class="at">data=</span>analytic.miss)</span>
 <span id="cb45-7"><a href="#cb45-7"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio5_a99c3807a6f13722e241cfbd53c86c10">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb46-2"><a href="#cb46-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb46-3"><a href="#cb46-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb46-4"><a href="#cb46-4"></a><span class="fu">publish</span>(fit.design)</span>
 <span id="cb46-5"><a href="#cb46-5"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95  p-value </span></span>
 <span id="cb46-6"><a href="#cb46-6"></a><span class="co">#&gt;        OA            1.14 [0.32;4.07]   0.8419</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section></section><section id="matched-with-replacement" class="level4"><h4 class="anchored" data-anchor-id="matched-with-replacement">Matched with replacement</h4>
 <p>Matching is performed with replacement, allowing control units to be used in more than one match.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio6_caf0beb0922ab310c70fc303ba94c977">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a><span class="co"># Step 1 and 2</span></span>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a><span class="co"># Step 1 and 2</span></span>
 <span id="cb47-2"><a href="#cb47-2"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
 <span id="cb47-3"><a href="#cb47-3"></a>                        <span class="at">data =</span> analytic11n,</span>
 <span id="cb47-4"><a href="#cb47-4"></a>                        <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
@@ -1792,16 +1765,15 @@ Tip
 <span id="cb47-80"><a href="#cb47-80"></a><span class="co">#&gt;      2nd grad.            8 ( 3.3)   2 ( 3.1)        </span></span>
 <span id="cb47-81"><a href="#cb47-81"></a><span class="co">#&gt;      Other 2nd grad.      9 ( 3.7)   1 ( 1.5)        </span></span>
 <span id="cb47-82"><a href="#cb47-82"></a><span class="co">#&gt;      Post-2nd grad.     168 (69.1)  49 (75.4)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="question-for-the-students-4" class="level4"><h4 class="anchored" data-anchor-id="question-for-the-students-4">Question for the students</h4>
 <ul>
 <li>Did all of the SMDs decrease?</li>
 </ul></section><section id="look-at-the-data-3" class="level4"><h4 class="anchored" data-anchor-id="look-at-the-data-3">Look at the data</h4>
 <div class="cell" data-hash="propensityscore2_cache/html/ratio7_20987e94438fcd53ecd4716ae49030fa">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
 <span id="cb48-2"><a href="#cb48-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1809,15 +1781,14 @@ Tip
   </script>
 </div>
 </div>
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
 <span id="cb49-2"><a href="#cb49-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb49-3"><a href="#cb49-3"></a><span class="co">#&gt;  0.7477  0.7477  0.7477  1.0000  1.0000  7.4769</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="survey-design-1" class="level4"><h4 class="anchored" data-anchor-id="survey-design-1">Survey design</h4>
 <p>The matched data is converted into a survey design object, and the treatment effect is estimated while accounting for the complex survey design.</p>
 <div class="cell" data-hash="propensityscore2_cache/html/new0_206cb2cf18113b2f1171cee4c262b55b">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb50-2"><a href="#cb50-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb50-3"><a href="#cb50-3"></a><span class="co">#&gt; [1] 397173</span></span>
 <span id="cb50-4"><a href="#cb50-4"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
@@ -1829,26 +1800,23 @@ Tip
 <span id="cb50-10"><a href="#cb50-10"></a><span class="co">#&gt; </span></span>
 <span id="cb50-11"><a href="#cb50-11"></a><span class="co">#&gt;      0      1 </span></span>
 <span id="cb50-12"><a href="#cb50-12"></a><span class="co">#&gt; 396865    308</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/new1_6533f78fe40fa73018fec802b1178dbf">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
 <span id="cb51-2"><a href="#cb51-2"></a>analytic.miss<span class="sc">$</span>combined.weight <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb51-3"><a href="#cb51-3"></a>analytic.miss<span class="sc">$</span>combined.weight[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span></span>
 <span id="cb51-4"><a href="#cb51-4"></a>  OACVD.match<span class="sc">$</span>weights<span class="sc">*</span>OACVD.match<span class="sc">$</span>survey.weight</span>
 <span id="cb51-5"><a href="#cb51-5"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>combined.weight, </span>
 <span id="cb51-6"><a href="#cb51-6"></a>                      <span class="at">data=</span>analytic.miss)</span>
 <span id="cb51-7"><a href="#cb51-7"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell" data-hash="propensityscore2_cache/html/new2_256137433b5defd12c19fa0f9efe4816">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb52-2"><a href="#cb52-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb52-3"><a href="#cb52-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb52-4"><a href="#cb52-4"></a><span class="fu">publish</span>(fit.design)</span>
 <span id="cb52-5"><a href="#cb52-5"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95  p-value </span></span>
 <span id="cb52-6"><a href="#cb52-6"></a><span class="co">#&gt;        OA            0.99 [0.26;3.72]   0.9909</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section></section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
 <div class="callout-tip callout callout-style-default callout-captioned">
@@ -1869,8 +1837,6 @@ Tip
 </iframe>
 </div>
 
-
-<!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-Matchit" class="csl-entry" role="doc-biblioentry">
@@ -2070,539 +2036,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">PSM in OA-CVD (US)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb53" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb53-1"><a href="#cb53-1"></a><span class="fu">## PSM in OA-CVD (CCHS) {.unnumbered}</span></span>
-<span id="cb53-2"><a href="#cb53-2"></a></span>
-<span id="cb53-3"><a href="#cb53-3"></a>This tutorial is a comprehensive guide on implementing Propensity Score Matching (PSM) using R, particularly focusing on a OA - CVD health study from the Canadian Community Health Survey (CCHS). This PSM method is used to reduce bias due to confounding variables in observational studies by matching treated and control units with similar propensity scores. The tutorial illustrates that PSM is an iterative process, where researchers may need to refine their matching strategy to achieve satisfactory balance in the matched sample. Different strategies for estimating the treatment effect in the matched sample are explored, each with its own assumptions and implications.</span>
-<span id="cb53-4"><a href="#cb53-4"></a></span>
-<span id="cb53-5"><a href="#cb53-5"></a><span class="fu">### Load packages</span></span>
-<span id="cb53-6"><a href="#cb53-6"></a></span>
-<span id="cb53-7"><a href="#cb53-7"></a>At first, various R packages are loaded to utilize their functions for data manipulation, statistical analysis, and visualization.</span>
-<span id="cb53-8"><a href="#cb53-8"></a></span>
-<span id="cb53-9"><a href="#cb53-9"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
-<span id="cb53-10"><a href="#cb53-10"></a><span class="co"># Load required packages</span></span>
-<span id="cb53-11"><a href="#cb53-11"></a><span class="fu">library</span>(MatchIt)</span>
-<span id="cb53-12"><a href="#cb53-12"></a><span class="fu">require</span>(tableone)</span>
-<span id="cb53-13"><a href="#cb53-13"></a><span class="fu">require</span>(survey)</span>
-<span id="cb53-14"><a href="#cb53-14"></a><span class="fu">require</span>(cobalt)</span>
-<span id="cb53-15"><a href="#cb53-15"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb53-16"><a href="#cb53-16"></a><span class="fu">require</span>(optmatch)</span>
-<span id="cb53-17"><a href="#cb53-17"></a><span class="in">```</span></span>
-<span id="cb53-18"><a href="#cb53-18"></a></span>
-<span id="cb53-19"><a href="#cb53-19"></a><span class="fu">### Load data</span></span>
-<span id="cb53-20"><a href="#cb53-20"></a></span>
-<span id="cb53-21"><a href="#cb53-21"></a>The dataset is loaded into the R environment. Variables are renamed to avoid conflicts in subsequent analyses.</span>
-<span id="cb53-22"><a href="#cb53-22"></a></span>
-<span id="cb53-23"><a href="#cb53-23"></a><span class="in">```{r data, cache=TRUE}</span></span>
-<span id="cb53-24"><a href="#cb53-24"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/cchs123c.RData"</span>)</span>
-<span id="cb53-25"><a href="#cb53-25"></a><span class="fu">head</span>(analytic11n)</span>
-<span id="cb53-26"><a href="#cb53-26"></a></span>
-<span id="cb53-27"><a href="#cb53-27"></a><span class="co"># later we will create another variable called weights</span></span>
-<span id="cb53-28"><a href="#cb53-28"></a><span class="co"># hence to avoid any conflict/ambiguity,</span></span>
-<span id="cb53-29"><a href="#cb53-29"></a><span class="co"># renaming weight variable to survey.weight</span></span>
-<span id="cb53-30"><a href="#cb53-30"></a>analytic.miss<span class="sc">$</span>survey.weight <span class="ot">&lt;-</span> analytic.miss<span class="sc">$</span>weight</span>
-<span id="cb53-31"><a href="#cb53-31"></a>analytic11n<span class="sc">$</span>survey.weight <span class="ot">&lt;-</span> analytic11n<span class="sc">$</span>weight</span>
-<span id="cb53-32"><a href="#cb53-32"></a>analytic.miss<span class="sc">$</span>weight <span class="ot">&lt;-</span> analytic11n<span class="sc">$</span>weight <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb53-33"><a href="#cb53-33"></a><span class="in">```</span></span>
-<span id="cb53-34"><a href="#cb53-34"></a></span>
-<span id="cb53-35"><a href="#cb53-35"></a><span class="fu">### Analysis</span></span>
-<span id="cb53-36"><a href="#cb53-36"></a></span>
-<span id="cb53-37"><a href="#cb53-37"></a>We are going to apply propensity score analysis (Matching) in our OA - CVD problem from CCHS. For computation considerations, we will only work with cycle 1.1, and the people from Northern provinces in Canada (<span class="in">`analytic11n`</span> data).</span>
-<span id="cb53-38"><a href="#cb53-38"></a></span>
-<span id="cb53-39"><a href="#cb53-39"></a><span class="fu">### Step 1</span></span>
-<span id="cb53-40"><a href="#cb53-40"></a></span>
-<span id="cb53-41"><a href="#cb53-41"></a><span class="fu">#### Specify PS</span></span>
-<span id="cb53-42"><a href="#cb53-42"></a></span>
-<span id="cb53-43"><a href="#cb53-43"></a>A logistic regression model formula is specified to calculate the propensity scores (PS), which is the probability of receiving the treatment given the observed covariates.</span>
-<span id="cb53-44"><a href="#cb53-44"></a></span>
-<span id="cb53-45"><a href="#cb53-45"></a><span class="in">```{r step1, cache=TRUE}</span></span>
-<span id="cb53-46"><a href="#cb53-46"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age + sex + stress + married + </span></span>
-<span id="cb53-47"><a href="#cb53-47"></a><span class="st">                         income + race + bmi + phyact + smoke +</span></span>
-<span id="cb53-48"><a href="#cb53-48"></a><span class="st">                        doctor + drink + bp + </span></span>
-<span id="cb53-49"><a href="#cb53-49"></a><span class="st">                         immigrate + fruit + diab + edu"</span>)</span>
-<span id="cb53-50"><a href="#cb53-50"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stress"</span>, <span class="st">"married"</span>, </span>
-<span id="cb53-51"><a href="#cb53-51"></a>               <span class="st">"income"</span>, <span class="st">"race"</span>, <span class="st">"bmi"</span>, <span class="st">"phyact"</span>, <span class="st">"smoke"</span>, </span>
-<span id="cb53-52"><a href="#cb53-52"></a>               <span class="st">"doctor"</span>, <span class="st">"drink"</span>, <span class="st">"bp"</span>, </span>
-<span id="cb53-53"><a href="#cb53-53"></a>               <span class="st">"immigrate"</span>, <span class="st">"fruit"</span>, <span class="st">"diab"</span>, <span class="st">"edu"</span>)</span>
-<span id="cb53-54"><a href="#cb53-54"></a><span class="in">```</span></span>
-<span id="cb53-55"><a href="#cb53-55"></a></span>
-<span id="cb53-56"><a href="#cb53-56"></a><span class="fu">#### Fit model</span></span>
-<span id="cb53-57"><a href="#cb53-57"></a></span>
-<span id="cb53-58"><a href="#cb53-58"></a>The software fits the PS model using a logistic regression by default. This package actually performs step 1 and 2 with one command <span class="in">`matchit`</span>. </span>
-<span id="cb53-59"><a href="#cb53-59"></a></span>
-<span id="cb53-60"><a href="#cb53-60"></a>Look at the website for arguments of matchit <span class="co">[</span><span class="ot">@Matchit</span><span class="co">]</span><span class="sc">\]</span>. It looks like this</span>
-<span id="cb53-61"><a href="#cb53-61"></a></span>
-<span id="cb53-62"><a href="#cb53-62"></a><span class="in">```{r  step1b, eval=FALSE}</span></span>
-<span id="cb53-63"><a href="#cb53-63"></a><span class="fu">matchit</span>(formula, data, <span class="at">model=</span><span class="st">"logit"</span>, <span class="at">discard=</span><span class="dv">0</span>, <span class="at">reestimate=</span><span class="cn">FALSE</span>, <span class="at">nearest=</span><span class="cn">TRUE</span>,</span>
-<span id="cb53-64"><a href="#cb53-64"></a>                 <span class="at">replace=</span><span class="cn">FALSE</span>, <span class="at">m.order=</span><span class="dv">2</span>, <span class="at">ratio=</span><span class="dv">1</span>, <span class="at">caliper=</span><span class="dv">0</span>, <span class="at">calclosest=</span><span class="cn">FALSE</span>,</span>
-<span id="cb53-65"><a href="#cb53-65"></a>                 <span class="at">subclass=</span><span class="dv">0</span>, <span class="at">sub.by=</span><span class="st">"treat"</span>, <span class="at">mahvars=</span><span class="cn">NULL</span>, <span class="at">exact=</span><span class="cn">FALSE</span>, <span class="at">counter=</span><span class="cn">TRUE</span>, <span class="at">full=</span><span class="cn">FALSE</span>, <span class="at">full.options=</span><span class="fu">list</span>(),...)</span>
-<span id="cb53-66"><a href="#cb53-66"></a><span class="in">```</span></span>
-<span id="cb53-67"><a href="#cb53-67"></a></span>
-<span id="cb53-68"><a href="#cb53-68"></a>::: callout-tip</span>
-<span id="cb53-69"><a href="#cb53-69"></a>**Nearest-Neighbor Matching**:</span>
-<span id="cb53-70"><a href="#cb53-70"></a></span>
-<span id="cb53-71"><a href="#cb53-71"></a>Nearest-neighbor matching is a widely used technique in PSM to pair treated and control units based on the proximity of their propensity scores. It is straightforward and computationally efficient, making it a popular choice in many applications of PSM. Nearest-neighbor matching is often termed a "greedy" algorithm because it matches units in order, without considering the global distribution of propensity scores. Once a match is made, it is not revisited, even if a later unit would have been a better match. The method seeks to minimize bias by creating closely matched pairs but can increase variance if the pool of potential matches is reduced too much (e.g., using a very narrow caliper). It is essential to ensure that there is a common support region where the distributions of propensity scores for treated and control units overlap, ensuring comparability.</span>
-<span id="cb53-72"><a href="#cb53-72"></a>::: </span>
-<span id="cb53-73"><a href="#cb53-73"></a></span>
-<span id="cb53-74"><a href="#cb53-74"></a><span class="fu">### Step 2</span></span>
-<span id="cb53-75"><a href="#cb53-75"></a></span>
-<span id="cb53-76"><a href="#cb53-76"></a><span class="fu">#### Match subjects by PS</span></span>
-<span id="cb53-77"><a href="#cb53-77"></a></span>
-<span id="cb53-78"><a href="#cb53-78"></a>We are going to match using a Nearest neighbor algorithm. This is a greedy matching algorithm. Note that we are not even defining any caliper.</span>
-<span id="cb53-79"><a href="#cb53-79"></a></span>
-<span id="cb53-80"><a href="#cb53-80"></a>::: callout-tip</span>
-<span id="cb53-81"><a href="#cb53-81"></a>**Caliper**:</span>
-<span id="cb53-82"><a href="#cb53-82"></a></span>
-<span id="cb53-83"><a href="#cb53-83"></a>In the context of PSM, a caliper is a predefined maximum allowable difference between the propensity scores of matched units. Essentially, it sets a threshold for how dissimilar matched units can be in terms of their propensity scores. When a caliper is used, a treated unit is only matched with a control unit if the absolute difference in their propensity scores is less than or equal to the specified caliper width. The caliper is used to avoid bad matches and thereby minimize bias in the estimated treatment effect. The size of the caliper is crucial. Too wide a caliper may allow poor matches, while too narrow a caliper may result in many units going unmatched. Implementing a caliper involves a trade-off between bias and efficiency. Using a caliper reduces bias by avoiding poor matches but may increase variance by reducing the number of matched pairs available for analysis. Therefore, the use of a caliper in PSM is a strategic decision to enhance the quality of matches and thereby improve the validity of causal inferences drawn from observational data. It is a practical tool to ensure that matched units are sufficiently similar in terms of their propensity scores, reducing the likelihood of bias due to poor matches.</span>
-<span id="cb53-84"><a href="#cb53-84"></a>:::</span>
-<span id="cb53-85"><a href="#cb53-85"></a></span>
-<span id="cb53-86"><a href="#cb53-86"></a><span class="in">```{r step2, cache=TRUE}</span></span>
-<span id="cb53-87"><a href="#cb53-87"></a><span class="co"># set seed</span></span>
-<span id="cb53-88"><a href="#cb53-88"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb53-89"><a href="#cb53-89"></a><span class="co"># match</span></span>
-<span id="cb53-90"><a href="#cb53-90"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
-<span id="cb53-91"><a href="#cb53-91"></a>                        <span class="at">data =</span> analytic11n,</span>
-<span id="cb53-92"><a href="#cb53-92"></a>                        <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
-<span id="cb53-93"><a href="#cb53-93"></a>                        <span class="at">ratio =</span> <span class="dv">1</span>)</span>
-<span id="cb53-94"><a href="#cb53-94"></a><span class="co"># see how many matched</span></span>
-<span id="cb53-95"><a href="#cb53-95"></a>matching.obj</span>
-<span id="cb53-96"><a href="#cb53-96"></a><span class="co"># create the "matched"" data</span></span>
-<span id="cb53-97"><a href="#cb53-97"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span>
-<span id="cb53-98"><a href="#cb53-98"></a><span class="co"># see the dimension</span></span>
-<span id="cb53-99"><a href="#cb53-99"></a><span class="fu">dim</span>(analytic11n)</span>
-<span id="cb53-100"><a href="#cb53-100"></a><span class="fu">dim</span>(OACVD.match)</span>
-<span id="cb53-101"><a href="#cb53-101"></a><span class="in">```</span></span>
-<span id="cb53-102"><a href="#cb53-102"></a></span>
-<span id="cb53-103"><a href="#cb53-103"></a>Let's try to understand how this is working.</span>
-<span id="cb53-104"><a href="#cb53-104"></a></span>
-<span id="cb53-105"><a href="#cb53-105"></a><span class="fu">#### Extract matched IDs</span></span>
-<span id="cb53-106"><a href="#cb53-106"></a></span>
-<span id="cb53-107"><a href="#cb53-107"></a><span class="in">```{r matchitstrata2, cache=TRUE }</span></span>
-<span id="cb53-108"><a href="#cb53-108"></a>m.mat<span class="ot">&lt;-</span>matching.obj<span class="sc">$</span>match.matrix</span>
-<span id="cb53-109"><a href="#cb53-109"></a><span class="fu">head</span>(m.mat)</span>
-<span id="cb53-110"><a href="#cb53-110"></a><span class="in">```</span></span>
-<span id="cb53-111"><a href="#cb53-111"></a></span>
-<span id="cb53-112"><a href="#cb53-112"></a><span class="fu">#### Extract the matched treated IDs</span></span>
-<span id="cb53-113"><a href="#cb53-113"></a></span>
-<span id="cb53-114"><a href="#cb53-114"></a><span class="in">```{r step2b, cache=TRUE}</span></span>
-<span id="cb53-115"><a href="#cb53-115"></a>treated.id<span class="ot">&lt;-</span><span class="fu">as.numeric</span>(<span class="fu">row.names</span>(m.mat))</span>
-<span id="cb53-116"><a href="#cb53-116"></a>treated.id <span class="co"># basically row names</span></span>
-<span id="cb53-117"><a href="#cb53-117"></a><span class="in">```</span></span>
-<span id="cb53-118"><a href="#cb53-118"></a></span>
-<span id="cb53-119"><a href="#cb53-119"></a><span class="fu">#### Extract the matched untreated IDs</span></span>
-<span id="cb53-120"><a href="#cb53-120"></a></span>
-<span id="cb53-121"><a href="#cb53-121"></a><span class="in">```{r step2c, cache=TRUE}</span></span>
-<span id="cb53-122"><a href="#cb53-122"></a>untreated.id <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(m.mat)</span>
-<span id="cb53-123"><a href="#cb53-123"></a>untreated.id <span class="co"># basically row names</span></span>
-<span id="cb53-124"><a href="#cb53-124"></a><span class="in">```</span></span>
-<span id="cb53-125"><a href="#cb53-125"></a></span>
-<span id="cb53-126"><a href="#cb53-126"></a><span class="fu">#### Extract the matched treated data</span></span>
-<span id="cb53-127"><a href="#cb53-127"></a></span>
-<span id="cb53-128"><a href="#cb53-128"></a><span class="in">```{r step2d, cache=TRUE}</span></span>
-<span id="cb53-129"><a href="#cb53-129"></a>tx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> treated.id,]</span>
-<span id="cb53-130"><a href="#cb53-130"></a><span class="fu">head</span>(tx[<span class="fu">c</span>(<span class="st">"OA"</span>, <span class="st">"CVD"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>)])</span>
-<span id="cb53-131"><a href="#cb53-131"></a><span class="in">```</span></span>
-<span id="cb53-132"><a href="#cb53-132"></a></span>
-<span id="cb53-133"><a href="#cb53-133"></a><span class="fu">#### Extract the matched untreated data</span></span>
-<span id="cb53-134"><a href="#cb53-134"></a></span>
-<span id="cb53-135"><a href="#cb53-135"></a><span class="in">```{r step2e, cache=TRUE}</span></span>
-<span id="cb53-136"><a href="#cb53-136"></a>utx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> untreated.id,]</span>
-<span id="cb53-137"><a href="#cb53-137"></a><span class="fu">head</span>(utx[<span class="fu">c</span>(<span class="st">"OA"</span>, <span class="st">"CVD"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>)])</span>
-<span id="cb53-138"><a href="#cb53-138"></a><span class="in">```</span></span>
-<span id="cb53-139"><a href="#cb53-139"></a></span>
-<span id="cb53-140"><a href="#cb53-140"></a><span class="fu">#### Extract the matched data altogether</span></span>
-<span id="cb53-141"><a href="#cb53-141"></a></span>
-<span id="cb53-142"><a href="#cb53-142"></a>Simply using <span class="in">`match.data`</span> is enough (as done earlier).</span>
-<span id="cb53-143"><a href="#cb53-143"></a></span>
-<span id="cb53-144"><a href="#cb53-144"></a><span class="in">```{r step2f, cache=TRUE}</span></span>
-<span id="cb53-145"><a href="#cb53-145"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span>
-<span id="cb53-146"><a href="#cb53-146"></a><span class="in">```</span></span>
-<span id="cb53-147"><a href="#cb53-147"></a></span>
-<span id="cb53-148"><a href="#cb53-148"></a><span class="fu">#### Assign match ID</span></span>
-<span id="cb53-149"><a href="#cb53-149"></a></span>
-<span id="cb53-150"><a href="#cb53-150"></a><span class="in">```{r step2g, cache=TRUE}</span></span>
-<span id="cb53-151"><a href="#cb53-151"></a>OACVD.match<span class="sc">$</span>match.ID <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb53-152"><a href="#cb53-152"></a>OACVD.match<span class="sc">$</span>match.ID[<span class="fu">rownames</span>(OACVD.match) <span class="sc">%in%</span> treated.id] <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(treated.id)</span>
-<span id="cb53-153"><a href="#cb53-153"></a>OACVD.match<span class="sc">$</span>match.ID[<span class="fu">rownames</span>(OACVD.match) <span class="sc">%in%</span> untreated.id] <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(untreated.id)</span>
-<span id="cb53-154"><a href="#cb53-154"></a><span class="fu">table</span>(OACVD.match<span class="sc">$</span>match.ID)</span>
-<span id="cb53-155"><a href="#cb53-155"></a><span class="in">```</span></span>
-<span id="cb53-156"><a href="#cb53-156"></a></span>
-<span id="cb53-157"><a href="#cb53-157"></a>Take a look at individual matches for the first match</span>
-<span id="cb53-158"><a href="#cb53-158"></a></span>
-<span id="cb53-159"><a href="#cb53-159"></a><span class="in">```{r step2h, cache=TRUE}</span></span>
-<span id="cb53-160"><a href="#cb53-160"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">1</span>,])</span>
-<span id="cb53-161"><a href="#cb53-161"></a><span class="in">```</span></span>
-<span id="cb53-162"><a href="#cb53-162"></a></span>
-<span id="cb53-163"><a href="#cb53-163"></a>Take a look at individual matches for the second match</span>
-<span id="cb53-164"><a href="#cb53-164"></a></span>
-<span id="cb53-165"><a href="#cb53-165"></a><span class="in">```{r step2i, cache=TRUE}</span></span>
-<span id="cb53-166"><a href="#cb53-166"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">2</span>,])</span>
-<span id="cb53-167"><a href="#cb53-167"></a><span class="in">```</span></span>
-<span id="cb53-168"><a href="#cb53-168"></a></span>
-<span id="cb53-169"><a href="#cb53-169"></a><span class="fu">### Step 3</span></span>
-<span id="cb53-170"><a href="#cb53-170"></a></span>
-<span id="cb53-171"><a href="#cb53-171"></a>Both graphical and numerical methods are used to assess the quality of the matches and the balance of covariates in the matched sample.</span>
-<span id="cb53-172"><a href="#cb53-172"></a></span>
-<span id="cb53-173"><a href="#cb53-173"></a><span class="fu">#### Examining PS graphically</span></span>
-<span id="cb53-174"><a href="#cb53-174"></a></span>
-<span id="cb53-175"><a href="#cb53-175"></a>Visually inspect the PS and assess the balance of covariates in the matched sample. Various plots are generated to visualize the distribution of PS across treatment groups and to check the balance of covariates before and after matching.</span>
-<span id="cb53-176"><a href="#cb53-176"></a></span>
-<span id="cb53-177"><a href="#cb53-177"></a><span class="fu">#### matchit package</span></span>
-<span id="cb53-178"><a href="#cb53-178"></a></span>
-<span id="cb53-179"><a href="#cb53-179"></a><span class="in">```{r step3, cache=TRUE}</span></span>
-<span id="cb53-180"><a href="#cb53-180"></a><span class="co"># plot(matching.obj) # covariate balance</span></span>
-<span id="cb53-181"><a href="#cb53-181"></a><span class="fu">plot</span>(matching.obj, <span class="at">type =</span> <span class="st">"jitter"</span>) <span class="co"># propensity score locations</span></span>
-<span id="cb53-182"><a href="#cb53-182"></a><span class="fu">plot</span>(matching.obj, <span class="at">type =</span> <span class="st">"hist"</span>) <span class="co">#check matched treated vs matched control</span></span>
-<span id="cb53-183"><a href="#cb53-183"></a>summrize.output <span class="ot">&lt;-</span> <span class="fu">summary</span>(matching.obj, <span class="at">standardize =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-184"><a href="#cb53-184"></a><span class="fu">plot</span>(summrize.output)</span>
-<span id="cb53-185"><a href="#cb53-185"></a><span class="in">```</span></span>
-<span id="cb53-186"><a href="#cb53-186"></a></span>
-<span id="cb53-187"><a href="#cb53-187"></a><span class="fu">#### Overalp check</span></span>
-<span id="cb53-188"><a href="#cb53-188"></a></span>
-<span id="cb53-189"><a href="#cb53-189"></a><span class="in">```{r step3b, cache=TRUE}</span></span>
-<span id="cb53-190"><a href="#cb53-190"></a><span class="co"># plot propensity scores by exposure group</span></span>
-<span id="cb53-191"><a href="#cb53-191"></a><span class="fu">plot</span>(<span class="fu">density</span>(OACVD.match<span class="sc">$</span>distance[OACVD.match<span class="sc">$</span>OA<span class="sc">==</span><span class="dv">1</span>]), </span>
-<span id="cb53-192"><a href="#cb53-192"></a>     <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">main =</span> <span class="st">""</span>)</span>
-<span id="cb53-193"><a href="#cb53-193"></a><span class="fu">lines</span>(<span class="fu">density</span>(OACVD.match<span class="sc">$</span>distance[OACVD.match<span class="sc">$</span>OA<span class="sc">==</span><span class="dv">0</span>]), </span>
-<span id="cb53-194"><a href="#cb53-194"></a>      <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb53-195"><a href="#cb53-195"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"Non-arthritis"</span>,<span class="st">"OA"</span>), </span>
-<span id="cb53-196"><a href="#cb53-196"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"blue"</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span>
-<span id="cb53-197"><a href="#cb53-197"></a><span class="in">```</span></span>
-<span id="cb53-198"><a href="#cb53-198"></a></span>
-<span id="cb53-199"><a href="#cb53-199"></a><span class="fu">#### cobalt package</span></span>
-<span id="cb53-200"><a href="#cb53-200"></a></span>
-<span id="cb53-201"><a href="#cb53-201"></a>Overlap check in a more convenient way</span>
-<span id="cb53-202"><a href="#cb53-202"></a></span>
-<span id="cb53-203"><a href="#cb53-203"></a><span class="in">```{r step3c, cache=TRUE}</span></span>
-<span id="cb53-204"><a href="#cb53-204"></a><span class="co"># different badwidth</span></span>
-<span id="cb53-205"><a href="#cb53-205"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"distance"</span>)</span>
-<span id="cb53-206"><a href="#cb53-206"></a><span class="in">```</span></span>
-<span id="cb53-207"><a href="#cb53-207"></a></span>
-<span id="cb53-208"><a href="#cb53-208"></a><span class="fu">#### Look at the data</span></span>
-<span id="cb53-209"><a href="#cb53-209"></a></span>
-<span id="cb53-210"><a href="#cb53-210"></a><span class="in">```{r step3d, cache=TRUE}</span></span>
-<span id="cb53-211"><a href="#cb53-211"></a><span class="co"># what is distance variable here?</span></span>
-<span id="cb53-212"><a href="#cb53-212"></a><span class="fu">head</span>(OACVD.match)</span>
-<span id="cb53-213"><a href="#cb53-213"></a><span class="in">```</span></span>
-<span id="cb53-214"><a href="#cb53-214"></a></span>
-<span id="cb53-215"><a href="#cb53-215"></a><span class="fu">#### Numerical values of PS</span></span>
-<span id="cb53-216"><a href="#cb53-216"></a></span>
-<span id="cb53-217"><a href="#cb53-217"></a><span class="in">```{r step3e, cache=TRUE}</span></span>
-<span id="cb53-218"><a href="#cb53-218"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>distance)</span>
-<span id="cb53-219"><a href="#cb53-219"></a><span class="fu">by</span>(OACVD.match<span class="sc">$</span>distance, OACVD.match<span class="sc">$</span>OA, summary)</span>
-<span id="cb53-220"><a href="#cb53-220"></a><span class="in">```</span></span>
-<span id="cb53-221"><a href="#cb53-221"></a></span>
-<span id="cb53-222"><a href="#cb53-222"></a><span class="fu">#### Question for the students</span></span>
-<span id="cb53-223"><a href="#cb53-223"></a></span>
-<span id="cb53-224"><a href="#cb53-224"></a><span class="ss">-   </span>Are you happy with the matching after reviewing the plots?</span>
-<span id="cb53-225"><a href="#cb53-225"></a></span>
-<span id="cb53-226"><a href="#cb53-226"></a><span class="fu">#### Covariate balance in matched sample</span></span>
-<span id="cb53-227"><a href="#cb53-227"></a></span>
-<span id="cb53-228"><a href="#cb53-228"></a>Covariate balance is assessed numerically using standardized mean differences (SMD).</span>
-<span id="cb53-229"><a href="#cb53-229"></a></span>
-<span id="cb53-230"><a href="#cb53-230"></a>::: callout-tip</span>
-<span id="cb53-231"><a href="#cb53-231"></a>**Standardized mean differences**:</span>
-<span id="cb53-232"><a href="#cb53-232"></a>SMD is a versatile and widely used statistical measure that facilitates the comparison of groups in research by providing a scale-free metric of difference and balance. In the context of propensity score matching, achieving low SMD values for covariates after matching is crucial to ensuring the validity of causal inferences drawn from the matched sample.</span>
-<span id="cb53-233"><a href="#cb53-233"></a></span>
-<span id="cb53-234"><a href="#cb53-234"></a>Benifits:</span>
-<span id="cb53-235"><a href="#cb53-235"></a></span>
-<span id="cb53-236"><a href="#cb53-236"></a><span class="ss">- </span>SMD is not influenced by the scale of the measured variable, making it suitable for comparing the balance of different variables measured on different scales.</span>
-<span id="cb53-237"><a href="#cb53-237"></a><span class="ss">- </span>Unlike hypothesis testing, SMD is not affected by sample size, making it a reliable measure for assessing balance in matched samples.</span>
-<span id="cb53-238"><a href="#cb53-238"></a>::: </span>
-<span id="cb53-239"><a href="#cb53-239"></a></span>
-<span id="cb53-240"><a href="#cb53-240"></a><span class="in">```{r step3f, cache=TRUE}</span></span>
-<span id="cb53-241"><a href="#cb53-241"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> OACVD.match, </span>
-<span id="cb53-242"><a href="#cb53-242"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
-<span id="cb53-243"><a href="#cb53-243"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-244"><a href="#cb53-244"></a><span class="in">```</span></span>
-<span id="cb53-245"><a href="#cb53-245"></a></span>
-<span id="cb53-246"><a href="#cb53-246"></a><span class="fu">#### Question for the students</span></span>
-<span id="cb53-247"><a href="#cb53-247"></a></span>
-<span id="cb53-248"><a href="#cb53-248"></a><span class="ss">-   </span>All SMD <span class="sc">\&lt;</span> 0.20?</span>
-<span id="cb53-249"><a href="#cb53-249"></a></span>
-<span id="cb53-250"><a href="#cb53-250"></a><span class="fu">#### Other balance measures</span></span>
-<span id="cb53-251"><a href="#cb53-251"></a></span>
-<span id="cb53-252"><a href="#cb53-252"></a><span class="fu">##### Individual categories</span></span>
-<span id="cb53-253"><a href="#cb53-253"></a></span>
-<span id="cb53-254"><a href="#cb53-254"></a>If you want to check balance at each category (not very useful in general situations). We are generally interested if the variables are balanced or not (not categories).</span>
-<span id="cb53-255"><a href="#cb53-255"></a></span>
-<span id="cb53-256"><a href="#cb53-256"></a><span class="in">```{r step3g, cache=TRUE}</span></span>
-<span id="cb53-257"><a href="#cb53-257"></a>baltab <span class="ot">&lt;-</span> <span class="fu">bal.tab</span>(matching.obj)</span>
-<span id="cb53-258"><a href="#cb53-258"></a>baltab</span>
-<span id="cb53-259"><a href="#cb53-259"></a><span class="in">```</span></span>
-<span id="cb53-260"><a href="#cb53-260"></a></span>
-<span id="cb53-261"><a href="#cb53-261"></a><span class="fu">##### Individual plots</span></span>
-<span id="cb53-262"><a href="#cb53-262"></a></span>
-<span id="cb53-263"><a href="#cb53-263"></a>You could plot each variables individually</span>
-<span id="cb53-264"><a href="#cb53-264"></a></span>
-<span id="cb53-265"><a href="#cb53-265"></a><span class="in">```{r step3h, cache=TRUE}</span></span>
-<span id="cb53-266"><a href="#cb53-266"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"income"</span>)</span>
-<span id="cb53-267"><a href="#cb53-267"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"age"</span>)</span>
-<span id="cb53-268"><a href="#cb53-268"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"race"</span>)</span>
-<span id="cb53-269"><a href="#cb53-269"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"diab"</span>)</span>
-<span id="cb53-270"><a href="#cb53-270"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"immigrate"</span>)</span>
-<span id="cb53-271"><a href="#cb53-271"></a><span class="in">```</span></span>
-<span id="cb53-272"><a href="#cb53-272"></a></span>
-<span id="cb53-273"><a href="#cb53-273"></a><span class="fu">##### Love plot</span></span>
-<span id="cb53-274"><a href="#cb53-274"></a></span>
-<span id="cb53-275"><a href="#cb53-275"></a><span class="in">```{r loveplot, cache=TRUE}</span></span>
-<span id="cb53-276"><a href="#cb53-276"></a><span class="co"># Individual categories again</span></span>
-<span id="cb53-277"><a href="#cb53-277"></a><span class="fu">love.plot</span>(baltab, <span class="at">threshold =</span> .<span class="dv">2</span>)</span>
-<span id="cb53-278"><a href="#cb53-278"></a><span class="in">```</span></span>
-<span id="cb53-279"><a href="#cb53-279"></a></span>
-<span id="cb53-280"><a href="#cb53-280"></a><span class="fu">### Repeat of Step 1-3 again</span></span>
-<span id="cb53-281"><a href="#cb53-281"></a></span>
-<span id="cb53-282"><a href="#cb53-282"></a>Covariate balance is reassessed in each step to ensure the quality of the match.</span>
-<span id="cb53-283"><a href="#cb53-283"></a></span>
-<span id="cb53-284"><a href="#cb53-284"></a><span class="fu">#### Add caliper</span></span>
-<span id="cb53-285"><a href="#cb53-285"></a></span>
-<span id="cb53-286"><a href="#cb53-286"></a>The matching process is repeated, this time introducing a caliper to ensure that matches are only made within a specified range of PS.</span>
-<span id="cb53-287"><a href="#cb53-287"></a></span>
-<span id="cb53-288"><a href="#cb53-288"></a><span class="in">```{r step3i, cache=TRUE}</span></span>
-<span id="cb53-289"><a href="#cb53-289"></a>logitPS <span class="ot">&lt;-</span>  <span class="sc">-</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">/</span>OACVD.match<span class="sc">$</span>distance <span class="sc">-</span> <span class="dv">1</span>) </span>
-<span id="cb53-290"><a href="#cb53-290"></a><span class="co"># logit of the propensity score</span></span>
-<span id="cb53-291"><a href="#cb53-291"></a>.<span class="dv">2</span><span class="sc">*</span><span class="fu">sd</span>(logitPS) <span class="co"># suggested in the literature</span></span>
-<span id="cb53-292"><a href="#cb53-292"></a></span>
-<span id="cb53-293"><a href="#cb53-293"></a></span>
-<span id="cb53-294"><a href="#cb53-294"></a><span class="co"># Step 1 and 2</span></span>
-<span id="cb53-295"><a href="#cb53-295"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
-<span id="cb53-296"><a href="#cb53-296"></a>                        <span class="at">data =</span> analytic11n,</span>
-<span id="cb53-297"><a href="#cb53-297"></a>                        <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
-<span id="cb53-298"><a href="#cb53-298"></a>                        <span class="at">ratio =</span> <span class="dv">1</span>,</span>
-<span id="cb53-299"><a href="#cb53-299"></a>                        <span class="at">caliper =</span> .<span class="dv">2</span><span class="sc">*</span><span class="fu">sd</span>(logitPS))</span>
-<span id="cb53-300"><a href="#cb53-300"></a><span class="co"># see how many matched</span></span>
-<span id="cb53-301"><a href="#cb53-301"></a>matching.obj</span>
-<span id="cb53-302"><a href="#cb53-302"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span>
-<span id="cb53-303"><a href="#cb53-303"></a><span class="in">```</span></span>
-<span id="cb53-304"><a href="#cb53-304"></a></span>
-<span id="cb53-305"><a href="#cb53-305"></a><span class="in">```{r step3j, cache=TRUE}</span></span>
-<span id="cb53-306"><a href="#cb53-306"></a><span class="co"># Step 3</span></span>
-<span id="cb53-307"><a href="#cb53-307"></a><span class="fu">by</span>(OACVD.match<span class="sc">$</span>distance, OACVD.match<span class="sc">$</span>OA, summary)</span>
-<span id="cb53-308"><a href="#cb53-308"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> OACVD.match, </span>
-<span id="cb53-309"><a href="#cb53-309"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
-<span id="cb53-310"><a href="#cb53-310"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-311"><a href="#cb53-311"></a><span class="in">```</span></span>
-<span id="cb53-312"><a href="#cb53-312"></a></span>
-<span id="cb53-313"><a href="#cb53-313"></a><span class="fu">#### Question for the students</span></span>
-<span id="cb53-314"><a href="#cb53-314"></a></span>
-<span id="cb53-315"><a href="#cb53-315"></a><span class="ss">-   </span>Did all of the SMDs decrease?</span>
-<span id="cb53-316"><a href="#cb53-316"></a></span>
-<span id="cb53-317"><a href="#cb53-317"></a><span class="fu">#### Look at the data</span></span>
-<span id="cb53-318"><a href="#cb53-318"></a></span>
-<span id="cb53-319"><a href="#cb53-319"></a><span class="in">```{r step3k, cache=TRUE}</span></span>
-<span id="cb53-320"><a href="#cb53-320"></a><span class="co"># what is weights variable for pair matching?</span></span>
-<span id="cb53-321"><a href="#cb53-321"></a><span class="fu">head</span>(OACVD.match)</span>
-<span id="cb53-322"><a href="#cb53-322"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
-<span id="cb53-323"><a href="#cb53-323"></a><span class="in">```</span></span>
-<span id="cb53-324"><a href="#cb53-324"></a></span>
-<span id="cb53-325"><a href="#cb53-325"></a><span class="fu">### Step 4</span></span>
-<span id="cb53-326"><a href="#cb53-326"></a></span>
-<span id="cb53-327"><a href="#cb53-327"></a><span class="fu">#### Estimate treatment effect for matched data</span></span>
-<span id="cb53-328"><a href="#cb53-328"></a></span>
-<span id="cb53-329"><a href="#cb53-329"></a>Different models (e.g., unconditional logistic regression, survey design) are fitted to estimate the treatment effect in the matched sample.</span>
-<span id="cb53-330"><a href="#cb53-330"></a></span>
-<span id="cb53-331"><a href="#cb53-331"></a><span class="fu">#### Unconditional logistic</span></span>
-<span id="cb53-332"><a href="#cb53-332"></a></span>
-<span id="cb53-333"><a href="#cb53-333"></a><span class="in">```{r step4, cache=TRUE}</span></span>
-<span id="cb53-334"><a href="#cb53-334"></a><span class="co"># Wrong model for population!!</span></span>
-<span id="cb53-335"><a href="#cb53-335"></a>outcome.model <span class="ot">&lt;-</span> <span class="fu">glm</span>(CVD <span class="sc">~</span> OA, <span class="at">data =</span> OACVD.match, <span class="at">family =</span> <span class="fu">binomial</span>())</span>
-<span id="cb53-336"><a href="#cb53-336"></a><span class="fu">publish</span>(outcome.model)</span>
-<span id="cb53-337"><a href="#cb53-337"></a><span class="in">```</span></span>
-<span id="cb53-338"><a href="#cb53-338"></a></span>
-<span id="cb53-339"><a href="#cb53-339"></a><span class="fu">#### Survey design</span></span>
-<span id="cb53-340"><a href="#cb53-340"></a></span>
-<span id="cb53-341"><a href="#cb53-341"></a><span class="fu">##### Convert data to design</span></span>
-<span id="cb53-342"><a href="#cb53-342"></a></span>
-<span id="cb53-343"><a href="#cb53-343"></a>The matched data is converted to a survey design object to account for the matched pairs in the analysis.</span>
-<span id="cb53-344"><a href="#cb53-344"></a></span>
-<span id="cb53-345"><a href="#cb53-345"></a><span class="in">```{r step4b, cache=TRUE}</span></span>
-<span id="cb53-346"><a href="#cb53-346"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb53-347"><a href="#cb53-347"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
-<span id="cb53-348"><a href="#cb53-348"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
-<span id="cb53-349"><a href="#cb53-349"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID])</span>
-<span id="cb53-350"><a href="#cb53-350"></a>analytic.miss<span class="sc">$</span>matched[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb53-351"><a href="#cb53-351"></a><span class="fu">table</span>(analytic.miss<span class="sc">$</span>matched)</span>
-<span id="cb53-352"><a href="#cb53-352"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>survey.weight, </span>
-<span id="cb53-353"><a href="#cb53-353"></a>                      <span class="at">data=</span>analytic.miss)</span>
-<span id="cb53-354"><a href="#cb53-354"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb53-355"><a href="#cb53-355"></a><span class="in">```</span></span>
-<span id="cb53-356"><a href="#cb53-356"></a></span>
-<span id="cb53-357"><a href="#cb53-357"></a><span class="fu">##### Balance in matched population?</span></span>
-<span id="cb53-358"><a href="#cb53-358"></a></span>
-<span id="cb53-359"><a href="#cb53-359"></a><span class="in">```{r step4c, cache=TRUE}</span></span>
-<span id="cb53-360"><a href="#cb53-360"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">svyCreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> w.design.m, </span>
-<span id="cb53-361"><a href="#cb53-361"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
-<span id="cb53-362"><a href="#cb53-362"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-363"><a href="#cb53-363"></a><span class="in">```</span></span>
-<span id="cb53-364"><a href="#cb53-364"></a></span>
-<span id="cb53-365"><a href="#cb53-365"></a><span class="fu">##### Outcome analysis</span></span>
-<span id="cb53-366"><a href="#cb53-366"></a></span>
-<span id="cb53-367"><a href="#cb53-367"></a><span class="in">```{r step4d, cache=TRUE}</span></span>
-<span id="cb53-368"><a href="#cb53-368"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
-<span id="cb53-369"><a href="#cb53-369"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
-<span id="cb53-370"><a href="#cb53-370"></a><span class="fu">publish</span>(fit.design)</span>
-<span id="cb53-371"><a href="#cb53-371"></a><span class="in">```</span></span>
-<span id="cb53-372"><a href="#cb53-372"></a></span>
-<span id="cb53-373"><a href="#cb53-373"></a><span class="fu">### Matched data with increase ratio</span></span>
-<span id="cb53-374"><a href="#cb53-374"></a></span>
-<span id="cb53-375"><a href="#cb53-375"></a>The matching process is repeated with a different ratio (e.g., 1:5) to explore how changing the ratio affects the covariate balance and treatment effect estimation.</span>
-<span id="cb53-376"><a href="#cb53-376"></a></span>
-<span id="cb53-377"><a href="#cb53-377"></a><span class="in">```{r ratio, cache=TRUE}</span></span>
-<span id="cb53-378"><a href="#cb53-378"></a><span class="co"># Step 1 and 2</span></span>
-<span id="cb53-379"><a href="#cb53-379"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
-<span id="cb53-380"><a href="#cb53-380"></a>                        <span class="at">data =</span> analytic11n,</span>
-<span id="cb53-381"><a href="#cb53-381"></a>                        <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
-<span id="cb53-382"><a href="#cb53-382"></a>                        <span class="at">ratio =</span> <span class="dv">5</span>,</span>
-<span id="cb53-383"><a href="#cb53-383"></a>                        <span class="at">caliper =</span> <span class="fl">0.2</span>)</span>
-<span id="cb53-384"><a href="#cb53-384"></a><span class="co"># see how many matched</span></span>
-<span id="cb53-385"><a href="#cb53-385"></a>matching.obj</span>
-<span id="cb53-386"><a href="#cb53-386"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span>
-<span id="cb53-387"><a href="#cb53-387"></a><span class="co"># Step 3</span></span>
-<span id="cb53-388"><a href="#cb53-388"></a><span class="fu">by</span>(OACVD.match<span class="sc">$</span>distance, OACVD.match<span class="sc">$</span>OA, summary)</span>
-<span id="cb53-389"><a href="#cb53-389"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> OACVD.match, </span>
-<span id="cb53-390"><a href="#cb53-390"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
-<span id="cb53-391"><a href="#cb53-391"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-392"><a href="#cb53-392"></a><span class="in">```</span></span>
-<span id="cb53-393"><a href="#cb53-393"></a></span>
-<span id="cb53-394"><a href="#cb53-394"></a><span class="fu">##### Question for the students</span></span>
-<span id="cb53-395"><a href="#cb53-395"></a></span>
-<span id="cb53-396"><a href="#cb53-396"></a><span class="ss">-   </span>Did all of the SMDs decrease?</span>
-<span id="cb53-397"><a href="#cb53-397"></a></span>
-<span id="cb53-398"><a href="#cb53-398"></a><span class="fu">##### Look at the data</span></span>
-<span id="cb53-399"><a href="#cb53-399"></a></span>
-<span id="cb53-400"><a href="#cb53-400"></a><span class="in">```{r summdata, cache=TRUE}</span></span>
-<span id="cb53-401"><a href="#cb53-401"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
-<span id="cb53-402"><a href="#cb53-402"></a><span class="fu">head</span>(OACVD.match)</span>
-<span id="cb53-403"><a href="#cb53-403"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
-<span id="cb53-404"><a href="#cb53-404"></a><span class="in">```</span></span>
-<span id="cb53-405"><a href="#cb53-405"></a></span>
-<span id="cb53-406"><a href="#cb53-406"></a><span class="fu">#### Combining matching weights</span></span>
-<span id="cb53-407"><a href="#cb53-407"></a></span>
-<span id="cb53-408"><a href="#cb53-408"></a>Different approaches to incorporating weights (e.g., matching weights, survey weights) are explored.</span>
-<span id="cb53-409"><a href="#cb53-409"></a></span>
-<span id="cb53-410"><a href="#cb53-410"></a><span class="fu">#### Not incorporating matching weights</span></span>
-<span id="cb53-411"><a href="#cb53-411"></a></span>
-<span id="cb53-412"><a href="#cb53-412"></a><span class="in">```{r ratio1, cache=TRUE}</span></span>
-<span id="cb53-413"><a href="#cb53-413"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb53-414"><a href="#cb53-414"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
-<span id="cb53-415"><a href="#cb53-415"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
-<span id="cb53-416"><a href="#cb53-416"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID])</span>
-<span id="cb53-417"><a href="#cb53-417"></a>analytic.miss<span class="sc">$</span>matched[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb53-418"><a href="#cb53-418"></a><span class="fu">table</span>(analytic.miss<span class="sc">$</span>matched)</span>
-<span id="cb53-419"><a href="#cb53-419"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>survey.weight, </span>
-<span id="cb53-420"><a href="#cb53-420"></a>                      <span class="at">data=</span>analytic.miss)</span>
-<span id="cb53-421"><a href="#cb53-421"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb53-422"><a href="#cb53-422"></a><span class="in">```</span></span>
-<span id="cb53-423"><a href="#cb53-423"></a></span>
-<span id="cb53-424"><a href="#cb53-424"></a><span class="in">```{r ratio2, cache=TRUE}</span></span>
-<span id="cb53-425"><a href="#cb53-425"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
-<span id="cb53-426"><a href="#cb53-426"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
-<span id="cb53-427"><a href="#cb53-427"></a><span class="fu">publish</span>(fit.design)</span>
-<span id="cb53-428"><a href="#cb53-428"></a><span class="in">```</span></span>
-<span id="cb53-429"><a href="#cb53-429"></a></span>
-<span id="cb53-430"><a href="#cb53-430"></a><span class="fu">##### Incorporating matching weights</span></span>
-<span id="cb53-431"><a href="#cb53-431"></a></span>
-<span id="cb53-432"><a href="#cb53-432"></a><span class="in">```{r ratio3, cache=TRUE}</span></span>
-<span id="cb53-433"><a href="#cb53-433"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb53-434"><a href="#cb53-434"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
-<span id="cb53-435"><a href="#cb53-435"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
-<span id="cb53-436"><a href="#cb53-436"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID])</span>
-<span id="cb53-437"><a href="#cb53-437"></a>analytic.miss<span class="sc">$</span>matched[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb53-438"><a href="#cb53-438"></a><span class="fu">table</span>(analytic.miss<span class="sc">$</span>matched)</span>
-<span id="cb53-439"><a href="#cb53-439"></a><span class="in">```</span></span>
-<span id="cb53-440"><a href="#cb53-440"></a></span>
-<span id="cb53-441"><a href="#cb53-441"></a><span class="in">```{r ratio4, cache=TRUE}</span></span>
-<span id="cb53-442"><a href="#cb53-442"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
-<span id="cb53-443"><a href="#cb53-443"></a>analytic.miss<span class="sc">$</span>combined.weight <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb53-444"><a href="#cb53-444"></a>analytic.miss<span class="sc">$</span>combined.weight[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span></span>
-<span id="cb53-445"><a href="#cb53-445"></a>  OACVD.match<span class="sc">$</span>weights<span class="sc">*</span>OACVD.match<span class="sc">$</span>survey.weight</span>
-<span id="cb53-446"><a href="#cb53-446"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>combined.weight, </span>
-<span id="cb53-447"><a href="#cb53-447"></a>                      <span class="at">data=</span>analytic.miss)</span>
-<span id="cb53-448"><a href="#cb53-448"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb53-449"><a href="#cb53-449"></a><span class="in">```</span></span>
-<span id="cb53-450"><a href="#cb53-450"></a></span>
-<span id="cb53-451"><a href="#cb53-451"></a><span class="in">```{r ratio5, cache=TRUE}</span></span>
-<span id="cb53-452"><a href="#cb53-452"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
-<span id="cb53-453"><a href="#cb53-453"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
-<span id="cb53-454"><a href="#cb53-454"></a><span class="fu">publish</span>(fit.design)</span>
-<span id="cb53-455"><a href="#cb53-455"></a><span class="in">```</span></span>
-<span id="cb53-456"><a href="#cb53-456"></a></span>
-<span id="cb53-457"><a href="#cb53-457"></a><span class="fu">#### Matched with replacement</span></span>
-<span id="cb53-458"><a href="#cb53-458"></a></span>
-<span id="cb53-459"><a href="#cb53-459"></a>Matching is performed with replacement, allowing control units to be used in more than one match.</span>
-<span id="cb53-460"><a href="#cb53-460"></a></span>
-<span id="cb53-461"><a href="#cb53-461"></a><span class="in">```{r ratio6, cache=TRUE}</span></span>
-<span id="cb53-462"><a href="#cb53-462"></a><span class="co"># Step 1 and 2</span></span>
-<span id="cb53-463"><a href="#cb53-463"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
-<span id="cb53-464"><a href="#cb53-464"></a>                        <span class="at">data =</span> analytic11n,</span>
-<span id="cb53-465"><a href="#cb53-465"></a>                        <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
-<span id="cb53-466"><a href="#cb53-466"></a>                        <span class="at">ratio =</span> <span class="dv">5</span>,</span>
-<span id="cb53-467"><a href="#cb53-467"></a>                        <span class="at">caliper =</span> <span class="fl">0.2</span>,</span>
-<span id="cb53-468"><a href="#cb53-468"></a>                        <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-469"><a href="#cb53-469"></a><span class="co"># see how many matched</span></span>
-<span id="cb53-470"><a href="#cb53-470"></a>matching.obj</span>
-<span id="cb53-471"><a href="#cb53-471"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span>
-<span id="cb53-472"><a href="#cb53-472"></a><span class="co"># Step 3</span></span>
-<span id="cb53-473"><a href="#cb53-473"></a><span class="fu">by</span>(OACVD.match<span class="sc">$</span>distance, OACVD.match<span class="sc">$</span>OA, summary)</span>
-<span id="cb53-474"><a href="#cb53-474"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> OACVD.match, </span>
-<span id="cb53-475"><a href="#cb53-475"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
-<span id="cb53-476"><a href="#cb53-476"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-477"><a href="#cb53-477"></a><span class="in">```</span></span>
-<span id="cb53-478"><a href="#cb53-478"></a></span>
-<span id="cb53-479"><a href="#cb53-479"></a><span class="fu">#### Question for the students</span></span>
-<span id="cb53-480"><a href="#cb53-480"></a></span>
-<span id="cb53-481"><a href="#cb53-481"></a><span class="ss">-   </span>Did all of the SMDs decrease?</span>
-<span id="cb53-482"><a href="#cb53-482"></a></span>
-<span id="cb53-483"><a href="#cb53-483"></a><span class="fu">#### Look at the data</span></span>
-<span id="cb53-484"><a href="#cb53-484"></a></span>
-<span id="cb53-485"><a href="#cb53-485"></a><span class="in">```{r ratio7, cache=TRUE}</span></span>
-<span id="cb53-486"><a href="#cb53-486"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
-<span id="cb53-487"><a href="#cb53-487"></a><span class="fu">head</span>(OACVD.match)</span>
-<span id="cb53-488"><a href="#cb53-488"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>weights)</span>
-<span id="cb53-489"><a href="#cb53-489"></a><span class="in">```</span></span>
-<span id="cb53-490"><a href="#cb53-490"></a></span>
-<span id="cb53-491"><a href="#cb53-491"></a><span class="fu">#### Survey design</span></span>
-<span id="cb53-492"><a href="#cb53-492"></a></span>
-<span id="cb53-493"><a href="#cb53-493"></a>The matched data is converted into a survey design object, and the treatment effect is estimated while accounting for the complex survey design.</span>
-<span id="cb53-494"><a href="#cb53-494"></a></span>
-<span id="cb53-495"><a href="#cb53-495"></a><span class="in">```{r new0, cache=TRUE}</span></span>
-<span id="cb53-496"><a href="#cb53-496"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb53-497"><a href="#cb53-497"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
-<span id="cb53-498"><a href="#cb53-498"></a><span class="fu">length</span>(OACVD.match<span class="sc">$</span>ID) <span class="co"># matched data</span></span>
-<span id="cb53-499"><a href="#cb53-499"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID])</span>
-<span id="cb53-500"><a href="#cb53-500"></a>analytic.miss<span class="sc">$</span>matched[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb53-501"><a href="#cb53-501"></a><span class="fu">table</span>(analytic.miss<span class="sc">$</span>matched)</span>
-<span id="cb53-502"><a href="#cb53-502"></a><span class="in">```</span></span>
-<span id="cb53-503"><a href="#cb53-503"></a></span>
-<span id="cb53-504"><a href="#cb53-504"></a><span class="in">```{r new1, cache=TRUE}</span></span>
-<span id="cb53-505"><a href="#cb53-505"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
-<span id="cb53-506"><a href="#cb53-506"></a>analytic.miss<span class="sc">$</span>combined.weight <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb53-507"><a href="#cb53-507"></a>analytic.miss<span class="sc">$</span>combined.weight[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span></span>
-<span id="cb53-508"><a href="#cb53-508"></a>  OACVD.match<span class="sc">$</span>weights<span class="sc">*</span>OACVD.match<span class="sc">$</span>survey.weight</span>
-<span id="cb53-509"><a href="#cb53-509"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>combined.weight, </span>
-<span id="cb53-510"><a href="#cb53-510"></a>                      <span class="at">data=</span>analytic.miss)</span>
-<span id="cb53-511"><a href="#cb53-511"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb53-512"><a href="#cb53-512"></a><span class="in">```</span></span>
-<span id="cb53-513"><a href="#cb53-513"></a></span>
-<span id="cb53-514"><a href="#cb53-514"></a><span class="in">```{r new2, cache=TRUE}</span></span>
-<span id="cb53-515"><a href="#cb53-515"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
-<span id="cb53-516"><a href="#cb53-516"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
-<span id="cb53-517"><a href="#cb53-517"></a><span class="fu">publish</span>(fit.design)</span>
-<span id="cb53-518"><a href="#cb53-518"></a><span class="in">```</span></span>
-<span id="cb53-519"><a href="#cb53-519"></a></span>
-<span id="cb53-520"><a href="#cb53-520"></a></span>
-<span id="cb53-521"><a href="#cb53-521"></a><span class="fu">### Video content (optional)</span></span>
-<span id="cb53-522"><a href="#cb53-522"></a></span>
-<span id="cb53-523"><a href="#cb53-523"></a>::: callout-tip</span>
-<span id="cb53-524"><a href="#cb53-524"></a>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</span>
-<span id="cb53-525"><a href="#cb53-525"></a>:::</span>
-<span id="cb53-526"><a href="#cb53-526"></a></span>
-<span id="cb53-527"><a href="#cb53-527"></a>::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}</span>
-<span id="cb53-528"><a href="#cb53-528"></a><span class="kw">&lt;iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">"https://www.youtube.com/embed/ONaKFZCTRfw"</span> <span class="er">style</span><span class="ot">=</span><span class="st">"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"</span> <span class="er">allowfullscreen</span><span class="kw">&gt;</span></span>
-<span id="cb53-529"><a href="#cb53-529"></a></span>
-<span id="cb53-530"><a href="#cb53-530"></a><span class="kw">&lt;/iframe&gt;</span></span>
-<span id="cb53-531"><a href="#cb53-531"></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

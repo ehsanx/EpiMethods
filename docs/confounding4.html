@@ -802,7 +802,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Z-bias</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">Z-bias</h1>
 </div>
 
 
@@ -817,9 +817,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 </header><p>Z-bias occurs in the context of causal inference, specifically when using instrumental variables to estimate causal effects. Instrumental variables (IVs) are used to isolate the variation in the treatment variable that is unrelated to the confounding factors, thus providing a pathway to estimate causal effects.</p>
 <div class="cell" data-hash="confounding4_cache/html/setup_96dcb0abbd875703ca886ba41d9e1cd9">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(simcausal)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="continuous-y" class="level3"><h3 class="anchored" data-anchor-id="continuous-y">Continuous Y</h3>
 <ul>
@@ -834,7 +833,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <section id="data-generating-process" class="level5"><h5 class="anchored" data-anchor-id="data-generating-process">Data generating process</h5>
 <div class="cell" data-hash="confounding4_cache/html/dgm10_37f3bbf5aa9648110be33309e1671ccf">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(simcausal)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb2-2"><a href="#cb2-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
 <span id="cb2-3"><a href="#cb2-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
 <span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">node</span>(<span class="st">"age"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
@@ -845,23 +844,22 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-9"><a href="#cb2-9"></a>  <span class="fu">node</span>(<span class="st">"smoking"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">1.2</span> <span class="sc">*</span> gender <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> age)) <span class="sc">+</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a>  <span class="fu">node</span>(<span class="st">"hypertension"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">3</span> <span class="sc">*</span> diet <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> smoking <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> gender, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
 <span id="cb2-11"><a href="#cb2-11"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="generate-dag" class="level5"><h5 class="anchored" data-anchor-id="generate-dag">Generate DAG</h5>
 <div class="cell" data-hash="confounding4_cache/html/dag10_82c0af345f4224499501b71117872376">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
 <span id="cb3-2"><a href="#cb3-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
 <span id="cb3-3"><a href="#cb3-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="confounding4_files/figure-html/dag10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="generate-data" class="level5"><h5 class="anchored" data-anchor-id="generate-data">Generate Data</h5>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(simcausal)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="fu">head</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -872,7 +870,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="estimate-effect" class="level5"><h5 class="anchored" data-anchor-id="estimate-effect">Estimate effect</h5>
 <div class="cell" data-hash="confounding4_cache/html/est10_b0baebc7a3b1822d225b960d52670a1f">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>Obs.Data<span class="sc">$</span>income <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(Obs.Data<span class="sc">$</span>income)</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>Obs.Data<span class="sc">$</span>income <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(Obs.Data<span class="sc">$</span>income)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co"># True data generating mechanism </span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co"># (unattainable as U is unmeasured)</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> diet <span class="sc">+</span> age <span class="sc">+</span> smoking <span class="sc">+</span> gender, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
@@ -890,7 +888,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt;              gender              0.50               [0.50;0.50]   &lt;1e-04 </span></span>
 <span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt;  smoking: income(0)              2.00               [1.99;2.00]   &lt;1e-04 </span></span>
 <span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt;  smoking: income(1)              2.00               [2.00;2.00]   &lt;1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section></section></section><section id="binary-y" class="level3"><h3 class="anchored" data-anchor-id="binary-y">Binary Y</h3>
 <ul>
@@ -905,7 +902,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <section id="data-generating-process-1" class="level5"><h5 class="anchored" data-anchor-id="data-generating-process-1">Data generating process</h5>
 <div class="cell" data-hash="confounding4_cache/html/dgm11_41cd92e942cbb2536e30724302d929b7">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">require</span>(simcausal)</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb6-2"><a href="#cb6-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
 <span id="cb6-3"><a href="#cb6-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
 <span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">node</span>(<span class="st">"U"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
@@ -913,23 +910,22 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb6-6"><a href="#cb6-6"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>U <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>Z)) <span class="sc">+</span></span>
 <span id="cb6-7"><a href="#cb6-7"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> A))</span>
 <span id="cb6-8"><a href="#cb6-8"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="generate-dag-1" class="level5"><h5 class="anchored" data-anchor-id="generate-dag-1">Generate DAG</h5>
 <div class="cell" data-hash="confounding4_cache/html/dag11_b98693fbe3a8eab9e2918638dbb9a2e6">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
 <span id="cb7-2"><a href="#cb7-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
 <span id="cb7-3"><a href="#cb7-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="confounding4_files/figure-html/dag11-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="generate-data-1" class="level5"><h5 class="anchored" data-anchor-id="generate-data-1">Generate Data</h5>
 <div class="cell">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">require</span>(simcausal)</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb8-2"><a href="#cb8-2"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="fu">head</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -940,7 +936,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="estimate-effect-1" class="level5"><h5 class="anchored" data-anchor-id="estimate-effect-1">Estimate effect</h5>
 <div class="cell" data-hash="confounding4_cache/html/est11_4ae712fc00f3ddd990e5f1fe18094913">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># True data generating mechanism (unattainable as U is unmeasured)</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># True data generating mechanism (unattainable as U is unmeasured)</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A <span class="sc">+</span> U, <span class="at">family=</span><span class="st">"binomial"</span>, <span class="at">data=</span>Obs.Data)</span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; (Intercept)           A           U </span></span>
@@ -967,11 +963,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb9-25"><a href="#cb9-25"></a><span class="fu">coef</span>(fit2)[<span class="st">"A"</span>] <span class="sc">-</span> <span class="fl">1.3</span></span>
 <span id="cb9-26"><a href="#cb9-26"></a><span class="co">#&gt;        A </span></span>
 <span id="cb9-27"><a href="#cb9-27"></a><span class="co">#&gt; 1.991396</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 
-
-<!-- -->
 
 </section></section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1166,137 +1159,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">Collapsibility</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb10" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">## Z-bias {.unnumbered}</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3"></a>Z-bias occurs in the context of causal inference, specifically when using instrumental variables to estimate causal effects. Instrumental variables (IVs) are used to isolate the variation in the treatment variable that is unrelated to the confounding factors, thus providing a pathway to estimate causal effects. </span>
-<span id="cb10-4"><a href="#cb10-4"></a></span>
-<span id="cb10-5"><a href="#cb10-5"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a><span class="co"># Load required packages</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="fu">library</span>(simcausal)</span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="in">```</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a></span>
-<span id="cb10-10"><a href="#cb10-10"></a><span class="fu">### Continuous Y</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a></span>
-<span id="cb10-12"><a href="#cb10-12"></a><span class="ss">-   </span>U is unmeasured continuous variable</span>
-<span id="cb10-13"><a href="#cb10-13"></a><span class="ss">-   </span>Z is an instrumental variable</span>
-<span id="cb10-14"><a href="#cb10-14"></a><span class="ss">-   </span>A is binary treatment</span>
-<span id="cb10-15"><a href="#cb10-15"></a><span class="ss">-   </span>Y is continuous outcome</span>
-<span id="cb10-16"><a href="#cb10-16"></a></span>
-<span id="cb10-17"><a href="#cb10-17"></a><span class="fu">#### Non-null effect</span></span>
-<span id="cb10-18"><a href="#cb10-18"></a></span>
-<span id="cb10-19"><a href="#cb10-19"></a><span class="ss">-   </span>True treatment effect = 1.3</span>
-<span id="cb10-20"><a href="#cb10-20"></a></span>
-<span id="cb10-21"><a href="#cb10-21"></a><span class="fu">##### Data generating process</span></span>
-<span id="cb10-22"><a href="#cb10-22"></a></span>
-<span id="cb10-23"><a href="#cb10-23"></a><span class="in">```{r dgm10, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-24"><a href="#cb10-24"></a><span class="fu">require</span>(simcausal)</span>
-<span id="cb10-25"><a href="#cb10-25"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
-<span id="cb10-26"><a href="#cb10-26"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
-<span id="cb10-27"><a href="#cb10-27"></a>  <span class="fu">node</span>(<span class="st">"age"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
-<span id="cb10-28"><a href="#cb10-28"></a>  <span class="fu">node</span>(<span class="st">"gender"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="fl">0.25</span>)) <span class="sc">+</span></span>
-<span id="cb10-29"><a href="#cb10-29"></a>  <span class="fu">node</span>(<span class="st">"education"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="dv">3</span> <span class="sc">+</span> <span class="dv">5</span><span class="sc">*</span> age)) <span class="sc">+</span></span>
-<span id="cb10-30"><a href="#cb10-30"></a>  <span class="fu">node</span>(<span class="st">"diet"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="dv">13</span> <span class="sc">+</span> <span class="dv">7</span> <span class="sc">*</span> education)) <span class="sc">+</span></span>
-<span id="cb10-31"><a href="#cb10-31"></a>  <span class="fu">node</span>(<span class="st">"income"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="dv">2</span> <span class="sc">+</span> <span class="fl">1.4</span> <span class="sc">*</span> education <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> age)) <span class="sc">+</span></span>
-<span id="cb10-32"><a href="#cb10-32"></a>  <span class="fu">node</span>(<span class="st">"smoking"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">1.2</span> <span class="sc">*</span> gender <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> age)) <span class="sc">+</span></span>
-<span id="cb10-33"><a href="#cb10-33"></a>  <span class="fu">node</span>(<span class="st">"hypertension"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">3</span> <span class="sc">*</span> diet <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> smoking <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> gender, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
-<span id="cb10-34"><a href="#cb10-34"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span>
-<span id="cb10-35"><a href="#cb10-35"></a><span class="in">```</span></span>
-<span id="cb10-36"><a href="#cb10-36"></a></span>
-<span id="cb10-37"><a href="#cb10-37"></a><span class="fu">##### Generate DAG</span></span>
-<span id="cb10-38"><a href="#cb10-38"></a></span>
-<span id="cb10-39"><a href="#cb10-39"></a><span class="in">```{r dag10, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-40"><a href="#cb10-40"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
-<span id="cb10-41"><a href="#cb10-41"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
-<span id="cb10-42"><a href="#cb10-42"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span>
-<span id="cb10-43"><a href="#cb10-43"></a></span>
-<span id="cb10-44"><a href="#cb10-44"></a><span class="in">```</span></span>
-<span id="cb10-45"><a href="#cb10-45"></a></span>
-<span id="cb10-46"><a href="#cb10-46"></a><span class="fu">##### Generate Data</span></span>
-<span id="cb10-47"><a href="#cb10-47"></a></span>
-<span id="cb10-48"><a href="#cb10-48"></a><span class="in">```{r data10, cache = FALSE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-49"><a href="#cb10-49"></a><span class="fu">require</span>(simcausal)</span>
-<span id="cb10-50"><a href="#cb10-50"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
-<span id="cb10-51"><a href="#cb10-51"></a><span class="fu">head</span>(Obs.Data)</span>
-<span id="cb10-52"><a href="#cb10-52"></a><span class="in">```</span></span>
-<span id="cb10-53"><a href="#cb10-53"></a></span>
-<span id="cb10-54"><a href="#cb10-54"></a><span class="fu">##### Estimate effect</span></span>
-<span id="cb10-55"><a href="#cb10-55"></a></span>
-<span id="cb10-56"><a href="#cb10-56"></a><span class="in">```{r est10, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-57"><a href="#cb10-57"></a>Obs.Data<span class="sc">$</span>income <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(Obs.Data<span class="sc">$</span>income)</span>
-<span id="cb10-58"><a href="#cb10-58"></a><span class="co"># True data generating mechanism </span></span>
-<span id="cb10-59"><a href="#cb10-59"></a><span class="co"># (unattainable as U is unmeasured)</span></span>
-<span id="cb10-60"><a href="#cb10-60"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> diet <span class="sc">+</span> age <span class="sc">+</span> smoking <span class="sc">+</span> gender, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
-<span id="cb10-61"><a href="#cb10-61"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
-<span id="cb10-62"><a href="#cb10-62"></a></span>
-<span id="cb10-63"><a href="#cb10-63"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb10-64"><a href="#cb10-64"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> diet <span class="sc">+</span> age <span class="sc">+</span> smoking<span class="sc">*</span>income <span class="sc">+</span> gender, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
-<span id="cb10-65"><a href="#cb10-65"></a><span class="fu">publish</span>(fit1)</span>
-<span id="cb10-66"><a href="#cb10-66"></a><span class="in">```</span></span>
-<span id="cb10-67"><a href="#cb10-67"></a></span>
-<span id="cb10-68"><a href="#cb10-68"></a><span class="fu">### Binary Y</span></span>
-<span id="cb10-69"><a href="#cb10-69"></a></span>
-<span id="cb10-70"><a href="#cb10-70"></a><span class="ss">-   </span>U is unmeasured continuous variable</span>
-<span id="cb10-71"><a href="#cb10-71"></a><span class="ss">-   </span>Z is an instrumental variable</span>
-<span id="cb10-72"><a href="#cb10-72"></a><span class="ss">-   </span>A is binary treatment</span>
-<span id="cb10-73"><a href="#cb10-73"></a><span class="ss">-   </span>Y is binary outcome</span>
-<span id="cb10-74"><a href="#cb10-74"></a></span>
-<span id="cb10-75"><a href="#cb10-75"></a><span class="fu">#### Non-null effect</span></span>
-<span id="cb10-76"><a href="#cb10-76"></a></span>
-<span id="cb10-77"><a href="#cb10-77"></a><span class="ss">-   </span>True treatment effect = 1.3</span>
-<span id="cb10-78"><a href="#cb10-78"></a></span>
-<span id="cb10-79"><a href="#cb10-79"></a><span class="fu">##### Data generating process</span></span>
-<span id="cb10-80"><a href="#cb10-80"></a></span>
-<span id="cb10-81"><a href="#cb10-81"></a><span class="in">```{r dgm11, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-82"><a href="#cb10-82"></a><span class="fu">require</span>(simcausal)</span>
-<span id="cb10-83"><a href="#cb10-83"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
-<span id="cb10-84"><a href="#cb10-84"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
-<span id="cb10-85"><a href="#cb10-85"></a>  <span class="fu">node</span>(<span class="st">"U"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
-<span id="cb10-86"><a href="#cb10-86"></a>  <span class="fu">node</span>(<span class="st">"Z"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
-<span id="cb10-87"><a href="#cb10-87"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>U <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>Z)) <span class="sc">+</span></span>
-<span id="cb10-88"><a href="#cb10-88"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> A))</span>
-<span id="cb10-89"><a href="#cb10-89"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span>
-<span id="cb10-90"><a href="#cb10-90"></a><span class="in">```</span></span>
-<span id="cb10-91"><a href="#cb10-91"></a></span>
-<span id="cb10-92"><a href="#cb10-92"></a><span class="fu">##### Generate DAG</span></span>
-<span id="cb10-93"><a href="#cb10-93"></a></span>
-<span id="cb10-94"><a href="#cb10-94"></a><span class="in">```{r dag11, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-95"><a href="#cb10-95"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
-<span id="cb10-96"><a href="#cb10-96"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
-<span id="cb10-97"><a href="#cb10-97"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span>
-<span id="cb10-98"><a href="#cb10-98"></a></span>
-<span id="cb10-99"><a href="#cb10-99"></a><span class="in">```</span></span>
-<span id="cb10-100"><a href="#cb10-100"></a></span>
-<span id="cb10-101"><a href="#cb10-101"></a><span class="fu">##### Generate Data</span></span>
-<span id="cb10-102"><a href="#cb10-102"></a></span>
-<span id="cb10-103"><a href="#cb10-103"></a><span class="in">```{r dat11, cache = FALSE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-104"><a href="#cb10-104"></a><span class="fu">require</span>(simcausal)</span>
-<span id="cb10-105"><a href="#cb10-105"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
-<span id="cb10-106"><a href="#cb10-106"></a><span class="fu">head</span>(Obs.Data)</span>
-<span id="cb10-107"><a href="#cb10-107"></a><span class="in">```</span></span>
-<span id="cb10-108"><a href="#cb10-108"></a></span>
-<span id="cb10-109"><a href="#cb10-109"></a><span class="fu">##### Estimate effect</span></span>
-<span id="cb10-110"><a href="#cb10-110"></a></span>
-<span id="cb10-111"><a href="#cb10-111"></a><span class="in">```{r est11, cache = TRUE, warning=FALSE, message=FALSE}</span></span>
-<span id="cb10-112"><a href="#cb10-112"></a><span class="co"># True data generating mechanism (unattainable as U is unmeasured)</span></span>
-<span id="cb10-113"><a href="#cb10-113"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A <span class="sc">+</span> U, <span class="at">family=</span><span class="st">"binomial"</span>, <span class="at">data=</span>Obs.Data)</span>
-<span id="cb10-114"><a href="#cb10-114"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
-<span id="cb10-115"><a href="#cb10-115"></a></span>
-<span id="cb10-116"><a href="#cb10-116"></a><span class="co"># Unadjusted effect (Z not controlled)</span></span>
-<span id="cb10-117"><a href="#cb10-117"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A, <span class="at">family=</span><span class="st">"binomial"</span>, <span class="at">data=</span>Obs.Data)</span>
-<span id="cb10-118"><a href="#cb10-118"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit1),<span class="dv">2</span>)</span>
-<span id="cb10-119"><a href="#cb10-119"></a></span>
-<span id="cb10-120"><a href="#cb10-120"></a><span class="co"># Bias fit 1</span></span>
-<span id="cb10-121"><a href="#cb10-121"></a><span class="fu">coef</span>(fit1)[<span class="st">"A"</span>] <span class="sc">-</span> <span class="fl">1.3</span></span>
-<span id="cb10-122"><a href="#cb10-122"></a></span>
-<span id="cb10-123"><a href="#cb10-123"></a><span class="co"># Adjusted effect (Z  controlled)</span></span>
-<span id="cb10-124"><a href="#cb10-124"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A <span class="sc">+</span> Z, <span class="at">family=</span><span class="st">"binomial"</span>, <span class="at">data=</span>Obs.Data)</span>
-<span id="cb10-125"><a href="#cb10-125"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit2),<span class="dv">2</span>)</span>
-<span id="cb10-126"><a href="#cb10-126"></a></span>
-<span id="cb10-127"><a href="#cb10-127"></a><span class="co"># Bias from fit 2</span></span>
-<span id="cb10-128"><a href="#cb10-128"></a><span class="fu">coef</span>(fit2)[<span class="st">"A"</span>] <span class="sc">-</span> <span class="fl">1.3</span></span>
-<span id="cb10-129"><a href="#cb10-129"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

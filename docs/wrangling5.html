@@ -803,7 +803,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Summary tables</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">Summary tables</h1>
 </div>
 
 
@@ -819,7 +819,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><p>Medical research and epidemiology often involve large, complex datasets. Data summarization is a vital step that transforms these vast datasets into concise, understandable insights. In medical contexts, these summaries can highlight patterns, indicate data inconsistencies, and guide further research. This tutorial will teach you how to use R to efficiently summarize medical data.</p>
 <p>In epidemiology and medical research, “Table 1” typically refers to the first table in a research paper or report that provides descriptive statistics of the study population. It offers a snapshot of the baseline characteristics of the study groups, whether in a cohort study, clinical trial, or any other study design.</p>
 <div class="cell" data-hash="wrangling5_cache/html/tab1a_c5c871aaaa48ca75b709554cc3f7d84a">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>mpg <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/wrangling/mpg.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>mpg <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/wrangling/mpg.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="do">## Ex create a summary table between manufacturer and drv</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">table</span>(mpg<span class="sc">$</span>drv, mpg<span class="sc">$</span>manufacturer)</span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt;    </span></span>
@@ -832,11 +832,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-11"><a href="#cb1-11"></a><span class="co">#&gt;   4      4       0     14     15          0</span></span>
 <span id="cb1-12"><a href="#cb1-12"></a><span class="co">#&gt;   f      9       5      0     19         27</span></span>
 <span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt;   r      0       0      0      0          0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>The first line reads a CSV file. It uses the table() function to generate a contingency table (cross-tabulation) between two categorical variables: <code>drv</code> (drive) and <code>manufacturer</code>. It essentially counts how many times each combination of drv and manufacturer appears in the dataset.</p>
 <div class="cell" data-hash="wrangling5_cache/html/tab1b_c5a8579418eb500839a0e3f708902077">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="do">## Get the percentage summary using prop.table</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="do">## Get the percentage summary using prop.table</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(mpg<span class="sc">$</span>drv, mpg<span class="sc">$</span>manufacturer), <span class="at">margin =</span> <span class="dv">2</span>)</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt;    </span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt;          audi chevrolet     dodge      ford     honda   hyundai      jeep</span></span>
@@ -854,7 +853,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt;   f  1.0000000</span></span>
 <span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt;   r  0.0000000</span></span>
 <span id="cb2-18"><a href="#cb2-18"></a><span class="do">## margin = 1 sum across row, 2 across col</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>This code calculates the column-wise proportion (as percentages) for each combination of <code>drv</code> and <code>manufacturer</code>. The prop.table() function is used to compute the proportions. The <code>margin = 2</code> argument indicates that the proportions are to be computed across columns (<code>margin = 1</code> would compute them across rows).</p>
 <section id="tableone-package" class="level3"><h3 class="anchored" data-anchor-id="tableone-package">tableone package</h3>
@@ -873,7 +871,7 @@ Tip
 </div>
 <p>This section introduces the tableone package, which offers the <code>CreateTableOne</code> function. This function helps in creating “Table 1” type summary tables, commonly used in epidemiological studies.</p>
 <div class="cell" data-hash="wrangling5_cache/html/tab2_7c5811f99f3b3606a3c9fc76750b5f4d">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">require</span>(tableone)</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">require</span>(tableone)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co">#&gt; Loading required package: tableone</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"cyl"</span>, <span class="st">"drv"</span>, <span class="st">"hwy"</span>, <span class="st">"cty"</span>), <span class="at">data =</span> mpg, </span>
 <span id="cb3-4"><a href="#cb3-4"></a>               <span class="at">strata =</span> <span class="st">"trans"</span>, <span class="at">includeNA =</span> <span class="cn">TRUE</span>, <span class="at">test =</span> <span class="cn">FALSE</span>)</span>
@@ -907,13 +905,12 @@ Tip
 <span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt;      r                4 ( 6.9)      4 (21.1) </span></span>
 <span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt;   hwy (mean (SD)) 26.29 (5.99)  24.21 (5.75) </span></span>
 <span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt;   cty (mean (SD)) 19.26 (4.56)  16.89 (3.83)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>The CreateTableOne function is used to create a summary table for the variables <code>cyl, drv, hwy, and cty</code> from the <code>mpg</code> dataset. The <code>strata = trans</code> argument means that the summary is stratified by the trans variable. The <code>includeNA = TRUE</code> argument means that missing values (NAs) are included in the summary. The <code>test = FALSE</code> argument indicates that no statistical tests should be applied to the data (often tests are used to compare groups in the table).</p>
 </section><section id="table1-package" class="level3"><h3 class="anchored" data-anchor-id="table1-package">table1 package</h3>
 <p>This section introduces another package, <code>table1</code>, which can also be used to create “Table 1” type summary tables.</p>
 <div class="cell" data-hash="wrangling5_cache/html/tab3_5dc2d69c71c12a94be0e149aad7f51e5">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(table1)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(table1)</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; Loading required package: table1</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; </span></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; Attaching package: 'table1'</span></span>
@@ -921,7 +918,7 @@ Tip
 <span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; </span></span>
 <span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt;     units, units&lt;-</span></span>
 <span id="cb4-8"><a href="#cb4-8"></a><span class="fu">table1</span>(<span class="sc">~</span> cyl <span class="sc">+</span> drv <span class="sc">+</span> hwy <span class="sc">+</span> cty <span class="sc">|</span> trans, <span class="at">data=</span>mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div class="Rtable1"><table class="Rtable1">
 <thead><tr>
@@ -1128,8 +1125,6 @@ Tip
 <p>The <code>table1()</code> function is used to generate a summary table for the specified variables. The formula-like syntax <code>(~ cyl + drv + hwy + cty | trans)</code> indicates that the summary should be stratified by the <code>trans</code> variable.</p>
 
 
-<!-- -->
-
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -1323,56 +1318,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">R Markdown</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">## Summary tables {.unnumbered}</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3"></a>Medical research and epidemiology often involve large, complex datasets. Data summarization is a vital step that transforms these vast datasets into concise, understandable insights. In medical contexts, these summaries can highlight patterns, indicate data inconsistencies, and guide further research. This tutorial will teach you how to use R to efficiently summarize medical data.</span>
-<span id="cb5-4"><a href="#cb5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5"></a>In epidemiology and medical research, "Table 1" typically refers to the first table in a research paper or report that provides descriptive statistics of the study population. It offers a snapshot of the baseline characteristics of the study groups, whether in a cohort study, clinical trial, or any other study design.</span>
-<span id="cb5-6"><a href="#cb5-6"></a></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="in">```{r tab1a, cache=TRUE}</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a>mpg <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/wrangling/mpg.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="do">## Ex create a summary table between manufacturer and drv</span></span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="fu">table</span>(mpg<span class="sc">$</span>drv, mpg<span class="sc">$</span>manufacturer)</span>
-<span id="cb5-11"><a href="#cb5-11"></a><span class="in">```</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a></span>
-<span id="cb5-13"><a href="#cb5-13"></a>The first line reads a CSV file. It uses the table() function to generate a contingency table (cross-tabulation) between two categorical variables: <span class="in">`drv`</span> (drive) and <span class="in">`manufacturer`</span>. It essentially counts how many times each combination of drv and manufacturer appears in the dataset.</span>
-<span id="cb5-14"><a href="#cb5-14"></a></span>
-<span id="cb5-15"><a href="#cb5-15"></a><span class="in">```{r tab1b, cache=TRUE}</span></span>
-<span id="cb5-16"><a href="#cb5-16"></a><span class="do">## Get the percentage summary using prop.table</span></span>
-<span id="cb5-17"><a href="#cb5-17"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(mpg<span class="sc">$</span>drv, mpg<span class="sc">$</span>manufacturer), <span class="at">margin =</span> <span class="dv">2</span>)</span>
-<span id="cb5-18"><a href="#cb5-18"></a><span class="do">## margin = 1 sum across row, 2 across col</span></span>
-<span id="cb5-19"><a href="#cb5-19"></a><span class="in">```</span></span>
-<span id="cb5-20"><a href="#cb5-20"></a></span>
-<span id="cb5-21"><a href="#cb5-21"></a>This code calculates the column-wise proportion (as percentages) for each combination of <span class="in">`drv`</span> and <span class="in">`manufacturer`</span>. The prop.table() function is used to compute the proportions. The <span class="in">`margin = 2`</span> argument indicates that the proportions are to be computed across columns (<span class="in">`margin = 1`</span> would compute them across rows).</span>
-<span id="cb5-22"><a href="#cb5-22"></a></span>
-<span id="cb5-23"><a href="#cb5-23"></a><span class="fu">### tableone package</span></span>
-<span id="cb5-24"><a href="#cb5-24"></a></span>
-<span id="cb5-25"><a href="#cb5-25"></a>::: callout-tip</span>
-<span id="cb5-26"><a href="#cb5-26"></a>CreateTableOne function from tableone package could be a very useful function to see the summary table. Type <span class="in">`?tableone::CreateTableOne`</span> to see for more details.</span>
-<span id="cb5-27"><a href="#cb5-27"></a>:::</span>
-<span id="cb5-28"><a href="#cb5-28"></a></span>
-<span id="cb5-29"><a href="#cb5-29"></a>This section introduces the tableone package, which offers the <span class="in">`CreateTableOne`</span> function. This function helps in creating "Table 1" type summary tables, commonly used in epidemiological studies.</span>
-<span id="cb5-30"><a href="#cb5-30"></a></span>
-<span id="cb5-31"><a href="#cb5-31"></a><span class="in">```{r tab2, cache=TRUE, warning=FALSE}</span></span>
-<span id="cb5-32"><a href="#cb5-32"></a><span class="fu">require</span>(tableone)</span>
-<span id="cb5-33"><a href="#cb5-33"></a><span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"cyl"</span>, <span class="st">"drv"</span>, <span class="st">"hwy"</span>, <span class="st">"cty"</span>), <span class="at">data =</span> mpg, </span>
-<span id="cb5-34"><a href="#cb5-34"></a>               <span class="at">strata =</span> <span class="st">"trans"</span>, <span class="at">includeNA =</span> <span class="cn">TRUE</span>, <span class="at">test =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb5-35"><a href="#cb5-35"></a><span class="in">```</span></span>
-<span id="cb5-36"><a href="#cb5-36"></a></span>
-<span id="cb5-37"><a href="#cb5-37"></a>The CreateTableOne function is used to create a summary table for the variables <span class="in">`cyl, drv, hwy, and cty`</span> from the <span class="in">`mpg`</span> dataset. The <span class="in">`strata = trans`</span> argument means that the summary is stratified by the trans variable. The <span class="in">`includeNA = TRUE`</span> argument means that missing values (NAs) are included in the summary. The <span class="in">`test = FALSE`</span> argument indicates that no statistical tests should be applied to the data (often tests are used to compare groups in the table).</span>
-<span id="cb5-38"><a href="#cb5-38"></a></span>
-<span id="cb5-39"><a href="#cb5-39"></a><span class="fu">### table1 package</span></span>
-<span id="cb5-40"><a href="#cb5-40"></a></span>
-<span id="cb5-41"><a href="#cb5-41"></a>This section introduces another package, <span class="in">`table1`</span>, which can also be used to create "Table 1" type summary tables.</span>
-<span id="cb5-42"><a href="#cb5-42"></a></span>
-<span id="cb5-43"><a href="#cb5-43"></a><span class="in">```{r tab3, cache=TRUE, warning=FALSE}</span></span>
-<span id="cb5-44"><a href="#cb5-44"></a><span class="fu">require</span>(table1)</span>
-<span id="cb5-45"><a href="#cb5-45"></a><span class="fu">table1</span>(<span class="sc">~</span> cyl <span class="sc">+</span> drv <span class="sc">+</span> hwy <span class="sc">+</span> cty <span class="sc">|</span> trans, <span class="at">data=</span>mpg)</span>
-<span id="cb5-46"><a href="#cb5-46"></a><span class="in">```</span></span>
-<span id="cb5-47"><a href="#cb5-47"></a></span>
-<span id="cb5-48"><a href="#cb5-48"></a>The <span class="in">`table1()`</span> function is used to generate a summary table for the specified variables. The formula-like syntax <span class="in">`(~ cyl + drv + hwy + cty | trans)`</span> indicates that the summary should be stratified by the <span class="in">`trans`</span> variable.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 

@@ -805,7 +805,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">PSM with MI</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i></button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title d-none d-lg-block">PSM with MI</h1>
 </div>
 
 
@@ -821,7 +821,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><p>The tutorial provides a detailed walkthrough of implementing Propensity Score Matching (PSM) combined with Multiple Imputation (MI) in a statistical analysis, focusing on handling missing data and mitigating bias in observational studies.</p>
 <p>The initial chunk is dedicated to loading various R packages that will be utilized throughout the tutorial. These libraries provide functions and tools that facilitate data manipulation, statistical modeling, visualization, and more.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/setup_f60a7910c4b849f4886b6f017d5e0650">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(MatchIt)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(tableone)</span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="fu">require</span>(survey)</span>
@@ -835,7 +835,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-12"><a href="#cb1-12"></a><span class="fu">require</span>(mitools)</span>
 <span id="cb1-13"><a href="#cb1-13"></a><span class="fu">library</span>(kableExtra)</span>
 <span id="cb1-14"><a href="#cb1-14"></a><span class="fu">library</span>(mice)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <section id="problem-statement" class="level3"><h3 class="anchored" data-anchor-id="problem-statement">Problem Statement</h3>
 <section id="logistic-regression" class="level4"><h4 class="anchored" data-anchor-id="logistic-regression">Logistic regression</h4>
@@ -900,7 +899,7 @@ Tip
 </ul></section><section id="pre-processing" class="level4"><h4 class="anchored" data-anchor-id="pre-processing">Pre-processing</h4>
 <p>The data is loaded and variables of interest are identified.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/data_1c9342393b0461b5cc31b64f50b17177">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/NHANES17.RData"</span>) <span class="co"># read data</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/NHANES17.RData"</span>) <span class="co"># read data</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic"           "analytic.with.miss"</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="fu">dim</span>(analytic.with.miss)</span>
@@ -910,49 +909,44 @@ Tip
 <span id="cb2-8"><a href="#cb2-8"></a>          <span class="st">"race"</span>, <span class="st">"age"</span>, <span class="st">"married"</span>,<span class="st">"education"</span>,<span class="st">"gender"</span>,<span class="st">"bmi"</span>,<span class="st">"systolicBP"</span>, <span class="co"># Covariates</span></span>
 <span id="cb2-9"><a href="#cb2-9"></a>          <span class="st">"born"</span>, <span class="co"># Exposure</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a>          <span class="st">"diabetes"</span>) <span class="co"># Outcome</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="subset-the-dataset" class="level4"><h4 class="anchored" data-anchor-id="subset-the-dataset">Subset the dataset</h4>
 <p>The dataset is then subsetted to retain only the relevant variables, ensuring that subsequent analyses are focused and computationally efficient.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/subset_651e1cfd817dc93aa2de1eaac0746e80">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>dat.with.miss <span class="ot">&lt;-</span> analytic.with.miss[,vars]</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>dat.with.miss <span class="ot">&lt;-</span> analytic.with.miss[,vars]</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">dim</span>(analytic.with.miss)</span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; [1] 9254   34</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="inspect-weights" class="level4"><h4 class="anchored" data-anchor-id="inspect-weights">Inspect weights</h4>
 <p>The weights of the observations are inspected and adjusted to avoid issues in subsequent analyses.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/weight_03644e3f051f4971926f362149004b5e">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">summary</span>(dat.with.miss<span class="sc">$</span>weight)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">summary</span>(dat.with.miss<span class="sc">$</span>weight)</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;       0   12347   21060   34671   37562  419763</span></span>
 <span id="cb4-4"><a href="#cb4-4"></a><span class="co"># weight = 0 would create problem in the analysis</span></span>
 <span id="cb4-5"><a href="#cb4-5"></a><span class="co"># ad-hoc solution to 0 weight problem</span></span>
 <span id="cb4-6"><a href="#cb4-6"></a>dat.with.miss<span class="sc">$</span>weight[dat.with.miss<span class="sc">$</span>weight <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="fl">0.00000001</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="recode-the-exposure-variable" class="level4"><h4 class="anchored" data-anchor-id="recode-the-exposure-variable">Recode the exposure variable</h4>
 <p>The exposure variable is recoded for clarity and ease of interpretation in results.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/recode_4c999db1d4dcbf784b8d628ad954e620">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dat.with.miss<span class="sc">$</span>born <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat.with.miss<span class="sc">$</span>born, </span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dat.with.miss<span class="sc">$</span>born <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat.with.miss<span class="sc">$</span>born, </span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="at">recodes =</span> <span class="st">" 'Born in 50 US states or Washingt' = </span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="st">'Born in US'; 'Others' = 'Others'; else = NA "</span> )</span>
 <span id="cb5-4"><a href="#cb5-4"></a>dat.with.miss<span class="sc">$</span>born <span class="ot">&lt;-</span> <span class="fu">factor</span>(dat.with.miss<span class="sc">$</span>born, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Born in US"</span>, <span class="st">"Others"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="variable-types" class="level4"><h4 class="anchored" data-anchor-id="variable-types">variable types</h4>
 <p>Variable types are set, ensuring that each variable is treated appropriately in the analyses.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/vartype_65c58d5e0a311de470a95629a38aa12e">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>factor.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"race"</span>, <span class="st">"married"</span>, <span class="st">"education"</span>, <span class="st">"gender"</span>, <span class="st">"diabetes"</span>)</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>factor.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"race"</span>, <span class="st">"married"</span>, <span class="st">"education"</span>, <span class="st">"gender"</span>, <span class="st">"diabetes"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2"></a>dat.with.miss[,factor.names] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(dat.with.miss[,factor.names], factor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="inspect-extent-of-missing-data-problem" class="level4"><h4 class="anchored" data-anchor-id="inspect-extent-of-missing-data-problem">Inspect extent of missing data problem</h4>
 <p>A visualization is generated to explore the extent and pattern of missing data in the dataset, which informs the strategy for handling them.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/plot_a94082b017d2a021110a4a264e924d9a">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">require</span>(DataExplorer)</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">require</span>(DataExplorer)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">plot_missing</span>(dat.with.miss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 <p><img src="propensityscore5_files/figure-html/plot-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
@@ -975,13 +969,12 @@ Tip
 <section id="initialization" class="level4"><h4 class="anchored" data-anchor-id="initialization">Initialization</h4>
 <p>The MI process is initialized, setting up the framework for subsequent imputations.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp0_e57d40044760199da38ab603439059ca">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="setting-imputation-model-covariates" class="level4"><h4 class="anchored" data-anchor-id="setting-imputation-model-covariates">Setting imputation model covariates</h4>
 <p>The predictor matrix is adjusted to specify which variables will be used to predict missing values in the imputation model. Setting strata as auxiliary variable:</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp1_58abd12e14db4cacfc61f61ae4c39f73">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>pred <span class="ot">&lt;-</span> imputation<span class="sc">$</span>pred</span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>pred <span class="ot">&lt;-</span> imputation<span class="sc">$</span>pred</span>
 <span id="cb9-2"><a href="#cb9-2"></a>pred</span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt;            ID psu strata weight race age married education gender bmi</span></span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; ID          0   1      1      1    1   1       1         1      1   1</span></span>
@@ -1044,19 +1037,17 @@ Tip
 <span id="cb9-61"><a href="#cb9-61"></a><span class="co">#&gt; systolicBP          0    1        1</span></span>
 <span id="cb9-62"><a href="#cb9-62"></a><span class="co">#&gt; born                1    0        1</span></span>
 <span id="cb9-63"><a href="#cb9-63"></a><span class="co">#&gt; diabetes            1    1        0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="setting-imputation-model-specification" class="level4"><h4 class="anchored" data-anchor-id="setting-imputation-model-specification">Setting imputation model specification</h4>
 <p>The method for imputing a particular variable is specified (e.g., using Predictive Mean Matching). Here, we add <code>pmm</code> for bmi:</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp2_6b1275b8a0444a57150f4e67478cfb27">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>meth <span class="ot">&lt;-</span> imputation<span class="sc">$</span>meth</span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>meth <span class="ot">&lt;-</span> imputation<span class="sc">$</span>meth</span>
 <span id="cb10-2"><a href="#cb10-2"></a>meth[<span class="st">"bmi"</span>] <span class="ot">&lt;-</span> <span class="st">"pmm"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="impute-incomplete-data" class="level4"><h4 class="anchored" data-anchor-id="impute-incomplete-data">Impute incomplete data</h4>
 <p>Multiple datasets are imputed, each providing a different “guess” at the missing values, based on observed data. We are imputing m = 3 times.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp3_e2d3d6cf2af8606f2a180e6429eeb77a">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, </span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, </span>
 <span id="cb11-2"><a href="#cb11-2"></a>                   <span class="at">seed =</span> <span class="dv">123</span>, </span>
 <span id="cb11-3"><a href="#cb11-3"></a>                   <span class="at">predictorMatrix =</span> pred,</span>
 <span id="cb11-4"><a href="#cb11-4"></a>                   <span class="at">method =</span> meth, </span>
@@ -1121,19 +1112,17 @@ Tip
 <span id="cb11-63"><a href="#cb11-63"></a><span class="co">#&gt;   .. ..$ diabetes  : Factor w/ 2 levels "No","Yes": 1 1 1 1 1 2 1 1 1 1 ...</span></span>
 <span id="cb11-64"><a href="#cb11-64"></a><span class="co">#&gt;  $ call       : language imputationList(lapply(1:m, function(n) subset(impdata, subset = .imp ==      n)))</span></span>
 <span id="cb11-65"><a href="#cb11-65"></a><span class="co">#&gt;  - attr(*, "class")= chr "imputationList"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="design" class="level4"><h4 class="anchored" data-anchor-id="design">Design</h4>
 <p>A survey design object is created, ensuring that subsequent analyses appropriately account for the survey design.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp4_3a47ccf4cc8513719a9129cdba1c2fe5">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>w.design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, <span class="at">weights =</span> <span class="sc">~</span>weight, <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>w.design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, <span class="at">weights =</span> <span class="sc">~</span>weight, <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
 <span id="cb12-2"><a href="#cb12-2"></a>                      <span class="at">data =</span> allImputations, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="survey-data-analysis" class="level4"><h4 class="anchored" data-anchor-id="survey-data-analysis">Survey data analysis</h4>
 <p>A logistic regression model is fitted to each imputed dataset.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp5_a3352996fbc38a0378a9d7f852968422">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">'Yes'</span>) <span class="sc">~</span> </span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">'Yes'</span>) <span class="sc">~</span> </span>
 <span id="cb13-2"><a href="#cb13-2"></a>                              born <span class="sc">+</span> race <span class="sc">+</span> age <span class="sc">+</span> married <span class="sc">+</span> </span>
 <span id="cb13-3"><a href="#cb13-3"></a>                              education <span class="sc">+</span> gender <span class="sc">+</span> bmi <span class="sc">+</span> systolicBP)</span>
 <span id="cb13-4"><a href="#cb13-4"></a>fit.from.logistic <span class="ot">&lt;-</span> <span class="fu">with</span>(w.design, <span class="fu">svyglm</span>(model.formula, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>)))</span>
@@ -1142,12 +1131,11 @@ Tip
 <span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb13-8"><a href="#cb13-8"></a></span>
 <span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="pooled-estimates" class="level4"><h4 class="anchored" data-anchor-id="pooled-estimates">Pooled estimates</h4>
 <p>Results from models across all imputed datasets are pooled to provide a single estimate, accounting for the uncertainty due to missing data.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp6_70b14a96301e33eb5fd980d299ccaeec">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit.from.logistic)</span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit.from.logistic)</span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="fu">summary</span>(pooled.estimates, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">logeffect=</span><span class="cn">TRUE</span>)</span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; Multiple imputation results:</span></span>
 <span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt;       with(w.design, svyglm(model.formula, family = binomial("logit")))</span></span>
@@ -1171,7 +1159,7 @@ Tip
 <span id="cb14-22"><a href="#cb14-22"></a>CI <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">confint</span>(pooled.estimates)), <span class="dv">2</span>)</span>
 <span id="cb14-23"><a href="#cb14-23"></a>OR <span class="ot">&lt;-</span> <span class="fu">cbind</span>(OR, CI)</span>
 <span id="cb14-24"><a href="#cb14-24"></a>OR[<span class="dv">2</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1184,14 +1172,13 @@ Tip
 <section id="initialization-1" class="level4"><h4 class="anchored" data-anchor-id="initialization-1">Initialization</h4>
 <p>The MI process is re-initialized to facilitate PSM in the context of MI.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp7_e58dd86b0580bedf72ea5b0af0d3313f">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb15-2"><a href="#cb15-2"></a>impdata <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imputation, <span class="at">action=</span><span class="st">"long"</span>)</span>
 <span id="cb15-3"><a href="#cb15-3"></a>m <span class="ot">&lt;-</span> <span class="dv">3</span></span>
 <span id="cb15-4"><a href="#cb15-4"></a>allImputations <span class="ot">&lt;-</span> <span class="fu">imputationList</span>(<span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>m, </span>
 <span id="cb15-5"><a href="#cb15-5"></a>                                        <span class="cf">function</span>(n) </span>
 <span id="cb15-6"><a href="#cb15-6"></a>                                          <span class="fu">subset</span>(impdata, </span>
 <span id="cb15-7"><a href="#cb15-7"></a>                                                 <span class="at">subset=</span>.imp<span class="sc">==</span>n)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="zanutto-e.-l.-2006-under-multiple-imputation" class="level4"><h4 class="anchored" data-anchor-id="zanutto-e.-l.-2006-under-multiple-imputation">Zanutto E. L. (2006) under multiple imputation</h4>
 <div class="callout-tip callout callout-style-default callout-captioned">
@@ -1215,7 +1202,7 @@ Tip
 </div>
 <p>Notice that we are performing multi-step process within MI</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp8_367435dae48ae1d536210f11746c396b">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>match.statm <span class="ot">&lt;-</span> SMDm <span class="ot">&lt;-</span> tab1m <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, m) </span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>match.statm <span class="ot">&lt;-</span> SMDm <span class="ot">&lt;-</span> tab1m <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, m) </span>
 <span id="cb16-2"><a href="#cb16-2"></a>fit.from.PS <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, m)</span>
 <span id="cb16-3"><a href="#cb16-3"></a></span>
 <span id="cb16-4"><a href="#cb16-4"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m) {</span>
@@ -1272,12 +1259,11 @@ Tip
 <span id="cb16-55"><a href="#cb16-55"></a>  fit.from.PS[[i]] <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(out.formula, <span class="at">design =</span> w.design.m, </span>
 <span id="cb16-56"><a href="#cb16-56"></a>                     <span class="at">family =</span> <span class="fu">quasibinomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb16-57"><a href="#cb16-57"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="check-matched-data" class="level4"><h4 class="anchored" data-anchor-id="check-matched-data">Check matched data</h4>
 <p>The matched data is inspected to ensure that matching was successful and appropriate.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp9_8e78ca2203b516b82611dd525a6c73c5">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>match.statm</span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>match.statm</span>
 <span id="cb17-2"><a href="#cb17-2"></a><span class="co">#&gt; [[1]]</span></span>
 <span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt; A matchit object</span></span>
 <span id="cb17-4"><a href="#cb17-4"></a><span class="co">#&gt;  - method: 1:1 nearest neighbor matching without replacement</span></span>
@@ -1304,12 +1290,11 @@ Tip
 <span id="cb17-25"><a href="#cb17-25"></a><span class="co">#&gt;  - number of obs.: 9254 (original), 3594 (matched)</span></span>
 <span id="cb17-26"><a href="#cb17-26"></a><span class="co">#&gt;  - target estimand: ATT</span></span>
 <span id="cb17-27"><a href="#cb17-27"></a><span class="co">#&gt;  - covariates: race, age, married, education, gender, bmi, systolicBP</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section><section id="check-balance-in-matched-data" class="level4"><h4 class="anchored" data-anchor-id="check-balance-in-matched-data">Check balance in matched data</h4>
 <p>The balance of covariates across matched groups is assessed to ensure that matching has successfully reduced bias.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp10_2477a0973328d5d5e2299d6af00db772">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>SMDm</span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>SMDm</span>
 <span id="cb18-2"><a href="#cb18-2"></a><span class="co">#&gt; [[1]]</span></span>
 <span id="cb18-3"><a href="#cb18-3"></a><span class="co">#&gt;                 1 vs 2</span></span>
 <span id="cb18-4"><a href="#cb18-4"></a><span class="co">#&gt; race       0.028883793</span></span>
@@ -1339,12 +1324,11 @@ Tip
 <span id="cb18-28"><a href="#cb18-28"></a><span class="co">#&gt; gender     0.01225625</span></span>
 <span id="cb18-29"><a href="#cb18-29"></a><span class="co">#&gt; bmi        0.03697878</span></span>
 <span id="cb18-30"><a href="#cb18-30"></a><span class="co">#&gt; systolicBP 0.10025529</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 </section></section><section id="pooled-estimate" class="level3"><h3 class="anchored" data-anchor-id="pooled-estimate">Pooled estimate</h3>
 <p>Finally, the treatment effect estimates from the matched analyses across all imputed datasets are pooled to provide a single, overall estimate, ensuring that the final result appropriately accounts for the uncertainty due to both the matching process and the imputation of missing data.</p>
 <div class="cell" data-hash="propensityscore5_cache/html/imp11_2be954224277b88d1e87822b47ed9f0a">
-<details><summary>Show the code</summary><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit.from.PS)</span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit.from.PS)</span>
 <span id="cb19-2"><a href="#cb19-2"></a><span class="fu">summary</span>(pooled.estimates, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">logeffect=</span><span class="cn">TRUE</span>)</span>
 <span id="cb19-3"><a href="#cb19-3"></a><span class="co">#&gt; Multiple imputation results:</span></span>
 <span id="cb19-4"><a href="#cb19-4"></a><span class="co">#&gt;       MIcombine.default(fit.from.PS)</span></span>
@@ -1367,7 +1351,7 @@ Tip
 <span id="cb19-21"><a href="#cb19-21"></a>CI <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">confint</span>(pooled.estimates)), <span class="dv">2</span>)</span>
 <span id="cb19-22"><a href="#cb19-22"></a>OR <span class="ot">&lt;-</span> <span class="fu">cbind</span>(OR, CI)</span>
 <span id="cb19-23"><a href="#cb19-23"></a>OR[<span class="dv">2</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details><div class="cell-output-display">
+<div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1377,8 +1361,6 @@ Tip
 </div>
 </div>
 
-
-<!-- -->
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1573,367 +1555,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         <span class="nav-page-text">R functions (S)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
-</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb20" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">## PSM with MI {.unnumbered}</span></span>
-<span id="cb20-2"><a href="#cb20-2"></a></span>
-<span id="cb20-3"><a href="#cb20-3"></a>The tutorial provides a detailed walkthrough of implementing Propensity Score Matching (PSM) combined with Multiple Imputation (MI) in a statistical analysis, focusing on handling missing data and mitigating bias in observational studies.</span>
-<span id="cb20-4"><a href="#cb20-4"></a></span>
-<span id="cb20-5"><a href="#cb20-5"></a></span>
-<span id="cb20-6"><a href="#cb20-6"></a>The initial chunk is dedicated to loading various R packages that will be utilized throughout the tutorial. These libraries provide functions and tools that facilitate data manipulation, statistical modeling, visualization, and more.</span>
-<span id="cb20-7"><a href="#cb20-7"></a></span>
-<span id="cb20-8"><a href="#cb20-8"></a><span class="in">```{r setup, warning=FALSE, message=FALSE, cache=TRUE}</span></span>
-<span id="cb20-9"><a href="#cb20-9"></a><span class="co"># Load required packages</span></span>
-<span id="cb20-10"><a href="#cb20-10"></a><span class="fu">library</span>(MatchIt)</span>
-<span id="cb20-11"><a href="#cb20-11"></a><span class="fu">require</span>(tableone)</span>
-<span id="cb20-12"><a href="#cb20-12"></a><span class="fu">require</span>(survey)</span>
-<span id="cb20-13"><a href="#cb20-13"></a><span class="fu">require</span>(cobalt)</span>
-<span id="cb20-14"><a href="#cb20-14"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb20-15"><a href="#cb20-15"></a><span class="fu">require</span>(optmatch)</span>
-<span id="cb20-16"><a href="#cb20-16"></a><span class="fu">require</span>(data.table)</span>
-<span id="cb20-17"><a href="#cb20-17"></a><span class="fu">require</span>(jtools)</span>
-<span id="cb20-18"><a href="#cb20-18"></a><span class="fu">require</span>(ggstance)</span>
-<span id="cb20-19"><a href="#cb20-19"></a><span class="fu">require</span>(DataExplorer)</span>
-<span id="cb20-20"><a href="#cb20-20"></a><span class="fu">require</span>(mitools)</span>
-<span id="cb20-21"><a href="#cb20-21"></a><span class="fu">library</span>(kableExtra)</span>
-<span id="cb20-22"><a href="#cb20-22"></a><span class="fu">library</span>(mice)</span>
-<span id="cb20-23"><a href="#cb20-23"></a><span class="in">```</span></span>
-<span id="cb20-24"><a href="#cb20-24"></a></span>
-<span id="cb20-25"><a href="#cb20-25"></a><span class="fu">### Problem Statement</span></span>
-<span id="cb20-26"><a href="#cb20-26"></a></span>
-<span id="cb20-27"><a href="#cb20-27"></a><span class="fu">#### Logistic regression</span></span>
-<span id="cb20-28"><a href="#cb20-28"></a></span>
-<span id="cb20-29"><a href="#cb20-29"></a><span class="ss">-   </span>Perform multiple imputation to deal with missing values; with 3 imputed datasets, 5 iterations,</span>
-<span id="cb20-30"><a href="#cb20-30"></a></span>
-<span id="cb20-31"><a href="#cb20-31"></a><span class="ss">-   </span>fit **survey featured logistic regression** in all of the 3 imputed datasets, and</span>
-<span id="cb20-32"><a href="#cb20-32"></a></span>
-<span id="cb20-33"><a href="#cb20-33"></a><span class="ss">-   </span>obtain the pooled OR (adjusted) and the corresponding 95% confidence intervals.</span>
-<span id="cb20-34"><a href="#cb20-34"></a></span>
-<span id="cb20-35"><a href="#cb20-35"></a><span class="ss">-   </span>Hints</span>
-<span id="cb20-36"><a href="#cb20-36"></a></span>
-<span id="cb20-37"><a href="#cb20-37"></a><span class="ss">    -   </span>Use the **covariates** (listed below) in the imputation model.</span>
-<span id="cb20-38"><a href="#cb20-38"></a><span class="ss">    -   </span>**Imputation model covariates** can be different than the original analysis covariates. You are encouraged to use variables in the imputation model that can be predictive of the variables with missing observations. In this example, we use the strata variable as an **auxiliary variable** in the imputation model, but not the survey weight or PSU variable.</span>
-<span id="cb20-39"><a href="#cb20-39"></a><span class="ss">    -   </span>Also the **imputation model specification** can be modified. For example, we use **pmm** method for bmi in the imputation model.</span>
-<span id="cb20-40"><a href="#cb20-40"></a><span class="ss">    -   </span>Remove any subject ID variable from the imputation model, if created in an intermediate step. Indeed ID variables should not be in the imputation model, if they are **not predictive** of the variables with missing observations.</span>
-<span id="cb20-41"><a href="#cb20-41"></a></span>
-<span id="cb20-42"><a href="#cb20-42"></a>::: callout-tip</span>
-<span id="cb20-43"><a href="#cb20-43"></a>**Predictive Mean Matching**:</span>
-<span id="cb20-44"><a href="#cb20-44"></a></span>
-<span id="cb20-45"><a href="#cb20-45"></a>The "Predictive Mean Matching" (PMM) method in Multiple Imputation (MI) is a widely used technique to handle missing data, particularly well-suited for continuous variables. PMM operates by first creating a predictive model for the variable with missing data, using observed values from other variables in the dataset. For each missing value, PMM identifies a set of observed values with predicted scores that are close to the predicted score for the missing value, derived from the predictive model. Then, instead of imputing a predicted score directly, PMM randomly selects one of the observed values from this set and assigns it as the imputed value. This method retains the original distribution of the imputed variable since it only uses observed values for imputation, and it also tends to preserve relationships between variables. PMM is particularly advantageous when the normality assumption of the imputed variable is questionable, providing a robust and practical approach to managing missing data in various research contexts.</span>
-<span id="cb20-46"><a href="#cb20-46"></a>::: </span>
-<span id="cb20-47"><a href="#cb20-47"></a></span>
-<span id="cb20-48"><a href="#cb20-48"></a></span>
-<span id="cb20-49"><a href="#cb20-49"></a><span class="fu">#### Propensity score matching (Zanutto, 2006)</span></span>
-<span id="cb20-50"><a href="#cb20-50"></a></span>
-<span id="cb20-51"><a href="#cb20-51"></a><span class="ss">-   </span>Use the **propensity score matching as per Zanutto E. L. (2006)**'s recommendation in all of the imputed datasets.</span>
-<span id="cb20-52"><a href="#cb20-52"></a><span class="ss">-   </span>Report the pooled OR estimates (adjusted) and corresponding 95% confidence intervals (adjusted OR).</span>
-<span id="cb20-53"><a href="#cb20-53"></a></span>
-<span id="cb20-54"><a href="#cb20-54"></a><span class="fu">### Data and variables</span></span>
-<span id="cb20-55"><a href="#cb20-55"></a></span>
-<span id="cb20-56"><a href="#cb20-56"></a><span class="fu">#### Analytic data</span></span>
-<span id="cb20-57"><a href="#cb20-57"></a></span>
-<span id="cb20-58"><a href="#cb20-58"></a>The analytic dataset is saved as NHANES17.RData.</span>
-<span id="cb20-59"><a href="#cb20-59"></a></span>
-<span id="cb20-60"><a href="#cb20-60"></a><span class="fu">#### Variables</span></span>
-<span id="cb20-61"><a href="#cb20-61"></a></span>
-<span id="cb20-62"><a href="#cb20-62"></a>We are primarily interested in outcome **diabetes** and exposure **whether born in the US (born)**.</span>
-<span id="cb20-63"><a href="#cb20-63"></a></span>
-<span id="cb20-64"><a href="#cb20-64"></a>Variables under consideration:</span>
-<span id="cb20-65"><a href="#cb20-65"></a></span>
-<span id="cb20-66"><a href="#cb20-66"></a><span class="ss">-   </span>survey features</span>
-<span id="cb20-67"><a href="#cb20-67"></a><span class="ss">    -   </span>PSU</span>
-<span id="cb20-68"><a href="#cb20-68"></a><span class="ss">    -   </span>strata</span>
-<span id="cb20-69"><a href="#cb20-69"></a><span class="ss">    -   </span>survey weight</span>
-<span id="cb20-70"><a href="#cb20-70"></a><span class="ss">-   </span>Covariates</span>
-<span id="cb20-71"><a href="#cb20-71"></a><span class="ss">    -   </span>race</span>
-<span id="cb20-72"><a href="#cb20-72"></a><span class="ss">    -   </span>age</span>
-<span id="cb20-73"><a href="#cb20-73"></a><span class="ss">    -   </span>marriage</span>
-<span id="cb20-74"><a href="#cb20-74"></a><span class="ss">    -   </span>education</span>
-<span id="cb20-75"><a href="#cb20-75"></a><span class="ss">    -   </span>gender</span>
-<span id="cb20-76"><a href="#cb20-76"></a><span class="ss">    -   </span>BMI</span>
-<span id="cb20-77"><a href="#cb20-77"></a><span class="ss">    -   </span>systolic blood pressure</span>
-<span id="cb20-78"><a href="#cb20-78"></a></span>
-<span id="cb20-79"><a href="#cb20-79"></a><span class="fu">#### Pre-processing</span></span>
-<span id="cb20-80"><a href="#cb20-80"></a></span>
-<span id="cb20-81"><a href="#cb20-81"></a>The data is loaded and variables of interest are identified. </span>
-<span id="cb20-82"><a href="#cb20-82"></a></span>
-<span id="cb20-83"><a href="#cb20-83"></a><span class="in">```{r data, cache=TRUE}</span></span>
-<span id="cb20-84"><a href="#cb20-84"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/NHANES17.RData"</span>) <span class="co"># read data</span></span>
-<span id="cb20-85"><a href="#cb20-85"></a><span class="fu">ls</span>()</span>
-<span id="cb20-86"><a href="#cb20-86"></a><span class="fu">dim</span>(analytic.with.miss)</span>
-<span id="cb20-87"><a href="#cb20-87"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ID"</span>, <span class="co"># ID</span></span>
-<span id="cb20-88"><a href="#cb20-88"></a>          <span class="st">"psu"</span>, <span class="st">"strata"</span>, <span class="st">"weight"</span>, <span class="co"># Survey features </span></span>
-<span id="cb20-89"><a href="#cb20-89"></a>          <span class="st">"race"</span>, <span class="st">"age"</span>, <span class="st">"married"</span>,<span class="st">"education"</span>,<span class="st">"gender"</span>,<span class="st">"bmi"</span>,<span class="st">"systolicBP"</span>, <span class="co"># Covariates</span></span>
-<span id="cb20-90"><a href="#cb20-90"></a>          <span class="st">"born"</span>, <span class="co"># Exposure</span></span>
-<span id="cb20-91"><a href="#cb20-91"></a>          <span class="st">"diabetes"</span>) <span class="co"># Outcome</span></span>
-<span id="cb20-92"><a href="#cb20-92"></a><span class="in">```</span></span>
-<span id="cb20-93"><a href="#cb20-93"></a></span>
-<span id="cb20-94"><a href="#cb20-94"></a><span class="fu">#### Subset the dataset</span></span>
-<span id="cb20-95"><a href="#cb20-95"></a></span>
-<span id="cb20-96"><a href="#cb20-96"></a>The dataset is then subsetted to retain only the relevant variables, ensuring that subsequent analyses are focused and computationally efficient. </span>
-<span id="cb20-97"><a href="#cb20-97"></a></span>
-<span id="cb20-98"><a href="#cb20-98"></a><span class="in">```{r subset, cache=TRUE}</span></span>
-<span id="cb20-99"><a href="#cb20-99"></a>dat.with.miss <span class="ot">&lt;-</span> analytic.with.miss[,vars]</span>
-<span id="cb20-100"><a href="#cb20-100"></a><span class="fu">dim</span>(analytic.with.miss)</span>
-<span id="cb20-101"><a href="#cb20-101"></a><span class="in">```</span></span>
-<span id="cb20-102"><a href="#cb20-102"></a></span>
-<span id="cb20-103"><a href="#cb20-103"></a><span class="fu">#### Inspect weights</span></span>
-<span id="cb20-104"><a href="#cb20-104"></a></span>
-<span id="cb20-105"><a href="#cb20-105"></a></span>
-<span id="cb20-106"><a href="#cb20-106"></a>The weights of the observations are inspected and adjusted to avoid issues in subsequent analyses.</span>
-<span id="cb20-107"><a href="#cb20-107"></a></span>
-<span id="cb20-108"><a href="#cb20-108"></a><span class="in">```{r weight, cache=TRUE}</span></span>
-<span id="cb20-109"><a href="#cb20-109"></a><span class="fu">summary</span>(dat.with.miss<span class="sc">$</span>weight)</span>
-<span id="cb20-110"><a href="#cb20-110"></a><span class="co"># weight = 0 would create problem in the analysis</span></span>
-<span id="cb20-111"><a href="#cb20-111"></a><span class="co"># ad-hoc solution to 0 weight problem</span></span>
-<span id="cb20-112"><a href="#cb20-112"></a>dat.with.miss<span class="sc">$</span>weight[dat.with.miss<span class="sc">$</span>weight <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="fl">0.00000001</span></span>
-<span id="cb20-113"><a href="#cb20-113"></a><span class="in">```</span></span>
-<span id="cb20-114"><a href="#cb20-114"></a></span>
-<span id="cb20-115"><a href="#cb20-115"></a><span class="fu">#### Recode the exposure variable</span></span>
-<span id="cb20-116"><a href="#cb20-116"></a></span>
-<span id="cb20-117"><a href="#cb20-117"></a>The exposure variable is recoded for clarity and ease of interpretation in results.</span>
-<span id="cb20-118"><a href="#cb20-118"></a></span>
-<span id="cb20-119"><a href="#cb20-119"></a><span class="in">```{r recode, cache=TRUE}</span></span>
-<span id="cb20-120"><a href="#cb20-120"></a>dat.with.miss<span class="sc">$</span>born <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat.with.miss<span class="sc">$</span>born, </span>
-<span id="cb20-121"><a href="#cb20-121"></a><span class="at">recodes =</span> <span class="st">" 'Born in 50 US states or Washingt' = </span></span>
-<span id="cb20-122"><a href="#cb20-122"></a><span class="st">'Born in US'; 'Others' = 'Others'; else = NA "</span> )</span>
-<span id="cb20-123"><a href="#cb20-123"></a>dat.with.miss<span class="sc">$</span>born <span class="ot">&lt;-</span> <span class="fu">factor</span>(dat.with.miss<span class="sc">$</span>born, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Born in US"</span>, <span class="st">"Others"</span>))</span>
-<span id="cb20-124"><a href="#cb20-124"></a><span class="in">```</span></span>
-<span id="cb20-125"><a href="#cb20-125"></a></span>
-<span id="cb20-126"><a href="#cb20-126"></a><span class="fu">#### variable types</span></span>
-<span id="cb20-127"><a href="#cb20-127"></a></span>
-<span id="cb20-128"><a href="#cb20-128"></a>Variable types are set, ensuring that each variable is treated appropriately in the analyses.</span>
-<span id="cb20-129"><a href="#cb20-129"></a></span>
-<span id="cb20-130"><a href="#cb20-130"></a><span class="in">```{r vartype, cache=TRUE}</span></span>
-<span id="cb20-131"><a href="#cb20-131"></a>factor.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"race"</span>, <span class="st">"married"</span>, <span class="st">"education"</span>, <span class="st">"gender"</span>, <span class="st">"diabetes"</span>)</span>
-<span id="cb20-132"><a href="#cb20-132"></a>dat.with.miss[,factor.names] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(dat.with.miss[,factor.names], factor)</span>
-<span id="cb20-133"><a href="#cb20-133"></a><span class="in">```</span></span>
-<span id="cb20-134"><a href="#cb20-134"></a></span>
-<span id="cb20-135"><a href="#cb20-135"></a><span class="fu">#### Inspect extent of missing data problem</span></span>
-<span id="cb20-136"><a href="#cb20-136"></a></span>
-<span id="cb20-137"><a href="#cb20-137"></a>A visualization is generated to explore the extent and pattern of missing data in the dataset, which informs the strategy for handling them.</span>
-<span id="cb20-138"><a href="#cb20-138"></a></span>
-<span id="cb20-139"><a href="#cb20-139"></a><span class="in">```{r plot, cache=TRUE}</span></span>
-<span id="cb20-140"><a href="#cb20-140"></a><span class="fu">require</span>(DataExplorer)</span>
-<span id="cb20-141"><a href="#cb20-141"></a><span class="fu">plot_missing</span>(dat.with.miss)</span>
-<span id="cb20-142"><a href="#cb20-142"></a><span class="in">```</span></span>
-<span id="cb20-143"><a href="#cb20-143"></a></span>
-<span id="cb20-144"><a href="#cb20-144"></a>Note that, **multiple imputation then delete** (MID) approach can be applied if the outcome had some missing values. Due to the small number of missingness, MICE may not impute the outcomes BTW.</span>
-<span id="cb20-145"><a href="#cb20-145"></a></span>
-<span id="cb20-146"><a href="#cb20-146"></a>::: callout-tip</span>
-<span id="cb20-147"><a href="#cb20-147"></a>**Multiple imputation then delete (MID)**:</span>
-<span id="cb20-148"><a href="#cb20-148"></a></span>
-<span id="cb20-149"><a href="#cb20-149"></a>MID is a specific approach used in the context of multiple imputation (MI) when dealing with missing outcome data. All missing values, including those in the outcome variable, are imputed to create several complete datasets. In subsequent analyses, the imputed values for the outcome variable are deleted, so that only observed outcome values are analyzed. Each dataset (with observed outcome values and imputed predictor values) is analyzed separately, and results are pooled to provide a single estimate.</span>
-<span id="cb20-150"><a href="#cb20-150"></a>::: </span>
-<span id="cb20-151"><a href="#cb20-151"></a></span>
-<span id="cb20-152"><a href="#cb20-152"></a><span class="fu">### Logistic regression</span></span>
-<span id="cb20-153"><a href="#cb20-153"></a></span>
-<span id="cb20-154"><a href="#cb20-154"></a><span class="fu">#### Initialization</span></span>
-<span id="cb20-155"><a href="#cb20-155"></a></span>
-<span id="cb20-156"><a href="#cb20-156"></a>The MI process is initialized, setting up the framework for subsequent imputations.</span>
-<span id="cb20-157"><a href="#cb20-157"></a></span>
-<span id="cb20-158"><a href="#cb20-158"></a><span class="in">```{r imp0, cache=TRUE}</span></span>
-<span id="cb20-159"><a href="#cb20-159"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb20-160"><a href="#cb20-160"></a><span class="in">```</span></span>
-<span id="cb20-161"><a href="#cb20-161"></a></span>
-<span id="cb20-162"><a href="#cb20-162"></a><span class="fu">#### Setting imputation model covariates</span></span>
-<span id="cb20-163"><a href="#cb20-163"></a></span>
-<span id="cb20-164"><a href="#cb20-164"></a>The predictor matrix is adjusted to specify which variables will be used to predict missing values in the imputation model. Setting strata as auxiliary variable:</span>
-<span id="cb20-165"><a href="#cb20-165"></a></span>
-<span id="cb20-166"><a href="#cb20-166"></a><span class="in">```{r imp1, cache=TRUE}</span></span>
-<span id="cb20-167"><a href="#cb20-167"></a>pred <span class="ot">&lt;-</span> imputation<span class="sc">$</span>pred</span>
-<span id="cb20-168"><a href="#cb20-168"></a>pred</span>
-<span id="cb20-169"><a href="#cb20-169"></a>pred[,<span class="st">"ID"</span>] <span class="ot">&lt;-</span> pred[<span class="st">"ID"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb20-170"><a href="#cb20-170"></a>pred[,<span class="st">"psu"</span>] <span class="ot">&lt;-</span> pred[<span class="st">"psu"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb20-171"><a href="#cb20-171"></a>pred[,<span class="st">"weight"</span>] <span class="ot">&lt;-</span> pred[<span class="st">"weight"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb20-172"><a href="#cb20-172"></a>pred[<span class="st">"strata"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb20-173"><a href="#cb20-173"></a>pred</span>
-<span id="cb20-174"><a href="#cb20-174"></a><span class="in">```</span></span>
-<span id="cb20-175"><a href="#cb20-175"></a></span>
-<span id="cb20-176"><a href="#cb20-176"></a><span class="fu">#### Setting imputation model specification</span></span>
-<span id="cb20-177"><a href="#cb20-177"></a></span>
-<span id="cb20-178"><a href="#cb20-178"></a>The method for imputing a particular variable is specified (e.g., using Predictive Mean Matching). Here, we add <span class="in">`pmm`</span> for bmi:</span>
-<span id="cb20-179"><a href="#cb20-179"></a></span>
-<span id="cb20-180"><a href="#cb20-180"></a><span class="in">```{r imp2, cache=TRUE}</span></span>
-<span id="cb20-181"><a href="#cb20-181"></a>meth <span class="ot">&lt;-</span> imputation<span class="sc">$</span>meth</span>
-<span id="cb20-182"><a href="#cb20-182"></a>meth[<span class="st">"bmi"</span>] <span class="ot">&lt;-</span> <span class="st">"pmm"</span></span>
-<span id="cb20-183"><a href="#cb20-183"></a><span class="in">```</span></span>
-<span id="cb20-184"><a href="#cb20-184"></a></span>
-<span id="cb20-185"><a href="#cb20-185"></a><span class="fu">#### Impute incomplete data</span></span>
-<span id="cb20-186"><a href="#cb20-186"></a></span>
-<span id="cb20-187"><a href="#cb20-187"></a>Multiple datasets are imputed, each providing a different "guess" at the missing values, based on observed data. We are imputing m = 3 times.</span>
-<span id="cb20-188"><a href="#cb20-188"></a></span>
-<span id="cb20-189"><a href="#cb20-189"></a><span class="in">```{r imp3, cache=TRUE, warning=FALSE}</span></span>
-<span id="cb20-190"><a href="#cb20-190"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, </span>
-<span id="cb20-191"><a href="#cb20-191"></a>                   <span class="at">seed =</span> <span class="dv">123</span>, </span>
-<span id="cb20-192"><a href="#cb20-192"></a>                   <span class="at">predictorMatrix =</span> pred,</span>
-<span id="cb20-193"><a href="#cb20-193"></a>                   <span class="at">method =</span> meth, </span>
-<span id="cb20-194"><a href="#cb20-194"></a>                   <span class="at">m =</span> <span class="dv">3</span>, </span>
-<span id="cb20-195"><a href="#cb20-195"></a>                   <span class="at">maxit =</span> <span class="dv">5</span>, </span>
-<span id="cb20-196"><a href="#cb20-196"></a>                   <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb20-197"><a href="#cb20-197"></a>impdata <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imputation, <span class="at">action=</span><span class="st">"long"</span>)</span>
-<span id="cb20-198"><a href="#cb20-198"></a>impdata<span class="sc">$</span>.id <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb20-199"><a href="#cb20-199"></a>m <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb20-200"><a href="#cb20-200"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb20-201"><a href="#cb20-201"></a>allImputations <span class="ot">&lt;-</span>  <span class="fu">imputationList</span>(<span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>m, </span>
-<span id="cb20-202"><a href="#cb20-202"></a>                                         <span class="cf">function</span>(n)</span>
-<span id="cb20-203"><a href="#cb20-203"></a>                                           <span class="fu">subset</span>(impdata, </span>
-<span id="cb20-204"><a href="#cb20-204"></a>                                                  <span class="at">subset=</span>.imp<span class="sc">==</span>n)))</span>
-<span id="cb20-205"><a href="#cb20-205"></a><span class="fu">str</span>(allImputations)</span>
-<span id="cb20-206"><a href="#cb20-206"></a><span class="in">```</span></span>
-<span id="cb20-207"><a href="#cb20-207"></a></span>
-<span id="cb20-208"><a href="#cb20-208"></a><span class="fu">#### Design</span></span>
-<span id="cb20-209"><a href="#cb20-209"></a></span>
-<span id="cb20-210"><a href="#cb20-210"></a>A survey design object is created, ensuring that subsequent analyses appropriately account for the survey design.</span>
-<span id="cb20-211"><a href="#cb20-211"></a></span>
-<span id="cb20-212"><a href="#cb20-212"></a><span class="in">```{r imp4, cache=TRUE}</span></span>
-<span id="cb20-213"><a href="#cb20-213"></a>w.design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, <span class="at">weights =</span> <span class="sc">~</span>weight, <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
-<span id="cb20-214"><a href="#cb20-214"></a>                      <span class="at">data =</span> allImputations, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb20-215"><a href="#cb20-215"></a><span class="in">```</span></span>
-<span id="cb20-216"><a href="#cb20-216"></a></span>
-<span id="cb20-217"><a href="#cb20-217"></a><span class="fu">#### Survey data analysis</span></span>
-<span id="cb20-218"><a href="#cb20-218"></a></span>
-<span id="cb20-219"><a href="#cb20-219"></a>A logistic regression model is fitted to each imputed dataset.</span>
-<span id="cb20-220"><a href="#cb20-220"></a></span>
-<span id="cb20-221"><a href="#cb20-221"></a><span class="in">```{r imp5, cache=TRUE}</span></span>
-<span id="cb20-222"><a href="#cb20-222"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">'Yes'</span>) <span class="sc">~</span> </span>
-<span id="cb20-223"><a href="#cb20-223"></a>                              born <span class="sc">+</span> race <span class="sc">+</span> age <span class="sc">+</span> married <span class="sc">+</span> </span>
-<span id="cb20-224"><a href="#cb20-224"></a>                              education <span class="sc">+</span> gender <span class="sc">+</span> bmi <span class="sc">+</span> systolicBP)</span>
-<span id="cb20-225"><a href="#cb20-225"></a>fit.from.logistic <span class="ot">&lt;-</span> <span class="fu">with</span>(w.design, <span class="fu">svyglm</span>(model.formula, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>)))</span>
-<span id="cb20-226"><a href="#cb20-226"></a><span class="in">```</span></span>
-<span id="cb20-227"><a href="#cb20-227"></a></span>
-<span id="cb20-228"><a href="#cb20-228"></a><span class="fu">#### Pooled estimates</span></span>
-<span id="cb20-229"><a href="#cb20-229"></a></span>
-<span id="cb20-230"><a href="#cb20-230"></a>Results from models across all imputed datasets are pooled to provide a single estimate, accounting for the uncertainty due to missing data.</span>
-<span id="cb20-231"><a href="#cb20-231"></a></span>
-<span id="cb20-232"><a href="#cb20-232"></a><span class="in">```{r imp6, cache=TRUE}</span></span>
-<span id="cb20-233"><a href="#cb20-233"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit.from.logistic)</span>
-<span id="cb20-234"><a href="#cb20-234"></a><span class="fu">summary</span>(pooled.estimates, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">logeffect=</span><span class="cn">TRUE</span>)</span>
-<span id="cb20-235"><a href="#cb20-235"></a>OR <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(pooled.estimates<span class="sc">$</span>coefficients), <span class="dv">2</span>) </span>
-<span id="cb20-236"><a href="#cb20-236"></a>OR <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(OR)</span>
-<span id="cb20-237"><a href="#cb20-237"></a>CI <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">confint</span>(pooled.estimates)), <span class="dv">2</span>)</span>
-<span id="cb20-238"><a href="#cb20-238"></a>OR <span class="ot">&lt;-</span> <span class="fu">cbind</span>(OR, CI)</span>
-<span id="cb20-239"><a href="#cb20-239"></a>OR[<span class="dv">2</span>,]</span>
-<span id="cb20-240"><a href="#cb20-240"></a><span class="in">```</span></span>
-<span id="cb20-241"><a href="#cb20-241"></a></span>
-<span id="cb20-242"><a href="#cb20-242"></a><span class="fu">### Propensity score matching analysis</span></span>
-<span id="cb20-243"><a href="#cb20-243"></a></span>
-<span id="cb20-244"><a href="#cb20-244"></a><span class="fu">#### Initialization</span></span>
-<span id="cb20-245"><a href="#cb20-245"></a></span>
-<span id="cb20-246"><a href="#cb20-246"></a>The MI process is re-initialized to facilitate PSM in the context of MI.</span>
-<span id="cb20-247"><a href="#cb20-247"></a></span>
-<span id="cb20-248"><a href="#cb20-248"></a><span class="in">```{r imp7, cache=TRUE}</span></span>
-<span id="cb20-249"><a href="#cb20-249"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.with.miss, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb20-250"><a href="#cb20-250"></a>impdata <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imputation, <span class="at">action=</span><span class="st">"long"</span>)</span>
-<span id="cb20-251"><a href="#cb20-251"></a>m <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb20-252"><a href="#cb20-252"></a>allImputations <span class="ot">&lt;-</span> <span class="fu">imputationList</span>(<span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>m, </span>
-<span id="cb20-253"><a href="#cb20-253"></a>                                        <span class="cf">function</span>(n) </span>
-<span id="cb20-254"><a href="#cb20-254"></a>                                          <span class="fu">subset</span>(impdata, </span>
-<span id="cb20-255"><a href="#cb20-255"></a>                                                 <span class="at">subset=</span>.imp<span class="sc">==</span>n)))</span>
-<span id="cb20-256"><a href="#cb20-256"></a><span class="in">```</span></span>
-<span id="cb20-257"><a href="#cb20-257"></a></span>
-<span id="cb20-258"><a href="#cb20-258"></a><span class="fu">#### Zanutto E. L. (2006) under multiple imputation</span></span>
-<span id="cb20-259"><a href="#cb20-259"></a></span>
-<span id="cb20-260"><a href="#cb20-260"></a>::: callout-tip</span>
-<span id="cb20-261"><a href="#cb20-261"></a>An iterative process is performed within each imputed dataset, which involves:</span>
-<span id="cb20-262"><a href="#cb20-262"></a></span>
-<span id="cb20-263"><a href="#cb20-263"></a><span class="ss">1. </span>Estimating propensity scores.</span>
-<span id="cb20-264"><a href="#cb20-264"></a><span class="ss">2. </span>Matching treated and untreated subjects based on these scores.</span>
-<span id="cb20-265"><a href="#cb20-265"></a><span class="ss">3. </span>Extracting matched data and checking the balance of covariates across matched groups.</span>
-<span id="cb20-266"><a href="#cb20-266"></a><span class="ss">4. </span>Fitting outcome models to the survey weighted matched data and estimating treatment effects.</span>
-<span id="cb20-267"><a href="#cb20-267"></a>::: </span>
-<span id="cb20-268"><a href="#cb20-268"></a></span>
-<span id="cb20-269"><a href="#cb20-269"></a>Notice that we are performing multi-step process within MI</span>
-<span id="cb20-270"><a href="#cb20-270"></a></span>
-<span id="cb20-271"><a href="#cb20-271"></a><span class="in">```{r imp8, cache=TRUE}</span></span>
-<span id="cb20-272"><a href="#cb20-272"></a>match.statm <span class="ot">&lt;-</span> SMDm <span class="ot">&lt;-</span> tab1m <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, m) </span>
-<span id="cb20-273"><a href="#cb20-273"></a>fit.from.PS <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, m)</span>
-<span id="cb20-274"><a href="#cb20-274"></a></span>
-<span id="cb20-275"><a href="#cb20-275"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m) {</span>
-<span id="cb20-276"><a href="#cb20-276"></a>  analytic.i <span class="ot">&lt;-</span> allImputations<span class="sc">$</span>imputations[[i]]</span>
-<span id="cb20-277"><a href="#cb20-277"></a>  <span class="co"># Rename the weight variable into survey.weight</span></span>
-<span id="cb20-278"><a href="#cb20-278"></a>  <span class="fu">names</span>(analytic.i)[<span class="fu">names</span>(analytic.i) <span class="sc">==</span> <span class="st">"weight"</span>] <span class="ot">&lt;-</span> <span class="st">"survey.weight"</span></span>
-<span id="cb20-279"><a href="#cb20-279"></a>  </span>
-<span id="cb20-280"><a href="#cb20-280"></a>  <span class="co"># Specify the PS model to estimate propensity scores</span></span>
-<span id="cb20-281"><a href="#cb20-281"></a>  ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(born<span class="sc">==</span><span class="st">"Others"</span>) <span class="sc">~</span> </span>
-<span id="cb20-282"><a href="#cb20-282"></a>                             race <span class="sc">+</span> age <span class="sc">+</span> married <span class="sc">+</span> education <span class="sc">+</span> </span>
-<span id="cb20-283"><a href="#cb20-283"></a>                             gender <span class="sc">+</span> bmi <span class="sc">+</span> systolicBP)</span>
-<span id="cb20-284"><a href="#cb20-284"></a></span>
-<span id="cb20-285"><a href="#cb20-285"></a>  <span class="co"># Propensity scores</span></span>
-<span id="cb20-286"><a href="#cb20-286"></a>  ps.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(ps.formula, <span class="at">data =</span> analytic.i, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
-<span id="cb20-287"><a href="#cb20-287"></a>  analytic.i<span class="sc">$</span>PS <span class="ot">&lt;-</span> <span class="fu">fitted</span>(ps.fit)</span>
-<span id="cb20-288"><a href="#cb20-288"></a>  </span>
-<span id="cb20-289"><a href="#cb20-289"></a>  <span class="co"># Match exposed and unexposed subjects </span></span>
-<span id="cb20-290"><a href="#cb20-290"></a>  <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb20-291"><a href="#cb20-291"></a>  match.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula, <span class="at">data =</span> analytic.i, </span>
-<span id="cb20-292"><a href="#cb20-292"></a>                       <span class="at">distance =</span> analytic.i<span class="sc">$</span>PS, </span>
-<span id="cb20-293"><a href="#cb20-293"></a>                       <span class="at">method =</span> <span class="st">"nearest"</span>, </span>
-<span id="cb20-294"><a href="#cb20-294"></a>                       <span class="at">replace =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb20-295"><a href="#cb20-295"></a>                       <span class="at">caliper =</span> <span class="fl">0.2</span>, </span>
-<span id="cb20-296"><a href="#cb20-296"></a>                       <span class="at">ratio =</span> <span class="dv">1</span>)</span>
-<span id="cb20-297"><a href="#cb20-297"></a>  match.statm[[i]] <span class="ot">&lt;-</span> match.obj</span>
-<span id="cb20-298"><a href="#cb20-298"></a>  analytic.i<span class="sc">$</span>PS <span class="ot">&lt;-</span> match.obj<span class="sc">$</span>distance</span>
-<span id="cb20-299"><a href="#cb20-299"></a>  </span>
-<span id="cb20-300"><a href="#cb20-300"></a>  <span class="co"># Extract matched data</span></span>
-<span id="cb20-301"><a href="#cb20-301"></a>  matched.data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj) </span>
-<span id="cb20-302"><a href="#cb20-302"></a>  </span>
-<span id="cb20-303"><a href="#cb20-303"></a>  <span class="co"># Balance checking</span></span>
-<span id="cb20-304"><a href="#cb20-304"></a>  cov <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"race"</span>, <span class="st">"age"</span>, <span class="st">"married"</span>, <span class="st">"education"</span>, <span class="st">"gender"</span>, <span class="st">"bmi"</span>, <span class="st">"systolicBP"</span>)</span>
-<span id="cb20-305"><a href="#cb20-305"></a>  </span>
-<span id="cb20-306"><a href="#cb20-306"></a>  tab1m[[i]] <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"born"</span>, </span>
-<span id="cb20-307"><a href="#cb20-307"></a>                               <span class="at">vars =</span> cov, <span class="at">data =</span> matched.data, </span>
-<span id="cb20-308"><a href="#cb20-308"></a>                               <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb20-309"><a href="#cb20-309"></a>  SMDm[[i]] <span class="ot">&lt;-</span> <span class="fu">ExtractSmd</span>(tab1m[[i]])</span>
-<span id="cb20-310"><a href="#cb20-310"></a>  </span>
-<span id="cb20-311"><a href="#cb20-311"></a>  <span class="co"># Setup the design with survey features</span></span>
-<span id="cb20-312"><a href="#cb20-312"></a>  analytic.i<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb20-313"><a href="#cb20-313"></a>  analytic.i<span class="sc">$</span>matched[analytic.i<span class="sc">$</span>ID <span class="sc">%in%</span> matched.data<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb20-314"><a href="#cb20-314"></a>  </span>
-<span id="cb20-315"><a href="#cb20-315"></a>  <span class="co"># Survey setup for full data</span></span>
-<span id="cb20-316"><a href="#cb20-316"></a>  w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">strata =</span> <span class="sc">~</span>strata, <span class="at">id =</span> <span class="sc">~</span>psu, <span class="at">weights =</span> <span class="sc">~</span>survey.weight, </span>
-<span id="cb20-317"><a href="#cb20-317"></a>                         <span class="at">data =</span> analytic.i, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb20-318"><a href="#cb20-318"></a>  </span>
-<span id="cb20-319"><a href="#cb20-319"></a>  <span class="co"># Subset matched data</span></span>
-<span id="cb20-320"><a href="#cb20-320"></a>  w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb20-321"><a href="#cb20-321"></a>  </span>
-<span id="cb20-322"><a href="#cb20-322"></a>  <span class="co"># Outcome model (double adjustment)</span></span>
-<span id="cb20-323"><a href="#cb20-323"></a>  out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> </span>
-<span id="cb20-324"><a href="#cb20-324"></a>                              born <span class="sc">+</span> race <span class="sc">+</span> age <span class="sc">+</span> married <span class="sc">+</span> </span>
-<span id="cb20-325"><a href="#cb20-325"></a>                              education <span class="sc">+</span> gender <span class="sc">+</span> bmi <span class="sc">+</span> systolicBP)</span>
-<span id="cb20-326"><a href="#cb20-326"></a>  fit.from.PS[[i]] <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(out.formula, <span class="at">design =</span> w.design.m, </span>
-<span id="cb20-327"><a href="#cb20-327"></a>                     <span class="at">family =</span> <span class="fu">quasibinomial</span>(<span class="st">"logit"</span>))</span>
-<span id="cb20-328"><a href="#cb20-328"></a>}</span>
-<span id="cb20-329"><a href="#cb20-329"></a><span class="in">```</span></span>
-<span id="cb20-330"><a href="#cb20-330"></a></span>
-<span id="cb20-331"><a href="#cb20-331"></a><span class="fu">#### Check matched data</span></span>
-<span id="cb20-332"><a href="#cb20-332"></a></span>
-<span id="cb20-333"><a href="#cb20-333"></a>The matched data is inspected to ensure that matching was successful and appropriate.</span>
-<span id="cb20-334"><a href="#cb20-334"></a></span>
-<span id="cb20-335"><a href="#cb20-335"></a><span class="in">```{r imp9, cache=TRUE}</span></span>
-<span id="cb20-336"><a href="#cb20-336"></a>match.statm</span>
-<span id="cb20-337"><a href="#cb20-337"></a><span class="in">```</span></span>
-<span id="cb20-338"><a href="#cb20-338"></a></span>
-<span id="cb20-339"><a href="#cb20-339"></a><span class="fu">#### Check balance in matched data</span></span>
-<span id="cb20-340"><a href="#cb20-340"></a></span>
-<span id="cb20-341"><a href="#cb20-341"></a>The balance of covariates across matched groups is assessed to ensure that matching has successfully reduced bias.</span>
-<span id="cb20-342"><a href="#cb20-342"></a></span>
-<span id="cb20-343"><a href="#cb20-343"></a><span class="in">```{r imp10, cache=TRUE}</span></span>
-<span id="cb20-344"><a href="#cb20-344"></a>SMDm</span>
-<span id="cb20-345"><a href="#cb20-345"></a><span class="in">```</span></span>
-<span id="cb20-346"><a href="#cb20-346"></a></span>
-<span id="cb20-347"><a href="#cb20-347"></a><span class="fu">### Pooled estimate</span></span>
-<span id="cb20-348"><a href="#cb20-348"></a></span>
-<span id="cb20-349"><a href="#cb20-349"></a>Finally, the treatment effect estimates from the matched analyses across all imputed datasets are pooled to provide a single, overall estimate, ensuring that the final result appropriately accounts for the uncertainty due to both the matching process and the imputation of missing data.</span>
-<span id="cb20-350"><a href="#cb20-350"></a></span>
-<span id="cb20-351"><a href="#cb20-351"></a><span class="in">```{r imp11, cache=TRUE}</span></span>
-<span id="cb20-352"><a href="#cb20-352"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit.from.PS)</span>
-<span id="cb20-353"><a href="#cb20-353"></a><span class="fu">summary</span>(pooled.estimates, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">logeffect=</span><span class="cn">TRUE</span>)</span>
-<span id="cb20-354"><a href="#cb20-354"></a>OR <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(pooled.estimates<span class="sc">$</span>coefficients), <span class="dv">2</span>) </span>
-<span id="cb20-355"><a href="#cb20-355"></a>OR <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(OR)</span>
-<span id="cb20-356"><a href="#cb20-356"></a>CI <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">confint</span>(pooled.estimates)), <span class="dv">2</span>)</span>
-<span id="cb20-357"><a href="#cb20-357"></a>OR <span class="ot">&lt;-</span> <span class="fu">cbind</span>(OR, CI)</span>
-<span id="cb20-358"><a href="#cb20-358"></a>OR[<span class="dv">2</span>,]</span>
-<span id="cb20-359"><a href="#cb20-359"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</nav>
 </div> <!-- /content -->
 
 
