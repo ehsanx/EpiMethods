@@ -27,6 +27,10 @@ library(gtsummary)
 library(glmnet)
 library(WeightedROC)
 library(ranger)
+library(scoring)
+library(DescTools)
+library(ggplot2)
+library(mlr3misc)
 ```
 
 ### Analytic dataset
@@ -74,7 +78,8 @@ The dataset contains 8,881 participants aged 65 years or older with 49 variables
 -   `htn`: Hypertension
 -   `liver.disease`: Liver disease
 -   `diabetes`: Diabetes
--   `ulcer`: Ulcer - `stroke`: Stroke
+-   `ulcer`: Ulcer 
+-   `stroke`: Stroke
 -   `emphysema`: Emphysema
 -   `copd`: COPD
 -   `high.cholesterol`: High cholesterol
@@ -117,13 +122,14 @@ As we can see, there are 7,280 participants with complete case information. Let'
 # Predictors
 predictors <- c("sex", "hhsize", "born", "marital", "region", "race", "education", 
                 "employment.status", "poverty.status", "veteran", "insurance", 
-                "sex.orientation", "worried.money", "good.neighborhood", "psy.symptom", 
-                "visit.ED", "surgery", "dr.visit", "cancer", "asthma", "htn", 
-                "liver.disease", "diabetes", "ulcer", "stroke", "emphysema", "copd", 
-                "high.cholesterol", "coronary.heart.disease", "angina", "heart.attack", 
-                "heart.disease", "arthritis", "crohns.disease", "place.routine.care",
-                "trouble.asleep", "obese", "current.smoker", "heavy.drinker", 
-                "hospitalization", "better.health.status", "physical.activity")
+                "sex.orientation", "worried.money", "good.neighborhood", 
+                "psy.symptom", "visit.ED", "surgery", "dr.visit", "cancer", 
+                "asthma", "htn", "liver.disease", "diabetes", "ulcer", "stroke",
+                "emphysema", "copd", "high.cholesterol", "coronary.heart.disease", 
+                "angina", "heart.attack", "heart.disease", "arthritis", 
+                "crohns.disease", "place.routine.care", "trouble.asleep", "obese", 
+                "current.smoker", "heavy.drinker", "hospitalization", 
+                "better.health.status", "physical.activity")
 
 # Table 1 - Unweighted 
 tbl_summary(data = dat.complete, include = predictors, by = HICP, missing = "no") %>% 
@@ -169,7 +175,7 @@ Now, we will fit the LASSO model with 5-fold cross-validation (CV). Here are the
 -   Repeat the analysis for all folds.
 
 ```{r lassofit, warning=FALSE, message=FALSE, cache = TRUE}
-fit.lasso <- list(NULL); auc.lasso <- NULL
+fit.lasso <- list(NULL); auc.lasso <- cal.slope.lasso <- brier.lasso <- NULL
 for (fold in 1:k) {
   # Training data
   dat.train <- dat.complete[nfolds != fold, ]
@@ -193,7 +199,17 @@ for (fold in 1:k) {
   dat.test$pred.lasso <- predict(fit.lasso[[fold]], newx = X.test, type = "response")
   
   # AUC on the test set with sampling weights
-  auc.lasso[fold] <- WeightedAUC(WeightedROC(dat.test$pred.lasso, dat.test$HICP, weight = dat.test$wgt))
+  auc.lasso[fold] <- WeightedAUC(WeightedROC(dat.test$pred.lasso, dat.test$HICP, 
+                                             weight = dat.test$wgt))
+  
+  # Weighted calibration slope
+  mod.cal <- glm(HICP ~ DescTools::Logit(dat.test$pred.lasso), data = dat.test, 
+                 family = binomial, weights = wgt)
+  cal.slope.lasso[fold] <- summary(mod.cal)$coef[2,1]
+  
+  # Weighted Brier Score
+  brier.lasso[fold] <- mean(brierscore(HICP ~ dat.test$pred.lasso, data = dat.test, 
+                                       wt = dat.test$wgt))
 }
 ```
 
@@ -231,13 +247,25 @@ fit.lasso[[5]]$beta
 ```{r lassoauc, warning=FALSE, message=FALSE, cache = TRUE}
 # AUCs from different folds
 auc.lasso
+
+# Calibration slope from different folds
+cal.slope.lasso
+
+# Brier score from different folds
+brier.lasso
 ```
 
-Now we will average out the AUC:
+Now we will average out the model performance measures:
 
 ```{r lassoaucmean, warning=FALSE, message=FALSE, cache = TRUE}
 # Average AUC
 mean(auc.lasso)
+
+# Average calibration slope
+mean(cal.slope.lasso)
+
+# Average Brier score
+mean(brier.lasso)
 ```
 
 This AUC is approximately the same as reported by the authors in Table 2.
@@ -247,8 +275,9 @@ This AUC is approximately the same as reported by the authors in Table 2.
 Now, we will fit the random forest model for predicting binary HICP with the listed predictors. Here are the steps for fitting the model with 5-fold CV:
 
 -   For fold 1, folds 2-5 is the training set and fold 1 is the test set
--   Fit 5-fold cross-validation on the training set to find the value of lambda that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.
--   Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey design.
+-   Fit random forest model on the training set to find the value of the hyperparameters (number of trees, number of predictors to split at in each node, and minimal node size to split at) that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.
+-   Grid-search with out-of-sample error approach is widely used in the literature. In this approach, we create a data frame from all combinations of the hyperparameters and check which combination gives the lowest out-of-sample error. 
+-   Fit the random forest model on the training with the selected hyperparameters from the previous step. Incorporate sampling weights in the model to account for survey design.
 -   Calculate predictive performance (e.g., AUC) on the test set
 -   Repeat the analysis for all folds.
 
@@ -268,7 +297,7 @@ Formula
 #### Random forest with 5-fold CV
 
 ```{r rffit, warning=FALSE, message=FALSE, cache = TRUE}
-fit.rf <- list(NULL); auc.rf <- NULL
+fit.rf <- list(NULL); auc.rf <- cal.slope.rf <- brier.rf <- NULL
 for (fold in 1:k) {
   # Training data
   dat.train <- dat.complete[nfolds != fold, ]
@@ -315,6 +344,16 @@ for (fold in 1:k) {
   # AUC on the test set with sampling weights
   auc.rf[fold] <- WeightedAUC(WeightedROC(dat.test$pred.rf, dat.test$HICP, 
                                           weight = dat.test$wgt))
+  
+  # Weighted calibration slope
+  dat.test$pred.rf[dat.test$pred.rf == 0] <- 0.00001
+  mod.cal <- glm(HICP ~ DescTools::Logit(dat.test$pred.rf), data = dat.test, 
+                 family = binomial, weights = wgt)
+  cal.slope.rf[fold] <- summary(mod.cal)$coef[2,1]
+  
+  # Weighted Brier Score
+  brier.rf[fold] <- mean(brierscore(HICP ~ dat.test$pred.rf, data = dat.test,
+                                  wt = dat.test$wgt))
 }
 ```
 
@@ -334,13 +373,52 @@ fit.rf[[5]]
 ```{r rfauc, warning=FALSE, message=FALSE, cache = TRUE}
 # AUCs from different folds
 auc.rf
+
+# Calibration slope from different folds
+cal.slope.rf
+
+# Brier score from different folds
+brier.rf
 ```
 
-Now we will average out the AUC:
+Now we will average out the model performance measures:
 
 ```{r rfaucmean, warning=FALSE, message=FALSE, cache = TRUE}
 # Average AUC
 mean(auc.rf)
+
+# Average calibration slope
+mean(cal.slope.rf)
+
+# Average Brier score
+mean(brier.rf)
 ```
 
 This AUC from random forest is approximately the same as obtained from the LASSO model.
+
+#### Variable importance plot
+One nice feature of random forest is that we can rank the variables and generate a variable importance plot. 
+
+```{r vim, warning=FALSE, message=FALSE, cache = TRUE}
+# Fold 1
+ggplot(
+  enframe(fit.rf[[1]]$variable.importance, name = "variable", value = "importance"),
+  aes(x = reorder(variable, importance), y = importance, fill = importance)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  ylab("Variable Importance") + xlab("") + ggtitle("") +
+  guides(fill = "none") +
+  scale_fill_gradient(low = "grey", high = "grey10") + 
+  theme_bw()
+
+# Fold 5
+ggplot(
+  enframe(fit.rf[[5]]$variable.importance, name = "variable", value = "importance"),
+  aes(x = reorder(variable, importance), y = importance, fill = importance)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  ylab("Variable Importance") + xlab("") + ggtitle("") +
+  guides(fill = "none") +
+  scale_fill_gradient(low = "grey", high = "grey10") + 
+  theme_bw()
+```
