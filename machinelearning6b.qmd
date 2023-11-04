@@ -16,7 +16,7 @@ For those interested in the National Health Interview Survey (NHIS) dataset, can
 To handle [missing data](missingdata.html) in the predictors, they used multiple imputation technique. However, for simplicity, this tutorial focuses on a complete case dataset. We will also only focus on predicting HICP for people aged 65 years or older (a dataset of \~8,800 participants compared to the dataset of 33,000 participants aged 18 years or older).
 :::
 
-### Load necessary packages
+### Load packages
 
 We load several R packages required for fitting LASSO and random forest models.
 
@@ -150,7 +150,7 @@ tbl_summary(data = dat.complete,
                            "stat_2") ~ "**HICP**")
 ```
 
-### LASSO for survey data
+### LASSO for surveys
 
 Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Similar to the [previous chapter](machinelearning6a.html), we will normalize the weight.
 
@@ -183,7 +183,7 @@ nfolds <- sample(1:k,
 table(nfolds)
 ```
 
-#### Regression formula
+#### Formula
 
 ```{r formula, warning=FALSE, message=FALSE, cache = TRUE}
 Formula <- formula(paste("HICP ~ ", paste(predictors, 
@@ -191,7 +191,7 @@ Formula <- formula(paste("HICP ~ ", paste(predictors,
 Formula
 ```
 
-#### LASSO with 5-fold CV
+#### 5-fold CV LASSO
 
 Now, we will fit the LASSO model with 5-fold cross-validation (CV). Here are the steps:
 
@@ -318,7 +318,7 @@ mean(brier.lasso)
 
 Although the authors used multiple imputation, our AUC from the LASSO model with complete case data analysis is not that different. Note: the authors reported the AUC values in Table 2.
 
-### Random forest for survey data
+### Random forest for surveys
 
 Now, we will fit the random forest model for predicting binary HICP with the listed predictors. Here are the steps for fitting the model with 5-fold CV:
 
@@ -336,13 +336,13 @@ k <- 5
 table(nfolds)
 ```
 
-#### Regression formula
+#### Formula
 
 ```{r formularf, warning=FALSE, message=FALSE, cache = TRUE}
 Formula
 ```
 
-#### Random forest with 5-fold CV
+#### 5-fold CV random forest
 
 ```{r rffit, warning=FALSE, message=FALSE, cache = TRUE}
 fit.rf <- list(NULL)
@@ -464,7 +464,7 @@ mean(brier.rf)
 
 This AUC from random forest is approximately the same as obtained from the LASSO model.
 
-#### Variable importance plot
+#### Variable importance
 
 One nice feature of random forest is that we can rank the variables and generate a variable importance plot.
 

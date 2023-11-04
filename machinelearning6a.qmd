@@ -1,6 +1,6 @@
 ## NHIS Example {.unnumbered}
 
-The tutorial aims to guide the users through fitting machine learning (ML) techniques with health survey data. We will use the [National Health Interview Survey (NHIS) 2016](https://www.cdc.gov/nchs/nhis/nhis_2016_data_release.htm) dataset to develop prediction models for predicting high impact chronic pain (HICP) among adults aged 65 years or older. We will use LASSO and random forest models with sampling weights to obtain population-level predictions. In this chapter, the split-sample approach as an internal validation technique will be used. You can review the [earlier tutorial](predictivefactors5.html) on data splitting technique. Note that this split-sample approach is flagged as a problematic approach in the literature [@steyerberg2001internal]. The better approach could be cross-validation and bootstrapping [@steyerberg2001internal,@steyerberg2019overfitting]. In the [next chapter](machinelearning6b.html), we will apply the ML techniques for survey data with cross-validation.
+The tutorial aims to guide the users through fitting machine learning (ML) techniques with health survey data. We will use the [National Health Interview Survey (NHIS) 2016](https://www.cdc.gov/nchs/nhis/nhis_2016_data_release.htm) dataset to develop prediction models for predicting high impact chronic pain (HICP) among adults aged 65 years or older. We will use LASSO and random forest models with sampling weights to obtain population-level predictions. In this tutorial, the split-sample approach as an internal validation technique will be used. You can review the [earlier tutorial](predictivefactors5.html) on data splitting technique. Note that this split-sample approach is flagged as a problematic approach in the literature [@steyerberg2001internal]. The better approach could be cross-validation and bootstrapping [@steyerberg2001internal,@steyerberg2019overfitting]. In the [next tutorial](machinelearning6b.html), we will apply the ML techniques for survey data with cross-validation.
 
 ::: column-margin
 Steyerberg EW, Harrell Jr FE, Borsboom GJ, Eijkemans MJ, Vergouwe Y, Habbema JD. Internal validation of predictive models: efficiency of some procedures for logistic regression analysis. Journal of Clinical Epidemiology. 2001; 54(8):774-81. DOI: [10.1016/S0895-4356(01)00341-9](https://doi.org/10.1016/S0895-4356(01)00341-9)
@@ -12,7 +12,7 @@ Steyerberg EW, Steyerberg EW. Overfitting and optimism in prediction models. Cli
 For those interested in the National Health Interview Survey (NHIS) dataset, can review the [earlier tutorial](accessing5.html) about the dataset.
 :::
 
-### Load necessary packages
+### Load packages
 
 We load several R packages required for fitting LASSO and random forest models.
 
@@ -85,7 +85,7 @@ tbl_summary(data = dat.analytic, include = predictors,
 
 ### Weight normalization
 
-Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Note that we are not interested in the statistical significance of the $\beta$ coefficients. Hence, not utilizing PSU and strata should not be an issue in this prediction problem. However, we still need to use sampling weights to get population-level predictions. Large weights are usually problematic, particularly with model evaluation. One way to solve the problem is weight normalization.
+Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Note that we are not interested in the statistical significance of the $\beta$ coefficients. Hence, not utilizing PSU and strata should not be an issue in this prediction problem. However, we still need to use sampling weights to get population-level predictions. Large weights are usually problematic, particularly with model evaluation. One way to solve the problem is weight normalization [@advancedsurvey].
 
 ```{r weight, warning=FALSE, message=FALSE, cache = TRUE}
 # Normalize weight
@@ -130,7 +130,7 @@ Formula <- formula(paste("HICP ~ ", paste(predictors,
 Formula
 ```
 
-### LASSO with survey data
+### LASSO for Surveys
 
 Now, we will fit the LASSO model for our survey data. Here are the steps:
 
@@ -138,7 +138,7 @@ Now, we will fit the LASSO model for our survey data. Here are the steps:
 -   Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey data.
 -   Calculate predictive performance (e.g., AUC) on the test data.
 
-#### Data in matrix format
+#### Data in matrix
 
 To perform LASSO with the `glmnet` package, we need to set the predictors in the data.matrix format and outcome variable as a vector.
 
@@ -164,7 +164,7 @@ As we can see, factor predictors are coded into dummy variables. It is important
 In glmnet function, `alpha = 1` for the LASSO, `alpha = 0` for the ridge, and setting alpha to some value between 0 and 1 is the elastic net model.
 :::
 
-#### Find the best lambda
+#### Find best lambda
 
 Now, we will use k-fold cross-validation with the `cv.glmnet` function to find the best lambda value. In this example, we choose k = 5. Note that we must incorporate sampling weight to account for survey data.
 
@@ -190,7 +190,7 @@ fit.cv.lasso$lambda.min
 
 The lambda value that has the lowest deviance is `r fit.cv.lasso$lambda.min`. Our next step is to fit the LASSO model with the best lambda. Again, we must incorporate sampling weight to account for survey data.
 
-#### LASSO with the best lambda
+#### LASSO with best lambda
 
 ```{r lassofit, warning=FALSE, message=FALSE, cache = TRUE}
 # Fit the model on the training set with optimum lambda
@@ -268,7 +268,7 @@ brier.lasso <- mean(brierscore(HICP ~ dat.test$pred.lasso,
 brier.lasso
 ```
 
-### Random forest for survey data
+### Random Forest for Surveys
 
 Now, we will fit the random forest model for predicting binary HICP with the listed predictors. Here are the steps for fitting the model:
 
@@ -277,7 +277,7 @@ Now, we will fit the random forest model for predicting binary HICP with the lis
 -   Fit the random forest model on the training with the selected hyperparameters from the previous step. Incorporate sampling weights in the model to account for survey data.
 -   Calculate predictive performance (e.g., AUC) on the test data.
 
-#### Regression formula
+#### Formula
 
 We will use the same formula defined above.
 
@@ -285,7 +285,7 @@ We will use the same formula defined above.
 Formula
 ```
 
-#### Tuning the hyperparameters
+#### Hyperparameter tuning
 
 For tuning the hyperparameters, let's use the grid search approach.
 
@@ -329,7 +329,7 @@ position <- which.min(grid.search$oob_error)
 grid.search[position,]
 ```
 
-#### Model with tuned hyperparameters
+#### Model after tuning
 
 Now, we will fit the random forest model with the tuned hyperparameters.
 
@@ -391,7 +391,7 @@ brier.rf <- mean(brierscore(HICP ~ dat.test$pred.rf,
 brier.rf
 ```
 
-#### Variable importance plot
+#### Variable importance
 
 One nice feature of random forest is that we can rank the variables and generate a variable importance plot.
 
@@ -418,9 +418,9 @@ As per the figure, marital status, poverty status, sex, and arthritis are the mo
 
 ### Performance comparison
 
-| Model | AUC           | Calibration slope   | Brier score     |
-|-------|---------------|---------------------|-----------------|
-| LASSO | `r auc.lasso` | `r cal.slope.lasso` | `r brier.lasso` |
-| Random forest | `r auc.rf` | `r cal.slope.rf` | `r brier.rf` |
+| Model         | AUC           | Calibration slope   | Brier score     |
+|---------------|---------------|---------------------|-----------------|
+| LASSO         | `r auc.lasso` | `r cal.slope.lasso` | `r brier.lasso` |
+| Random forest | `r auc.rf`    | `r cal.slope.rf`    | `r brier.rf`    |
 
 ### References
