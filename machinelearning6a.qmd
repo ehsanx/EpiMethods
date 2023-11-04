@@ -1,19 +1,15 @@
-## Replicate Results {.unnumbered}
+## NHIS Example {.unnumbered}
 
-The tutorial aims to guide the users through fitting machine learning techniques with health survey data. We will replicate some of the results of this article by [Falasinnu et al. (2023)](https://doi.org/10.1016/j.jpain.2023.03.008). 
+The tutorial aims to guide the users through fitting machine learning (ML) techniques with health survey data. We will use the [National Health Interview Survey (NHIS) 2016](https://www.cdc.gov/nchs/nhis/nhis_2016_data_release.htm) dataset to develop prediction models for predicting high impact chronic pain (HICP) among adults aged 65 years or older. We will use LASSO and random forest models with sampling weights to obtain population-level predictions. In this chapter, the split-sample approach as an internal validation technique will be used. You can review the [earlier tutorial](predictivefactors5.html) on data splitting technique. Note that this split-sample approach is flagged as a problematic approach in the literature [@steyerberg2001internal]. The better approach could be cross-validation and bootstrapping [@steyerberg2001internal,@steyerberg2019overfitting]. In the [next chapter](machinelearning6b.html), we will apply the ML techniques for survey data with cross-validation.
 
 ::: column-margin
-Falasinnu T, Hossain MB, Weber II KA, Helmick CG, Karim ME, Mackey S. The Problem of Pain in the United States: A Population-Based Characterization of Biopsychosocial Correlates of High Impact Chronic Pain Using the National Health Interview Survey. The Journal of Pain. 2023;24(6):1094-103. DOI: [10.1016/j.jpain.2023.03.008](https://doi.org/10.1016/j.jpain.2023.03.008)
+Steyerberg EW, Harrell Jr FE, Borsboom GJ, Eijkemans MJ, Vergouwe Y, Habbema JD. Internal validation of predictive models: efficiency of some procedures for logistic regression analysis. Journal of Clinical Epidemiology. 2001; 54(8):774-81. DOI: [10.1016/S0895-4356(01)00341-9](https://doi.org/10.1016/S0895-4356(01)00341-9)
+
+Steyerberg EW, Steyerberg EW. Overfitting and optimism in prediction models. Clinical prediction models: A practical approach to development, validation, and updating. 2019:95-112. DOI: [10.1007/978-3-030-16399-0_5](https://link.springer.com/chapter/10.1007/978-3-030-16399-0_5)
 :::
 
-The authors used the [National Health Interview Survey (NHIS) 2016](https://www.cdc.gov/nchs/nhis/nhis_2016_data_release.htm) dataset to develop prediction models for predicting high impact chronic pain (HICP). They also evaluated the predictive performances of the models within sociodemographic subgroups, such as sex (male, female), age ($<65$, $\ge 65$), and race/ethnicity (White, Black, Hispanic). They used LASSO and random forest models with 5-fold cross-validation as an internal validation. To obtain population-level predictions, they account for survey weights in both models. 
-
-::: column-margin
+::: callout-note
 For those interested in the National Health Interview Survey (NHIS) dataset, can review the [earlier tutorial](accessing5.html) about the dataset.
-:::
-
-::: {.callout-note}
-To handle [missing data](missingdata.html) in the predictors, they used multiple imputation technique. However, for simplicity, this tutorial focuses on a complete case dataset. We will also only focus on predicting HICP for people aged 65 years or older (a dataset of \~8,800 participants compared to the dataset of 33,000 participants aged 18 years or older).
 :::
 
 ### Load necessary packages
@@ -40,385 +36,391 @@ library(mlr3misc)
 We load the dataset into the R environment and lists all available variables and objects.
 
 ```{r load, warning=FALSE, message=FALSE, cache = TRUE}
-load("Data/machinelearning/Falasinnu2023.RData")
+load("Data/machinelearning/nhis2016.RData")
 ls()
 ```
 
 ```{r dim, warning=FALSE, message=FALSE, cache = TRUE}
-dim(dat)
+dim(dat.analytic)
+
+head(dat.analytic)
 ```
 
-The dataset contains 8,881 participants aged 65 years or older with 49 variables:
+The dataset contains 7,828 complete case participants (i.e., no missing) with 14 variables:
 
 -   `studyid`: Unique identifier
 -   `psu`: Pseudo-PSU
 -   `strata`: Pseudo-stratum
 -   `weight`: Sampling weight
--   `HICP`: HICP (binary outcome variable)
--   `age`: Age - `sex`: Sex
--   `hhsize`: Number of people in household
--   `born`: Citizenship
+-   `HICP`: HICP (high impact chronic pain, the binary outcome variable)
+-   `sex`: Sex
 -   `marital`: Marital status
--   `region`: Region
 -   `race`: Race/ethnicity
--   `education`: Education
--   `employment.status`: Employment status
 -   `poverty.status`: Poverty status
--   `veteran`: Veteran
--   `insurance`: Health insurance coverage
--   `sex.orientation`: Sexual orientation
--   `worried.money`: Worried about money
--   `good.neighborhood`: Good neighborhood
--   `psy.symptom`: Psychological symptoms
--   `visit.ED`: Number of times in ER/ED
--   `surgery`: Number of surgeries in past 12 months
--   `dr.visit`: Time since doctor visits
--   `cancer`: Cancer
--   `asthma`: Asthma
--   `htn`: Hypertension
--   `liver.disease`: Liver disease
 -   `diabetes`: Diabetes
--   `ulcer`: Ulcer 
--   `stroke`: Stroke
--   `emphysema`: Emphysema
--   `copd`: COPD
 -   `high.cholesterol`: High cholesterol
--   `coronary.heart.disease`: Coronary heart disease
--   `angina`: Angina pectoris
--   `heart.attack`: Heart attack
--   `heart.disease`: Heart condition/disease
+-   `stroke`: Stroke
 -   `arthritis`: Arthritis and rheumatism
--   `crohns.disease`: Crohn's disease
--   `place.routine.care`: Usual place for routine care
--   `trouble.asleep`: Trouble falling asleep
--   `obese`: Obesity
 -   `current.smoker`: Current smoker
--   `heavy.drinker`: Heavy drinker
--   `hospitalization`: Hospital stay days
--   `better.health.status`: Better health status
--   `physical.activity`: Physical activity
 
-See the NHIS 2016 dataset and the article for better understanding of the variables.
-
-#### Complete case data
-
-```{r desc, warning=FALSE, message=FALSE, cache = TRUE}
-# Age
-table(dat$age, useNA = "always")
-```
-
-Let us consider a complete case dataset
-
-```{r completecase, warning=FALSE, message=FALSE, cache = TRUE}
-dat.complete <- na.omit(dat)
-dim(dat.complete)
-```
-
-As we can see, there are 7,280 participants with complete case information. Let's see the descriptive statistics of the predictors stratified by HICP.
+Let's see the descriptive statistics of the predictors stratified by the outcome variable (HICP).
 
 #### Descriptive statistics
 
 ```{r tab1, warning=FALSE, message=FALSE, cache = TRUE}
 # Predictors
-predictors <- c("sex", "hhsize", "born", "marital", "region", "race", "education", 
-                "employment.status", "poverty.status", "veteran", "insurance", 
-                "sex.orientation", "worried.money", "good.neighborhood", 
-                "psy.symptom", "visit.ED", "surgery", "dr.visit", "cancer", 
-                "asthma", "htn", "liver.disease", "diabetes", "ulcer", "stroke",
-                "emphysema", "copd", "high.cholesterol", "coronary.heart.disease", 
-                "angina", "heart.attack", "heart.disease", "arthritis", 
-                "crohns.disease", "place.routine.care", "trouble.asleep", "obese", 
-                "current.smoker", "heavy.drinker", "hospitalization", 
-                "better.health.status", "physical.activity")
+predictors <- c("sex", "marital", "race", "poverty.status", 
+                "diabetes", "high.cholesterol", "stroke",
+                "arthritis", "current.smoker")
 
 # Table 1 - Unweighted 
-tbl_summary(data = dat.complete, include = predictors, by = HICP, missing = "no") %>% 
+#tab1 <- CreateTableOne(vars = predictors, strata = "HICP", 
+#                       data = dat.analytic, test = F)
+#print(tab1, showAllLevels = T)
+
+tbl_summary(data = dat.analytic, include = predictors, 
+            by = HICP, missing = "no") %>% 
   modify_spanning_header(c("stat_1", "stat_2") ~ "**HICP**")
 ```
 
-### LASSO for survey data
+### Weight normalization
 
-Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Note that we are not interested in the statistical significance of the $\beta$ coefficients. Hence, not utilizing PSU and strata should not be an issue in this prediction problem. However, we still need to use sampling weights to get population-level predictions. Large weights are usually problematic, particularly with random forest model. One way to solve the problem is weight normalization.
+Now, we will fit the LASSO model for predicting binary HICP with the listed predictors. Note that we are not interested in the statistical significance of the $\beta$ coefficients. Hence, not utilizing PSU and strata should not be an issue in this prediction problem. However, we still need to use sampling weights to get population-level predictions. Large weights are usually problematic, particularly with model evaluation. One way to solve the problem is weight normalization.
 
 ```{r weight, warning=FALSE, message=FALSE, cache = TRUE}
 # Normalize weight
-dat.complete$wgt <- dat.complete$weight * nrow(dat.complete)/sum(dat.complete$weight)
-summary(dat.complete$weight)
-summary(dat.complete$wgt)
+dat.analytic$wgt <- dat.analytic$weight * 
+  nrow(dat.analytic)/sum(dat.analytic$weight)
+
+# Weight summary
+summary(dat.analytic$weight)
+summary(dat.analytic$wgt)
+
+# The weighted and unweighted n are equal
+nrow(dat.analytic)
+sum(dat.analytic$wgt)
 ```
 
-#### Folds
+### Split-sample
 
-Let's create five random folds and specify the regression formula.
+Let us create our training and test data using the split-sample approach. We created 70% training and 30% test data for our example.
 
-```{r folds, warning=FALSE, message=FALSE, cache = TRUE}
-k <- 5
-set.seed(604)
-nfolds <- sample(1:k, size = nrow(dat.complete), replace = T)
-table(nfolds)
+```{r splitsample, warning=FALSE, message=FALSE, cache = TRUE}
+set.seed(604001)
+dat.analytic$datasplit <- rbinom(nrow(dat.analytic), 
+                                 size = 1, prob = 0.7) 
+table(dat.analytic$datasplit)
+
+# Training data
+dat.train <- dat.analytic[dat.analytic$datasplit == 1,]
+dim(dat.train)
+
+# Test data
+dat.test <- dat.analytic[dat.analytic$datasplit == 0,]
+dim(dat.test)
 ```
 
-#### Regression formula
+### Regression formula
+
+Let's us define the regression formula:
 
 ```{r formula, warning=FALSE, message=FALSE, cache = TRUE}
-Formula <- formula(paste("HICP ~ ", paste(predictors, collapse=" + ")))
+Formula <- formula(paste("HICP ~ ", paste(predictors, 
+                                          collapse=" + ")))
+Formula
 ```
 
-#### LASSO with 5-fold CV
+### LASSO with survey data
 
-Now, we will fit the LASSO model with 5-fold cross-validation (CV). Here are the steps:
+Now, we will fit the LASSO model for our survey data. Here are the steps:
 
--   For fold 1, folds 2-5 is the training set and fold 1 is the test set
--   Fit 5-fold cross-validation on the training set to find the value of lambda that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.
--   Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey design.
--   Calculate predictive performance (e.g., AUC) on the test set
--   Repeat the analysis for all folds.
+-   We will fit 5-fold cross-validation on the training data to find the value of lambda that gives minimum prediction error. We will incorporate sampling weights in the model to account for survey data.
+-   Fit LASSO on the training with the optimum lambda from the previous step. Incorporate sampling weights in the model to account for survey data.
+-   Calculate predictive performance (e.g., AUC) on the test data.
+
+#### Data in matrix format
+
+To perform LASSO with the `glmnet` package, we need to set the predictors in the data.matrix format and outcome variable as a vector.
+
+```{r lassodata, warning=FALSE, message=FALSE, cache = TRUE}
+# Training data - X: predictor, y: outcome
+X.train <- model.matrix(Formula, dat.train)[,-1] 
+y.train <- as.matrix(dat.train$HICP) 
+
+# Test data - X: predictor, y: outcome
+X.test <- model.matrix(Formula, dat.test)[,-1] 
+y.test <- as.matrix(dat.test$HICP) 
+```
+
+Let us see the few rows of the data:
+
+```{r lassodata2, warning=FALSE, message=FALSE, cache = TRUE}
+head(X.train)
+```
+
+As we can see, factor predictors are coded into dummy variables. It is important to note that the continuous predictors should be standardized. glmnet does this by default. Next, we will use the `glmnet` function to fit the LASSO model.
+
+::: callout-note
+In glmnet function, `alpha = 1` for the LASSO, `alpha = 0` for the ridge, and setting alpha to some value between 0 and 1 is the elastic net model.
+:::
+
+#### Find the best lambda
+
+Now, we will use k-fold cross-validation with the `cv.glmnet` function to find the best lambda value. In this example, we choose k = 5. Note that we must incorporate sampling weight to account for survey data.
+
+```{r lambda, warning=FALSE, message=FALSE, cache = TRUE}
+# Find the best lambda using 5-fold CV
+fit.cv.lasso <- cv.glmnet(x = X.train, y = y.train, 
+                          nfolds = 5, alpha = 1, 
+                          family = "binomial", 
+                          weights = dat.train$wgt)
+fit.cv.lasso
+```
+
+We can also plot all the lambda values against the deviance (i.e., prediction error).
+
+```{r lambdaplot, warning=FALSE, message=FALSE, cache = TRUE}
+plot(fit.cv.lasso)
+```
+
+```{r bestlambda, warning=FALSE, message=FALSE, cache = TRUE}
+# Best lambda
+fit.cv.lasso$lambda.min
+```
+
+The lambda value that has the lowest deviance is `r fit.cv.lasso$lambda.min`. Our next step is to fit the LASSO model with the best lambda. Again, we must incorporate sampling weight to account for survey data.
+
+#### LASSO with the best lambda
 
 ```{r lassofit, warning=FALSE, message=FALSE, cache = TRUE}
-fit.lasso <- list(NULL); auc.lasso <- cal.slope.lasso <- brier.lasso <- NULL
-for (fold in 1:k) {
-  # Training data
-  dat.train <- dat.complete[nfolds != fold, ]
-  X.train <- model.matrix(Formula, dat.train)[,-1]
-  y.train <- as.matrix(dat.train$HICP)
-  
-  # Test data
-  dat.test <- dat.complete[nfolds == fold, ]
-  X.test <- model.matrix(Formula, dat.test)[,-1]
-  y.test <- as.matrix(dat.test$HICP)
-  
-  # Find the optimum lambda using 5-fold CV
-  fit.cv.lasso <- cv.glmnet(x = X.train, y = y.train, nfolds = 5, alpha = 1, 
-                            family = "binomial", weights = dat.train$wgt)
-  
-  # Fit the model on the training set with optimum lambda
-  fit.lasso[[fold]] <- glmnet(x = X.train, y = y.train, alpha = 1, family = "binomial",
-                      lambda = fit.cv.lasso$lambda.min, weights = dat.train$wgt)
-  
-  # Prediction on the test set
-  dat.test$pred.lasso <- predict(fit.lasso[[fold]], newx = X.test, type = "response")
-  
-  # AUC on the test set with sampling weights
-  auc.lasso[fold] <- WeightedAUC(WeightedROC(dat.test$pred.lasso, dat.test$HICP, 
-                                             weight = dat.test$wgt))
-  
-  # Weighted calibration slope
-  mod.cal <- glm(HICP ~ DescTools::Logit(dat.test$pred.lasso), data = dat.test, 
-                 family = binomial, weights = wgt)
-  cal.slope.lasso[fold] <- summary(mod.cal)$coef[2,1]
-  
-  # Weighted Brier Score
-  brier.lasso[fold] <- mean(brierscore(HICP ~ dat.test$pred.lasso, data = dat.test, 
-                                       wt = dat.test$wgt))
-}
+# Fit the model on the training set with optimum lambda
+fit.lasso <- glmnet(x = X.train, y = y.train, 
+                    alpha = 1, family = "binomial",
+                    lambda = fit.cv.lasso$lambda.min, 
+                    weights = dat.train$wgt)
+fit.lasso
+```
+
+Let's check the coefficients from the model:
+
+```{r lassofit2, warning=FALSE, message=FALSE, cache = TRUE}
+# Intercept 
+fit.lasso$a0
+
+# Beta coefficients
+fit.lasso$beta
+```
+
+As we can see, the coefficient is not shown for some predictors. This is because the LASSO model shrunk the coefficient to zero. In other words, these predictors were dropped entirely from the model because they were not contributing enough to predict the outcome. next, we will use the final model to make predictions on new observations or our test data.
+
+```{r lassopred, warning=FALSE, message=FALSE, cache = TRUE}
+# Pr.(HICP = Yes) on the test set
+dat.test$pred.lasso <- predict(fit.lasso, 
+                               newx = X.test, 
+                               type = "response")
+head(dat.test$pred.lasso)
 ```
 
 #### Model performance
 
-Let's check how prediction worked.
+Now, we will calculate the model performance measures such as AUC, calibration slope, and Brier score [@steyerberg2010assessing,@steyerberg2014towards,@christodoulou2019systematic]. We will incorporate sampling weights to get population-level estimates.
 
-```{r lassofit2, warning=FALSE, message=FALSE, cache = TRUE}
-# Fitted LASSO models
-fit.lasso[[1]]
-fit.lasso[[2]]
-fit.lasso[[3]]
-fit.lasso[[4]]
-fit.lasso[[5]]
-```
+::: column-margin
+Steyerberg EW, Vickers AJ, Cook NR, Gerds T, Gonen M, Obuchowski N, Pencina MJ, Kattan MW. Assessing the performance of prediction models: a framework for some traditional and novel measures. Epidemiology (Cambridge, Mass.). 2010;21(1):128. DOI: [10.1097/EDE.0b013e3181c30fb2](https://doi.org/10.1097%2FEDE.0b013e3181c30fb2)
 
-```{r lassofit3, warning=FALSE, message=FALSE, cache = TRUE}
-# Intercept from the LASSO models in different folds
-fit.lasso[[1]]$a0
-fit.lasso[[2]]$a0
-fit.lasso[[3]]$a0
-fit.lasso[[4]]$a0
-fit.lasso[[5]]$a0
-```
+Steyerberg EW, Vergouwe Y. Towards better clinical prediction models: seven steps for development and an ABCD for validation. European heart journal. 2014;35(29):1925-31. DOI: [10.1093/eurheartj/ehu207](https://doi.org/10.1093/eurheartj/ehu207)
 
-```{r lassofit4, warning=FALSE, message=FALSE, cache = TRUE}
-# Beta coefficients from the LASSO models in different folds
-fit.lasso[[1]]$beta
-fit.lasso[[2]]$beta
-fit.lasso[[3]]$beta
-fit.lasso[[4]]$beta
-fit.lasso[[5]]$beta
-```
+Christodoulou E, Ma J, Collins GS, Steyerberg EW, Verbakel JY, Van Calster B. A systematic review shows no performance benefit of machine learning over logistic regression for clinical prediction models. Journal of clinical epidemiology. 2019;110:12-22. DOI: [10.1016/j.jclinepi.2019.02.004](https://doi.org/10.1016/j.jclinepi.2019.02.004)
+:::
+
+::: callout-note
+-   Area under the curve (AUC) is a measure of discrimination or accuracy of a model. A higher AUC is better. An AUC value of 1 is considered a perfect prediction, while an AUC value of 0.50 is no better than a coin toss. In practice, AUC values of 0.70 to 0.80 are considered good, and those $>0.80$ are considered very good.
+
+-   Calibration is defined as the agreement between observed and predicted probability of the outcome. In this exercise, we will estimate the calibration slope as a measure of calibration. A calibration slope of 1 reflects a well-calibrated model, a calibration slope less than 1 indicates overfitting and greater than 1 indicates underfitting of the model.
+
+-   The Brier score is a measure of overall performance. The Brier score can range from 0 to 1 and is similar to the mean squared error. A lower Brier score value (closer to 0) indicates a better model.
+:::
 
 ```{r lassoauc, warning=FALSE, message=FALSE, cache = TRUE}
-# AUCs from different folds
+# AUC on the test set with sampling weights
+auc.lasso <- WeightedAUC(WeightedROC(dat.test$pred.lasso, 
+                                     dat.test$HICP, 
+                                     weight = dat.test$wgt))
 auc.lasso
+```
 
-# Calibration slope from different folds
+```{r lassoslope, warning=FALSE, message=FALSE, cache = TRUE}
+# Logit of the predicted probability
+dat.test$pred.lasso.logit <- Logit(dat.test$pred.lasso)
+
+# Weighted calibration slope
+mod.cal <- glm(HICP ~ pred.lasso.logit, data = dat.test, 
+               family = binomial, weights = wgt)
+cal.slope.lasso <- summary(mod.cal)$coef[2,1]
 cal.slope.lasso
+```
 
-# Brier score from different folds
+```{r lassobrier, warning=FALSE, message=FALSE, cache = TRUE}
+# Weighted Brier Score
+brier.lasso <- mean(brierscore(HICP ~ dat.test$pred.lasso, 
+                               data = dat.test, 
+                               wt = dat.test$wgt))
 brier.lasso
 ```
 
-Now we will average out the model performance measures:
-
-```{r lassoaucmean, warning=FALSE, message=FALSE, cache = TRUE}
-# Average AUC
-mean(auc.lasso)
-
-# Average calibration slope
-mean(cal.slope.lasso)
-
-# Average Brier score
-mean(brier.lasso)
-```
-
-This AUC is approximately the same as reported by the authors in Table 2.
-
 ### Random forest for survey data
 
-Now, we will fit the random forest model for predicting binary HICP with the listed predictors. Here are the steps for fitting the model with 5-fold CV:
+Now, we will fit the random forest model for predicting binary HICP with the listed predictors. Here are the steps for fitting the model:
 
--   For fold 1, folds 2-5 is the training set and fold 1 is the test set
--   Fit random forest model on the training set to find the value of the hyperparameters (number of trees, number of predictors to split at in each node, and minimal node size to split at) that gives minimum prediction error. Incorporate sampling weights in the model to account for survey design.
--   Grid-search with out-of-sample error approach is widely used in the literature. In this approach, we create a data frame from all combinations of the hyperparameters and check which combination gives the lowest out-of-sample error. 
--   Fit the random forest model on the training with the selected hyperparameters from the previous step. Incorporate sampling weights in the model to account for survey design.
--   Calculate predictive performance (e.g., AUC) on the test set
--   Repeat the analysis for all folds.
-
-#### Folds
-
-```{r foldsrf, warning=FALSE, message=FALSE, cache = TRUE}
-k <- 5
-table(nfolds)
-```
+-   Fit random forest model on the training set to find the value of the hyperparameters (number of trees, number of predictors to split at in each node, and minimal node size to split at) that gives minimum prediction error. Incorporate sampling weights in the model to account for survey data.
+-   Grid-search with out-of-sample error approach is widely used in the literature. In this approach, we create a data frame from all combinations of the hyperparameters and check which combination gives the lowest out-of-sample error.
+-   Fit the random forest model on the training with the selected hyperparameters from the previous step. Incorporate sampling weights in the model to account for survey data.
+-   Calculate predictive performance (e.g., AUC) on the test data.
 
 #### Regression formula
+
+We will use the same formula defined above.
 
 ```{r formularf, warning=FALSE, message=FALSE, cache = TRUE}
 Formula
 ```
 
-#### Random forest with 5-fold CV
+#### Tuning the hyperparameters
+
+For tuning the hyperparameters, let's use the grid search approach.
+
+```{r rftuning, warning=FALSE, message=FALSE, cache = TRUE}
+# Grid with 1000 models - huge time consuming
+#grid.search <- expand.grid(mtry = 1:10, node.size = 1:10, 
+#                           num.trees = seq(50,500,50), 
+#                           oob_error = 0)
+  
+# Grid with 36 models as an exercise
+grid.search <- expand.grid(mtry = 5:7, node.size = 1:3, 
+                           num.trees = seq(200,500,100), 
+                           oob_error = 0)
+head(grid.search)
+```
+
+Now, we will fit the random forest model with the selected grids. We will incorporate sampling weight as the case weight in the `ranger` function.
+
+```{r rftuning2, warning=FALSE, message=FALSE, cache = TRUE}
+## Calculate prediction error for each grid 
+for(ii in 1:nrow(grid.search)) {
+  # Model on training set with grid
+  fit.rf.tune <- ranger(formula = Formula, 
+                        data = dat.train, 
+                        num.trees = grid.search$num.trees[ii],
+                        mtry = grid.search$mtry[ii], 
+                        min.node.size = grid.search$node.size[ii],
+                        importance = 'impurity', 
+                        case.weights = dat.train$wgt)
+  
+  # Add Out-of-bag (OOB) error to each grid
+  grid.search$oob_error[ii] <- sqrt(fit.rf.tune$prediction.error)
+}
+head(grid.search)
+```
+
+Let's check which combination of hyperparameters (number of trees, number of predictors to split at in each node, and minimal node size to split at) gives minimum prediction error.
+
+```{r rftuningposition, warning=FALSE, message=FALSE, cache = TRUE}
+position <- which.min(grid.search$oob_error)
+grid.search[position,]
+```
+
+#### Model with tuned hyperparameters
+
+Now, we will fit the random forest model with the tuned hyperparameters.
 
 ```{r rffit, warning=FALSE, message=FALSE, cache = TRUE}
-fit.rf <- list(NULL); auc.rf <- cal.slope.rf <- brier.rf <- NULL
-for (fold in 1:k) {
-  # Training data
-  dat.train <- dat.complete[nfolds != fold, ]
-  
-  # Test data
-  dat.test <- dat.complete[nfolds == fold, ]
-  
-  # Tuning the hyperparameters 
-  ## Grid with 1000 models - huge time consuming
-  #grid.search <- expand.grid(mtry = 1:10, node.size = 1:10, 
-  #                           num.trees = seq(50,500,50), OOB_RMSE = 0)
-  
-  ## Grid with 36 models as an exercise
-  grid.search <- expand.grid(mtry = 5:7, node.size = 1:3, 
-                             num.trees = seq(200,500,100), OOB_RMSE = 0) 
-  
-  ## Model with grids 
-  for(ii in 1:nrow(grid.search)) {
-    # Model on training set with grid
-    fit.rf.tune <- ranger(formula = Formula, data = dat.train, 
-                          num.trees = grid.search$num.trees[ii],
-                          mtry = grid.search$mtry[ii], 
-                          min.node.size = grid.search$node.size[ii],
-                          importance = 'impurity', 
-                          case.weights = dat.train$wgt)
-    
-    # Add Out-of-bag (OOB) error to grid
-    grid.search$OOB_RMSE[ii] <- sqrt(fit.rf.tune$prediction.error)
-  }
-  # Position of the tuned hyperparameters
-  position <- which.min(grid.search$OOB_RMSE)
-  
-  # Fit the model on the training set with tuned hyperparameters
-  fit.rf[[fold]] <- ranger(formula = Formula, data = dat.train, 
-                           case.weights = dat.train$wgt, probability = T,
-                           num.trees = grid.search$num.trees[position], 
-                           min.node.size = grid.search$node.size[position], 
-                           mtry = grid.search$mtry[position], 
-                           importance = 'impurity')
-  
-  # Prediction on the test set
-  dat.test$pred.rf <- predict(fit.rf[[fold]], data = dat.test)$predictions[,2]
-  
-  # AUC on the test set with sampling weights
-  auc.rf[fold] <- WeightedAUC(WeightedROC(dat.test$pred.rf, dat.test$HICP, 
-                                          weight = dat.test$wgt))
-  
-  # Weighted calibration slope
-  dat.test$pred.rf[dat.test$pred.rf == 0] <- 0.00001
-  mod.cal <- glm(HICP ~ DescTools::Logit(dat.test$pred.rf), data = dat.test, 
-                 family = binomial, weights = wgt)
-  cal.slope.rf[fold] <- summary(mod.cal)$coef[2,1]
-  
-  # Weighted Brier Score
-  brier.rf[fold] <- mean(brierscore(HICP ~ dat.test$pred.rf, data = dat.test,
-                                  wt = dat.test$wgt))
-}
+# Fit the model on the training set 
+fit.rf <- ranger(formula = Formula, 
+                 data = dat.train, 
+                 case.weights = dat.train$wgt, 
+                 probability = T,
+                 num.trees = grid.search$num.trees[position], 
+                 min.node.size = grid.search$node.size[position], 
+                 mtry = grid.search$mtry[position], 
+                 importance = 'impurity')
+
+# Fitted random forest model
+fit.rf
+```
+
+Now, we can use the model to make predictions on our test data.
+
+```{r rfprediction, warning=FALSE, message=FALSE, cache = TRUE}
+# Pr.(HICP = Yes) on the test set
+dat.test$pred.rf <- predict(fit.rf, 
+                            data = dat.test)$predictions[,2]
+head(dat.test$pred.rf)
 ```
 
 #### Model performance
 
-Let's check how prediction worked.
-
-```{r rffit2, warning=FALSE, message=FALSE, cache = TRUE}
-# Fitted random forest models
-fit.rf[[1]]
-fit.rf[[2]]
-fit.rf[[3]]
-fit.rf[[4]]
-fit.rf[[5]]
-```
+The same as the LASSO model, we can calculate the AUC, calibration slope, and Brier score.
 
 ```{r rfauc, warning=FALSE, message=FALSE, cache = TRUE}
-# AUCs from different folds
+# AUC on the test set with sampling weights
+auc.rf <- WeightedAUC(WeightedROC(dat.test$pred.rf, 
+                                  dat.test$HICP, 
+                                  weight = dat.test$wgt))
 auc.rf
+```
 
-# Calibration slope from different folds
+```{r rfslope, warning=FALSE, message=FALSE, cache = TRUE}
+# Logit of the predicted probability
+dat.test$pred.rf[dat.test$pred.rf == 0] <- 0.00001
+dat.test$pred.rf.logit <- Logit(dat.test$pred.rf)
+
+# Weighted calibration slope
+mod.cal <- glm(HICP ~ pred.rf.logit, 
+               data = dat.test, 
+               family = binomial, 
+               weights = wgt)
+cal.slope.rf <- summary(mod.cal)$coef[2,1]
 cal.slope.rf
+```
 
-# Brier score from different folds
+```{r rfbrier, warning=FALSE, message=FALSE, cache = TRUE}
+# Weighted Brier Score
+brier.rf <- mean(brierscore(HICP ~ dat.test$pred.rf, 
+                            data = dat.test,
+                            wt = dat.test$wgt))
 brier.rf
 ```
 
-Now we will average out the model performance measures:
-
-```{r rfaucmean, warning=FALSE, message=FALSE, cache = TRUE}
-# Average AUC
-mean(auc.rf)
-
-# Average calibration slope
-mean(cal.slope.rf)
-
-# Average Brier score
-mean(brier.rf)
-```
-
-This AUC from random forest is approximately the same as obtained from the LASSO model.
-
 #### Variable importance plot
-One nice feature of random forest is that we can rank the variables and generate a variable importance plot. 
+
+One nice feature of random forest is that we can rank the variables and generate a variable importance plot.
 
 ```{r vim, warning=FALSE, message=FALSE, cache = TRUE}
-# Fold 1
 ggplot(
-  enframe(fit.rf[[1]]$variable.importance, name = "variable", value = "importance"),
-  aes(x = reorder(variable, importance), y = importance, fill = importance)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  enframe(fit.rf$variable.importance, 
+          name = "variable", 
+          value = "importance"),
+  aes(x = reorder(variable, importance), 
+      y = importance, fill = importance)) +
+  geom_bar(stat = "identity", 
+           position = "dodge") +
   coord_flip() +
-  ylab("Variable Importance") + xlab("") + ggtitle("") +
+  ylab("Variable Importance") + 
+  xlab("") + 
+  ggtitle("") +
   guides(fill = "none") +
-  scale_fill_gradient(low = "grey", high = "grey10") + 
-  theme_bw()
-
-# Fold 5
-ggplot(
-  enframe(fit.rf[[5]]$variable.importance, name = "variable", value = "importance"),
-  aes(x = reorder(variable, importance), y = importance, fill = importance)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  coord_flip() +
-  ylab("Variable Importance") + xlab("") + ggtitle("") +
-  guides(fill = "none") +
-  scale_fill_gradient(low = "grey", high = "grey10") + 
+  scale_fill_gradient(low = "grey", 
+                      high = "grey10") + 
   theme_bw()
 ```
+
+As per the figure, marital status, poverty status, sex, and arthritis are the most influential predictors in predicting HICP, while stroke is the least important predictor.
+
+### Performance comparison
+
+| Model | AUC           | Calibration slope   | Brier score     |
+|-------|---------------|---------------------|-----------------|
+| LASSO | `r auc.lasso` | `r cal.slope.lasso` | `r brier.lasso` |
+| Random forest | `r auc.rf` | `r cal.slope.rf` | `r brier.rf` |
+
+### References
