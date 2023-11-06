@@ -1,5 +1,135 @@
-## TMLE {.unnumbered}
+## SuperLearner {.unnumbered}
 
-See [@ehsan_karim_2021_5246085] for a tutorial explaining an overview of TMLE in medical research.
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+require(tableone)
+require(Publish)
+require(randomForest)
+load(file = "Data/machinelearningCausal/cl1.RData")
+```
 
-### Reference
+### Choosing Learners  {-}
+
+SuperLearner is a *type 2* ensemble method, meaning it combines many methods of different types into one predictive model. SuperLearner uses cross-validation to find the best weighted combination of algorithms based on the predictive performance measure specified (default in the `SuperLearner` package is non-negative least squares based on the Lawson-Hanson algorithm [@nnlsPkgDocs], but measures such as AUC can also be used). To run SuperLearner, the user needs to specify a *library* consisting of all the different methods SuperLearner should incorporate in the final model, as well as the number of cross-validation folds.
+
+::: column-margin
+See [previous chapter](https://ehsanx.github.io/EpiMethods/machinelearning5.html#ensemble-methods-type-ii) for other types of ensemble learning methods.
+:::
+
+SuperLearner will perform as well as possible *given the library of algorithms considered*. A very recent paper by @phillips2023ConsiderationsSL provides some concrete guidelines for the determination of the number of cross-validation folds necessary and the selection of algorithms to include. Overall, we want to make sure the set of algorithms provided is:
+
+-   **Diverse**: Having a rich library of algorithms allows the SuperLearner to adapt to a range of underlying data structures. Diverse libraries include:
+
+    -   Parametric learners such as generalized linear models (GLMs)
+    -   Highly data-adaptive learners
+    -   Multiple variants of the same learner with different parameter specifications
+
+-   **Computationally feasible**: Lots of machine learning algorithms take a long time to run. Having multiple computationally intensive algorithms in your library will cause the SuperLearner as a whole to take much too long to run.
+
+::: callout-note
+Some of the more specific guidelines depend on our effective sample size. For binary outcomes, this can be calculated as:
+
+$$ n_{eff}=min(n, 5*(n*min(\bar{p},1-\bar{p})))   $$
+
+where $\bar{p}$: prevalence of the outcome.
+
+For continuous outcomes, the effective sample size is the same as the sample size ($n_{eff} = n$).
+:::
+
+We also want to consider the characteristics of our particular sample.
+
+-   **If there are continuous covariates**: We should include learners that do not force relationships to be linear/monotonic. For example, we could include regression splines, support vector machines, and tree-based methods like regression trees.
+
+-   **If we have high-dimensional data (a large number of covariates** **e.g. more than** $n_{eff}/20$ **)**: We should include some learners that fall under the class of *screeners*. These are learners which incorporate dimension reduction such as LASSO and random forests.
+
+-   **If the sample size is very large** (i.e. $n_{eff}>500$ ): We should include as many learners as is computationally feasible.
+
+-   **If the sample size is small** (i.e. $n_{eff} \leq 500$ ): We should include fewer learners (e.g. up to $n_{eff}/5$ ), and include less flexible learners.
+
+Some examples of learners that could be included are given in the table below [@SuperLearnerPkgDocs]:
+
++---------------------------------------------+--------------------------------------------------------------------------------------------+
+| Type of learner                             | Examples                                                                                   |
++=============================================+============================================================================================+
+| Parametric                                  | -   `SL.mean`: simple mean                                                                 |
+|                                             |                                                                                            |
+|                                             | -   `SL.glm`: generalized linear models                                                    |
+|                                             |                                                                                            |
+|                                             | -   `SL.lm`: ordinary least squares                                                        |
+|                                             |                                                                                            |
+|                                             | -   `SL.speedglm`: fast version of glm                                                     |
+|                                             |                                                                                            |
+|                                             | -   `SL.speedlm`: fast version of lm                                                       |
+|                                             |                                                                                            |
+|                                             | -   `SL.gam`: generalized additive methods                                                 |
+|                                             |                                                                                            |
+|                                             | -   `SL.step`: choose model based on AIC (backwards or forwards or both)                   |
++---------------------------------------------+--------------------------------------------------------------------------------------------+
+| Highly data-adaptive                        | -   `SL.glmnet`: penalized regression using elastic net (ridge regression and Lasso)       |
+|                                             |                                                                                            |
+|                                             | -   Kernel-based methods                                                                   |
+|                                             |                                                                                            |
+|                                             |     -   `SL.kernelKnn`: k-nearest neighbours                                               |
+|                                             |                                                                                            |
+|                                             |     -   `SL.ksvm`: kernel-based support vector machine                                     |
+|                                             |                                                                                            |
+|                                             | -   `SL.xgboost`: extreme gradient boosting                                                |
+|                                             |                                                                                            |
+|                                             | -   `SL.gbm`: gradient-boosted machines                                                    |
+|                                             |                                                                                            |
+|                                             | -   `SL.nnet`: neural networks                                                             |
++---------------------------------------------+--------------------------------------------------------------------------------------------+
+| Allowing non-linear/monotonic relationships | -   `SL.earth`: multivariate adaptive regression splines                                   |
+|                                             |                                                                                            |
+|                                             | -   Tree-based methods                                                                     |
+|                                             |                                                                                            |
+|                                             |     -   `SL.randomForest`: random forests                                                  |
+|                                             |                                                                                            |
+|                                             |     -   `tmle.SL.dbarts2`: bayesian additive regression trees                              |
+|                                             |                                                                                            |
+|                                             |     -   `SL.cforest`: random forests using conditional inference trees                     |
+|                                             |                                                                                            |
+|                                             |     -   `SL.ranger`: fast implementation of random forest suited for high dimensional data |
+|                                             |                                                                                            |
+|                                             | -   `SL.svm`: support vector machines                                                      |
++---------------------------------------------+--------------------------------------------------------------------------------------------+
+| Screeners                                   | -   `screen.corP`: retain covariates with correlation with outcome p-value \<0.1           |
+|                                             |                                                                                            |
+|                                             | -   `screen.corRank`: retain top *j* covariates with highest correlation with outcome      |
+|                                             |                                                                                            |
+|                                             | -   `screen.glmnet`: Lasso                                                                 |
+|                                             |                                                                                            |
+|                                             | -   `screen.randomForest`: random forests                                                  |
+|                                             |                                                                                            |
+|                                             | -   `screen.SIS`: retain covariates based on distance correlation                          |
++---------------------------------------------+--------------------------------------------------------------------------------------------+
+
+There is also a useful tool implemented in the `SuperLearner` library which allows us to easily see a list of all available learners.
+
+```{r, cache=TRUE}
+SuperLearner::listWrappers()
+```
+
+### SuperLearner in TMLE  {-}
+
+-   The default SuperLearner library for estimating the outcome includes [@tmlePkgDocs]
+
+    -   `SL.glm`: generalized linear models (GLMs)
+    -   `SL.glmnet`: least absolute shrinkage and selection operator (LASSO)
+    -   `tmle.SL.dbarts2`: modeling and prediction using Bayesian Additive Regression Trees (BART)
+
+-   The default library for estimating the propensity scores includes
+
+    -   `SL.glm`: generalized linear models (GLMs)
+    -   `tmle.SL.dbarts.k.5`: SL wrappers for modeling and prediction using BART
+    -   `SL.gam`: generalized additive models (GAMs)
+
+-   It is certainly possible to use different set of learners
+
+    -   More methods can be added by
+        -   specifying lists of models in the *Q.SL.library* (for the outcome model) and *g.SL.library* (for the propensity score model)
+
+```{r, cache=TRUE, echo=FALSE}
+save.image(file = "Data/machinelearningCausal/cl2.RData")
+```
+
+### References  {-}

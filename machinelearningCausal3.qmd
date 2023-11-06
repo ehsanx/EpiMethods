@@ -1,0 +1,294 @@
+## Binary Outcomes  {.unnumbered}
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+require(tableone)
+require(Publish)
+require(randomForest)
+require(tmle)
+require(xgboost)
+require(kableExtra)
+load(file = "Data/machinelearningCausal/cl2.RData")
+```
+
+For this example we will be looking at the binary outcome variable `death`.
+
+```{r tab1bin, cache=TRUE, echo = TRUE}
+tab1 <- CreateTableOne(vars = c("Death"),
+                       data = ObsData, 
+                       strata = "RHC.use", 
+                       test = FALSE)
+print(tab1, showAllLevels = FALSE, )
+```
+
+### TMLE {-}
+
+TMLE works by first constructing an initial outcome and extracting a crude estimate of the treatment effect. Then, TMLE aims to refine the initial estimate in the direction of the true value of the parameter of interest through use of the exposure model.
+
+The basic steps are:
+
+1.  Construct initial outcome model & get crude estimate
+2.  Construct exposure model and use propensity scores to update the initial outcome model through a targeted adjustment
+3.  Extract treatment effect estimate
+4.  Estimate confidence interval based on a closed-form formula
+
+The tmle package implements TMLE for both binary and continuous outcomes, and uses the SuperLearner to construct the exposure and outcome models.
+
+The *tmle* method takes a number of parameters, including:
+
+```{r results='asis', echo=FALSE}
+library(knitr)
+library(kableExtra)
+
+# Create a data frame for the table content
+df <- data.frame(
+  Term = c("Y", "A", "W", "family", "V", "Q.SL.library", "g.SL.library"),
+  Description = c(
+    "Outcome vector",
+    "Exposure vector",
+    "Matrix that includes vectors of all covariates",
+    "Distribution",
+    "Cross-validation folds for exposure and outcome modeling",
+    "Set of machine learning methods to use for SuperLearner for outcome modeling",
+    "Set of machine learning methods to use for SuperLearner for exposure modeling"
+  )
+)
+
+# Generate the kable with kableExtra styling
+kable(df, format = "html", align = 'll', col.names = c("Term", "Description")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE) %>%
+  row_spec(0, bold = TRUE, color = "white", background = "#D3D3D3")
+```
+
+### Constructing SuperLearner  {-}
+
+We will need to specify two SuperLearners, one for the exposure and one for the outcome model. We will need to consider the characteristics of our sample in order to decide the number of cross-validation folds and construct a diverse and computationally feasible library of algorithms.
+
+#### Number of folds  {-}
+
+First, we need to define the number of cross-validation folds to use for each model. This depends on our effective sample size [@phillips2023ConsiderationsSL].
+
+Our effective sample size for the outcome model is:
+
+```{r, cache=TRUE}
+n <- nrow(ObsData) 
+p <- nrow(ObsData[ObsData$Death == 1,])/n 
+n_eff <- min(n, 5*(n*min(p, 1-p))) 
+n_eff
+```
+
+Our effective sample size for the exposure model is:
+
+```{r, cache=TRUE}
+p_exp <- nrow(ObsData[ObsData$RHC.use == 1,])/n 
+n_eff_exp <- min(n, 5*(n*min(p, 1-p))) 
+n_eff_exp
+```
+
+For both models, the effective sample size is the same as our sample size, $n = 5735$.
+
+Since $500 \leq n_{eff} \leq 5000$, we should use 10 or more cross-validation folds according to @phillips2023ConsiderationsSL. For the sake of computational feasibility, we will use **10 folds** in this example.
+
+#### Candidate learners  {-}
+
+The second step is to define the library of learners we will feed in to SuperLearner as potential options for each model (exposure and outcome). In this example, some of our covariates are continuous variables, such as temperature and blood pressure, so we need to include learners that allow non-linear/monotonic relationships.
+
+Since $n$ is large ($>500$), we should include as many learners as is computationally feasible in our libraries.
+
+Furthermore, we have 50 covariates:
+
+```{r, cache=TRUE}
+length(c(baselinevars, "Length.of.Stay"))
+```
+
+$5735/20 = 286.75$, and $50<286.75$, so we do not have high-dimensional data and including screeners is optional [@phillips2023ConsiderationsSL].
+
+Since the requirements for the exposure and outcome models are the same in this example, we will use the same SuperLearner library for both. Overall for this example we need to make sure to include:
+
+-   Parametric learners
+
+-   Highly data-adaptive learners
+
+-   Multiple variants of the same learner with different parameter specifications
+
+-   Learners that allow non-linear/monotonic relationships
+
+For this example, we will include the following learners:
+
+-   Parametric
+
+    -   `SL.mean`
+
+    -   `SL.glm`
+
+-   Highly data-adaptive
+
+    -   `SL.glmnet`
+
+    -   `SL.xgboost`
+
+-   Allowing non-linear/monotonic relationships
+
+    -   `SL.randomForest`
+
+    -   `tmle.SL.dbarts2`
+
+    -   `SL.svm`
+
+```{r, cache=TRUE}
+# Construct the SuperLearner library
+SL.library <- c("SL.mean", 
+                "SL.glm", 
+                "SL.glmnet", 
+                "SL.xgboost", 
+                "SL.randomForest", 
+                "tmle.SL.dbarts2", 
+                "SL.svm")
+```
+
+### TMLE with SuperLearner   {-}
+
+To run TMLE, first install the tmle package:
+
+```{r, eval=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
+install.packages(c('tmle', 'xgboost'))
+require(tmle)
+require(xgboost)
+```
+
+We also need to create a data frame containing only the covariates:
+
+```{r, eval = FALSE}
+ObsData.noYA <- dplyr::select(ObsData, 
+                              !c(Death, RHC.use))
+ObsData$Death <- as.numeric(ObsData$Death)
+```
+
+Then we can run TMLE using the `tmle` method from the `tmle` package:
+
+```{r, eval = FALSE}
+tmle.fit <- tmle::tmle(Y = ObsData$Death, 
+                   A = ObsData$RHC.use, 
+                   W = ObsData.noYA, 
+                   family = "binomial", 
+                   V = 10,
+                   Q.SL.library = SL.library, 
+                   g.SL.library = SL.library)
+
+tmle.est.bin <- tmle.fit$estimates$OR$psi
+tmle.ci.bin <- tmle.fit$estimates$OR$CI
+```
+
+
+```{r, eval = FALSE, echo=FALSE}
+saveRDS(tmle.est.bin, file = "Data/machinelearningCausal/tmlebin.RDS")
+saveRDS(tmle.ci.bin, file = "Data/machinelearningCausal/tmlebinci.RDS")
+```
+
+```{r, cache=TRUE, echo = FALSE}
+tmle.est.bin <- readRDS("Data/machinelearningCausal/tmlebin.RDS")
+tmle.ci.bin <- readRDS("Data/machinelearningCausal/tmlebinci.RDS")
+```
+
+ATE for binary outcome using user-specified library: `r round(tmle.est.bin, 2)` and 95% CI is `r tmle.ci.bin`
+
+These results show those who received RHC had odds of death that were `r round(tmle.est.bin, 2)` times as high as the odds of death in those who did not receive RHC.
+
+### Understanding defaults  {-}
+
+We can compare the results using our specified SuperLearner library to the results we would get when using the `tmle` package's default SuperLearner libraries. To do this we simply do not specify libraries for the `Q.SL.library` and `g.SL.library` arguments.
+
+```{r, cache=TRUE}
+# small test library 
+# with only glm just 
+# for sake of making this work
+SL.library.test <- c("SL.glm")
+```
+
+```{r, eval = FALSE}
+tmle.fit.def <- tmle::tmle(Y = ObsData$Death, 
+                           A = ObsData$RHC.use, 
+                           W = ObsData.noYA, 
+                           family = "binomial", 
+                           V = 10)
+# Q.SL.library = SL.library.test,  ## removed this line
+# g.SL.library = SL.library.test)  ## removed this line
+
+tmle.est.bin.def <- tmle.fit.def$estimates$OR$psi
+tmle.ci.bin.def <- tmle.fit.def$estimates$OR$CI
+```
+
+
+```{r, eval = FALSE, echo=FALSE}
+saveRDS(tmle.est.bin.def, file = "Data/machinelearningCausal/tmlebindef.RDS")
+saveRDS(tmle.ci.bin.def, file = "Data/machinelearningCausal/tmlebincidef.RDS")
+```
+
+```{r, cache=TRUE, echo = FALSE}
+tmle.est.bin.def <- readRDS("Data/machinelearningCausal/tmlebindef.RDS")
+tmle.ci.bin.def <- readRDS("Data/machinelearningCausal/tmlebincidef.RDS")
+```
+
+ATE for binary outcome using default library: `r round(tmle.est.bin.def, 2)` with 95% CI `r tmle.ci.bin.def`.
+
+These ATE when using the default SuperLearner library (1.31) is very close to the ATE when using our user-specified SuperLearner library (1.29). However, the confidence interval from TMLE using the default SuperLearner library (1.17, 1.46) is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library (1.20, 1.39).
+
+### Comparison of results  {-}
+
+We can also compare these results to those from a basic regression and from the literature.
+
+```{r reg1bin, cache=TRUE, echo = FALSE, results='hide', echo=FALSE}
+# adjust the exposure variable (primary interest)
+fit0.bin <- lm(Death~RHC.use, data = ObsData)
+require(Publish)
+crude.fit.bin <- publish(fit0.bin, digits=1)$regressionTable[2,]
+```
+
+```{r reg2bin, cache=TRUE, echo = TRUE, results='hide'}
+# adjust the exposure variable 
+# (primary interest) + covariates
+baselineVars.Death <- c(baselinevars, "Length.of.Stay")
+out.formula.bin <- as.formula(
+  paste("Death~ RHC.use +",
+        paste(baselineVars.Death, 
+              collapse = "+")))
+fit1.bin <- lm(out.formula.bin, data = ObsData)
+```
+
+```{r, cache=TRUE, echo = FALSE}
+saveRDS(fit1.bin, file = "Data/machinelearningCausal/adjregbin.RDS")
+```
+
+@connors1996effectiveness conducted a propensity score matching analysis. Table 4 showed that, after propensity score pair (1-to-1) matching, the odds of in-hospital mortality were 39% higher in those who received RHC (OR: 1.39 (1.15, 1.67)).
+
+```{r summarytable0bin, cache=TRUE, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+fit.reg.bin <- readRDS(file = "Data/machinelearningCausal/adjregbin.RDS")
+TEr <- round(fit.reg.bin$coefficients[2], 2)
+CIr <- round(as.numeric(confint(fit.reg.bin, 'RHC.use')), 2)
+tmlebin <- readRDS(file = "Data/machinelearningCausal/tmlebin.RDS")
+tmlebinci <- readRDS(file = "Data/machinelearningCausal/tmlebinci.RDS")
+tmlesl <- readRDS(file = "Data/machinelearningCausal/tmlebindef.RDS")
+tmlecisl <- readRDS(file = "Data/machinelearningCausal/tmlebincidef.RDS")
+ci.b <- rep(NA,2)
+ks <- 1.39
+ci.ks <- c(1.15,1.67)
+point <- as.numeric(c(TEr, tmlebin, tmlesl, ks))
+CIs <- cbind(CIr, tmlebinci, tmlecisl, ci.ks)    
+```
+
+```{r summarytablebin, cache=TRUE, echo=FALSE}
+method.list <- c("Adjusted Regression", 
+                 "TMLE (user-specified SL library)",
+                 "TMLE (default SL library)",
+                 "Connors et al. (1996) paper") 
+results <- data.frame(method.list) 
+results$Estimate <- round(point,2)
+results$`2.5 %` <- CIs[1,] 
+results$`97.5 %` <- CIs[2,]
+
+require(kableExtra)
+kab <- kable(results,digits = 2)
+row_spec(kab, 1:4)
+```
+
+
+### References {-}

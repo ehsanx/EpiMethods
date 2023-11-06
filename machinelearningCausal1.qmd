@@ -1,128 +1,55 @@
-## PSM with ML {.unnumbered}
+## Motivation {.unnumbered}
 
-```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
-# Load required packages
-require(caret)
-require(SuperLearner)
-require(DataExplorer)
-```
+-   When using methods like propensity score approaches, we are making assumptions about the model specification. For example, we must specify any interaction terms.
 
-### Data
+-   With machine learning methods, these assumptions can be relaxed somewhat, as some machine learning methods allow automatic detection of data structures such as interactions.
 
-```{r load, cache=TRUE}
-load("Data/machinelearningCausal/NHANES15to16chl.RData")
-ls()
-plot_missing(analytic3) # already imputed dataset for simplicity
-```
+-   However, machine learning was created for prediction modeling, not with causal inference in mind. Statistical inference such as calculating standard errors and confidence intervals is not as straightforward since the estimator given by machine learning methods does not follow a known statistical distribution. By contrast, the estimators resulting from a standard regression using maximum likelihood estimation will follow an approximately normal distribution, where it is easy to calculate standard errors and confidence intervals.
 
-### Propensity score (PS) modelling
+-   **Targeted maximum likelihood estimation (TMLE)** is a causal inference method that can incorporate machine learning in a way that still allows straightforward statistical inference based on theoretical development grounded in semi-parametric theory.
 
-#### Super Learner (SL) to estimate PS
+    -   TMLE is a **doubly robust** method. This means it uses both the exposure (AKA propensity score) model *and* the outcome model. As long as *one* of these models is correctly specified, TMLE will give a **consistent estimator**, meaning it gets closer and closer to the true value as the sample size increases.
 
-```{r slw, cache=TRUE, warning=FALSE, message=FALSE}
-require(SuperLearner)
-listWrappers(what = 'SL')
-```
+    -   Since TMLE uses both the exposure and the outcome model, machine learning can be used in each of these intermediary modeling steps while allowing straightforward statistical inference.
 
-```{r slfit, cache=TRUE, results = 'hide'}
-SL.library <- c("SL.glm", "SL.glmnet", "SL.rpart")
-Y <- analytic3$cholesterol.bin.num
-A <- as.numeric(I(analytic3$diabetes == "Yes"))
-X <- analytic3[c("gender", "age", "born", "race", "education", "married", 
-                 "income", "diastolicBP", "systolicBP", "bmi",  
-                 "triglycerides", "uric.acid", "protein", "bilirubin", 
-                 "phosphorus", "sodium", "potassium", "globulin", 
-                 "calcium", "physical.work","physical.recreational")
-]
-cv.fit <- CV.SuperLearner(Y = A, X = X, family="binomial",
-                          SL.library=SL.library, verbose=FALSE,
-                          V=5, method = "method.NNLS")
-```
+-   It has been shown that TMLE outperform singly robust methods with machine learning, such as IPTW.
 
-#### Extract all PS
-
-```{r sl, cache=TRUE}
-predictions <- cbind(cv.fit$SL.predict,cv.fit$library.predict)
-head(predictions)
-```
-
-#### Match with PS from SL
-
-```{r balance, cache=TRUE}
-ps<-predictions[,1]
-summary(ps)
-require(Matching)
-match<-Match(Y=Y, Tr=A, X=ps, caliper=0.2,
-               M=1,estimand="ATT",ties=TRUE,
-               version="standard",replace=FALSE)
-summary(match)
-matched <- rbind(analytic3[match$index.treated,],
-                 analytic3[match$index.control,])
-```
-
-#### Check PS balance for PS from SL
-
-```{r balancetab, cache=TRUE}
+```{r setupTMLE, include=FALSE}
 require(tableone)
-varb <- c("gender", "age", "born", "race", "education", "married", 
-                 "income", "diastolicBP", "systolicBP", "bmi",  
-                 "triglycerides", "uric.acid", "protein", "bilirubin", 
-                 "phosphorus", "sodium", "potassium", "globulin", 
-                 "calcium", "physical.work","physical.recreational")
-tab0 <- CreateTableOne(data=analytic3, strata= "diabetes",
-                       var = varb)
-sdiff.before <- ExtractSmd(tab0)
-tab1 <- CreateTableOne(data=matched, strata= "diabetes",
-                       var = varb)
-sdiff.after<- ExtractSmd(tab1)
-cbind(sdiff.before, sdiff.after)
+require(Publish)
+require(randomForest)
 ```
 
-#### Compare SMDs
+### Revisiting RHC Data  {-}
 
-```{r slplot, cache=TRUE}
-SL.library
-SL.lib <- c("SL", SL.library)
-plot(sdiff.before,1:length(varb),type="l", col = "gray",
-       xlab="Std.diff", main = SL.lib[1],
-       xlim=c(-1,1), ylab = "Parameters")
-lines(sdiff.after,1:length(varb),type="l", col = "blue")
-abline(v=0, col = "green", lty = 2)
-abline(v=.25, col = "green", lty = 2)
-abline(v=-.25, col = "green", lty = 2)
-mtext("blue = after matching, gray = before matching")
+::: callout-note
+This tutorial uses the same data as some of the previous tutorials, including [working with a predictive question](researchquestion1.html), [machine learning with a continuous outocome](machinelearning1.html), and [machine learning with a binary outcome](machinelearning4.html).
+:::
+
+```{r, cache=TRUE}
+ObsData <- readRDS(file = 
+                     "Data/machinelearningCausal/rhcAnalyticTest.RDS")
+baselinevars <- names(dplyr::select(ObsData, 
+                         !c(RHC.use,Length.of.Stay,Death)))
+head(ObsData)
 ```
 
-#### PS from each candidate learners
+### Table 1  {-}
 
-```{r slplots, cache=TRUE}
-require(tableone)
-SL.library
-SL.lib <- c("SL", SL.library)
-for (k in 2:length(SL.lib)){
-  cat("Result from", SL.lib[k], "\n")
-  ps<-predictions[,k]
-  summary(ps)
-  require(Matching)
-  match<-Match(Y=Y, Tr=A, X=ps, caliper=0.2,
-               M=1,estimand="ATT",ties=TRUE,
-               version="standard",replace=FALSE)
-  matched <- rbind(analytic3[match$index.treated,],
-                 analytic3[match$index.control,])
-  tab0 <- CreateTableOne(data=analytic3, strata= "diabetes",
-                       var = varb)
-  sdiff.before <- ExtractSmd(tab0)
-  tab1 <- CreateTableOne(data=matched, strata= "diabetes",
-                       var = varb)
-  sdiff.after<- ExtractSmd(tab1)
-  sdiff.after
-  plot(sdiff.before,1:length(varb),type="l", col = "gray",
-       xlab="Std.diff", main = SL.lib[k],
-       xlim=c(-1,1), ylab = "Parameters")
-  lines(sdiff.after,1:length(varb),type="l", col = "blue")
-  abline(v=0, col = "green", lty = 2)
-  abline(v=.25, col = "green", lty = 2)
-  abline(v=-.25, col = "green", lty = 2)
-  mtext("blue = after matching, gray = before matching")
-}
+Only for some demographic and comorbidity variables; matches with Table 1 in @connors1996effectiveness.
+
+```{r, cache=TRUE}
+tab0 <- CreateTableOne(vars = c("age", "sex", "race", 
+                                "Disease.category", "Cancer"),
+                       data = ObsData, 
+                       strata = "RHC.use", 
+                       test = FALSE)
+print(tab0, showAllLevels = FALSE)
 ```
+
+```{r, cache=TRUE, echo=FALSE}
+save.image(file = "Data/machinelearningCausal/cl1.RData")
+```
+
+
+### References  {-}

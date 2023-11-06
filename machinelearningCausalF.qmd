@@ -7,14 +7,23 @@ library(knitr)
 library(kableExtra)
 
 data <- data.frame(
-  "Function name" = c("ExtractSmd", "listWrappers", "Match"),
-  "Package name" = c("tableone", "SuperLearner", "Matching"),
-  "Use" = c("To extract the standardized mean differences of a tableone object", 
-            "To see the list of wrapper functions, i.e., list of learners, in SuperLearner",
-            "To match an exposed/treated to M unexposed/controls")
+  "Function name" = c("CreateTableOne", "tmle", "SL.mean", "SL.glm", "SL.glmnet", "SL.xgboost", "SL.randomForest", "tmle.SL.dbarts2", "SL.svm", "publish", "median"),
+  "Package name" = c("tableone", "tmle", "SuperLearner", "SuperLearner", "SuperLearner", "SuperLearner", "SuperLearner", "tmle", "SuperLearner", "Publish", "stats"),
+  "Use" = c("To create a summary table for a dataset",
+            "To run Targeted Maximum Likelihood Estimation (TMLE) for causal inference",
+            "SuperLearner wrapper for the mean learner",
+            "SuperLearner wrapper for the generalized linear model learner",
+            "SuperLearner wrapper for the generalized linear model with elastic net penalty learner",
+            "SuperLearner wrapper for the extreme gradient boosting learner",
+            "SuperLearner wrapper for the random forest learner",
+            "SuperLearner wrapper for the Bayesian Additive Regression Trees (BART) learner",
+            "SuperLearner wrapper for the support vector machine (SVM) learner",
+            "To publish regression models",
+            "To calculate the median of a numeric vector")
 )
-
-kable(data, format = "html", escape = F, table.attr = 'class="table table-hover"') %>%
+data <- data[order(data[[2]]),]
+kable(data, format = "html", escape = F, table.attr = 'class="table table-hover"',
+      row.names = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = F) %>%
   column_spec(1, bold = T) %>%
   column_spec(2, color = "blue") %>%
