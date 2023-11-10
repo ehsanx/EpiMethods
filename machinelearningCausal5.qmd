@@ -69,11 +69,20 @@ fit.glm <- glm(Formula,
 We can use `flextable` package to view `fit.glm`, the regression output:
 
 ```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+coef_summary <- summary(fit.glm)$coef
+odds_ratios <- exp(coef_summary[, "Estimate"])
+odds_ci_lower <- exp(coef_summary[, "Estimate"] - 1.96 * coef_summary[, "Std. Error"])
+odds_ci_upper <- exp(coef_summary[, "Estimate"] + 1.96 * coef_summary[, "Std. Error"])
+result_df <- data.frame(
+  Variable = rownames(coef_summary),
+  Odds_Ratio = sprintf("%.2f", odds_ratios),
+  CI_Lower = sprintf("%.2f", odds_ci_lower),
+  CI_Upper = sprintf("%.2f", odds_ci_upper) 
+)
+result_df <- result_df[result_df$Variable == "RHC.use", ]
 library(flextable)
-Variables <- rownames(coef(summary(fit.glm)))
-dd <- round(as.data.frame(coef(summary(fit.glm))),2)
-coefficients_df <- cbind(Variables, dd)
-ft <- flextable(data = coefficients_df)
+ft <- flextable(result_df)
+ft <- flextable::set_table_properties(ft, width = .5, layout = "autofit")
 ft
 ```
 
@@ -199,11 +208,20 @@ fit.psm <- glm(Death ~ RHC.use,
 Summary of `fit.psm`:
 
 ```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+coef_summary <- summary(fit.psm)$coef
+odds_ratios <- exp(coef_summary[, "Estimate"])
+odds_ci_lower <- exp(coef_summary[, "Estimate"] - 1.96 * coef_summary[, "Std. Error"])
+odds_ci_upper <- exp(coef_summary[, "Estimate"] + 1.96 * coef_summary[, "Std. Error"])
+result_df <- data.frame(
+  Variable = rownames(coef_summary),
+  Odds_Ratio = sprintf("%.2f", odds_ratios),
+  CI_Lower = sprintf("%.2f", odds_ci_lower),
+  CI_Upper = sprintf("%.2f", odds_ci_upper) 
+)
+result_df <- result_df[result_df$Variable == "RHC.use", ]
 library(flextable)
-Variables <- rownames(coef(summary(fit.psm)))
-dd <- round(as.data.frame(coef(summary(fit.psm))),2)
-coefficients_df <- cbind(Variables, dd)
-ft <- flextable(data = coefficients_df)
+ft <- flextable(result_df)
+ft <- flextable::set_table_properties(ft, width = .5, layout = "autofit")
 ft
 ```
 
@@ -268,11 +286,20 @@ fit.ipw <- svyglm(Death ~ RHC.use,
 Summary of `fit.ipw`:
 
 ```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+coef_summary <- summary(fit.ipw)$coef
+odds_ratios <- exp(coef_summary[, "Estimate"])
+odds_ci_lower <- exp(coef_summary[, "Estimate"] - 1.96 * coef_summary[, "Std. Error"])
+odds_ci_upper <- exp(coef_summary[, "Estimate"] + 1.96 * coef_summary[, "Std. Error"])
+result_df <- data.frame(
+  Variable = rownames(coef_summary),
+  Odds_Ratio = sprintf("%.2f", odds_ratios),
+  CI_Lower = sprintf("%.2f", odds_ci_lower),
+  CI_Upper = sprintf("%.2f", odds_ci_upper) 
+)
+result_df <- result_df[result_df$Variable == "RHC.use", ]
 library(flextable)
-Variables <- rownames(coef(summary(fit.ipw)))
-dd <- round(as.data.frame(coef(summary(fit.ipw))),2)
-coefficients_df <- cbind(Variables, dd)
-ft <- flextable(data = coefficients_df)
+ft <- flextable(result_df)
+ft <- flextable::set_table_properties(ft, width = .5, layout = "autofit")
 ft
 ```
 
@@ -418,11 +445,20 @@ fit.psm.sl <- glm(Death ~ RHC.use,
 Summary of `fit.psm.sl`:
 
 ```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+coef_summary <- summary(fit.psm.sl)$coef
+odds_ratios <- exp(coef_summary[, "Estimate"])
+odds_ci_lower <- exp(coef_summary[, "Estimate"] - 1.96 * coef_summary[, "Std. Error"])
+odds_ci_upper <- exp(coef_summary[, "Estimate"] + 1.96 * coef_summary[, "Std. Error"])
+result_df <- data.frame(
+  Variable = rownames(coef_summary),
+  Odds_Ratio = sprintf("%.2f", odds_ratios),
+  CI_Lower = sprintf("%.2f", odds_ci_lower),
+  CI_Upper = sprintf("%.2f", odds_ci_upper) 
+)
+result_df <- result_df[result_df$Variable == "RHC.use", ]
 library(flextable)
-Variables <- rownames(coef(summary(fit.psm.sl)))
-dd <- round(as.data.frame(coef(summary(fit.psm.sl))),2)
-coefficients_df <- cbind(Variables, dd)
-ft <- flextable(data = coefficients_df)
+ft <- flextable(result_df)
+ft <- flextable::set_table_properties(ft, width = .5, layout = "autofit")
 ft
 ```
 
@@ -484,11 +520,20 @@ fit.ipw.sl <- svyglm(Death ~ RHC.use,
 Summary of `fit.ipw.sl`:
 
 ```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+coef_summary <- summary(fit.ipw.sl)$coef
+odds_ratios <- exp(coef_summary[, "Estimate"])
+odds_ci_lower <- exp(coef_summary[, "Estimate"] - 1.96 * coef_summary[, "Std. Error"])
+odds_ci_upper <- exp(coef_summary[, "Estimate"] + 1.96 * coef_summary[, "Std. Error"])
+result_df <- data.frame(
+  Variable = rownames(coef_summary),
+  Odds_Ratio = sprintf("%.2f", odds_ratios),
+  CI_Lower = sprintf("%.2f", odds_ci_lower),
+  CI_Upper = sprintf("%.2f", odds_ci_upper) 
+)
+result_df <- result_df[result_df$Variable == "RHC.use", ]
 library(flextable)
-Variables <- rownames(coef(summary(fit.ipw.sl)))
-dd <- round(as.data.frame(coef(summary(fit.ipw.sl))),2)
-coefficients_df <- cbind(Variables, dd)
-ft <- flextable(data = coefficients_df)
+ft <- flextable(result_df)
+ft <- flextable::set_table_properties(ft, width = .5, layout = "autofit")
 ft
 ```
 
@@ -558,8 +603,8 @@ data <- data.frame(
     "Logistic regression",
     "Propensity score matching with logistic",
     "Propensity score weighting with logistic",
-    "Propensity score matching with super learner",
-    "Propensity score weighting with super learner",
+    "Propensity score matching with super learner (logistic, LASSO, and XGBoost)",
+    "Propensity score weighting with super learner (logistic, LASSO, and XGBoost)",
     "TMLE (default SL library)"
   ),
   `Odds ratio` = c(1.42, 1.29, 1.30, 1.26, 1.26, 1.26),
