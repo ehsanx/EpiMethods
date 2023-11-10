@@ -1,0 +1,621 @@
+## Comparing results {.unnumbered}
+
+In this tutorial, we will use the RHC dataset in exploring the relationship between RHC (yes/no) and death (yes/no). We will use the following approaches:
+
+-   logistic regression
+-   propensity score matching and weighting with logistic regression
+-   propensity score matching and weighting with Super Learner
+-   TMLE
+
+### Load packages
+
+We load several R packages required for fitting the models.
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(tableone)
+library(Publish)
+library(randomForest)
+library(tmle)
+library(xgboost)
+library(kableExtra)
+library(SuperLearner)
+library(dbarts)
+library(MatchIt)
+library(cobalt)
+library(survey)
+library(knitr)
+```
+
+### Load dataset
+
+```{r data, warning=FALSE, message=FALSE, cache=TRUE}
+load(file = "Data/machinelearningCausal/cl2.RData")
+ls()
+```
+
+```{r data2, warning=FALSE, message=FALSE, cache=TRUE}
+# Data
+dat <- ObsData
+head(dat)
+
+# Data dimension
+dim(dat)
+```
+
+Confounder list in the `baselinevars` vector is
+
+```{r data2x, warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+# Confounder list
+kable(data.frame(Confounders = baselinevars), format = "markdown")
+```
+
+### Logistic regression
+
+Let us define the regression formula and fit logistic regression, adjusting for baseline confounders.
+
+```{r logistic, warning=FALSE, message=FALSE, cache=TRUE}
+# Formula
+Formula <- formula(paste("Death ~ RHC.use + ", 
+                         paste(baselinevars, 
+                               collapse = " + ")))
+
+# Logistic regression
+fit.glm <- glm(Formula, 
+               data = dat, 
+               family = binomial)
+```
+
+We can use `flextable` package to view `fit.glm`, the regression output:
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(coef(summary(fit.glm)))
+dd <- round(as.data.frame(coef(summary(fit.glm))),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+As we can see, the odds of death was 42% higher among those participants with RHC use than those with no RHC use.
+
+### Propensity score matching with logistic regression
+
+Now we will use propensity score matching, where propensity score will be estimated using logistic regression. The first step is to define the propensity score formula and estimate the propensity scores.
+
+#### Step 1
+
+```{r psml1, warning=FALSE, message=FALSE, cache=TRUE}
+# Propensity score model define
+ps.formula <- as.formula(paste0("RHC.use ~ ", 
+                                paste(baselinevars, 
+                                      collapse = "+")))
+
+# Propensity score model fitting
+fit.ps <- glm(ps.formula, 
+              data = dat, 
+              family = binomial)
+
+# Propensity scores
+dat$ps <- predict(fit.ps, 
+                  type = "response")
+summary(dat$ps)
+```
+
+#### Step 2
+
+The second step is to match exposed (i.e., RHC users) to unexposed (i.e., RHC non-users) based on the propensity scores. We will use nearest neighborhood and caliper approach.
+
+```{r psml2a, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE, echo=FALSE}
+# Caliper
+caliper <- 0.2*sd(log(dat$ps/
+                        (1-dat$ps)))
+
+# 1:1 matching
+set.seed(123)
+match.obj <- matchit(ps.formula, 
+                     data = dat,
+                     distance = dat$ps, 
+                     method = "nearest",
+                     ratio = 1,
+                     caliper = caliper)
+
+save(caliper, match.obj, file = "Data/machinelearningCausal/mlc1.RData")
+```
+
+```{r psml2b, warning=FALSE, message=FALSE, cache=TRUE, eval=TRUE, echo=FALSE}
+load("Data/machinelearningCausal/mlc1.RData")
+```
+
+```{r psml2c, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+# Caliper
+caliper <- 0.2*sd(log(dat$ps/(1-dat$ps)))
+
+# 1:1 matching
+set.seed(123)
+match.obj <- matchit(ps.formula, 
+                     data = dat,
+                     distance = dat$ps, 
+                     method = "nearest",
+                     ratio = 1,
+                     caliper = caliper)
+```
+
+```{r psml2d, warning=FALSE, message=FALSE, cache=TRUE}
+# See how many matched
+match.obj 
+
+# Extract matched data
+matched.data <- match.data(match.obj)
+
+# Overlap checking
+bal.plot(match.obj,
+         var.name="distance",
+         which="both",
+         type = "density",
+         colors = c("red","blue"))
+```
+
+#### Step 3
+
+The third step is to check the balancing on the matched data. We will compare the similarity of baseline characteristics between RHC users and non-users in the propensity score matched sample. Let's consider SMD \>0.1 as imbalanced.
+
+```{r psml3, warning=FALSE, message=FALSE, cache=TRUE}
+# Balance checking in terms of SMD - using love plot
+love.plot(match.obj, 
+          binary = "std", 
+          grid = TRUE,
+          thresholds = c(m = .1),
+          colors = c("red","blue")) 
+
+# Balance checking in terms of SMD - using tableone
+tab1b <- CreateTableOne(vars = baselinevars, strata = "RHC.use", 
+                        data = matched.data, includeNA = T,
+                        addOverall = F, test = F)
+#print(tab1b, showAllLevels = T, catDigits = 2, smd = T)
+```
+
+`ExtractSmd(tab1b)` shows
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(ExtractSmd(tab1b))
+dd <- round(as.data.frame(ExtractSmd(tab1b)),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+After propensity score matching, all the confounders are balanced in terms of SMD. Now, we will fit the outcome model on the matched data.
+
+#### Step 4
+
+```{r psml4, warning=FALSE, message=FALSE, cache=TRUE}
+fit.psm <- glm(Death ~ RHC.use, 
+               data = matched.data, 
+               family = binomial)
+```
+
+Summary of `fit.psm`:
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(coef(summary(fit.psm)))
+dd <- round(as.data.frame(coef(summary(fit.psm))),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+In the propensity score matched data, the odds of death was 29% higher among those participants with RHC use than those with no RHC use.
+
+### Propensity score weighting with logistic regression
+
+Now we will use the propensity score weighting approach where propensity scores are estimated using logistic regression.
+
+#### Step 1
+
+Step 1 is the same as we did it for the propensity score matching.
+
+#### Step 2
+
+For the second step, we will calculate the stabilized inverse probability weight.
+
+```{r pswl2, warning=FALSE, message=FALSE, cache=TRUE}
+dat$ipw <- with(dat, ifelse(RHC.use==1, mean(RHC.use)/ps, 
+                            mean(1-RHC.use)/(1-ps)))
+summary(dat$ipw)
+```
+
+#### Step 3
+
+Now, we will check the balance in terms of SMD.
+
+```{r pswl3, warning=FALSE, message=FALSE, cache=TRUE}
+# Design with inverse probability weights
+w.design <- svydesign(id = ~1, weights = ~ipw, data = dat, nest = F)
+
+# Balance checking in terms of SMD
+tab1e <- svyCreateTableOne(vars = baselinevars, strata = "RHC.use", 
+                           data = w.design, includeNA = T, 
+                           addOverall = F, test = F)
+#print(tab1e, showAllLevels = T, catDigits = 2, smd = T)
+```
+
+`ExtractSmd(tab1e)` shows
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(ExtractSmd(tab1e))
+dd <- round(as.data.frame(ExtractSmd(tab1e)),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+All confounders are balanced (SMD \< 0.1).
+
+
+
+#### Step 4
+
+```{r pswl4, warning=FALSE, message=FALSE, cache=TRUE}
+fit.ipw <- svyglm(Death ~ RHC.use, 
+                  design = w.design, 
+                  family = binomial)
+```
+
+Summary of `fit.ipw`:
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(coef(summary(fit.ipw)))
+dd <- round(as.data.frame(coef(summary(fit.ipw))),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+In the propensity score weighted data, the odds of death was 30% higher among those participants with RHC use than those with no RHC use.
+
+### Propensity score matching with super learner
+
+Now we will use the propensity score matching, where we will be using super learner to calculate the propensity scores. We use logistic, LASSO, and XGBoost as the candidate learners.
+
+#### Step 1
+
+```{r psmSL1a, warning=FALSE, message=FALSE, cache=TRUE,include=FALSE,eval=FALSE, echo=FALSE}
+set.seed(123)
+ps.fit <- CV.SuperLearner(
+  Y = dat$RHC.use,
+  X = dat[,baselinevars], 
+  family = "binomial",
+  SL.library = c("SL.glm", "SL.glmnet", "SL.xgboost"), 
+  verbose = FALSE,
+  V = 5, 
+  method = "method.NNLS")
+save(ps.fit, file = "Data/machinelearningCausal/mlc2.RData")
+```
+
+```{r psmSL1b, warning=FALSE, message=FALSE, cache=TRUE, eval=TRUE, echo=FALSE}
+load("Data/machinelearningCausal/mlc2.RData")
+```
+
+```{r psmSL1c, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+set.seed(123)
+ps.fit <- CV.SuperLearner(
+  Y = dat$RHC.use,
+  X = dat[,baselinevars], 
+  family = "binomial",
+  SL.library = c("SL.glm", "SL.glmnet", "SL.xgboost"), 
+  verbose = FALSE,
+  V = 5, 
+  method = "method.NNLS")
+```
+
+```{r psmSL1d, warning=FALSE, message=FALSE, cache=TRUE}
+# Propensity scores for all learners  
+predictions <- cbind(ps.fit$SL.predict, ps.fit$library.predict)
+head(predictions)
+
+# Propensity scores for super learner
+dat$ps.sl <- predictions[,1]
+summary(dat$ps.sl)
+```
+
+#### Step 2
+
+The same as before, we will match exposed to unexposed based on their propensity scores.
+
+```{r psmSL2a, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE, echo=FALSE}
+# Caliper
+caliper <- 0.2*sd(log(dat$ps.sl/(1-dat$ps.sl)))
+
+# 1:1 matching
+set.seed(123)
+match.obj2 <- matchit(ps.formula, 
+                      data = dat,
+                      distance = dat$ps.sl, 
+                      method = "nearest",
+                      ratio = 1,
+                      caliper = caliper)
+save(caliper, match.obj2, file = "Data/machinelearningCausal/mlc3.RData")
+```
+
+```{r psmSL2b, warning=FALSE, message=FALSE, cache=TRUE, eval=TRUE, echo=FALSE}
+load("Data/machinelearningCausal/mlc3.RData")
+```
+
+```{r psmSL2c, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+# Caliper
+caliper <- 0.2*sd(log(dat$ps.sl/(1-dat$ps.sl)))
+
+# 1:1 matching
+set.seed(123)
+match.obj2 <- matchit(ps.formula, 
+                      data = dat,
+                      distance = dat$ps.sl, 
+                      method = "nearest",
+                      ratio = 1,
+                      caliper = caliper)
+```
+
+```{r psmSL2, warning=FALSE, message=FALSE, cache=TRUE}
+# See how many matched
+match.obj2 
+
+# Extract matched data
+matched.data.sl <- match.data(match.obj2) 
+
+# Overlap checking
+bal.plot(match.obj2,
+         var.name="distance",
+         which="both",
+         type = "density",
+         colors = c("red","blue"))
+```
+
+#### Step 3
+
+Now we will check the balancing on the matched data.
+
+```{r psmSL3, warning=FALSE, message=FALSE, cache=TRUE}
+# Balance checking in terms of SMD - using love plot
+love.plot(match.obj2, 
+          binary = "std", 
+          grid = TRUE,
+          thresholds = c(m = .1),
+          colors = c("red","blue")) 
+
+# Balance checking in terms of SMD - using tableone
+tab1c <- CreateTableOne(vars = baselinevars, strata = "RHC.use", 
+                        data = matched.data.sl, includeNA = T, 
+                        addOverall = T, test = F)
+#print(tab1c, showAllLevels = T, catDigits = 2, smd = T)
+```
+
+`ExtractSmd(tab1c)` shows
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(ExtractSmd(tab1c))
+dd <- round(as.data.frame(ExtractSmd(tab1c)),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+Again, all confounders are balanced in terms of SMD (all SMDs \< 0.1). Next, we will fit the outcome model.
+
+#### Step 4
+
+```{r psmSL4, warning=FALSE, message=FALSE, cache=TRUE}
+fit.psm.sl <- glm(Death ~ RHC.use, 
+                  data = matched.data.sl, 
+                  family = binomial)
+```
+
+Summary of `fit.psm.sl`:
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(coef(summary(fit.psm.sl)))
+dd <- round(as.data.frame(coef(summary(fit.psm.sl))),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+The interpretation is the same as before. In the propensity score matched data, the odds of death was 26% higher among those participants with RHC use than those without RHC use.
+
+### Propensity score weighting with super learner
+
+#### Step 1
+
+Step 1 is the same as we did it for the propensity score matching.
+
+#### Step 2
+
+For the second step, we will calculate the stabilized inverse probability weight.
+
+```{r pswSL2, warning=FALSE, message=FALSE, cache=TRUE}
+dat$ipw.sl <- with(dat, ifelse(RHC.use==1, mean(RHC.use)/ps.sl, 
+                               mean(1-RHC.use)/(1-ps.sl)))
+summary(dat$ipw.sl)
+```
+
+#### Step 3
+
+Next, we will check the balance in terms of SMD.
+
+```{r pswSL3, warning=FALSE, message=FALSE, cache=TRUE}
+# Design with inverse probability weights
+w.design.sl <- svydesign(id = ~1, weights = ~ipw.sl, 
+                         data = dat, nest = F)
+
+# Balance checking in terms of SMD
+tab1k <- svyCreateTableOne(vars = baselinevars, strata = "RHC.use", 
+                           data = w.design.sl, includeNA = T, 
+                           addOverall = T, test = F)
+#print(tab1k, showAllLevels = T, catDigits = 2, smd = T)
+```
+
+`ExtractSmd(tab1k)` shows
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(ExtractSmd(tab1k))
+dd <- round(as.data.frame(ExtractSmd(tab1k)),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+All confounders are balanced (SMD \< 0.1).
+
+#### Step 4
+
+```{r pswSL4, warning=FALSE, message=FALSE, cache=TRUE}
+fit.ipw.sl <- svyglm(Death ~ RHC.use, 
+                     design = w.design.sl, 
+                     family = binomial)
+```
+
+Summary of `fit.ipw.sl`:
+
+```{r, caption="Your Table Title", warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+library(flextable)
+Variables <- rownames(coef(summary(fit.ipw.sl)))
+dd <- round(as.data.frame(coef(summary(fit.ipw.sl))),2)
+coefficients_df <- cbind(Variables, dd)
+ft <- flextable(data = coefficients_df)
+ft
+```
+
+In the propensity score weighted data, the odds of death was 26% higher among those participants with RHC use than those without RHC use.
+
+### TMLE
+
+From the previous tutorial, we calculated the effective sample size for the outcome model as well as for the exposure model:
+
+```{r neffY, cache=TRUE}
+n <- nrow(dat) 
+pY <- nrow(dat[dat$Death == 1,])/n 
+n_eff <- min(n, 5*(n*min(pY, 1 - pY))) 
+n_eff
+```
+
+```{r neffA, cache=TRUE}
+n <- nrow(dat) 
+pA <- nrow(dat[dat$RHC.use == 1,])/n 
+n_eff <- min(n, 5*(n*min(pA, 1 - pA))) 
+n_eff
+```
+
+Since the effective sample size is $\ge 5,000$ for both model, we can consider $5 \le \text{V} \le 10$, where V is the number of folds. Let's work with 10-fold cross-validation for both the exposure and the outcome model, with the default super learner library.
+
+```{r tmle1a, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE, echo=FALSE}
+set.seed(123)
+fit.tmle <- tmle(Y = dat$Death, 
+                 A = dat$RHC.use, 
+                 W = dat[,baselinevars], 
+                 family = "binomial", 
+                 V.Q = 10, 
+                 V.g = 10)
+save(fit.tmle, file = "Data/machinelearningCausal/mlc4.RData")
+```
+
+```{r tmle1b, warning=FALSE, message=FALSE, cache=TRUE, eval=TRUE, echo=FALSE}
+load("Data/machinelearningCausal/mlc4.RData")
+```
+
+```{r tmle1c, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+fit.tmle <- tmle(Y = dat$Death, 
+                 A = dat$RHC.use, 
+                 W = dat[,baselinevars], 
+                 family = "binomial", 
+                 V.Q = 10, 
+                 V.g = 10)
+```
+
+```{r tmle1OR, warning=FALSE, message=FALSE, cache=TRUE}
+# OR
+round(fit.tmle$estimates$OR$psi, 2)
+
+# 95% CI
+round(fit.tmle$estimates$OR$CI, 2)
+```
+
+As we can see that the odds of death was 26% higher among those participants with RHC use than those without RHC use.
+
+### Results comparison
+
+```{r, echo=FALSE, echo = FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+data <- data.frame(
+  Model = c(
+    "Logistic regression",
+    "Propensity score matching with logistic",
+    "Propensity score weighting with logistic",
+    "Propensity score matching with super learner",
+    "Propensity score weighting with super learner",
+    "TMLE (default SL library)"
+  ),
+  `Odds ratio` = c(1.42, 1.29, 1.30, 1.26, 1.26, 1.26),
+  `95% CI` = c(
+    "1.32-1.65",
+    "1.12-1.48",
+    "1.11-1.53",
+    "1.09-1.45",
+    "1.04-1.52",
+    "1.12-1.42"
+  )
+)
+
+knitr::kable(data, format = "html", escape = FALSE, col.names = c("Model", "OR", "95% CI"))%>%
+  kable_styling(
+    full_width = FALSE,
+    position = "center",
+    latex_options = c("striped", "scale_down"),
+    font_size = 14
+  ) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2:3, width = "15%")
+```
+
+
+```{r, echo=FALSE, fig.width = 8, fig.height = 6, echo = FALSE, fig.cap = "Forest Plot of Odds Ratios", message=FALSE, warning=FALSE}
+library(ggplot2)
+data <- data.frame(
+  Model = c("Logistic regression", "PS matching (logistic)", 
+            "PS weighting (logistic)", 
+            "PS matching (SL)", 
+            "PS weighting (SL)", 
+            "TMLE (default SL)"),
+  OR = c(1.42, 1.29, 1.30, 1.26, 1.26, 1.26),
+  CI_lower = c(1.32, 1.12, 1.11, 1.09, 1.04, 1.12),
+  CI_upper = c(1.65, 1.48, 1.53, 1.45, 1.52, 1.42)
+)
+
+data$logOR <- log(data$OR)
+data$Model <- factor(data$Model, levels = data$Model[order(data$OR, decreasing = TRUE)])
+
+ggplot(data, aes(x = logOR, xmin = log(CI_lower), xmax = log(CI_upper), y = Model)) +
+  geom_pointrange() +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
+  labs(
+    title = "Transposed Forest Plot of Odds Ratios (Ordered by OR)",
+    x = "Log Odds Ratio",
+    subtitle = "95% Confidence Intervals"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(hjust = 0),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank() 
+  )
+
+```
+
