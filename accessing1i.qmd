@@ -1,0 +1,302 @@
+## Descriptions {.unnumbered}
+
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
+# Load required packages
+use.saved.chche <- TRUE
+library(knitr)
+library(SASxport)
+library(foreign)
+library(nhanesA)
+require(DiagrammeR)
+require(DiagrammeRsvg)
+require(rsvg)
+library(magrittr)
+library(svglite)
+library(png)
+```
+
+This tutorial introduces CCHS as a cross-sectional survey that collects health-related data and discusses its objectives and data usage. Additionally, it highlights the survey's evolution and redesigns. For NHANES, the tutorial covers the importance of the dataset, its sampling procedures, history, data files, and documents. It also discusses how to combine data from different cycles, handle missing data, and deal with outliers. NHIS, another CDC-supported survey, is briefly introduced as a source of annual health-related data. 
+
+### CCHS
+
+#### Overview
+
+CCHS is a cross-sectional survey that collects vital health-related data, including health status, healthcare utilization, and health determinants, from the Canadian population. Available in both official languages, this survey relies on a substantial sample size to provide reliable estimates at various geographical levels every two years.
+
+#### Objectives of the CCHS
+
+The CCHS has four primary objectives: supporting health surveillance programs at national, provincial, and intra-provincial levels; offering a single data source for health research on small populations and rare characteristics; providing timely and easily accessible information to a diverse user community; and maintaining flexibility to address emerging health issues within the population.
+
+#### Data Products and Usage
+
+The CCHS generates annual microdata files and combines two years of data for analysis. Users can also combine data from different years to study specific populations or rare characteristics. The data is primarily used for health surveillance and population health research, benefiting federal and provincial health departments, social service agencies, government bodies, and researchers from various fields. Non-profit health organizations and the media also utilize CCHS results to raise awareness about health concerns.
+
+#### Evolution and Redesigns
+
+The CCHS started collecting data in 2001, transitioning to annual data collection in 2007 with a sample size adjustment to 65,000 respondents per year. It has undergone two significant redesigns to enhance its utility. The 2015 redesign updated sampling methods, adopted a new sample frame, modernized health content, and reviewed the target population. In 2022, the survey underwent another redesign, further updating content and transitioning to an online electronic questionnaire (EQ) for direct self-reporting by selected respondents. Both redesigns involved extensive consultations with stakeholders, including federal, provincial, and territorial partners, health region authorities, and academics.
+
+### NHANES
+
+This section covers
+
+1.  Introduction to the NHANES dataset, highlighting its significance in evaluating the health and nutritional status of U.S. adults and children.
+2.  Sampling Procedure details, explaining the multi-stage sampling strategy and emphasizing the importance of using survey features like weights, strata, and primary sampling units for population-level estimates.
+3.  Survey History with a visualization representing different NHANES survey cycles.
+4.  NHANES Data Files and Documents:
+
+-   Explains the data's file format, mostly in SAS transport file format (.xpt).
+-   Breaks down the NHANES components, which include demographics, dietary, examination, laboratory, and questionnaire data.
+-   Provides guidelines on combining data from different cycles and handling missing data or outliers.
+
+#### Overview
+
+National Center for Health Statistics (NCHS) conducts National Health and Nutrition Examination Survey (NHANES) [@nhanes]. These surveys are designed to evaluate the health and nutritional status of U.S. adults and children. These surveys are being administered in two-year cycles or intervals starting from 1999-2000. Prior to 1999, a number of surveys were conducted (e.g., NHANES III), but in our discussion, we will mostly restrict our discussions to continuous NHANES (e.g., NHANES 1999-2000 to NHANES 2017-2018).
+
+::: column-margin
+@nhanes
+:::
+
+#### Sampling Procedure:
+
+It is a probabilistic sample (we know probability of getting selected for all individuals). This sample is unlikely to be representative of the entire population, as some under/oversampling occurs (unlike SRS), and samples may be dependent (due to proximity of some samples). For example, household with the following characteristics may be oversampled in NHANES, e.g., African Americans, Mexican Americans, Low income White Americans, Persons age 60+ years.
+
+::: column-margin
+Sampling Procedure:
+
+-   not obtained via simple random sample
+-   multistage sample designs
+-   A sample weight is assigned to each sample person where weight = the number of people in the target population represented by that sample person in NHANES
+:::
+
+NHANES used multistage sample designs:
+
+-   Stage 1: PSU/clusters = geographically contiguous counties. 50 states - divided into \~3100 counties. Each PSU is assigned to a strata (e.g., urban/rural or PSU size etc.). The counties are randomly/PPS selected using a 2-per-stratum design. Complex sample variance estimation requires PSU + strata (masking involved).
+-   Stage 2: each selected county is broken into segments (with at least \~50-100 housing units). Segments are randomly/PPS selected.
+-   Stage 3: each selected segment is divided into households. Households are randomly selected.
+-   Stage 4: Within each sampled household, an individual is randomly selected.
+
+::: column-margin
+To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster)
+:::
+
+#### Survey history
+
+Overall NHANES survey history
+
+```{r graph0i, echo=FALSE, cache=use.saved.chche}
+g1 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+    node [shape = circle]
+    O0 [label = 'Older surveys\n NHES']
+    M0 [label = 'Periodic survey\n NHANES I-III']
+    N [label = 'Continuous\n NHANES']
+    
+	  node [shape = plaintext]
+    # node [shape = circle]
+    S [label = 'NHANES\n Surveys']
+	  O [label = '1960-1970']
+	  o1 [label = 'NHES I']
+	  o2 [label = 'NHES II']
+	  o3 [label = 'NHES III']
+    M [label = '1971-1975']
+    m [label = 'NHANES I']
+    M1 [label = '1976-1980']
+    m1 [label = 'NHANES II']
+    M2 [label = '1988-1994']
+    m2 [label = 'NHANES III']
+    n [label = '1999 - ']
+    n10 [label = 'NHANES 2017-2018']
+    n9 [label = 'NHANES 2015-2016']
+    n8 [label = 'NHANES 2013-2014']
+    n7 [label = 'NHANES 2011-2012']
+    n6 [label = 'NHANES 2009-2010']
+    n5 [label = 'NHANES 2007-2008']
+    n4 [label = 'NHANES 2005-2006']
+    n3 [label = 'NHANES 2003-2004']
+    n2 [label = 'NHANES 2001-2002']
+    n1 [label = 'NHANES 1999-2000']
+	  
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  rankdir = LR
+    S -> {O0 M0 N}
+    O0 -> O
+    M0 -> {M M1 M2}
+	  O-> {o1 o2 o3}
+    M -> m
+    M1 -> m1
+    M2 -> m2
+    N -> n
+    n -> {n1 n2 n3 n4 n5 n6 n7 n8 n9 n10}
+	  
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+g1 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("Images/accessing/g1.png")
+```
+
+```{r graph0xi, echo=FALSE, out.width = '75%'}
+knitr::include_graphics("Images/accessing/g1.png")
+```
+
+#### NHANES datafile and documents
+
+##### File format
+
+The Continuous NHANES files are stored in the NHANES website as SAS transport file formats (.xpt). You can import this data in any statistical package that supports this file format.
+
+##### Continuous NHANES Components
+
+Continuous NHANES components separated to reduce the amount of time to download and documentation size:
+
+::: column-margin
+[NHANES Tutorials](https://wwwn.cdc.gov/nchs/nhanes/tutorials/default.aspx?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fnchs%2Ftutorials%2Findex.htm)
+:::
+
+```{r graph1i, echo=FALSE, cache=use.saved.chche}
+g2 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+    node [shape = box]
+    # node [shape = circle]
+    d [label = 'Demographics']
+    i [label = 'Dietary']
+    e [label = 'Examination'] 
+    l [label = 'Laboratory']
+    q [label = 'Questionnaire']
+
+    node [shape = plaintext]
+    N [label = 'Continuous NHANES\n cycles data\n collection']
+    d1 [label = 'Survey design']
+    d2 [label = 'demographic\n variables']
+    i1 [label = 'foods']
+    i2 [label = 'beverages']
+    i3 [label = 'dietary\n supplements']
+    e1 [label = 'physical exams*']
+    e2 [label = 'dental exams']
+    #e3 [label = 'dietary interview']
+    l1 [label = 'blood']
+    l2 [label = 'urine']
+    l3 [label = 'hair']
+    l4 [label = 'air']
+    l5 [label = 'tuberculosis\n skin test']
+    l6 [label = 'household\n dust and\n water\n specimens']
+    q1 [label = 'household\n interview']
+    q2 [label = 'mobile\n examination\n center (MEC)\n interview']
+    d11 [label = 'weights']
+    d12 [label = 'design\n strata']
+    d13 [label = 'primary\n sampling\n units']
+	  
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  rankdir = LR
+    N -> {d i e l q}
+    d -> {d1 d2}
+    i -> {i1 i2 i3}
+    e -> {e1 e2}
+    l -> {l1 l2 l3 l4 l5 l6}
+    q -> {q1 q2}
+    d1 -> {d11 d12 d13}
+
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+g2 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("Images/accessing/g2.png")
+```
+
+```{r graph1xi, echo=FALSE, out.width = '75%'}
+knitr::include_graphics("Images/accessing/g2.png")
+```
+
+::: column-margin
+Broadly, continuous NHANES data are available in 5 categories:
+
+-   Demographics
+-   Dietary
+-   Examination
+-   Laboratory
+-   Questionnaire
+:::
+
+##### Combining data
+
+###### Different cycles
+
+It is possible to combine datasets from different years/cycles together in NHANES. However, NHANES is a cross-sectional data, and identification of the same person accross different cycles is not possible in the public release datasets. For appending data from different cycles, please make sure that the variable names/labels are the same/identical in years under consideration (in some years, names and labels do change).
+
+::: column-margin
+The following data have not been released on the NHANES website as public release files due to confidentiality concerns:
+
+-   adolescent data on alcohol use
+-   smoking
+-   sexual behavior
+-   reproductive health and drug use
+:::
+
+###### Within the same cycle
+
+Within NHANES datasets in a given cycle, each sampled person has an unique identifier sequence number (variable `SEQN`).
+
+##### Missing data and outliers
+
+@CDCfaq recommends:
+
+::: column-margin
+@CDCfaq
+:::
+
+Key points on NHANESd data analysis and missing data handling:
+
+1. If less than 10% of your data for a variable are missing, it's generally acceptable to proceed with your analysis without further evaluation or adjustment. However, when more than 10% of data is missing, assess if the missing values are evenly distributed across socio-demographic characteristics. Consider options like imputation or adjusted weights if necessary.
+2. Identify and treat 'refusal' or 'do not know' responses as missing data to prevent distorted results in statistical analyses. Recode these responses as missing values, using either a period (.) for numeric variables or a blank for character variables.
+3. Be cautious about outliers with exceptionally large weights, as they can significantly impact your estimates. Analysts should decide whether to include or exclude these influential outliers from the analysis, taking into account their potential impact on results.
+
+##### NHANES documents
+
+```{r graph2i, echo=FALSE,cache=use.saved.chche}
+g3 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+	  node [shape = plaintext]
+    # node [shape = circle]
+    N [label = 'Continuous NHANES cycles']
+    c [label = 'codebook']
+    d [label = 'data file\n documentation'] 
+    f [label = 'frequency tables']
+	  
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  rankdir = LR
+    N -> {c d f}
+
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+g3 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("Images/accessing/g3.png")
+```
+
+```{r graph2xi, echo=FALSE, out.width = '65%'}
+knitr::include_graphics("Images/accessing/g3.png")
+```
+
+::: column-margin
+The following websites could be helpful: - For more information about [NHANES design](https://wwwn.cdc.gov/nchs/nhanes/tutorials/module2.aspx).
+
+-   Visit [US CDC](https://wwwn.cdc.gov/Nchs/Nhanes/search/) website and do a variable keyword search based on your research interest (e.g., arthritis).
+:::
+
+### NHIS
+
+Like NHANES, National Health Interview Survey (NHIS) is supported by the CDC and is a large-scale multi-stage cross-sectional survey. The NHIS survey includes information on population disease prevalence, extent of disability, and use of health care services. In contrast to the NHANES that provides data every 2 years, NHIS provides data annually.
+
+::: column-margin
+To obtain population-level estimate, we must utilize the survey features (weights, strata, PSU/cluster)
+:::
