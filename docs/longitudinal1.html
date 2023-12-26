@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Advanced Epidemiological Methods - Mixed effects models</title>
 <style>
@@ -14,10 +14,9 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -44,19 +43,48 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
+    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-/* CSS for citations */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
 }
-.hanging-indent div.csl-entry {
+.hanging div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -70,7 +98,8 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}</style>
+}
+</style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -105,8 +134,7 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
 
@@ -116,34 +144,28 @@ gtag('js', new Date());
 gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><script src="site_libs/kePrint-0.0.1/kePrint.js"></script><link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
-<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - Mixed effects models">
-<meta name="twitter:description" content="">
-<meta name="twitter:image" content="longitudinal1_files/figure-html/data1-1.png">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="In this section, we will learn about mixed effects models. Mixed effects models are popular choices for modeling repeated measurements, such as longitudinal or clustered data.">
+<meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked slimcontent">
 
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./longitudinal.html">Longitudinal data</a></li><li class="breadcrumb-item"><a href="./longitudinal1.html">Mixed effects models</a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Mixed effects models</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
       </button>
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Advanced Epidemiological Methods</a> 
         <div class="sidebar-tools-main">
-  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
   <i class="bi"></i>
   </div>
@@ -151,802 +173,681 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
     </div>
       </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
+      <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-        </div>
+      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Project</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data wrangling</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R basics</span></a>
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data types</span></a>
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Automating tasks</span></a>
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing dataset</span></a>
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data manipulation</span></a>
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Import external data</span></a>
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Summary tables</span></a>
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R Markdown</span></a>
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R Functions (W)</span></a>
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (W)</span></a>
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (W)</span></a>
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Data accessing</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Survey data sources</span></a>
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Descriptions</span></a>
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">Descriptions</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing CCHS to R</span></a>
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing NHANES to R</span></a>
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing results</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing NHIS to R</span></a>
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">Importing NHIS to R</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R Functions (A)</span></a>
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (A)</span></a>
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (A)</span></a>
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise (A)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Research questions</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Predictive question-1</span></a>
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Predictive question-2a</span></a>
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Predictive question-2b</span></a>
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Causal question-1</span></a>
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Causal question-2</span></a>
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (Q)</span></a>
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (Q)</span></a>
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./confounding.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Causal roles</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Confounding</span></a>
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mediator</span></a>
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collider</span></a>
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Z-bias</span></a>
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collapsibility</span></a>
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Change-in-estimate</span></a>
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (R)</span></a>
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (R)</span></a>
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Prediction ideas</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collinear predictors</span></a>
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Continuous outcome</span></a>
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Binary outcome</span></a>
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Overfitting and performance</span></a>
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data spliting</span></a>
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data spliting</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Cross-validation</span></a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bootstrap</span></a>
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (P)</span></a>
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (P)</span></a>
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Survey data analysis</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Revisiting PICOT</span></a>
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Assessing data</span></a>
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Bivariate analysis</span></a>
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Regression</span></a>
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Performance</span></a>
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHANES: Blood Pressure</span></a>
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHANES: Cholesterol</span></a>
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHANES: Subsetting</span></a>
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (D)</span></a>
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (D)</span></a>
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (D)</span></a>
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Missing data analysis</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Imputation</span></a>
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Imputation in NHANES</span></a>
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">Imputation in NHANES</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Missing in outcome</span></a>
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Performance with NA</span></a>
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Subpopulations</span></a>
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">MCAR tests</span></a>
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">MCAR tests</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Effect modification</span></a>
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (M)</span></a>
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (M)</span></a>
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (M)</span></a>
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Propensity score</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exact Matching (CCHS)</span></a>
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">Exact Matching (CCHS)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM in OA-CVD (CCHS)</span></a>
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (CCHS)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM in OA-CVD (US)</span></a>
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (US)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM in BMI-diabetes</span></a>
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">PSM in BMI-diabetes</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM with MI</span></a>
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">PSM with MI</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (S)</span></a>
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (S)</span></a>
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">Quiz (S)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (S)</span></a>
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Machine learning (ML)</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true" aria-label="Toggle section">
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning (ML)</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Continuous outcome</span></a>
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data spliting</span></a>
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">Data spliting</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Cross-validation</span></a>
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Binary outcome</span></a>
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Supervised learning</span></a>
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">Supervised learning</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Unsupervised learning</span></a>
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">Unsupervised learning</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHIS Example</span></a>
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">NHIS Example</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Replicate Results</span></a>
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">Replicate Results</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ML in causal inference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true" aria-label="Toggle section">
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Motivation</span></a>
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">Motivation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SuperLearner</span></a>
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">SuperLearner</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Binary Outcomes</span></a>
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">Binary Outcomes</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Continuous Outcomes</span></a>
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">Continuous Outcomes</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Comparing results</span></a>
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">Comparing results</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (C)</span></a>
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Complex outcomes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true" aria-label="Toggle section">
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">Complex outcomes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Polytomous and ordinal</span></a>
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">Polytomous and ordinal</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Survival analysis</span></a>
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">Survival analysis</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Poisson</span></a>
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">Poisson</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (N)</span></a>
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">R functions (N)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (N)</span></a>
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">Quiz (N)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Longitudinal data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true" aria-label="Toggle section">
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">Longitudinal data</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Mixed effects models</span></a>
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link active">Mixed effects models</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">GEE</span></a>
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">GEE</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (T)</span></a>
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">R functions (T)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (T)</span></a>
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">Quiz (T)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./mediation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mediation analysis</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true" aria-label="Toggle section">
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">Mediation analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Baron and Kenny</span></a>
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">Baron and Kenny</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Justification</span></a>
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">Justification</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mediation Example</span></a>
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">Mediation Example</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (I)</span></a>
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">R functions (I)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (I)</span></a>
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">Quiz (I)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reporting.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing tools</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true" aria-label="Toggle section">
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Writing tools</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collaborative Writing</span></a>
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">Collaborative Writing</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Formatting Tools</span></a>
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">Formatting Tools</a>
   </div>
 </li>
       </ul>
 </li>
     </ul>
 </div>
-</nav><div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
@@ -960,7 +861,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title">Mixed effects models</h1>
+<h1 class="title d-none d-lg-block">Mixed effects models</h1>
 </div>
 
 
@@ -992,12 +893,12 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>A useful reference on linear mixed effects models is Section 12.4 of <span class="citation" data-cites="hothorn2014handbook">Hothorn and Everitt (<a href="#ref-hothorn2014handbook" role="doc-biblioref">2014</a>)</span>.</p>
-</div></div><div class="callout callout-style-default callout-important callout-titled">
+</div></div><div class="callout-important callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
+<div class="callout-caption-container flex-fill">
 Important
 </div>
 </div>
@@ -1017,78 +918,79 @@ Important
 <span id="cb2-4"><a href="#cb2-4"></a><span class="fu">kable</span>(<span class="fu">head</span>(BtheB))<span class="sc">%&gt;%</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F, <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-striped table-sm small" data-quarto-postprocess="true">
-<thead><tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">drug</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">length</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">treatment</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.pre</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.2m</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.3m</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.5m</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.8m</th>
-</tr></thead>
+
+<table class="table table-striped" style="width: auto !important; ">
+<thead><tr>
+<th style="text-align:left;"> drug </th>
+   <th style="text-align:left;"> length </th>
+   <th style="text-align:left;"> treatment </th>
+   <th style="text-align:right;"> bdi.pre </th>
+   <th style="text-align:right;"> bdi.2m </th>
+   <th style="text-align:right;"> bdi.3m </th>
+   <th style="text-align:right;"> bdi.5m </th>
+   <th style="text-align:right;"> bdi.8m </th>
+  </tr></thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">29</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">24</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">20</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">25</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">9</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">23</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
+<tr>
+<td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 29 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:right;"> 16 </td>
+   <td style="text-align:right;"> 24 </td>
+   <td style="text-align:right;"> 17 </td>
+   <td style="text-align:right;"> 20 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 25 </td>
+   <td style="text-align:right;"> 20 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 17 </td>
+   <td style="text-align:right;"> 16 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 9 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 26 </td>
+   <td style="text-align:right;"> 23 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
 </tbody>
 </table>
 </div>
@@ -1127,78 +1029,79 @@ Important
 <span id="cb4-7"><a href="#cb4-7"></a><span class="fu">kable</span>(<span class="fu">head</span>(BtheB_long))<span class="sc">%&gt;%</span></span>
 <span id="cb4-8"><a href="#cb4-8"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F, <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-striped table-sm small" data-quarto-postprocess="true">
-<thead><tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">drug</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">length</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">treatment</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.pre</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">subject</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">time</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi</th>
-</tr></thead>
+
+<table class="table table-striped" style="width: auto !important; ">
+<thead><tr>
+<th style="text-align:left;">   </th>
+   <th style="text-align:left;"> drug </th>
+   <th style="text-align:left;"> length </th>
+   <th style="text-align:left;"> treatment </th>
+   <th style="text-align:right;"> bdi.pre </th>
+   <th style="text-align:left;"> subject </th>
+   <th style="text-align:right;"> time </th>
+   <th style="text-align:right;"> bdi </th>
+  </tr></thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">1.2m</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">29</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2.2m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">16</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3.2m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">25</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">20</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">4.2m</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: left;">4</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">17</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">5.2m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">23</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">6.2m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: left;">6</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-</tr>
+<tr>
+<td style="text-align:left;"> 1.2m </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 29 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 2 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 2.2m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:left;"> 2 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 16 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 3.2m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 25 </td>
+   <td style="text-align:left;"> 3 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 20 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 4.2m </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:left;"> 4 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 17 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 5.2m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 26 </td>
+   <td style="text-align:left;"> 5 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 23 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 6.2m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:left;"> 6 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
 </tbody>
 </table>
 </div>
@@ -1213,116 +1116,118 @@ Important
 <span id="cb5-9"><a href="#cb5-9"></a><span class="fu">kable</span>(<span class="fu">subset</span>(BtheB_long,  subject <span class="sc">==</span> <span class="dv">2</span>))<span class="sc">%&gt;%</span></span>
 <span id="cb5-10"><a href="#cb5-10"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F, <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-striped table-sm small" data-quarto-postprocess="true">
-<thead><tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">drug</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">length</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">treatment</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.pre</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">subject</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">time</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi</th>
-</tr></thead>
+
+<table class="table table-striped" style="width: auto !important; ">
+<thead><tr>
+<th style="text-align:left;">   </th>
+   <th style="text-align:left;"> drug </th>
+   <th style="text-align:left;"> length </th>
+   <th style="text-align:left;"> treatment </th>
+   <th style="text-align:right;"> bdi.pre </th>
+   <th style="text-align:left;"> subject </th>
+   <th style="text-align:right;"> time </th>
+   <th style="text-align:right;"> bdi </th>
+  </tr></thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">2.2m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">16</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2.3m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">24</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2.5m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">17</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2.8m</td>
-<td style="text-align: left;">Yes</td>
-<td style="text-align: left;">&gt;6m</td>
-<td style="text-align: left;">BtheB</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">20</td>
-</tr>
+<tr>
+<td style="text-align:left;"> 2.2m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:left;"> 2 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 16 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 2.3m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:left;"> 2 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 24 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 2.5m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:left;"> 2 </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:right;"> 17 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 2.8m </td>
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> &gt;6m </td>
+   <td style="text-align:left;"> BtheB </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:left;"> 2 </td>
+   <td style="text-align:right;"> 8 </td>
+   <td style="text-align:right;"> 20 </td>
+  </tr>
 </tbody>
 </table>
 </div>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">kable</span>(<span class="fu">subset</span>(BtheB_long,  subject <span class="sc">==</span> <span class="dv">99</span>))<span class="sc">%&gt;%</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F, <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-striped table-sm small" data-quarto-postprocess="true">
-<thead><tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">drug</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">length</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">treatment</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi.pre</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">subject</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">time</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">bdi</th>
-</tr></thead>
+
+<table class="table table-striped" style="width: auto !important; ">
+<thead><tr>
+<th style="text-align:left;">   </th>
+   <th style="text-align:left;"> drug </th>
+   <th style="text-align:left;"> length </th>
+   <th style="text-align:left;"> treatment </th>
+   <th style="text-align:right;"> bdi.pre </th>
+   <th style="text-align:left;"> subject </th>
+   <th style="text-align:right;"> time </th>
+   <th style="text-align:right;"> bdi </th>
+  </tr></thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">99.2m</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: left;">99</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">5</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">99.3m</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: left;">99</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">5</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">99.5m</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: left;">99</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">99.8m</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">&lt;6m</td>
-<td style="text-align: left;">TAU</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: left;">99</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">6</td>
-</tr>
+<tr>
+<td style="text-align:left;"> 99.2m </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 13 </td>
+   <td style="text-align:left;"> 99 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 5 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 99.3m </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 13 </td>
+   <td style="text-align:left;"> 99 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 5 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 99.5m </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 13 </td>
+   <td style="text-align:left;"> 99 </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+<tr>
+<td style="text-align:left;"> 99.8m </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> &lt;6m </td>
+   <td style="text-align:left;"> TAU </td>
+   <td style="text-align:right;"> 13 </td>
+   <td style="text-align:left;"> 99 </td>
+   <td style="text-align:right;"> 8 </td>
+   <td style="text-align:right;"> 6 </td>
+  </tr>
 </tbody>
 </table>
 </div>
@@ -1335,101 +1240,90 @@ Important
 <span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; Warning: package 'jtools' was built under R version 4.3.1</span></span>
 <span id="cb7-8"><a href="#cb7-8"></a><span class="fu">summ</span>(lmfit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true"><tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Observations</td>
-<td style="text-align: right;">280 (120 missing obs. deleted)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Dependent variable</td>
-<td style="text-align: right;">bdi</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Type</td>
-<td style="text-align: right;">OLS linear regression</td>
-</tr>
+
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Observations </td>
+   <td style="text-align:right;"> 280 (120 missing obs. deleted) </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
+   <td style="text-align:right;"> bdi </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Type </td>
+   <td style="text-align:right;"> OLS linear regression </td>
+  </tr>
 </tbody></table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true"><tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">F(5,274)</td>
-<td style="text-align: right;">35.78</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">R²</td>
-<td style="text-align: right;">0.40</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Adj. R²</td>
-<td style="text-align: right;">0.38</td>
-</tr>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;"> F(5,274) </td>
+   <td style="text-align:right;"> 35.78 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> R² </td>
+   <td style="text-align:right;"> 0.40 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Adj. R² </td>
+   <td style="text-align:right;"> 0.38 </td>
+  </tr>
 </tbody></table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<thead><tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Est.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">S.E.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
-</tr></thead>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<thead><tr>
+<th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Est. </th>
+   <th style="text-align:right;"> S.E. </th>
+   <th style="text-align:right;"> t val. </th>
+   <th style="text-align:right;"> p </th>
+  </tr></thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">(Intercept)</td>
-<td style="text-align: right;">7.32</td>
-<td style="text-align: right;">1.73</td>
-<td style="text-align: right;">4.24</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">bdi.pre</td>
-<td style="text-align: right;">0.57</td>
-<td style="text-align: right;">0.05</td>
-<td style="text-align: right;">10.44</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">time</td>
-<td style="text-align: right;">-0.94</td>
-<td style="text-align: right;">0.24</td>
-<td style="text-align: right;">-3.97</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">treatmentBtheB</td>
-<td style="text-align: right;">-3.32</td>
-<td style="text-align: right;">1.10</td>
-<td style="text-align: right;">-3.02</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">drugYes</td>
-<td style="text-align: right;">-3.57</td>
-<td style="text-align: right;">1.15</td>
-<td style="text-align: right;">-3.11</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">length&gt;6m</td>
-<td style="text-align: right;">1.71</td>
-<td style="text-align: right;">1.11</td>
-<td style="text-align: right;">1.54</td>
-<td style="text-align: right;">0.12</td>
-</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
+   <td style="text-align:right;"> 7.32 </td>
+   <td style="text-align:right;"> 1.73 </td>
+   <td style="text-align:right;"> 4.24 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> bdi.pre </td>
+   <td style="text-align:right;"> 0.57 </td>
+   <td style="text-align:right;"> 0.05 </td>
+   <td style="text-align:right;"> 10.44 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> time </td>
+   <td style="text-align:right;"> -0.94 </td>
+   <td style="text-align:right;"> 0.24 </td>
+   <td style="text-align:right;"> -3.97 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> treatmentBtheB </td>
+   <td style="text-align:right;"> -3.32 </td>
+   <td style="text-align:right;"> 1.10 </td>
+   <td style="text-align:right;"> -3.02 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> drugYes </td>
+   <td style="text-align:right;"> -3.57 </td>
+   <td style="text-align:right;"> 1.15 </td>
+   <td style="text-align:right;"> -3.11 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> length&gt;6m </td>
+   <td style="text-align:right;"> 1.71 </td>
+   <td style="text-align:right;"> 1.11 </td>
+   <td style="text-align:right;"> 1.54 </td>
+   <td style="text-align:right;"> 0.12 </td>
+  </tr>
 </tbody>
-<tfoot><tr class="odd">
-<td style="text-align: left; padding: 0;">
-<sup></sup> Standard errors: OLS</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-</tr></tfoot>
+<tfoot><tr><td style="padding: 0; " colspan="100%">
+<sup></sup> Standard errors: OLS</td></tr></tfoot>
 </table>
-</div>
 </div>
 </div>
 </section><section id="random-intercept-but-fixed-slope" class="level4"><h4 class="anchored" data-anchor-id="random-intercept-but-fixed-slope">Random intercept but fixed slope</h4>
@@ -1479,195 +1373,149 @@ Important
 <span id="cb8-42"><a href="#cb8-42"></a><span class="co">#&gt; length&gt;6m   -0.243 -0.242 -0.036  0.002  0.157</span></span>
 <span id="cb8-43"><a href="#cb8-43"></a><span class="fu">summ</span>(BtheB_lmer1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true"><tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Observations</td>
-<td style="text-align: right;">280</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Dependent variable</td>
-<td style="text-align: right;">bdi</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Type</td>
-<td style="text-align: right;">Mixed effects linear regression</td>
-</tr>
+
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Observations </td>
+   <td style="text-align:right;"> 280 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
+   <td style="text-align:right;"> bdi </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Type </td>
+   <td style="text-align:right;"> Mixed effects linear regression </td>
+  </tr>
 </tbody></table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true"><tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">AIC</td>
-<td style="text-align: right;">1887.49</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">BIC</td>
-<td style="text-align: right;">1916.57</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Pseudo-R² (fixed effects)</td>
-<td style="text-align: right;">0.39</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Pseudo-R² (total)</td>
-<td style="text-align: right;">0.79</td>
-</tr>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;"> AIC </td>
+   <td style="text-align:right;"> 1887.49 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> BIC </td>
+   <td style="text-align:right;"> 1916.57 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Pseudo-R² (fixed effects) </td>
+   <td style="text-align:right;"> 0.39 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Pseudo-R² (total) </td>
+   <td style="text-align:right;"> 0.79 </td>
+  </tr>
 </tbody></table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-</colgroup>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
-<tr class="header">
-<th colspan="6" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Fixed Effects
-</div></th>
-</tr>
-<tr class="odd">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Est.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">S.E.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">d.f.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
-</tr>
+<tr><th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="6"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fixed Effects</div></th></tr>
+<tr>
+<th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Est. </th>
+   <th style="text-align:right;"> S.E. </th>
+   <th style="text-align:right;"> t val. </th>
+   <th style="text-align:right;"> d.f. </th>
+   <th style="text-align:right;"> p </th>
+  </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">(Intercept)</td>
-<td style="text-align: right;">5.59</td>
-<td style="text-align: right;">2.24</td>
-<td style="text-align: right;">2.49</td>
-<td style="text-align: right;">108.98</td>
-<td style="text-align: right;">0.01</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">bdi.pre</td>
-<td style="text-align: right;">0.64</td>
-<td style="text-align: right;">0.08</td>
-<td style="text-align: right;">8.21</td>
-<td style="text-align: right;">104.08</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">time</td>
-<td style="text-align: right;">-0.70</td>
-<td style="text-align: right;">0.15</td>
-<td style="text-align: right;">-4.81</td>
-<td style="text-align: right;">199.32</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">treatmentBtheB</td>
-<td style="text-align: right;">-2.33</td>
-<td style="text-align: right;">1.67</td>
-<td style="text-align: right;">-1.39</td>
-<td style="text-align: right;">97.12</td>
-<td style="text-align: right;">0.17</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">drugYes</td>
-<td style="text-align: right;">-2.82</td>
-<td style="text-align: right;">1.73</td>
-<td style="text-align: right;">-1.64</td>
-<td style="text-align: right;">98.20</td>
-<td style="text-align: right;">0.11</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">length&gt;6m</td>
-<td style="text-align: right;">0.20</td>
-<td style="text-align: right;">1.64</td>
-<td style="text-align: right;">0.12</td>
-<td style="text-align: right;">100.26</td>
-<td style="text-align: right;">0.90</td>
-</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
+   <td style="text-align:right;"> 5.59 </td>
+   <td style="text-align:right;"> 2.24 </td>
+   <td style="text-align:right;"> 2.49 </td>
+   <td style="text-align:right;"> 108.98 </td>
+   <td style="text-align:right;"> 0.01 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> bdi.pre </td>
+   <td style="text-align:right;"> 0.64 </td>
+   <td style="text-align:right;"> 0.08 </td>
+   <td style="text-align:right;"> 8.21 </td>
+   <td style="text-align:right;"> 104.08 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> time </td>
+   <td style="text-align:right;"> -0.70 </td>
+   <td style="text-align:right;"> 0.15 </td>
+   <td style="text-align:right;"> -4.81 </td>
+   <td style="text-align:right;"> 199.32 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> treatmentBtheB </td>
+   <td style="text-align:right;"> -2.33 </td>
+   <td style="text-align:right;"> 1.67 </td>
+   <td style="text-align:right;"> -1.39 </td>
+   <td style="text-align:right;"> 97.12 </td>
+   <td style="text-align:right;"> 0.17 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> drugYes </td>
+   <td style="text-align:right;"> -2.82 </td>
+   <td style="text-align:right;"> 1.73 </td>
+   <td style="text-align:right;"> -1.64 </td>
+   <td style="text-align:right;"> 98.20 </td>
+   <td style="text-align:right;"> 0.11 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> length&gt;6m </td>
+   <td style="text-align:right;"> 0.20 </td>
+   <td style="text-align:right;"> 1.64 </td>
+   <td style="text-align:right;"> 0.12 </td>
+   <td style="text-align:right;"> 100.26 </td>
+   <td style="text-align:right;"> 0.90 </td>
+  </tr>
 </tbody>
-<tfoot><tr class="even">
-<td style="text-align: left; padding: 0;">
-<sup></sup> p values calculated using Satterthwaite d.f.</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-</tr></tfoot>
+<tfoot><tr><td style="padding: 0; " colspan="100%">
+<sup></sup>  p values calculated using Satterthwaite d.f. </td></tr></tfoot>
 </table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Random Effects
-</div></th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Group</th>
-<th data-quarto-table-cell-role="th">Parameter</th>
-<th data-quarto-table-cell-role="th">Std. Dev.</th>
-</tr>
+<tr><th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Random Effects</div></th></tr>
+<tr>
+<th> Group </th>
+   <th> Parameter </th>
+   <th> Std. Dev. </th>
+  </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td>subject</td>
-<td>(Intercept)</td>
-<td>6.98</td>
-</tr>
-<tr class="even">
-<td>Residual</td>
-<td></td>
-<td>5.01</td>
-</tr>
+<tr>
+<td> subject </td>
+   <td> (Intercept) </td>
+   <td> 6.98 </td>
+  </tr>
+<tr>
+<td> Residual </td>
+   <td>  </td>
+   <td> 5.01 </td>
+  </tr>
 </tbody>
 </table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Grouping Variables
-</div></th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Group</th>
-<th data-quarto-table-cell-role="th"># groups</th>
-<th data-quarto-table-cell-role="th">ICC</th>
-</tr>
+<tr><th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Grouping Variables</div></th></tr>
+<tr>
+<th> Group </th>
+   <th> # groups </th>
+   <th> ICC </th>
+  </tr>
 </thead>
-<tbody><tr class="odd">
-<td>subject</td>
-<td>97</td>
-<td>0.66</td>
-</tr></tbody>
+<tbody><tr>
+<td> subject </td>
+   <td> 97 </td>
+   <td> 0.66 </td>
+  </tr></tbody>
 </table>
 </div>
 </div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-important callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
+<div class="callout-caption-container flex-fill">
 Important
 </div>
 </div>
@@ -1701,192 +1549,146 @@ Important
 <span id="cb10-6"><a href="#cb10-6"></a></span>
 <span id="cb10-7"><a href="#cb10-7"></a><span class="fu">summ</span>(BtheB_lmer2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true"><tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Observations</td>
-<td style="text-align: right;">280</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Dependent variable</td>
-<td style="text-align: right;">bdi</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Type</td>
-<td style="text-align: right;">Mixed effects linear regression</td>
-</tr>
+
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Observations </td>
+   <td style="text-align:right;"> 280 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
+   <td style="text-align:right;"> bdi </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Type </td>
+   <td style="text-align:right;"> Mixed effects linear regression </td>
+  </tr>
 </tbody></table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true"><tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">AIC</td>
-<td style="text-align: right;">1891.04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">BIC</td>
-<td style="text-align: right;">1927.39</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Pseudo-R² (fixed effects)</td>
-<td style="text-align: right;">0.39</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Pseudo-R² (total)</td>
-<td style="text-align: right;">0.80</td>
-</tr>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;"> AIC </td>
+   <td style="text-align:right;"> 1891.04 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> BIC </td>
+   <td style="text-align:right;"> 1927.39 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Pseudo-R² (fixed effects) </td>
+   <td style="text-align:right;"> 0.39 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> Pseudo-R² (total) </td>
+   <td style="text-align:right;"> 0.80 </td>
+  </tr>
 </tbody></table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-</colgroup>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
-<tr class="header">
-<th colspan="6" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Fixed Effects
-</div></th>
-</tr>
-<tr class="odd">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Est.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">S.E.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">d.f.</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
-</tr>
+<tr><th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="6"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fixed Effects</div></th></tr>
+<tr>
+<th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Est. </th>
+   <th style="text-align:right;"> S.E. </th>
+   <th style="text-align:right;"> t val. </th>
+   <th style="text-align:right;"> d.f. </th>
+   <th style="text-align:right;"> p </th>
+  </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">(Intercept)</td>
-<td style="text-align: right;">5.61</td>
-<td style="text-align: right;">2.25</td>
-<td style="text-align: right;">2.50</td>
-<td style="text-align: right;">106.79</td>
-<td style="text-align: right;">0.01</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">bdi.pre</td>
-<td style="text-align: right;">0.64</td>
-<td style="text-align: right;">0.08</td>
-<td style="text-align: right;">8.25</td>
-<td style="text-align: right;">102.78</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">time</td>
-<td style="text-align: right;">-0.70</td>
-<td style="text-align: right;">0.15</td>
-<td style="text-align: right;">-4.56</td>
-<td style="text-align: right;">57.69</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">treatmentBtheB</td>
-<td style="text-align: right;">-2.38</td>
-<td style="text-align: right;">1.67</td>
-<td style="text-align: right;">-1.42</td>
-<td style="text-align: right;">97.12</td>
-<td style="text-align: right;">0.16</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">drugYes</td>
-<td style="text-align: right;">-2.87</td>
-<td style="text-align: right;">1.73</td>
-<td style="text-align: right;">-1.66</td>
-<td style="text-align: right;">98.18</td>
-<td style="text-align: right;">0.10</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">length&gt;6m</td>
-<td style="text-align: right;">0.14</td>
-<td style="text-align: right;">1.64</td>
-<td style="text-align: right;">0.09</td>
-<td style="text-align: right;">100.04</td>
-<td style="text-align: right;">0.93</td>
-</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
+   <td style="text-align:right;"> 5.61 </td>
+   <td style="text-align:right;"> 2.25 </td>
+   <td style="text-align:right;"> 2.50 </td>
+   <td style="text-align:right;"> 106.79 </td>
+   <td style="text-align:right;"> 0.01 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> bdi.pre </td>
+   <td style="text-align:right;"> 0.64 </td>
+   <td style="text-align:right;"> 0.08 </td>
+   <td style="text-align:right;"> 8.25 </td>
+   <td style="text-align:right;"> 102.78 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> time </td>
+   <td style="text-align:right;"> -0.70 </td>
+   <td style="text-align:right;"> 0.15 </td>
+   <td style="text-align:right;"> -4.56 </td>
+   <td style="text-align:right;"> 57.69 </td>
+   <td style="text-align:right;"> 0.00 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> treatmentBtheB </td>
+   <td style="text-align:right;"> -2.38 </td>
+   <td style="text-align:right;"> 1.67 </td>
+   <td style="text-align:right;"> -1.42 </td>
+   <td style="text-align:right;"> 97.12 </td>
+   <td style="text-align:right;"> 0.16 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> drugYes </td>
+   <td style="text-align:right;"> -2.87 </td>
+   <td style="text-align:right;"> 1.73 </td>
+   <td style="text-align:right;"> -1.66 </td>
+   <td style="text-align:right;"> 98.18 </td>
+   <td style="text-align:right;"> 0.10 </td>
+  </tr>
+<tr>
+<td style="text-align:left;font-weight: bold;"> length&gt;6m </td>
+   <td style="text-align:right;"> 0.14 </td>
+   <td style="text-align:right;"> 1.64 </td>
+   <td style="text-align:right;"> 0.09 </td>
+   <td style="text-align:right;"> 100.04 </td>
+   <td style="text-align:right;"> 0.93 </td>
+  </tr>
 </tbody>
-<tfoot><tr class="even">
-<td style="text-align: left; padding: 0;">
-<sup></sup> p values calculated using Satterthwaite d.f.</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-</tr></tfoot>
+<tfoot><tr><td style="padding: 0; " colspan="100%">
+<sup></sup>  p values calculated using Satterthwaite d.f. </td></tr></tfoot>
 </table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Random Effects
-</div></th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Group</th>
-<th data-quarto-table-cell-role="th">Parameter</th>
-<th data-quarto-table-cell-role="th">Std. Dev.</th>
-</tr>
+<tr><th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Random Effects</div></th></tr>
+<tr>
+<th> Group </th>
+   <th> Parameter </th>
+   <th> Std. Dev. </th>
+  </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td>subject</td>
-<td>(Intercept)</td>
-<td>7.12</td>
-</tr>
-<tr class="even">
-<td>subject</td>
-<td>time</td>
-<td>0.43</td>
-</tr>
-<tr class="odd">
-<td>Residual</td>
-<td></td>
-<td>4.90</td>
-</tr>
+<tr>
+<td> subject </td>
+   <td> (Intercept) </td>
+   <td> 7.12 </td>
+  </tr>
+<tr>
+<td> subject </td>
+   <td> time </td>
+   <td> 0.43 </td>
+  </tr>
+<tr>
+<td> Residual </td>
+   <td>  </td>
+   <td> 4.90 </td>
+  </tr>
 </tbody>
 </table>
-</div>
-<div class="table-responsive">
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Grouping Variables
-</div></th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Group</th>
-<th data-quarto-table-cell-role="th"># groups</th>
-<th data-quarto-table-cell-role="th">ICC</th>
-</tr>
+<tr><th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Grouping Variables</div></th></tr>
+<tr>
+<th> Group </th>
+   <th> # groups </th>
+   <th> ICC </th>
+  </tr>
 </thead>
-<tbody><tr class="odd">
-<td>subject</td>
-<td>97</td>
-<td>0.68</td>
-</tr></tbody>
+<tbody><tr>
+<td> subject </td>
+   <td> 97 </td>
+   <td> 0.68 </td>
+  </tr></tbody>
 </table>
-</div>
 </div>
 </div>
 <p>The interpretation of the model outputs will be similar to the model with only random intercepts. Let us plot the data:</p>
@@ -1986,12 +1788,12 @@ Grouping Variables
 </div>
 <p>Since points are almost on the lines, we can say that the normality assumption is met.</p>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
+<div class="callout-caption-container flex-fill">
 Tip
 </div>
 </div>
@@ -2010,11 +1812,11 @@ Tip
 </section><section id="reference" class="level3"><h3 class="anchored" data-anchor-id="reference">Reference</h3>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-faraway2016extending" class="csl-entry" role="listitem">
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-faraway2016extending" class="csl-entry" role="doc-biblioentry">
 Faraway, Julian J. 2016. <em>Extending the Linear Model with r: Generalized Linear, Mixed Effects and Nonparametric Regression Models</em>. CRC press.
 </div>
-<div id="ref-hothorn2014handbook" class="csl-entry" role="listitem">
+<div id="ref-hothorn2014handbook" class="csl-entry" role="doc-biblioentry">
 Hothorn, Torsten, and Brian S Everitt. 2014. <em>A Handbook of Statistical Analyses Using r</em>. CRC press.
 </div>
 </div>
@@ -2045,23 +1847,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
+    target: function(trigger) {
+      return trigger.previousElementSibling;
     }
   });
   clipboard.on('success', function(e) {
@@ -2177,92 +1965,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
