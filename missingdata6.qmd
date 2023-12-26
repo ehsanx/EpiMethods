@@ -54,7 +54,7 @@ Obs.Data.original <- Obs.Data
 
 #### Randomly set some data to missing
 
-Some values in the dataset are randomly set to missing (i.e., randomly assign some L values to missing). This simulates a scenario where data might be missing completely at random (MCAR). 
+Some values in the dataset are randomly set to missing (i.e., randomly assign some L values to missing). This simulates a scenario where data might be missing completely at random (MCAR).
 
 ```{r data0a, cache=TRUE}
 set.seed(123)
@@ -78,12 +78,23 @@ Margin plots are used to compare the distributions of variables when a particula
 -   The blue boxplot depicts the distribution of the values of a variable in the data where **L has an observed value**.
 -   **Same median and spread (range) may mean no difference in the distribution**.
 
-```{r plot0, warning=FALSE, message=FALSE}
+
+```{r plot0p, warning=FALSE, message=FALSE}
 marginplot(Obs.Data[,c("L", "P")])
+```
+
+```{r plot0b, warning=FALSE, message=FALSE}
 marginplot(Obs.Data[,c("L", "B")])
+```
+
+```{r plot0a, warning=FALSE, message=FALSE}
 marginplot(Obs.Data[,c("L", "A")])
+```
+
+```{r plot0y, warning=FALSE, message=FALSE}
 marginplot(Obs.Data[,c("L", "Y")])
 ```
+
 
 #### Little's MCAR test
 
@@ -91,21 +102,17 @@ A statistical test is conducted to determine if data is missing entirely at rand
 
 Little's 1988 chi-squared test evaluates if data is MCAR by checking for significant differences in the means of various missing-value patterns [@little1988test]. Based on the test's statistic and p-value, we can infer if the data is MCAR. The null hypothesis for this test is that the data is MCAR.
 
-- The essence of this test is to compare means across groups with different missing data patterns. It uses a likelihood ratio test and assumes the data follows a multivariate normal distribution.
-- If this test is rejected (indicated by a low p-value or a high statistic), it suggests the data might not be MCAR.
+-   The essence of this test is to compare means across groups with different missing data patterns. It uses a likelihood ratio test and assumes the data follows a multivariate normal distribution.
+-   If this test is rejected (indicated by a low p-value or a high statistic), it suggests the data might not be MCAR.
 
 However, this test has several limitations [@natest]:
 
-- The test doesn't pinpoint which specific variables don't adhere to MCAR, meaning it doesn't highlight potential variables associated with missingness.
-- It assumes multivariate normality. If this assumption isn't met, especially with non-normal or categorical variables, the test might not be reliable unless there's a large sample size.
-- The test assumes that all missing data patterns have the same covariance matrix. This means it can't detect deviations from MCAR that are based on covariance, especially if the data is Missing at Random (MAR) or Missing Not at Random (MNAR).
-- Research has shown that Little's MCAR test might have low power, especially when few variables don't follow MCAR, the association between the data and its missingness is weak, or if the data is MNAR.
-- The test can only reject the MCAR assumption but can't confirm it. A non-significant result doesn't necessarily confirm that the data is MCAR.
-- Even if the test result is significant, it doesn't rule out the possibility of the data being MNAR.
-
-
-
-
+-   The test doesn't pinpoint which specific variables don't adhere to MCAR, meaning it doesn't highlight potential variables associated with missingness.
+-   It assumes multivariate normality. If this assumption isn't met, especially with non-normal or categorical variables, the test might not be reliable unless there's a large sample size.
+-   The test assumes that all missing data patterns have the same covariance matrix. This means it can't detect deviations from MCAR that are based on covariance, especially if the data is Missing at Random (MAR) or Missing Not at Random (MNAR).
+-   Research has shown that Little's MCAR test might have low power, especially when few variables don't follow MCAR, the association between the data and its missingness is weak, or if the data is MNAR.
+-   The test can only reject the MCAR assumption but can't confirm it. A non-significant result doesn't necessarily confirm that the data is MCAR.
+-   Even if the test result is significant, it doesn't rule out the possibility of the data being MNAR.
 
 ```{r mcar, cache=TRUE, message=FALSE, warning=FALSE}
 require(naniar)
@@ -116,7 +123,6 @@ na.test(Obs.Data)
 ```
 
 #### MCAR and normality test
-
 
 Hawkins, in 1981, introduced a method to assess both multivariate normality and the consistency in variances, known as homoscedasticity. This method not only checks for consistent variances but also for mean equality [@hawkins1981new].
 
@@ -130,9 +136,23 @@ The following package [@jamshidian2010tests] tests multivariate normality and ho
 library(MissMech)
 test.result <- TestMCARNormality(data = Obs.Data)
 test.result
-
 summary(test.result)
+```
+
+
+```{r normality2, cache=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+png("E:/GitHub/EpiMethods/Images/missingdata/boxplot.png", width = 600, height = 600)
 boxplot(test.result)
+dev.off()
+```
+
+
+```{r normality3, cache=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+boxplot(test.result)
+```
+
+```{r echo=FALSE,out.width="800px"}
+knitr::include_graphics("Images/missingdata/boxplot.png")
 ```
 
 ### Non-MCAR data
@@ -182,5 +202,20 @@ A test is conducted to check if the data follows a multivariate normal distribut
 test.result <- TestMCARNormality(data = Obs.Data)
 test.result
 summary(test.result)
+```
+
+
+```{r normality1p, cache=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+png("E:/GitHub/EpiMethods/Images/missingdata/boxplot1.png", width = 600, height = 600)
 boxplot(test.result)
+dev.off()
+```
+
+
+```{r normality1ps, cache=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+boxplot(test.result)
+```
+
+```{r echo=FALSE,out.width="800px"}
+knitr::include_graphics("Images/missingdata/boxplot1.png")
 ```

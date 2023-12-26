@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Advanced Epidemiological Methods - MCAR tests</title>
 <style>
@@ -14,9 +14,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -43,48 +44,19 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+/* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
 }
-.hanging div.csl-entry {
+.hanging-indent div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -98,8 +70,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}
-</style>
+}</style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -134,7 +105,8 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
 
@@ -145,26 +117,32 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - MCAR tests">
-<meta name="twitter:description" content="MCAR tests are essential tools in the data analysis process.">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="missingdata6_files/figure-html/dag0-1.png">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body class="nav-sidebar docked">
 
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">MCAR tests</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./missingdata.html">Missing data analysis</a></li><li class="breadcrumb-item"><a href="./missingdata6.html">MCAR tests</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Advanced Epidemiological Methods</a> 
         <div class="sidebar-tools-main">
-  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
   <i class="bi"></i>
   </div>
@@ -172,681 +150,802 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
     </div>
       </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Project</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data wrangling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R basics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data types</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automating tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing dataset</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data manipulation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Import external data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary tables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Markdown</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (W)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Data accessing</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data accessing</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data sources</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">Descriptions</a>
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descriptions</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing CCHS to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHANES to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing results</a>
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reproducing results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">Importing NHIS to R</a>
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHIS to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise (A)</a>
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (A)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research questions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2a</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2b</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-2</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (Q)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (Q)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal roles</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Confounding</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collider</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Z-bias</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collapsibility</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Change-in-estimate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (R)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prediction ideas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collinear predictors</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overfitting and performance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data spliting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bootstrap</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (P)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (P)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Revisiting PICOT</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Assessing data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Bivariate analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Regression</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Performance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Blood Pressure</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Cholesterol</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Subsetting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (D)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">Imputation in NHANES</a>
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation in NHANES</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing in outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance with NA</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Subpopulations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link active">MCAR tests</a>
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">MCAR tests</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Effect modification</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (M)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Propensity score</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">Exact Matching (CCHS)</a>
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exact Matching (CCHS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (CCHS)</a>
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (CCHS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (US)</a>
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (US)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">PSM in BMI-diabetes</a>
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in BMI-diabetes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">PSM with MI</a>
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">Quiz (S)</a>
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (S)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning (ML)</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine learning (ML)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data spliting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">Supervised learning</a>
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Supervised learning</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">Unsupervised learning</a>
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unsupervised learning</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">NHIS Example</a>
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHIS Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">Replicate Results</a>
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ML in causal inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">Motivation</a>
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Motivation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">SuperLearner</a>
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">Binary Outcomes</a>
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary Outcomes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">Continuous Outcomes</a>
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous Outcomes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">Comparing results</a>
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (C)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">Complex outcomes</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex outcomes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">Polytomous and ordinal</a>
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polytomous and ordinal</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">Survival analysis</a>
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">Poisson</a>
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Poisson</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">R functions (N)</a>
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (N)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">Quiz (N)</a>
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (N)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">Longitudinal data</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true">
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Longitudinal data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">Mixed effects models</a>
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixed effects models</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">GEE</a>
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GEE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">R functions (T)</a>
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (T)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">Quiz (T)</a>
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (T)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./mediation.html" class="sidebar-item-text sidebar-link">Mediation analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true">
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">Baron and Kenny</a>
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Baron and Kenny</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">Justification</a>
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Justification</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">Mediation Example</a>
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">R functions (I)</a>
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (I)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">Quiz (I)</a>
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (I)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Writing tools</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true">
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing tools</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">Collaborative Writing</a>
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collaborative Writing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">Formatting Tools</a>
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
       </ul>
 </li>
     </ul>
 </div>
-</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</nav><div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
@@ -856,7 +955,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title d-none d-lg-block">MCAR tests</h1>
+<h1 class="title">MCAR tests</h1>
 </div>
 
 
@@ -872,7 +971,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><p>MCAR tests are essential tools in the data analysis process. They help researchers understand the nature of missingness in their datasets, guide appropriate imputation strategies, and ensure the validity and reliability of statistical analyses.</p>
 <section id="mcar-data" class="level3"><h3 class="anchored" data-anchor-id="mcar-data">MCAR data</h3>
 <p>In the initial chunk, several packages are loaded. These packages provide functions and tools necessary for the subsequent analysis, including multiple imputation, statistical modeling, and data visualization.</p>
-<div class="cell" data-hash="missingdata6_cache/html/setup_5bbd1a6ed8aabb8c683fd6924bc3776b">
+<div class="cell" data-hash="missingdata6_cache/html/setup_a36a0aeabec1847c4536de947802d983">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">require</span>(mice)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(mitools)</span>
@@ -882,7 +981,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="data-generating-process" class="level4"><h4 class="anchored" data-anchor-id="data-generating-process">Data generating process</h4>
 <p>A Directed Acyclic Graph (DAG) is defined, which represents a causal model of how different variables in the dataset relate to each other. This DAG is used to simulate data based on the relationships defined. We generate <code>L</code> as a function of <code>P</code> and <code>B</code>.</p>
-<div class="cell" data-hash="missingdata6_cache/html/dgm0_1a19a07925709511aec10922baea37cd">
+<div class="cell" data-hash="missingdata6_cache/html/dgm0_c1ab4d0d4281f288db330b4f7c7ac83e">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb2-2"><a href="#cb2-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
 <span id="cb2-3"><a href="#cb2-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
@@ -895,7 +994,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="generate-dag" class="level4"><h4 class="anchored" data-anchor-id="generate-dag">Generate DAG</h4>
 <p>The previously defined DAG is visualized, providing a graphical representation of the relationships between variables.</p>
-<div class="cell" data-hash="missingdata6_cache/html/dag0_d913ef730ec31c1e55533964aa0d26a8">
+<div class="cell" data-hash="missingdata6_cache/html/dag0_4021df7be074bbe52959ce1964d2e211">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
 <span id="cb3-2"><a href="#cb3-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
 <span id="cb3-3"><a href="#cb3-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -905,7 +1004,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="generate-data" class="level4"><h4 class="anchored" data-anchor-id="generate-data">Generate Data</h4>
 <p>Using the DAG, a dataset is simulated. This dataset will be used for subsequent analysis.</p>
-<div class="cell" data-hash="missingdata6_cache/html/data0_3b2c299592f59f4b6611af538bc4b8a9">
+<div class="cell" data-hash="missingdata6_cache/html/data0_6ff68d9ea2475f3a9603febcc894dcf9">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">10000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="fu">head</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -920,7 +1019,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="randomly-set-some-data-to-missing" class="level4"><h4 class="anchored" data-anchor-id="randomly-set-some-data-to-missing">Randomly set some data to missing</h4>
 <p>Some values in the dataset are randomly set to missing (i.e., randomly assign some L values to missing). This simulates a scenario where data might be missing completely at random (MCAR).</p>
-<div class="cell" data-hash="missingdata6_cache/html/data0a_d58b5034392c6a010e94dfb039cf1031">
+<div class="cell" data-hash="missingdata6_cache/html/data0a_bc6a121600caa0960ec3378b83abfbb2">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb6-2"><a href="#cb6-2"></a>Obs.Data<span class="sc">$</span>L[<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(Obs.Data<span class="sc">$</span>L), <span class="at">size =</span> <span class="dv">1000</span>)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="fu">summary</span>(Obs.Data<span class="sc">$</span>L)</span>
@@ -947,19 +1046,25 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"P"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="missingdata6_files/figure-html/plot0-1.png" class="img-fluid" width="672"></p>
+<p><img src="missingdata6_files/figure-html/plot0p-1.png" class="img-fluid" width="672"></p>
 </div>
+</div>
+<div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"B"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="missingdata6_files/figure-html/plot0-2.png" class="img-fluid" width="672"></p>
+<p><img src="missingdata6_files/figure-html/plot0b-1.png" class="img-fluid" width="672"></p>
 </div>
+</div>
+<div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"A"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="missingdata6_files/figure-html/plot0-3.png" class="img-fluid" width="672"></p>
+<p><img src="missingdata6_files/figure-html/plot0a-1.png" class="img-fluid" width="672"></p>
 </div>
+</div>
+<div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"Y"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="missingdata6_files/figure-html/plot0-4.png" class="img-fluid" width="672"></p>
+<p><img src="missingdata6_files/figure-html/plot0y-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="littles-mcar-test" class="level4"><h4 class="anchored" data-anchor-id="littles-mcar-test">Little’s MCAR test</h4>
@@ -978,7 +1083,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>The test can only reject the MCAR assumption but can’t confirm it. A non-significant result doesn’t necessarily confirm that the data is MCAR.</li>
 <li>Even if the test result is significant, it doesn’t rule out the possibility of the data being MNAR.</li>
 </ul>
-<div class="cell" data-hash="missingdata6_cache/html/mcar_25f80311593c6dbba5773073ef11fd7f">
+<div class="cell" data-hash="missingdata6_cache/html/mcar_e3ed3ade4351c4a401cd2040cb2ef556">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">require</span>(naniar)</span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="fu">mcar_test</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1001,7 +1106,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>Hawkins, in 1981, introduced a method to assess both multivariate normality and the consistency in variances, known as homoscedasticity. This method not only checks for consistent variances but also for mean equality <span class="citation" data-cites="hawkins1981new">(<a href="#ref-hawkins1981new" role="doc-biblioref">Hawkins 1981</a>)</span>.</p>
 <p>In 2010, Jamshidian and Jalal suggested a technique to compare covariances among groups with the same missing data patterns. They utilized the Hawkins test for data assumed to be normal and a non-parametric approach for other data types <span class="citation" data-cites="jamshidian2010tests">(<a href="#ref-jamshidian2010tests" role="doc-biblioref">Jamshidian and Jalal 2010</a>)</span>.</p>
 <p>The following package <span class="citation" data-cites="jamshidian2010tests">(<a href="#ref-jamshidian2010tests" role="doc-biblioref">Jamshidian and Jalal 2010</a>)</span> tests multivariate normality and homoscedasticity in the context of missing data.</p>
-<div class="cell" data-hash="missingdata6_cache/html/normality_d2202d41eb1b3eba318fb30ca52fa7a1">
+<div class="cell" data-hash="missingdata6_cache/html/normality_87791a1e87bf15774304db599b95df48">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">#library(devtools)</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co">#install_github("cran/MissMech")</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="fu">library</span>(MissMech)</span>
@@ -1037,78 +1142,86 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb14-33"><a href="#cb14-33"></a><span class="co">#&gt; </span></span>
 <span id="cb14-34"><a href="#cb14-34"></a><span class="co">#&gt;     Reject Normality at 0.05 significance level.</span></span>
 <span id="cb14-35"><a href="#cb14-35"></a><span class="co">#&gt;     There is not sufficient evidence to reject MCAR at 0.05 significance level.</span></span>
-<span id="cb14-36"><a href="#cb14-36"></a></span>
-<span id="cb14-37"><a href="#cb14-37"></a><span class="fu">summary</span>(test.result)</span>
-<span id="cb14-38"><a href="#cb14-38"></a><span class="co">#&gt; </span></span>
-<span id="cb14-39"><a href="#cb14-39"></a><span class="co">#&gt; Number of imputation:  1 </span></span>
-<span id="cb14-40"><a href="#cb14-40"></a><span class="co">#&gt; </span></span>
-<span id="cb14-41"><a href="#cb14-41"></a><span class="co">#&gt; Number of Patterns:  2 </span></span>
-<span id="cb14-42"><a href="#cb14-42"></a><span class="co">#&gt; </span></span>
-<span id="cb14-43"><a href="#cb14-43"></a><span class="co">#&gt; Total number of cases used in the analysis:  10000 </span></span>
-<span id="cb14-44"><a href="#cb14-44"></a><span class="co">#&gt; </span></span>
-<span id="cb14-45"><a href="#cb14-45"></a><span class="co">#&gt;  Pattern(s) used:</span></span>
-<span id="cb14-46"><a href="#cb14-46"></a><span class="co">#&gt;           ID   B   P    L   A   Y   Number of cases</span></span>
-<span id="cb14-47"><a href="#cb14-47"></a><span class="co">#&gt; group.1    1   1   1   NA   1   1              1000</span></span>
-<span id="cb14-48"><a href="#cb14-48"></a><span class="co">#&gt; group.2    1   1   1    1   1   1              9000</span></span>
+<span id="cb14-36"><a href="#cb14-36"></a><span class="fu">summary</span>(test.result)</span>
+<span id="cb14-37"><a href="#cb14-37"></a><span class="co">#&gt; </span></span>
+<span id="cb14-38"><a href="#cb14-38"></a><span class="co">#&gt; Number of imputation:  1 </span></span>
+<span id="cb14-39"><a href="#cb14-39"></a><span class="co">#&gt; </span></span>
+<span id="cb14-40"><a href="#cb14-40"></a><span class="co">#&gt; Number of Patterns:  2 </span></span>
+<span id="cb14-41"><a href="#cb14-41"></a><span class="co">#&gt; </span></span>
+<span id="cb14-42"><a href="#cb14-42"></a><span class="co">#&gt; Total number of cases used in the analysis:  10000 </span></span>
+<span id="cb14-43"><a href="#cb14-43"></a><span class="co">#&gt; </span></span>
+<span id="cb14-44"><a href="#cb14-44"></a><span class="co">#&gt;  Pattern(s) used:</span></span>
+<span id="cb14-45"><a href="#cb14-45"></a><span class="co">#&gt;           ID   B   P    L   A   Y   Number of cases</span></span>
+<span id="cb14-46"><a href="#cb14-46"></a><span class="co">#&gt; group.1    1   1   1   NA   1   1              1000</span></span>
+<span id="cb14-47"><a href="#cb14-47"></a><span class="co">#&gt; group.2    1   1   1    1   1   1              9000</span></span>
+<span id="cb14-48"><a href="#cb14-48"></a><span class="co">#&gt; </span></span>
 <span id="cb14-49"><a href="#cb14-49"></a><span class="co">#&gt; </span></span>
-<span id="cb14-50"><a href="#cb14-50"></a><span class="co">#&gt; </span></span>
-<span id="cb14-51"><a href="#cb14-51"></a><span class="co">#&gt;     Test of normality and Homoscedasticity:</span></span>
-<span id="cb14-52"><a href="#cb14-52"></a><span class="co">#&gt;   -------------------------------------------</span></span>
-<span id="cb14-53"><a href="#cb14-53"></a><span class="co">#&gt; </span></span>
-<span id="cb14-54"><a href="#cb14-54"></a><span class="co">#&gt; Hawkins Test:</span></span>
-<span id="cb14-55"><a href="#cb14-55"></a><span class="co">#&gt; </span></span>
-<span id="cb14-56"><a href="#cb14-56"></a><span class="co">#&gt;     P-value for the Hawkins test of normality and homoscedasticity:  1.749746e-15 </span></span>
-<span id="cb14-57"><a href="#cb14-57"></a><span class="co">#&gt; </span></span>
-<span id="cb14-58"><a href="#cb14-58"></a><span class="co">#&gt; Non-Parametric Test:</span></span>
-<span id="cb14-59"><a href="#cb14-59"></a><span class="co">#&gt; </span></span>
-<span id="cb14-60"><a href="#cb14-60"></a><span class="co">#&gt;     P-value for the non-parametric test of homoscedasticity:  0.4019219</span></span>
-<span id="cb14-61"><a href="#cb14-61"></a><span class="fu">boxplot</span>(test.result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-50"><a href="#cb14-50"></a><span class="co">#&gt;     Test of normality and Homoscedasticity:</span></span>
+<span id="cb14-51"><a href="#cb14-51"></a><span class="co">#&gt;   -------------------------------------------</span></span>
+<span id="cb14-52"><a href="#cb14-52"></a><span class="co">#&gt; </span></span>
+<span id="cb14-53"><a href="#cb14-53"></a><span class="co">#&gt; Hawkins Test:</span></span>
+<span id="cb14-54"><a href="#cb14-54"></a><span class="co">#&gt; </span></span>
+<span id="cb14-55"><a href="#cb14-55"></a><span class="co">#&gt;     P-value for the Hawkins test of normality and homoscedasticity:  1.749746e-15 </span></span>
+<span id="cb14-56"><a href="#cb14-56"></a><span class="co">#&gt; </span></span>
+<span id="cb14-57"><a href="#cb14-57"></a><span class="co">#&gt; Non-Parametric Test:</span></span>
+<span id="cb14-58"><a href="#cb14-58"></a><span class="co">#&gt; </span></span>
+<span id="cb14-59"><a href="#cb14-59"></a><span class="co">#&gt;     P-value for the non-parametric test of homoscedasticity:  0.4019219</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="missingdata6_cache/html/normality2_f75f4c428f3f0d7d065163bae2de22ef">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">png</span>(<span class="st">"E:/GitHub/EpiMethods/Images/missingdata/boxplot.png"</span>, <span class="at">width =</span> <span class="dv">600</span>, <span class="at">height =</span> <span class="dv">600</span>)</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">boxplot</span>(test.result)</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="missingdata6_cache/html/normality3_cf9e3f9e791ddc4ea39920b3eb44ce3a">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">boxplot</span>(test.result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
 <div class="cell-output-display">
-<p><img src="missingdata6_files/figure-html/normality-1.png" class="img-fluid" width="672"></p>
+<p><img src="Images/missingdata/boxplot.png" class="img-fluid" width="800"></p>
 </div>
 </div>
 </section></section><section id="non-mcar-data" class="level3"><h3 class="anchored" data-anchor-id="non-mcar-data">Non-MCAR data</h3>
 <section id="set-some-data-to-missing-based-on-a-rule" class="level4"><h4 class="anchored" data-anchor-id="set-some-data-to-missing-based-on-a-rule">Set some data to missing based on a rule</h4>
 <p>In this section, the original dataset is restored. Then, for a specific column, any value greater than a certain threshold is set to ‘missing’. A summary of this column is then provided to understand the distribution of missing values.</p>
-<div class="cell" data-hash="missingdata6_cache/html/data1_3d089f708d6289aa4fb0f745c68209b6">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>Obs.Data <span class="ot">&lt;-</span> Obs.Data.original</span>
-<span id="cb15-2"><a href="#cb15-2"></a>Obs.Data<span class="sc">$</span>L[Obs.Data<span class="sc">$</span>L <span class="sc">&gt;</span> <span class="fl">7.79</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">summary</span>(Obs.Data<span class="sc">$</span>L)</span>
-<span id="cb15-4"><a href="#cb15-4"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#&gt; -17.116  -1.482   1.330   1.050   3.954   7.787    1035</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="missingdata6_cache/html/data1_676c85e426cf3019d450bed56ed5ecb8">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>Obs.Data <span class="ot">&lt;-</span> Obs.Data.original</span>
+<span id="cb17-2"><a href="#cb17-2"></a>Obs.Data<span class="sc">$</span>L[Obs.Data<span class="sc">$</span>L <span class="sc">&gt;</span> <span class="fl">7.79</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="fu">summary</span>(Obs.Data<span class="sc">$</span>L)</span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="co">#&gt; -17.116  -1.482   1.330   1.050   3.954   7.787    1035</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The dataset’s missing data patterns are visualized. This visualization helps in understanding which data points are missing and their distribution across the dataset.</p>
-<div class="cell" data-hash="missingdata6_cache/html/plot1_50828a9cce87819b36fe3aa0176c5a4e">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>res <span class="ot">&lt;-</span> <span class="fu">aggr</span>(Obs.Data, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb16-2"><a href="#cb16-2"></a><span class="fu">plot</span>(res, <span class="at">numbers =</span> <span class="cn">TRUE</span>, <span class="at">prop =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="missingdata6_cache/html/plot1_1f679796341d3fbf90aa26f28258c79d">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>res <span class="ot">&lt;-</span> <span class="fu">aggr</span>(Obs.Data, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="fu">plot</span>(res, <span class="at">numbers =</span> <span class="cn">TRUE</span>, <span class="at">prop =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="missingdata6_files/figure-html/plot1-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="visualize-via-margin-plots-1" class="level4"><h4 class="anchored" data-anchor-id="visualize-via-margin-plots-1">Visualize via margin plots</h4>
 <p>Margin plots are used to visualize the relationship between two variables, especially when one of them has missing values. Here, the relationship of a specific column with missing values is visualized against other columns in the dataset. This helps in understanding how the missingness in one variable might relate to other variables.</p>
-<div class="cell" data-hash="missingdata6_cache/html/plot2_28ed8d1e4f82184001a94adb7d377c10">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"P"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="missingdata6_cache/html/plot2_19dc94b5952af58bafd662676eec4728">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"P"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="missingdata6_files/figure-html/plot2-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"B"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"B"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="missingdata6_files/figure-html/plot2-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"A"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"A"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="missingdata6_files/figure-html/plot2-3.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"Y"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">marginplot</span>(Obs.Data[,<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"Y"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="missingdata6_files/figure-html/plot2-4.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="littles-mcar-test-1" class="level4"><h4 class="anchored" data-anchor-id="littles-mcar-test-1">Little’s MCAR test</h4>
 <p>Little’s MCAR test is applied to the dataset to check if the data is missing completely at random. This test provides a statistic and a p-value to determine the nature of missingness in the data.</p>
-<div class="cell" data-hash="missingdata6_cache/html/mcar1_f85652ae1a69ad560c18c2c97a3b35f4">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">mcar_test</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="missingdata6_cache/html/mcar1_d1c4b89ca92c217c71bf042fc8e37555">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">mcar_test</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -1117,89 +1230,98 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">na.test</span>(Obs.Data)</span>
-<span id="cb22-2"><a href="#cb22-2"></a><span class="co">#&gt;  Little's MCAR Test</span></span>
-<span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt; </span></span>
-<span id="cb22-4"><a href="#cb22-4"></a><span class="co">#&gt;       n nIncomp nPattern    chi2 df  pval </span></span>
-<span id="cb22-5"><a href="#cb22-5"></a><span class="co">#&gt;   10000    1035        2 3511.08  5 0.000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="fu">na.test</span>(Obs.Data)</span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="co">#&gt;  Little's MCAR Test</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="co">#&gt; </span></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="co">#&gt;       n nIncomp nPattern    chi2 df  pval </span></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="co">#&gt;   10000    1035        2 3511.08  5 0.000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="mcar-and-normality-test-1" class="level4"><h4 class="anchored" data-anchor-id="mcar-and-normality-test-1">MCAR and normality test</h4>
 <p>A test is conducted to check if the data follows a multivariate normal distribution and if the variances across different groups are consistent (homoscedasticity). The results of this test, along with a summary and a boxplot visualization, are provided to understand the distribution and characteristics of the data.</p>
-<div class="cell" data-hash="missingdata6_cache/html/normality1_6ea1109d2b1ca17b6af1f194bfdc2d08">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>test.result <span class="ot">&lt;-</span> <span class="fu">TestMCARNormality</span>(<span class="at">data =</span> Obs.Data)</span>
-<span id="cb23-2"><a href="#cb23-2"></a>test.result</span>
-<span id="cb23-3"><a href="#cb23-3"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb23-4"><a href="#cb23-4"></a><span class="co">#&gt; TestMCARNormality(data = Obs.Data)</span></span>
-<span id="cb23-5"><a href="#cb23-5"></a><span class="co">#&gt; </span></span>
-<span id="cb23-6"><a href="#cb23-6"></a><span class="co">#&gt; Number of Patterns:  2 </span></span>
-<span id="cb23-7"><a href="#cb23-7"></a><span class="co">#&gt; </span></span>
-<span id="cb23-8"><a href="#cb23-8"></a><span class="co">#&gt; Total number of cases used in the analysis:  10000 </span></span>
-<span id="cb23-9"><a href="#cb23-9"></a><span class="co">#&gt; </span></span>
-<span id="cb23-10"><a href="#cb23-10"></a><span class="co">#&gt;  Pattern(s) used:</span></span>
-<span id="cb23-11"><a href="#cb23-11"></a><span class="co">#&gt;           ID   B   P    L   A   Y   Number of cases</span></span>
-<span id="cb23-12"><a href="#cb23-12"></a><span class="co">#&gt; group.1    1   1   1    1   1   1              8965</span></span>
-<span id="cb23-13"><a href="#cb23-13"></a><span class="co">#&gt; group.2    1   1   1   NA   1   1              1035</span></span>
-<span id="cb23-14"><a href="#cb23-14"></a><span class="co">#&gt; </span></span>
-<span id="cb23-15"><a href="#cb23-15"></a><span class="co">#&gt; </span></span>
-<span id="cb23-16"><a href="#cb23-16"></a><span class="co">#&gt;     Test of normality and Homoscedasticity:</span></span>
-<span id="cb23-17"><a href="#cb23-17"></a><span class="co">#&gt;   -------------------------------------------</span></span>
-<span id="cb23-18"><a href="#cb23-18"></a><span class="co">#&gt; </span></span>
-<span id="cb23-19"><a href="#cb23-19"></a><span class="co">#&gt; Hawkins Test:</span></span>
-<span id="cb23-20"><a href="#cb23-20"></a><span class="co">#&gt; </span></span>
-<span id="cb23-21"><a href="#cb23-21"></a><span class="co">#&gt;     P-value for the Hawkins test of normality and homoscedasticity:  2.401873e-30 </span></span>
-<span id="cb23-22"><a href="#cb23-22"></a><span class="co">#&gt; </span></span>
-<span id="cb23-23"><a href="#cb23-23"></a><span class="co">#&gt;     Either the test of multivariate normality or homoscedasticity (or both) is rejected.</span></span>
-<span id="cb23-24"><a href="#cb23-24"></a><span class="co">#&gt;     Provided that normality can be assumed, the hypothesis of MCAR is </span></span>
-<span id="cb23-25"><a href="#cb23-25"></a><span class="co">#&gt;     rejected at 0.05 significance level. </span></span>
-<span id="cb23-26"><a href="#cb23-26"></a><span class="co">#&gt; </span></span>
-<span id="cb23-27"><a href="#cb23-27"></a><span class="co">#&gt; Non-Parametric Test:</span></span>
-<span id="cb23-28"><a href="#cb23-28"></a><span class="co">#&gt; </span></span>
-<span id="cb23-29"><a href="#cb23-29"></a><span class="co">#&gt;     P-value for the non-parametric test of homoscedasticity:  0 </span></span>
-<span id="cb23-30"><a href="#cb23-30"></a><span class="co">#&gt; </span></span>
-<span id="cb23-31"><a href="#cb23-31"></a><span class="co">#&gt;     Hypothesis of MCAR is rejected at  0.05 significance level.</span></span>
-<span id="cb23-32"><a href="#cb23-32"></a><span class="co">#&gt;     The multivariate normality test is inconclusive.</span></span>
-<span id="cb23-33"><a href="#cb23-33"></a><span class="fu">summary</span>(test.result)</span>
-<span id="cb23-34"><a href="#cb23-34"></a><span class="co">#&gt; </span></span>
-<span id="cb23-35"><a href="#cb23-35"></a><span class="co">#&gt; Number of imputation:  1 </span></span>
-<span id="cb23-36"><a href="#cb23-36"></a><span class="co">#&gt; </span></span>
-<span id="cb23-37"><a href="#cb23-37"></a><span class="co">#&gt; Number of Patterns:  2 </span></span>
-<span id="cb23-38"><a href="#cb23-38"></a><span class="co">#&gt; </span></span>
-<span id="cb23-39"><a href="#cb23-39"></a><span class="co">#&gt; Total number of cases used in the analysis:  10000 </span></span>
-<span id="cb23-40"><a href="#cb23-40"></a><span class="co">#&gt; </span></span>
-<span id="cb23-41"><a href="#cb23-41"></a><span class="co">#&gt;  Pattern(s) used:</span></span>
-<span id="cb23-42"><a href="#cb23-42"></a><span class="co">#&gt;           ID   B   P    L   A   Y   Number of cases</span></span>
-<span id="cb23-43"><a href="#cb23-43"></a><span class="co">#&gt; group.1    1   1   1    1   1   1              8965</span></span>
-<span id="cb23-44"><a href="#cb23-44"></a><span class="co">#&gt; group.2    1   1   1   NA   1   1              1035</span></span>
-<span id="cb23-45"><a href="#cb23-45"></a><span class="co">#&gt; </span></span>
-<span id="cb23-46"><a href="#cb23-46"></a><span class="co">#&gt; </span></span>
-<span id="cb23-47"><a href="#cb23-47"></a><span class="co">#&gt;     Test of normality and Homoscedasticity:</span></span>
-<span id="cb23-48"><a href="#cb23-48"></a><span class="co">#&gt;   -------------------------------------------</span></span>
-<span id="cb23-49"><a href="#cb23-49"></a><span class="co">#&gt; </span></span>
-<span id="cb23-50"><a href="#cb23-50"></a><span class="co">#&gt; Hawkins Test:</span></span>
-<span id="cb23-51"><a href="#cb23-51"></a><span class="co">#&gt; </span></span>
-<span id="cb23-52"><a href="#cb23-52"></a><span class="co">#&gt;     P-value for the Hawkins test of normality and homoscedasticity:  2.401873e-30 </span></span>
-<span id="cb23-53"><a href="#cb23-53"></a><span class="co">#&gt; </span></span>
-<span id="cb23-54"><a href="#cb23-54"></a><span class="co">#&gt; Non-Parametric Test:</span></span>
-<span id="cb23-55"><a href="#cb23-55"></a><span class="co">#&gt; </span></span>
-<span id="cb23-56"><a href="#cb23-56"></a><span class="co">#&gt;     P-value for the non-parametric test of homoscedasticity:  0</span></span>
-<span id="cb23-57"><a href="#cb23-57"></a><span class="fu">boxplot</span>(test.result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="missingdata6_cache/html/normality1_7b3a51fb351148ac059a7b24b89a14d3">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>test.result <span class="ot">&lt;-</span> <span class="fu">TestMCARNormality</span>(<span class="at">data =</span> Obs.Data)</span>
+<span id="cb25-2"><a href="#cb25-2"></a>test.result</span>
+<span id="cb25-3"><a href="#cb25-3"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb25-4"><a href="#cb25-4"></a><span class="co">#&gt; TestMCARNormality(data = Obs.Data)</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a><span class="co">#&gt; </span></span>
+<span id="cb25-6"><a href="#cb25-6"></a><span class="co">#&gt; Number of Patterns:  2 </span></span>
+<span id="cb25-7"><a href="#cb25-7"></a><span class="co">#&gt; </span></span>
+<span id="cb25-8"><a href="#cb25-8"></a><span class="co">#&gt; Total number of cases used in the analysis:  10000 </span></span>
+<span id="cb25-9"><a href="#cb25-9"></a><span class="co">#&gt; </span></span>
+<span id="cb25-10"><a href="#cb25-10"></a><span class="co">#&gt;  Pattern(s) used:</span></span>
+<span id="cb25-11"><a href="#cb25-11"></a><span class="co">#&gt;           ID   B   P    L   A   Y   Number of cases</span></span>
+<span id="cb25-12"><a href="#cb25-12"></a><span class="co">#&gt; group.1    1   1   1    1   1   1              8965</span></span>
+<span id="cb25-13"><a href="#cb25-13"></a><span class="co">#&gt; group.2    1   1   1   NA   1   1              1035</span></span>
+<span id="cb25-14"><a href="#cb25-14"></a><span class="co">#&gt; </span></span>
+<span id="cb25-15"><a href="#cb25-15"></a><span class="co">#&gt; </span></span>
+<span id="cb25-16"><a href="#cb25-16"></a><span class="co">#&gt;     Test of normality and Homoscedasticity:</span></span>
+<span id="cb25-17"><a href="#cb25-17"></a><span class="co">#&gt;   -------------------------------------------</span></span>
+<span id="cb25-18"><a href="#cb25-18"></a><span class="co">#&gt; </span></span>
+<span id="cb25-19"><a href="#cb25-19"></a><span class="co">#&gt; Hawkins Test:</span></span>
+<span id="cb25-20"><a href="#cb25-20"></a><span class="co">#&gt; </span></span>
+<span id="cb25-21"><a href="#cb25-21"></a><span class="co">#&gt;     P-value for the Hawkins test of normality and homoscedasticity:  2.401873e-30 </span></span>
+<span id="cb25-22"><a href="#cb25-22"></a><span class="co">#&gt; </span></span>
+<span id="cb25-23"><a href="#cb25-23"></a><span class="co">#&gt;     Either the test of multivariate normality or homoscedasticity (or both) is rejected.</span></span>
+<span id="cb25-24"><a href="#cb25-24"></a><span class="co">#&gt;     Provided that normality can be assumed, the hypothesis of MCAR is </span></span>
+<span id="cb25-25"><a href="#cb25-25"></a><span class="co">#&gt;     rejected at 0.05 significance level. </span></span>
+<span id="cb25-26"><a href="#cb25-26"></a><span class="co">#&gt; </span></span>
+<span id="cb25-27"><a href="#cb25-27"></a><span class="co">#&gt; Non-Parametric Test:</span></span>
+<span id="cb25-28"><a href="#cb25-28"></a><span class="co">#&gt; </span></span>
+<span id="cb25-29"><a href="#cb25-29"></a><span class="co">#&gt;     P-value for the non-parametric test of homoscedasticity:  0 </span></span>
+<span id="cb25-30"><a href="#cb25-30"></a><span class="co">#&gt; </span></span>
+<span id="cb25-31"><a href="#cb25-31"></a><span class="co">#&gt;     Hypothesis of MCAR is rejected at  0.05 significance level.</span></span>
+<span id="cb25-32"><a href="#cb25-32"></a><span class="co">#&gt;     The multivariate normality test is inconclusive.</span></span>
+<span id="cb25-33"><a href="#cb25-33"></a><span class="fu">summary</span>(test.result)</span>
+<span id="cb25-34"><a href="#cb25-34"></a><span class="co">#&gt; </span></span>
+<span id="cb25-35"><a href="#cb25-35"></a><span class="co">#&gt; Number of imputation:  1 </span></span>
+<span id="cb25-36"><a href="#cb25-36"></a><span class="co">#&gt; </span></span>
+<span id="cb25-37"><a href="#cb25-37"></a><span class="co">#&gt; Number of Patterns:  2 </span></span>
+<span id="cb25-38"><a href="#cb25-38"></a><span class="co">#&gt; </span></span>
+<span id="cb25-39"><a href="#cb25-39"></a><span class="co">#&gt; Total number of cases used in the analysis:  10000 </span></span>
+<span id="cb25-40"><a href="#cb25-40"></a><span class="co">#&gt; </span></span>
+<span id="cb25-41"><a href="#cb25-41"></a><span class="co">#&gt;  Pattern(s) used:</span></span>
+<span id="cb25-42"><a href="#cb25-42"></a><span class="co">#&gt;           ID   B   P    L   A   Y   Number of cases</span></span>
+<span id="cb25-43"><a href="#cb25-43"></a><span class="co">#&gt; group.1    1   1   1    1   1   1              8965</span></span>
+<span id="cb25-44"><a href="#cb25-44"></a><span class="co">#&gt; group.2    1   1   1   NA   1   1              1035</span></span>
+<span id="cb25-45"><a href="#cb25-45"></a><span class="co">#&gt; </span></span>
+<span id="cb25-46"><a href="#cb25-46"></a><span class="co">#&gt; </span></span>
+<span id="cb25-47"><a href="#cb25-47"></a><span class="co">#&gt;     Test of normality and Homoscedasticity:</span></span>
+<span id="cb25-48"><a href="#cb25-48"></a><span class="co">#&gt;   -------------------------------------------</span></span>
+<span id="cb25-49"><a href="#cb25-49"></a><span class="co">#&gt; </span></span>
+<span id="cb25-50"><a href="#cb25-50"></a><span class="co">#&gt; Hawkins Test:</span></span>
+<span id="cb25-51"><a href="#cb25-51"></a><span class="co">#&gt; </span></span>
+<span id="cb25-52"><a href="#cb25-52"></a><span class="co">#&gt;     P-value for the Hawkins test of normality and homoscedasticity:  2.401873e-30 </span></span>
+<span id="cb25-53"><a href="#cb25-53"></a><span class="co">#&gt; </span></span>
+<span id="cb25-54"><a href="#cb25-54"></a><span class="co">#&gt; Non-Parametric Test:</span></span>
+<span id="cb25-55"><a href="#cb25-55"></a><span class="co">#&gt; </span></span>
+<span id="cb25-56"><a href="#cb25-56"></a><span class="co">#&gt;     P-value for the non-parametric test of homoscedasticity:  0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="missingdata6_cache/html/normality1p_77bdf7f1df61eaaa8dcd594f4a4d0b9d">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">png</span>(<span class="st">"E:/GitHub/EpiMethods/Images/missingdata/boxplot1.png"</span>, <span class="at">width =</span> <span class="dv">600</span>, <span class="at">height =</span> <span class="dv">600</span>)</span>
+<span id="cb26-2"><a href="#cb26-2"></a><span class="fu">boxplot</span>(test.result)</span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="missingdata6_cache/html/normality1ps_e5b94fbb542c03970cf4da2a236c1f8d">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">boxplot</span>(test.result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
 <div class="cell-output-display">
-<p><img src="missingdata6_files/figure-html/normality1-1.png" class="img-fluid" width="672"></p>
+<p><img src="Images/missingdata/boxplot1.png" class="img-fluid" width="800"></p>
 </div>
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="ref-hawkins1981new" class="csl-entry" role="doc-biblioentry">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-hawkins1981new" class="csl-entry" role="listitem">
 Hawkins, Douglas M. 1981. <span>“A New Test for Multivariate Normality and Homoscedasticity.”</span> <em>Technometrics</em> 23 (1): 105–10.
 </div>
-<div id="ref-jamshidian2010tests" class="csl-entry" role="doc-biblioentry">
+<div id="ref-jamshidian2010tests" class="csl-entry" role="listitem">
 Jamshidian, Mortaza, and Siavash Jalal. 2010. <span>“Tests of Homoscedasticity, Normality, and Missing Completely at Random for Incomplete Multivariate Data.”</span> <em>Psychometrika</em> 75 (4): 649–74.
 </div>
-<div id="ref-little1988test" class="csl-entry" role="doc-biblioentry">
+<div id="ref-little1988test" class="csl-entry" role="listitem">
 Little, Roderick JA. 1988. <span>“A Test of Missing Completely at Random for Multivariate Data with Missing Values.”</span> <em>Journal of the American Statistical Association</em> 83 (404): 1198–1202.
 </div>
-<div id="ref-natest" class="csl-entry" role="doc-biblioentry">
+<div id="ref-natest" class="csl-entry" role="listitem">
 rdrr. 2023. <span>“Na.test: Little’s Missing Completely at Random (MCAR) Test.”</span> <a href="https://rdrr.io/cran/misty/man/na.test.html">https://rdrr.io/cran/misty/man/na.test.html</a>.
 </div>
 </div>
@@ -1230,9 +1352,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1348,6 +1484,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
