@@ -333,14 +333,14 @@
     "href": "researchquestion0.html#picot-framework",
     "title": "Concepts (Q)",
     "section": "PICOT Framework",
-    "text": "PICOT Framework\nThe PICOT framework helps to structure a specific and clear research question by focusing on five key elements:\n\n\n\n\nElement\nDescription\nExample\n\n\n\nP\nPopulation of Interest: Who is the target group you are studying?\nUS adults\n\n\nI\nIntervention: What is the main action, treatment, or variable you're looking at?\nEffect of having rheumatoid arthritis\n\n\nC\nComparison: Are you comparing the intervention against a control group or usual care?\nPeople without rheumatoid arthritis\n\n\nO\nOutcome of Interest: What specifically do you want to measure?\nRate of cardiovascular diseases\n\n\nT\nTime Frame: Over what time period will your study take place?\n1999–2018\n\n\n\n\n\n\n\nResearch Question: “In US adults, does having rheumatoid arthritis, compared to those without rheumatoid arthritis, affect the rate of cardiovascular diseases during 1999–2018?” based on Hossain et al. (2022): DOI: 10.1016/j.annepidem.2022.03.005"
+    "text": "PICOT Framework\nThe PICOT framework helps to structure a specific and clear research question by focusing on five key elements:\n\n\n\n\n\n Element \n    Description \n    Example \n  \n\n\n P \n    Population of Interest: Who is the target group you are studying? \n    US adults \n  \n\n I \n    Intervention: What is the main action, treatment, or variable you're looking at? \n    Effect of having rheumatoid arthritis \n  \n\n C \n    Comparison: Are you comparing the intervention against a control group or usual care? \n    People without rheumatoid arthritis \n  \n\n O \n    Outcome of Interest: What specifically do you want to measure? \n    Rate of cardiovascular diseases \n  \n\n T \n    Time Frame: Over what time period will your study take place? \n    1999–2018 \n  \n\n\n\n\n\n\nResearch Question: “In US adults, does having rheumatoid arthritis, compared to those without rheumatoid arthritis, affect the rate of cardiovascular diseases during 1999–2018?” based on Hossain et al. (2022): DOI: 10.1016/j.annepidem.2022.03.005"
   },
   {
     "objectID": "researchquestion0.html#finer-criteria",
     "href": "researchquestion0.html#finer-criteria",
     "title": "Concepts (Q)",
     "section": "FINER Criteria",
-    "text": "FINER Criteria\nOnce we have formulated your research question with the help of the PICOT elements, we should evaluate it using the FINER criteria:\n\n\n\nFINER Criteria\n\nElement\nDescription\n\n\n\nF\nFeasible: Is it possible to conduct this research with available resources?\n\n\nI\nInteresting: Is the research question intriguing to the scientific community?\n\n\nN\nNovel: Is the question original and not already thoroughly researched?\n\n\nE\nEthical: Is the research ethically sound?\n\n\nR\nRelevant: Is the research currently needed or will it fill a gap in existing knowledge?\n\n\n\n\n\nThe key takeaway is: Use the PICOT and FINER frameworks to guide you in framing a compelling, ethical, and achievable research question."
+    "text": "FINER Criteria\nOnce we have formulated your research question with the help of the PICOT elements, we should evaluate it using the FINER criteria:\n\n\n\n\nFINER Criteria\n \n Element \n    Description \n  \n\n\n F \n    Feasible: Is it possible to conduct this research with available resources? \n  \n\n I \n    Interesting: Is the research question intriguing to the scientific community? \n  \n\n N \n    Novel: Is the question original and not already thoroughly researched? \n  \n\n E \n    Ethical: Is the research ethically sound? \n  \n\n R \n    Relevant: Is the research currently needed or will it fill a gap in existing knowledge? \n  \n\n\n\n\nThe key takeaway is: Use the PICOT and FINER frameworks to guide you in framing a compelling, ethical, and achievable research question."
   },
   {
     "objectID": "researchquestion0.html#sap",
@@ -963,7 +963,7 @@
     "href": "missingdata7.html",
     "title": "Effect modification",
     "section": "",
-    "text": "In this tutorial, we delve into the concept of effect modification.\n\n\n\n\n\n\nImportant\n\n\n\nWe discussed about effect modification in an earlier tutorial.\n\n\nWe start by loading the necessary packages that will aid in the analysis. We also define a function tidy.pool_mi to streamline the pooling process for multiple imputation results.\n\n# Load required packages\nlibrary(survey)\nrequire(interactions)\nrequire(mitools)\nrequire(mice)\nrequire(miceadds)\nlibrary(modelsummary)\n\ntidy.pool_mi &lt;- function(x, ...) {\n  msg &lt;- capture.output(out &lt;- summary(x, ...))\n  out$term &lt;- row.names(out)\n  colnames(out) &lt;- c(\"estimate\", \"std.error\", \"statistic\", \"p.value\",\n                     \"conf.low\", \"conf.high\", \"miss\", \"term\")\n  return(out)\n}\n\nData\nWe load a dataset named smi. This dataset is a list of multiple imputed datasets, which is evident from the structure and the way we access its elements.\n\nrequire(mitools)\ndata(smi)\nlength(smi)\n#&gt; [1] 2\nlength(smi[[1]])\n#&gt; [1] 5\nhead(smi[[1]][[1]])\n#&gt;       id wave mmetro parsmk         drkfre         alcdos alcdhi           smk\n#&gt; 1 920006    1      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#&gt; 2 920006    2      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#&gt; 3 920006    3      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#&gt; 4 920006    4      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#&gt; 5 920006    5      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#&gt; 6 920006    6      1      0 not in last wk not in last wk      0 non/ex-smoker\n#&gt;   cistot mdrkfre sex drinkreg\n#&gt; 1      0       0   1    FALSE\n#&gt; 2      0       0   1    FALSE\n#&gt; 3      0       0   1    FALSE\n#&gt; 4      1       0   1    FALSE\n#&gt; 5      4       0   1    FALSE\n#&gt; 6      3       0   1    FALSE\n\nModel with interaction and ORs\nWe’re interested in understanding how the variable wave interacts with sex in predicting drinkreg. We fit two logistic regression models, one for each level of the sex variable, to understand this interaction. wave is exposure here.\nFor effect modifier sex = 0\n\nmodels &lt;- with(smi, glm(drinkreg~ wave + sex + wave*sex, family = binomial()))\nsummary(pool(models, rule = \"rubin1987\"), conf.int = TRUE, exponentiate = TRUE)[2,]\n#&gt;   term estimate  std.error statistic       df      p.value   2.5 %   97.5 %\n#&gt; 2 wave 1.271952 0.06587423  3.651693 234.4974 0.0003212903 1.11714 1.448217\n\nFor effect modifier sex = 1 (just changing reference)\n\nmodels2&lt;-with(smi, glm(drinkreg~ wave + I(sex==0) + wave*I(sex==0),family=binomial()))\nsummary(pool(models2, rule = \"rubin1987\"),conf.int = TRUE, exponentiate = TRUE)[2,]\n#&gt;   term estimate  std.error statistic       df      p.value    2.5 %   97.5 %\n#&gt; 2 wave 1.225438 0.05876369   3.45959 240.3053 0.0006399352 1.091487 1.375828\n\n\nNotice the ORs for wave in the above 2 analyses. These are basically our target.\nFor proper survey data analysis, you will have to work with design and make sure you subset your subpopulation (those eligible) appropriately.\nSimple slopes analyses\nWe perform a simple slopes analysis for each imputed dataset. This analysis helps in understanding the relationship between the predictor and the outcome at specific levels of the moderator.\n\na1 &lt;- sim_slopes(models[[1]], pred = wave, modx = sex)\na2 &lt;- sim_slopes(models[[2]], pred = wave, modx = sex)\na3 &lt;- sim_slopes(models[[3]], pred = wave, modx = sex)\na4 &lt;- sim_slopes(models[[4]], pred = wave, modx = sex)\na5 &lt;- sim_slopes(models[[5]], pred = wave, modx = sex)\n\nAfter obtaining the results from each imputed dataset, we pool them to get a consolidated result. This is done separately for each level of the sex variable.\nPooled results for sex = 0\n\n# For sex = 0\nef.lev &lt;- 1\nest &lt;- c(a1$slopes$Est.[ef.lev],\n         a2$slopes$Est.[ef.lev],\n         a3$slopes$Est.[ef.lev],\n         a4$slopes$Est.[ef.lev],\n         a5$slopes$Est.[ef.lev])\nse &lt;- c(a1$slopes$S.E.[ef.lev],\n        a2$slopes$S.E.[ef.lev],\n        a3$slopes$S.E.[ef.lev],\n        a4$slopes$S.E.[ef.lev],\n        a5$slopes$S.E.[ef.lev])\nvr &lt;- se^2\nOR &lt;- exp(est)\nOR.se &lt;- OR * se\nOR.v &lt;- OR.se^2\n\nmod_pooled &lt;- miceadds::pool_mi(qhat=OR, u=OR.v)\ntidy.pool_mi(mod_pooled)\n#&gt;   estimate  std.error statistic      p.value conf.low conf.high   miss term\n#&gt; 1 1.272164 0.08386552  15.16909 6.987679e-39 1.107118   1.43721 12.2 %    1\nsummary(MIcombine(as.list(OR), as.list(OR.v)))\n#&gt; Multiple imputation results:\n#&gt;       MIcombine.default(as.list(OR), as.list(OR.v))\n#&gt;    results         se   (lower  upper) missInfo\n#&gt; 1 1.272164 0.08386552 1.107118 1.43721     12 %\n\nPooled results for sex = 1\n\n# For sex = 1\nef.lev &lt;- 2\nest &lt;- c(a1$slopes$Est.[ef.lev],\n         a2$slopes$Est.[ef.lev],\n         a3$slopes$Est.[ef.lev],\n         a4$slopes$Est.[ef.lev],\n         a5$slopes$Est.[ef.lev])\nse &lt;- c(a1$slopes$S.E.[ef.lev],\n        a2$slopes$S.E.[ef.lev],\n        a3$slopes$S.E.[ef.lev],\n        a4$slopes$S.E.[ef.lev],\n        a5$slopes$S.E.[ef.lev])\nvr &lt;- se^2\nOR &lt;- exp(est)\nOR.se &lt;- OR * se\nOR.v &lt;- OR.se^2\n\nmod_pooled &lt;- miceadds::pool_mi(qhat=OR, u=OR.v)\ntidy.pool_mi(mod_pooled)\n#&gt;   estimate  std.error statistic      p.value conf.low conf.high   miss term\n#&gt; 1 1.225598 0.07204679  17.01113 2.282427e-46 1.083838  1.367357 11.9 %    1\nsummary(MIcombine(as.list(OR), as.list(OR.v)))\n#&gt; Multiple imputation results:\n#&gt;       MIcombine.default(as.list(OR), as.list(OR.v))\n#&gt;    results         se   (lower   upper) missInfo\n#&gt; 1 1.225598 0.07204679 1.083838 1.367357     12 %"
+    "text": "In this tutorial, we delve into the concept of effect modification.\n\n\n\n\n\n\nImportant\n\n\n\nWe discussed about effect modification in an earlier tutorial.\n\n\nWe start by loading the necessary packages that will aid in the analysis. We also define a function tidy.pool_mi to streamline the pooling process for multiple imputation results.\n\n# Load required packages\nlibrary(survey)\nrequire(interactions)\nrequire(mitools)\nrequire(mice)\nrequire(miceadds)\nlibrary(modelsummary)\n\ntidy.pool_mi <- function(x, ...) {\n  msg <- capture.output(out <- summary(x, ...))\n  out$term <- row.names(out)\n  colnames(out) <- c(\"estimate\", \"std.error\", \"statistic\", \"p.value\",\n                     \"conf.low\", \"conf.high\", \"miss\", \"term\")\n  return(out)\n}\n\nData\nWe load a dataset named smi. This dataset is a list of multiple imputed datasets, which is evident from the structure and the way we access its elements.\n\nrequire(mitools)\ndata(smi)\nlength(smi)\n#> [1] 2\nlength(smi[[1]])\n#> [1] 5\nhead(smi[[1]][[1]])\n#>       id wave mmetro parsmk         drkfre         alcdos alcdhi           smk\n#> 1 920006    1      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#> 2 920006    2      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#> 3 920006    3      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#> 4 920006    4      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#> 5 920006    5      1      0    Non drinker    Non drinker      0 non/ex-smoker\n#> 6 920006    6      1      0 not in last wk not in last wk      0 non/ex-smoker\n#>   cistot mdrkfre sex drinkreg\n#> 1      0       0   1    FALSE\n#> 2      0       0   1    FALSE\n#> 3      0       0   1    FALSE\n#> 4      1       0   1    FALSE\n#> 5      4       0   1    FALSE\n#> 6      3       0   1    FALSE\n\nModel with interaction and ORs\nWe’re interested in understanding how the variable wave interacts with sex in predicting drinkreg. We fit two logistic regression models, one for each level of the sex variable, to understand this interaction. wave is exposure here.\nFor effect modifier sex = 0\n\nmodels <- with(smi, glm(drinkreg~ wave + sex + wave*sex, family = binomial()))\nsummary(pool(models, rule = \"rubin1987\"), conf.int = TRUE, exponentiate = TRUE)[2,]\n#>   term estimate  std.error statistic       df      p.value   2.5 %   97.5 %\n#> 2 wave 1.271952 0.06587423  3.651693 234.4974 0.0003212903 1.11714 1.448217\n\nFor effect modifier sex = 1 (just changing reference)\n\nmodels2<-with(smi, glm(drinkreg~ wave + I(sex==0) + wave*I(sex==0),family=binomial()))\nsummary(pool(models2, rule = \"rubin1987\"),conf.int = TRUE, exponentiate = TRUE)[2,]\n#>   term estimate  std.error statistic       df      p.value    2.5 %   97.5 %\n#> 2 wave 1.225438 0.05876369   3.45959 240.3053 0.0006399352 1.091487 1.375828\n\n\nNotice the ORs for wave in the above 2 analyses. These are basically our target.\nFor proper survey data analysis, you will have to work with design and make sure you subset your subpopulation (those eligible) appropriately.\nSimple slopes analyses\nWe perform a simple slopes analysis for each imputed dataset. This analysis helps in understanding the relationship between the predictor and the outcome at specific levels of the moderator.\n\na1 <- sim_slopes(models[[1]], pred = wave, modx = sex)\na2 <- sim_slopes(models[[2]], pred = wave, modx = sex)\na3 <- sim_slopes(models[[3]], pred = wave, modx = sex)\na4 <- sim_slopes(models[[4]], pred = wave, modx = sex)\na5 <- sim_slopes(models[[5]], pred = wave, modx = sex)\n\nAfter obtaining the results from each imputed dataset, we pool them to get a consolidated result. This is done separately for each level of the sex variable.\nPooled results for sex = 0\n\n# For sex = 0\nef.lev <- 1\nest <- c(a1$slopes$Est.[ef.lev],\n         a2$slopes$Est.[ef.lev],\n         a3$slopes$Est.[ef.lev],\n         a4$slopes$Est.[ef.lev],\n         a5$slopes$Est.[ef.lev])\nse <- c(a1$slopes$S.E.[ef.lev],\n        a2$slopes$S.E.[ef.lev],\n        a3$slopes$S.E.[ef.lev],\n        a4$slopes$S.E.[ef.lev],\n        a5$slopes$S.E.[ef.lev])\nvr <- se^2\nOR <- exp(est)\nOR.se <- OR * se\nOR.v <- OR.se^2\n\nmod_pooled <- miceadds::pool_mi(qhat=OR, u=OR.v)\ntidy.pool_mi(mod_pooled)\n#>   estimate  std.error statistic      p.value conf.low conf.high   miss term\n#> 1 1.272164 0.08386552  15.16909 6.987679e-39 1.107118   1.43721 12.2 %    1\nsummary(MIcombine(as.list(OR), as.list(OR.v)))\n#> Multiple imputation results:\n#>       MIcombine.default(as.list(OR), as.list(OR.v))\n#>    results         se   (lower  upper) missInfo\n#> 1 1.272164 0.08386552 1.107118 1.43721     12 %\n\nPooled results for sex = 1\n\n# For sex = 1\nef.lev <- 2\nest <- c(a1$slopes$Est.[ef.lev],\n         a2$slopes$Est.[ef.lev],\n         a3$slopes$Est.[ef.lev],\n         a4$slopes$Est.[ef.lev],\n         a5$slopes$Est.[ef.lev])\nse <- c(a1$slopes$S.E.[ef.lev],\n        a2$slopes$S.E.[ef.lev],\n        a3$slopes$S.E.[ef.lev],\n        a4$slopes$S.E.[ef.lev],\n        a5$slopes$S.E.[ef.lev])\nvr <- se^2\nOR <- exp(est)\nOR.se <- OR * se\nOR.v <- OR.se^2\n\nmod_pooled <- miceadds::pool_mi(qhat=OR, u=OR.v)\ntidy.pool_mi(mod_pooled)\n#>   estimate  std.error statistic      p.value conf.low conf.high   miss term\n#> 1 1.225598 0.07204679  17.01113 2.282427e-46 1.083838  1.367357 11.9 %    1\nsummary(MIcombine(as.list(OR), as.list(OR.v)))\n#> Multiple imputation results:\n#>       MIcombine.default(as.list(OR), as.list(OR.v))\n#>    results         se   (lower   upper) missInfo\n#> 1 1.225598 0.07204679 1.083838 1.367357     12 %"
   },
   {
     "objectID": "missingdataF.html",
@@ -1405,5 +1405,341 @@
     "title": "Formatting Tools",
     "section": "",
     "text": "The tutorial elucidates a variety of tools and methodologies aimed at streamlining and enhancing academic writing and presentation creation, discussing topics such as utilizing a typesetting system, converting tables across different formats, employing various R packages for enhanced data visualization and presentation, drawing flow and Gantt charts, crafting HTML5 presentations, enabling collaborative writing and document sharing, managing references efficiently, formatting articles, and employing specific platforms for identifying appropriate journals for publishing academic articles.\nLaTex\nGet an account in ShareLaTeX/Overleaf.\nTable conversion\nFrom MS word to latex / markdown / HTML in TablesGenerator.\nYou can use tableone package to generate csv file, and then import them in the TablesGenerator to convert to HTML to paste to doc file!\n\ntab1x &lt;- print(tab1, quote = FALSE, noSpaces = TRUE, printToggle = FALSE)\nwrite.csv(tab1x, file = \"tab1x.csv\")\n\nFancy table and chart generators:\nR Packages\n\nofficer\nofficedown\nflextable\nmschart\nDrawing flow chart\ndraw.io\nPresentation\nThe “xaringan” package, derived from a love for the Japanese manga and anime “Naruto”, serves as an R Markdown extension, and it facilitates the creation of distinctively styled HTML5 presentations by leveraging the JavaScript library remark.js. Originating from an intent to produce a unique, though not widely adopted style, due to its potentially challenging pronunciation unless familiar with the anime, “xaringan” offers significant customizability in presentation design and has garnered additional theme contributions from its user community. Despite only supporting Markdown, “xaringan” enhances remark.js by introducing support for R Markdown and additional utilities, simplifying the slide-building and previewing processes. Further insights into “xaringan”, its background, and its utility can be explored through its documentation.\nGantt charts\nofficetimeline\nSimultaneous collaborative writing\nGoogle Docs offers a platform for real-time collaborative writing. Multiple users can edit documents simultaneously, and changes are saved automatically.\n\nCommenting and Suggesting: Use the comment and suggest features to provide feedback without altering the original text.\nRevision History: Navigate through the revision history to view changes and revert to previous versions if needed.\nSharing and Permissions: Manage who can view, comment, or edit the document with varied permission levels.\nReference manager\nZotero stands out as a free, open-source reference management software that assists researchers, academics, and students in organizing, managing, and formatting their citations and bibliographies. It’s not just a reference manager but also a powerful tool for collaborative work on research projects. Try the Zotero desktop manager as well for assisting with reference inserting.\nZotero syncs data across devices, ensuring that users can access their libraries from any location. Users can work offline with Zotero, and any changes made will be synchronized when the internet connection is restored.\nZoteroBib: Use ZoteroBib to generate bibliographies instantly without creating an account or installing software.\nArticle formatting\nThe rticles package in R provides a diverse selection of templates for creating academic articles and is easily accessible directly within the RStudio environment by navigating through File -&gt; New File -&gt; R Markdown, where users can select their desired template. For users not utilizing RStudio, the installation of Pandoc is requisite, with articles being creatable using the rmarkdown::draft() function, and specifying the template and package parameters as needed. Additionally, the package enables viewing a list of available journal names using rticles::journals(). To employ enhanced features, such as automatic figure numbering and cross-referencing of tables, users can utilize functionalities from the bookdown package. This involves adjusting the YAML to use bookdown::pdf_book as the output format, and designating the chosen rticles template as the base_format. Comprehensive details and tutorials regarding the use of the rticles package can be found in its online documentation. The complete array of options can be explored within the R Markdown templates window in RStudio, via the packages’s GitHub readme or accessed programmatically via the following function:\n\nrticles::journals()\n#&gt;  [1] \"acm\"            \"acs\"            \"aea\"            \"agu\"           \n#&gt;  [5] \"ajs\"            \"amq\"            \"ams\"            \"arxiv\"         \n#&gt;  [9] \"asa\"            \"bioinformatics\" \"biometrics\"     \"copernicus\"    \n#&gt; [13] \"ctex\"           \"elsevier\"       \"frontiers\"      \"glossa\"        \n#&gt; [17] \"ieee\"           \"ims\"            \"informs\"        \"iop\"           \n#&gt; [21] \"isba\"           \"jasa\"           \"jedm\"           \"joss\"          \n#&gt; [25] \"jss\"            \"lipics\"         \"lncs\"           \"mdpi\"          \n#&gt; [29] \"mnras\"          \"oup_v0\"         \"oup_v1\"         \"peerj\"         \n#&gt; [33] \"pihph\"          \"plos\"           \"pnas\"           \"rjournal\"      \n#&gt; [37] \"rsos\"           \"rss\"            \"sage\"           \"sim\"           \n#&gt; [41] \"springer\"       \"tf\"             \"trb\"            \"wellcomeor\"\n\nFind appropriate journals\n\njane\nSee more extensive list here\n\nSpecific Epidemiology-focus journals\n\nSummary\n\n\nCategory\nTool\nDescription\n\n\n\nAcademic Search Engine\nGoogle Scholar\nFreely accessible search engine indexing scholarly literature.\n\n\nArticle Formatting\nrticles (R Package)\nR package providing templates for various academic journals.\n\n\nBrainstorming & Mapping\nMindMeister\nOnline mind mapping tool for brainstorming and collaborative visualization.\n\n\nDocument Creation & Editing\nOverleaf\nCollaborative LaTeX editor online.\n\n\n\nGoogle Docs\nPlatform for real-time collaborative writing.\n\n\n\nofficer (R Package)\nR package for generating Word and PowerPoint files.\n\n\n\nofficedown (R Package)\nR package to produce Word documents with officer.\n\n\nGantt Chart Generators\nOffice Timeline\nOnline tool for creating Gantt charts.\n\n\nJournal Finding\njane\nTool to assist in finding the right journal for publishing.\n\n\n\nCustom List\nExtensive list and guide on finding suitable journals.\n\n\n\nEpidemiology Journals\nSpecific list of epidemiology-focus journals.\n\n\nNote & Research Management\nEvernote\nNote-taking and organization tool for managing research notes and drafts.\n\n\nPresentation & Sharing\nPrezi\nDynamic and visually engaging presentation creation tool.\n\n\n\nSlideShare\nPlatform for sharing presentations and professional documents.\n\n\nPresentation\nxaringan (R Package)\nR Markdown extension for creating presentations using remark.js.\n\n\nProject Management\nAsana\nProject management tool for workflow organization and collaboration.\n\n\n\nTrello\nProject management tool for task tracking and collaboration.\n\n\nReference Management\nEndNote\nReference management software for organizing and integrating references.\n\n\n\nJabRef\nOpen-source bibliography reference manager using BibTeX.\n\n\n\nMendeley\nReference management and academic social network.\n\n\n\nPaperpile\nReference management and academic research library.\n\n\n\nZotero\nReference management and collaborative tool.\n\n\n\nZoteroBib\nQuick bibliography generation tool.\n\n\nResearch Identity Management\nORCID\nProvides a persistent digital identifier to distinguish researchers.\n\n\nTable & Chart Generators\ndraw.io\nOnline diagram software for flow charts and various diagrams.\n\n\n\nTablesGenerator\nConverts tables to LaTeX, markdown, HTML formats.\n\n\n\nflextable (R Package)\nR package for tabular reporting in various formats (Word, HTML, etc.).\n\n\n\nmschart (R Package)\nR package to create PowerPoint charts.\n\n\nWriting & Editing\nAuthorea\nCollaborative platform for writing, citing, and publishing.\n\n\n\nGrammarly\nWriting assistant for grammar and style enhancement."
+  },
+  {
+    "objectID": "surveydata0.html#survey-data-analysis",
+    "href": "surveydata0.html#survey-data-analysis",
+    "title": "Concepts (D)",
+    "section": "Survey Data Analysis",
+    "text": "Survey Data Analysis\nDesign-based analysis differs from model-based analysis in its approach to handling survey data. Design-based analysis emphasizes the importance of the survey’s sampling method and structure, focusing on representativeness and accurate variance estimation according to how the data was collected. It accounts for the complexities of the sampling design, e.g., stratification and clustering, to ensure that results are representative of the entire population. On the other hand, model-based analysis uses statistical models to understand relationships and patterns, assuming data come from a specific distribution and often relying on random sampling.\nUnderstanding survey features such as weights, strata, and clusters is crucial in complex survey data analysis. Survey weights adjust for unequal probabilities of selection and nonresponse, ensuring that the sample represents the population accurately. Stratification improves precision and representation of subgroups, while clustering, often used for practicality and cost considerations, must be accounted for to avoid underestimating standard errors. These features are vital in design-based analysis to provide unbiased, reliable estimates and are what fundamentally distinguish it from model-based approaches, which may not reflect the difficulties of complex survey structures. NHANES is used an an example to explain these ideas."
+  },
+  {
+    "objectID": "surveydata0.html#reading-list",
+    "href": "surveydata0.html#reading-list",
+    "title": "Concepts (D)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference: (Steven G. Heeringa, West, and Berglund 2017) (chapters 2 and 3)\nOptional reading: (Steven G. Heeringa, West, and Berglund 2014)\nTheoretical references (optional):\n\nF/chi-squared statistic with the Rao-Scott second-order correction (Rao and Scott 1984; Koch, Freeman Jr, and Freeman 1975; Thomas and Rao 1987)\nAIC and BIC for modeling with complex survey data (Lumley and Scott 2015)\nPseudo-R2 statistics under complex sampling (Lumley 2017)\nTests for regression models fitted to survey data (Lumley and Scott 2014)\nGoodness-of-fit test for a logistic regression model fitted using survey sample data (Archer and Lemeshow 2006)"
+  },
+  {
+    "objectID": "surveydata0.html#lecture-videos",
+    "href": "surveydata0.html#lecture-videos",
+    "title": "Concepts (D)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nSurvey Data Analysis\n\n\n\nWhat is included in this lecture:\n\nreference 00:38\ndesign-based 1:28\nexamples 3:33\nNHANES and sampling 4:54\nweights and other survey features 9:05\nestimate of interest 12:55\ndesign effect 15:52\nVariance estimation 18:13\ndesign-based analysis 25:11\nHow to make inference 29:33\ninappropriate analysis 32:08\nhow useful are sampling weights 36:15\nhow useful are psu/cluster info 37:42\nsubpopulation / subsetting 38:57\nmissingness collected to weights? 40:45\nDealing with subpopulation 41:38\n\nThe timestamps are also included in the YouTube video description."
+  },
+  {
+    "objectID": "surveydata0.html#lecture-slides",
+    "href": "surveydata0.html#lecture-slides",
+    "title": "Concepts (D)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides"
+  },
+  {
+    "objectID": "surveydata0.html#links",
+    "href": "surveydata0.html#links",
+    "title": "Concepts (D)",
+    "section": "Links",
+    "text": "Links\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "surveydata0.html#references",
+    "href": "surveydata0.html#references",
+    "title": "Concepts (D)",
+    "section": "References",
+    "text": "References\n\n\n\n\nArcher, K. J., and S. Lemeshow. 2006. “Goodness-of-Fit Test for a Logistic Regression Model Fitted Using Survey Sample Data.” The Stata Journal 6 (1): 97–105.\n\n\nHeeringa, Steven G., Brady T. West, and Patricia A. Berglund. 2014. “Regression with Complex Samples.” In The SAGE Handbook of Regression Analysis and Causal Inference, edited by Henning Best and Christof Wolf. SAGE Publications.\n\n\nHeeringa, Steven G, Brady T West, and Patricia A Berglund. 2017. Applied Survey Data Analysis. Chapman; Hall/CRC.\n\n\nKoch, G. G., D. H. Freeman Jr, and J. L. Freeman. 1975. “Strategies in the Multivariate Analysis of Data from Complex Surveys.” International Statistical Review/Revue Internationale de Statistique, 59–78.\n\n\nLumley, Thomas. 2017. “Pseudo-R2 Statistics Under Complex Sampling.” Australian & New Zealand Journal of Statistics 59 (2): 187–94.\n\n\nLumley, Thomas, and Alan Scott. 2014. “Tests for Regression Models Fitted to Survey Data.” Australian & New Zealand Journal of Statistics 56 (1): 1–14.\n\n\n———. 2015. “AIC and BIC for Modeling with Complex Survey Data.” Journal of Survey Statistics and Methodology 3 (1): 1–18.\n\n\nRao, J. N. K., and A. J. Scott. 1984. “On Chi-Squared Tests for Multiway Contingency Tables with Cell Proportions Estimated from Survey Data.” The Annals of Statistics, 46–60.\n\n\nThomas, D. R., and J. N. K. Rao. 1987. “Small-Sample Comparisons of Level and Power for Simple Goodness-of-Fit Statistics Under Cluster Sampling.” Journal of the American Statistical Association 82 (398): 630–36."
+  },
+  {
+    "objectID": "missingdata0.html#missing-data-analysis",
+    "href": "missingdata0.html#missing-data-analysis",
+    "title": "Concepts (M)",
+    "section": "Missing Data Analysis",
+    "text": "Missing Data Analysis\nThis section is about understanding, categorizing, and addressing missing data in clinical and epidemiological research. Tt highlights the prevalence of missing data in these fields, the common use of complete case analysis without considering the implications, and the types of missingness: Missing Completely at Random (MCAR), Missing at Random (MAR), and Not Missing at Random (NMAR), each requiring different approaches and considerations. The consequences of not properly addressing missing data are detailed as bias, incorrect standard errors/precision, and a substantial loss in power.\nThis section also delves into strategies for addressing missing data, focusing on ad-hoc approaches and imputation methods. Ad-hoc approaches such as ignoring missing data or using a missing category indicator are generally dismissed as statistically invalid. In contrast, imputation, particularly multiple imputation (MI), is presented as a more robust and statistically sound method. Multiple imputation involves creating multiple complete datasets by predicting missing values and pooling the results to address the uncertainty associated with missing data. The section further discusses the types of imputation, the necessity of including a sufficient number of predictive variables, and the use of subject-area knowledge in building imputation models, providing a nuanced understanding of the challenges and solutions associated with missing data in research.\nReporting Guideline section delves into the complexities of handling missing data in statistical analysis, primarily through MI methods, especially Multiple Imputation by Chained Equations (MICE). It lays out the assumptions necessary for these methods (MCAR, MAR, MNAR). The guide also details how MICE works, using sequential regression imputation to create multiple imputed datasets, thereby allowing for more accurate and robust statistical inferences. Additionally, it provides comprehensive instructions on reporting MICE analysis, including detailing the missingness rates, the reasons for missing data, the assumptions made, and the specifics of the imputation and pooling methods used, ensuring transparency and reproducibility in research."
+  },
+  {
+    "objectID": "missingdata0.html#reading-list",
+    "href": "missingdata0.html#reading-list",
+    "title": "Concepts (M)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference: (Sterne and al. 2009)\nOptional reading: (Van Buuren 2018)\nFurther optional readings: (Lumley 2011; Granger, Sergeant, and Lunt 2019; Hughes et al. 2019)"
+  },
+  {
+    "objectID": "missingdata0.html#lecture-videos",
+    "href": "missingdata0.html#lecture-videos",
+    "title": "Concepts (M)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nMissing Data Analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nReporting guidelines when missing data is present"
+  },
+  {
+    "objectID": "missingdata0.html#lecture-slides",
+    "href": "missingdata0.html#lecture-slides",
+    "title": "Concepts (M)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides\nLecture\n\n\nReporting guideline"
+  },
+  {
+    "objectID": "missingdata0.html#links",
+    "href": "missingdata0.html#links",
+    "title": "Concepts (M)",
+    "section": "Links",
+    "text": "Links\nLecture\n\nGoogle Slides\nPDF Slides\n\nReporting guideline\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "missingdata0.html#references",
+    "href": "missingdata0.html#references",
+    "title": "Concepts (M)",
+    "section": "References",
+    "text": "References\n\n\n\n\nGranger, Elizabeth, Jamie C. Sergeant, and Mark Lunt. 2019. “Avoiding Pitfalls When Combining Multiple Imputation and Propensity Scores.” Statistics in Medicine 38 (26): 5120–32.\n\n\nHughes, Rachael A., Jon Heron, Jonathan A. Sterne, and Kate Tilling. 2019. “Accounting for Missing Data in Statistical Analyses: Multiple Imputation Is Not Always the Answer.” International Journal of Epidemiology 1: 11.\n\n\nLumley, Thomas. 2011. Complex Surveys: A Guide to Analysis Using r. Vol. 565. John Wiley & Sons.\n\n\nSterne, Jonathan A., and et al. 2009. “Multiple Imputation for Missing Data in Epidemiological and Clinical Research: Potential and Pitfalls.” BMJ 338: b2393.\n\n\nVan Buuren, Stef. 2018. Flexible Imputation of Missing Data. Chapman; Hall/CRC."
+  },
+  {
+    "objectID": "propensityscore0.html#propensity-score-analysis",
+    "href": "propensityscore0.html#propensity-score-analysis",
+    "title": "Concepts (S)",
+    "section": "Propensity Score Analysis",
+    "text": "Propensity Score Analysis\nThis section provides a comprehensive exploration into various facets of propensity score (PS) methods and their application in observational studies and surveys. Beginning with an in-depth look into key concepts and calculations related to ATE and ATT, the content navigates through the practical application and diagnostic checks of covariate balance using the SMD. It further elucidates the methodology and application of PS, particularly focusing on matching and weighting to mitigate bias and create comparable groups for causal inference. The intricacies of employing PS methods within surveys are explored, highlighting different approaches and the incorporation of design variables in PS and outcome models. Fundamental assumptions for causal inference, namely Conditional Exchangeability, Positivity, and Causal Consistency, are dissected to form a foundational understanding for conducting robust causal analyses. Additionally, the content optionally delves into the nuances of implementing IPW in surveys. Lastly, additional optional content features an insightful workshop, offering more explanations of PS method implementations in research contexts."
+  },
+  {
+    "objectID": "propensityscore0.html#reading-list",
+    "href": "propensityscore0.html#reading-list",
+    "title": "Concepts (S)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference: (Peter C. Austin 2011)\nOptional reading:\n\nPropensity score introduction (Karim 2021) External link\nExtensions of Propensity score approaches External link: prepared for Guest Lecture in SPPH 500/007 (Analytical Methods in Epidemiological Research)\nPropensity score for complex surveys External link: Uses the same lectures here, with some added text descriptions. This also includes a a structured framework for reporting analyses using PS methods in research manuscripts.\nReporting guideline (Stuart 2018)\nAssumptions (Hernán and Robins 2020)\n\nTheoretical references for propensity score analyses in complex surveys:\n(Peter C. Austin, Jembere, and Chiu 2018; DuGoff, Schuler, and Stuart 2014; Zanutto 2006; Leite, Stapleton, and Bettini 2018; Lenis, Ackerman, and Stuart 2018; Lenis et al. 2017; Ridgeway et al. 2015)"
+  },
+  {
+    "objectID": "propensityscore0.html#lecture-videos",
+    "href": "propensityscore0.html#lecture-videos",
+    "title": "Concepts (S)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nTarget parameters\n\n\n\nAverage Treatment Effect (ATE) vs. Average Treatment effect on the Treated (ATT)\n\n\n\n\n\n\n\n\n\n\n\n\nBalance\n\n\n\nBalance and standardized mean difference (SMD) in observational studies\n\n\n\n\n\n\n\n\n\n\n\n\nPropensity score matching\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPropensity score matching in complex survey\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPropensity score weighting in complex survey\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCausal Assumptions\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nConference Workshop (Optional)\n\n\n\nPost Conference Workshop for 2021 Conference - Canadian Society for Epidemiology and Biostatistics (CSEB)"
+  },
+  {
+    "objectID": "propensityscore0.html#lecture-slides",
+    "href": "propensityscore0.html#lecture-slides",
+    "title": "Concepts (S)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides\nTarget parameters\n\n\nBalance\n\n\nPropensity score matching\n\n\nPropensity score matching in complex survey\n\n\nPropensity score weighting in complex survey\n\n\nCausal Assumptions"
+  },
+  {
+    "objectID": "propensityscore0.html#links",
+    "href": "propensityscore0.html#links",
+    "title": "Concepts (S)",
+    "section": "Links",
+    "text": "Links\nTarget parameters\n\nGoogle Slides\nPDF Slides\n\nBalance\n\nGoogle Slides\nPDF Slides\n\nPropensity score matching\n\nGoogle Slides\nPDF Slides\n\nPropensity score matching in complex survey\n\nGoogle Slides\nPDF Slides\n\nPropensity score weighting in complex survey\n\nGoogle Slides\nPDF Slides\n\nCausal Assumptions\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "propensityscore0.html#references",
+    "href": "propensityscore0.html#references",
+    "title": "Concepts (S)",
+    "section": "References",
+    "text": "References\n\n\n\n\nAustin, Peter C. 2011. “A Tutorial and Case Study in Propensity Score Analysis: An Application to Estimating the Effect of in-Hospital Smoking Cessation Counseling on Mortality.” Multivariate Behavioral Research 46 (1): 119–51.\n\n\nAustin, Peter C, Nathaniel Jembere, and Maria Chiu. 2018. “Propensity Score Matching and Complex Surveys.” Statistical Methods in Medical Research 27 (4): 1240–57.\n\n\nDuGoff, Eva H, Megan Schuler, and Elizabeth A Stuart. 2014. “Generalizing Observational Study Results: Applying Propensity Score Methods to Complex Surveys.” Health Services Research 49 (1): 284–303.\n\n\nHernán, Miguel A., and James M. Robins. 2020. “Chapter 3.” In Causal Inference: What If. Boca Raton: Chapman & Hall/CRC.\n\n\nKarim, ME. 2021. “Understanding Propensity Score Matching.” 2021. https://ehsanx.github.io/psw/.\n\n\nLeite, Walter L., Laura M. Stapleton, and Eduardo F. Bettini. 2018. “Propensity Score Analysis of Complex Survey Data with Structural Equation Modeling: A Tutorial with Mplus.” Structural Equation Modeling: A Multidisciplinary Journal, 1–22.\n\n\nLenis, Diego, Benjamin Ackerman, and Elizabeth A. Stuart. 2018. “Measuring Model Misspecification: Application to Propensity Score Methods with Complex Survey Data.” Computational Statistics & Data Analysis.\n\n\nLenis, Diego, Thuan Quoc Nguyen, Dong, and Elizabeth A. Stuart. 2017. “It’s All about Balance: Propensity Score Matching in the Context of Complex Survey Data.” Biostatistics.\n\n\nRidgeway, Greg, Stephanie A. Kovalchik, Beth Ann Griffin, and Mohammed U. Kabeto. 2015. “Propensity Score Analysis with Survey Weighted Data.” Journal of Causal Inference 3 (2): 237–49.\n\n\nStuart, Elizabeth A. 2018. “Chapter 28. Propensity Scores and Matching Methods.” In The Reviewer’s Guide to Quantitative Methods in the Social Sciences, Second Edition, edited by Gregory R. Hancock, Ralph O. Mueller, and Laura M. Stapleton. Routledge.\n\n\nZanutto, Elaine L. 2006. “A Comparison of Propensity Score and Linear Regression Analysis of Complex Survey Data.” Journal of Data Science 4 (1): 67–91."
+  },
+  {
+    "objectID": "machinelearning0.html#machine-learning",
+    "href": "machinelearning0.html#machine-learning",
+    "title": "Concepts (L)",
+    "section": "Machine learning",
+    "text": "Machine learning"
+  },
+  {
+    "objectID": "machinelearning0.html#reading-list",
+    "href": "machinelearning0.html#reading-list",
+    "title": "Concepts (L)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference:\nOptional reading:"
+  },
+  {
+    "objectID": "machinelearning0.html#lecture-videos",
+    "href": "machinelearning0.html#lecture-videos",
+    "title": "Concepts (L)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nMachine learning\n\n\n\nWhat is included in this lecture:\n\nreference 00:38\ndesign-based 1:28\nexamples 3:33\nNHANES and sampling 4:54\nweights and other survey features 9:05\nestimate of interest 12:55\ndesign effect 15:52\nVariance estimation 18:13\ndesign-based analysis 25:11\nHow to make inference 29:33\ninappropriate analysis 32:08\nhow useful are sampling weights 36:15\nhow useful are psu/cluster info 37:42\nsubpopulation / subsetting 38:57\nmissingness collected to weights? 40:45\nDealing with subpopulation 41:38\n\nThe timestamps are also included in the YouTube video description."
+  },
+  {
+    "objectID": "machinelearning0.html#lecture-slides",
+    "href": "machinelearning0.html#lecture-slides",
+    "title": "Concepts (L)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides"
+  },
+  {
+    "objectID": "machinelearning0.html#links",
+    "href": "machinelearning0.html#links",
+    "title": "Concepts (L)",
+    "section": "Links",
+    "text": "Links\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "machinelearning0.html#references",
+    "href": "machinelearning0.html#references",
+    "title": "Concepts (L)",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "machinelearningCausal0.html#ml-in-causal-inference",
+    "href": "machinelearningCausal0.html#ml-in-causal-inference",
+    "title": "Concepts (C)",
+    "section": "ML in causal inference",
+    "text": "ML in causal inference"
+  },
+  {
+    "objectID": "machinelearningCausal0.html#reading-list",
+    "href": "machinelearningCausal0.html#reading-list",
+    "title": "Concepts (C)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference:\nOptional reading:"
+  },
+  {
+    "objectID": "machinelearningCausal0.html#lecture-videos",
+    "href": "machinelearningCausal0.html#lecture-videos",
+    "title": "Concepts (C)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nMachine learning\n\n\n\nWhat is included in this lecture:\n\nreference 00:38\ndesign-based 1:28\nexamples 3:33\nNHANES and sampling 4:54\nweights and other survey features 9:05\nestimate of interest 12:55\ndesign effect 15:52\nVariance estimation 18:13\ndesign-based analysis 25:11\nHow to make inference 29:33\ninappropriate analysis 32:08\nhow useful are sampling weights 36:15\nhow useful are psu/cluster info 37:42\nsubpopulation / subsetting 38:57\nmissingness collected to weights? 40:45\nDealing with subpopulation 41:38\n\nThe timestamps are also included in the YouTube video description."
+  },
+  {
+    "objectID": "machinelearningCausal0.html#lecture-slides",
+    "href": "machinelearningCausal0.html#lecture-slides",
+    "title": "Concepts (C)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides"
+  },
+  {
+    "objectID": "machinelearningCausal0.html#links",
+    "href": "machinelearningCausal0.html#links",
+    "title": "Concepts (C)",
+    "section": "Links",
+    "text": "Links\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "machinelearningCausal0.html#references",
+    "href": "machinelearningCausal0.html#references",
+    "title": "Concepts (C)",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "nonbinary0.html#complex-outcomes-beyond-binary",
+    "href": "nonbinary0.html#complex-outcomes-beyond-binary",
+    "title": "Concepts (N)",
+    "section": "Complex outcomes beyond binary",
+    "text": "Complex outcomes beyond binary"
+  },
+  {
+    "objectID": "nonbinary0.html#reading-list",
+    "href": "nonbinary0.html#reading-list",
+    "title": "Concepts (N)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference:\nOptional reading:"
+  },
+  {
+    "objectID": "nonbinary0.html#lecture-videos",
+    "href": "nonbinary0.html#lecture-videos",
+    "title": "Concepts (N)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nComplex outcomes beyond binary\n\n\n\nWhat is included in this lecture:\n\nreference 00:38\ndesign-based 1:28\nexamples 3:33\nNHANES and sampling 4:54\nweights and other survey features 9:05\nestimate of interest 12:55\ndesign effect 15:52\nVariance estimation 18:13\ndesign-based analysis 25:11\nHow to make inference 29:33\ninappropriate analysis 32:08\nhow useful are sampling weights 36:15\nhow useful are psu/cluster info 37:42\nsubpopulation / subsetting 38:57\nmissingness collected to weights? 40:45\nDealing with subpopulation 41:38\n\nThe timestamps are also included in the YouTube video description."
+  },
+  {
+    "objectID": "nonbinary0.html#lecture-slides",
+    "href": "nonbinary0.html#lecture-slides",
+    "title": "Concepts (N)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides"
+  },
+  {
+    "objectID": "nonbinary0.html#links",
+    "href": "nonbinary0.html#links",
+    "title": "Concepts (N)",
+    "section": "Links",
+    "text": "Links\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "nonbinary0.html#references",
+    "href": "nonbinary0.html#references",
+    "title": "Concepts (N)",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "longitudinal0.html#longitudinal-data-analysis",
+    "href": "longitudinal0.html#longitudinal-data-analysis",
+    "title": "Concepts (T)",
+    "section": "Longitudinal Data Analysis",
+    "text": "Longitudinal Data Analysis"
+  },
+  {
+    "objectID": "longitudinal0.html#reading-list",
+    "href": "longitudinal0.html#reading-list",
+    "title": "Concepts (T)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference:\nOptional reading:"
+  },
+  {
+    "objectID": "longitudinal0.html#lecture-videos",
+    "href": "longitudinal0.html#lecture-videos",
+    "title": "Concepts (T)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nLongitudinal Data Analysis\n\n\n\nWhat is included in this lecture:\n\nreference 00:38\ndesign-based 1:28\nexamples 3:33\nNHANES and sampling 4:54\nweights and other survey features 9:05\nestimate of interest 12:55\ndesign effect 15:52\nVariance estimation 18:13\ndesign-based analysis 25:11\nHow to make inference 29:33\ninappropriate analysis 32:08\nhow useful are sampling weights 36:15\nhow useful are psu/cluster info 37:42\nsubpopulation / subsetting 38:57\nmissingness collected to weights? 40:45\nDealing with subpopulation 41:38\n\nThe timestamps are also included in the YouTube video description."
+  },
+  {
+    "objectID": "longitudinal0.html#lecture-slides",
+    "href": "longitudinal0.html#lecture-slides",
+    "title": "Concepts (T)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides"
+  },
+  {
+    "objectID": "longitudinal0.html#links",
+    "href": "longitudinal0.html#links",
+    "title": "Concepts (T)",
+    "section": "Links",
+    "text": "Links\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "longitudinal0.html#references",
+    "href": "longitudinal0.html#references",
+    "title": "Concepts (T)",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "mediation0.html#mediation-analysis",
+    "href": "mediation0.html#mediation-analysis",
+    "title": "Concepts (I)",
+    "section": "Mediation Analysis",
+    "text": "Mediation Analysis"
+  },
+  {
+    "objectID": "mediation0.html#reading-list",
+    "href": "mediation0.html#reading-list",
+    "title": "Concepts (I)",
+    "section": "Reading list",
+    "text": "Reading list\nKey reference:\nOptional reading:"
+  },
+  {
+    "objectID": "mediation0.html#lecture-videos",
+    "href": "mediation0.html#lecture-videos",
+    "title": "Concepts (I)",
+    "section": "Lecture Videos",
+    "text": "Lecture Videos\n\n\n\n\n\n\nMediation Analysis\n\n\n\nWhat is included in this lecture:\n\nreference 00:38\ndesign-based 1:28\nexamples 3:33\nNHANES and sampling 4:54\nweights and other survey features 9:05\nestimate of interest 12:55\ndesign effect 15:52\nVariance estimation 18:13\ndesign-based analysis 25:11\nHow to make inference 29:33\ninappropriate analysis 32:08\nhow useful are sampling weights 36:15\nhow useful are psu/cluster info 37:42\nsubpopulation / subsetting 38:57\nmissingness collected to weights? 40:45\nDealing with subpopulation 41:38\n\nThe timestamps are also included in the YouTube video description."
+  },
+  {
+    "objectID": "mediation0.html#lecture-slides",
+    "href": "mediation0.html#lecture-slides",
+    "title": "Concepts (I)",
+    "section": "Lecture Slides",
+    "text": "Lecture Slides"
+  },
+  {
+    "objectID": "mediation0.html#links",
+    "href": "mediation0.html#links",
+    "title": "Concepts (I)",
+    "section": "Links",
+    "text": "Links\n\nGoogle Slides\nPDF Slides"
+  },
+  {
+    "objectID": "mediation0.html#references",
+    "href": "mediation0.html#references",
+    "title": "Concepts (I)",
+    "section": "References",
+    "text": "References"
   }
 ]
