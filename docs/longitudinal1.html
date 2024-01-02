@@ -405,16 +405,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding7.html" class="sidebar-item-text sidebar-link">Effect modifier</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./confounding8.html" class="sidebar-item-text sidebar-link">Table 2 fallacy</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
   </div>
 </li>
@@ -949,10 +939,12 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li><p>Fixed effects refer to general trends that are applicable to all subjects/clusters. This implies that we might want to investigate how students perform (on average) in different subjects such as math and history. These effects are commonly observed, i.e., fixed, across all schools.</p></li>
 <li><p>Random Effects capture the unique characteristics of each subject/cluster that differentiate them from one another. For instance, some schools may have better resources, more experienced teachers, or a more supportive learning environment. These differences are specific to each school, and we use random effects to capture them.</p></li>
 </ul>
-<div class="cell" data-hash="longitudinal1_cache/html/setup_9bac109f03de7c1715b442e491359cac">
+<div class="cell" data-hash="longitudinal1_cache/html/setup_58725617b16b2963e015093a96c937a7">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(kableExtra)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">require</span>(Matrix)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">require</span>(jtools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="repeated-measures" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="repeated-measures">Repeated measures</h3>
 
@@ -981,7 +973,7 @@ Important
 </div>
 <section id="data" class="level4"><h4 class="anchored" data-anchor-id="data">Data</h4>
 <p>We are going to use the <code>BtheB</code> dataset from the <code>HSAUR2</code> package to explain the linear mixed effect model:</p>
-<div class="cell" data-hash="longitudinal1_cache/html/load_2fce403728abb42b0ba8ba5dc8af585f">
+<div class="cell" data-hash="longitudinal1_cache/html/load_0e2fe62522b73e8bc9b7557b80faea7b">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">library</span>(HSAUR2)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt; Loading required package: tools</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="fu">data</span>(<span class="st">"BtheB"</span>)</span>
@@ -1069,7 +1061,7 @@ Important
 <li><p>A typical form of repeated measurement data from a clinical trial data.</p></li>
 <li><p>The individuals are allocated to different treatments then the response Beck Depression Inventory II were taken at baseline, 2, 3, 5, and 8 months</p></li>
 </ul>
-<div class="cell" data-hash="longitudinal1_cache/html/data1_56037cdeada65ff2aaa90ff965d3039e">
+<div class="cell" data-hash="longitudinal1_cache/html/data1_68337e4c1e2132dbab8c811e4a77329c">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="do">## Box-plot of responses at different time points in treatment and control groups</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">data</span>(<span class="st">"BtheB"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="fu">layout</span>(<span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">nrow =</span> <span class="dv">1</span>))</span>
@@ -1089,7 +1081,7 @@ Important
 <li><p>As time goes, drops in BDI are more obvious in intervention which may indicate the intervention is effective.</p></li>
 </ul></section><section id="regular-model-fixed-intercept-and-slope" class="level4"><h4 class="anchored" data-anchor-id="regular-model-fixed-intercept-and-slope">Regular model fixed intercept and slope</h4>
 <p>To compare, we start with fixed effect linear model, i.e., a regular linear model without any random effect:</p>
-<div class="cell" data-hash="longitudinal1_cache/html/fixed_b0ea5c68b53db10f0f5c4459c490d9b5">
+<div class="cell" data-hash="longitudinal1_cache/html/fixed_5cb2d1c4557091418c394abeb81da49b">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="do">## To analyze the data, we first need to convert the dataset to a analysis-ready form</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>BtheB<span class="sc">$</span>subject <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rownames</span>(BtheB))</span>
 <span id="cb4-3"><a href="#cb4-3"></a>nobs <span class="ot">&lt;-</span> <span class="fu">nrow</span>(BtheB)</span>
@@ -1306,9 +1298,7 @@ Important
 <span id="cb7-3"><a href="#cb7-3"></a>lmfit <span class="ot">&lt;-</span> <span class="fu">lm</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> time <span class="sc">+</span> treatment <span class="sc">+</span> drug <span class="sc">+</span>length, <span class="at">data =</span> BtheB_long,</span>
 <span id="cb7-4"><a href="#cb7-4"></a>                    <span class="at">na.action =</span> na.omit)</span>
 <span id="cb7-5"><a href="#cb7-5"></a><span class="fu">require</span>(jtools)</span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; Loading required package: jtools</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; Warning: package 'jtools' was built under R version 4.3.1</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="fu">summ</span>(lmfit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="fu">summ</span>(lmfit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
@@ -1398,50 +1388,49 @@ Important
 </div>
 </section><section id="random-intercept-but-fixed-slope" class="level4"><h4 class="anchored" data-anchor-id="random-intercept-but-fixed-slope">Random intercept but fixed slope</h4>
 <p>Let us start with a model with a random intercept but fixed slope. In this case, the resulting regression line for each individual is parallel (for fixed slope) but have different intercepts (for random intercept).</p>
-<div class="cell" data-hash="longitudinal1_cache/html/random_75eef390259f97a7951bc315dfd85e13">
+<div class="cell" data-hash="longitudinal1_cache/html/random_55228e71d0d35d00f11b8202719778bd">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="do">## Fit a random intercept model with lme4 package</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; Warning: package 'lme4' was built under R version 4.3.1</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a>BtheB_lmer1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> time <span class="sc">+</span> treatment <span class="sc">+</span> drug <span class="sc">+</span>length </span>
-<span id="cb8-6"><a href="#cb8-6"></a>                    <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">data =</span> BtheB_long, <span class="at">REML =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb8-7"><a href="#cb8-7"></a>                    <span class="at">na.action =</span> na.omit)</span>
-<span id="cb8-8"><a href="#cb8-8"></a></span>
-<span id="cb8-9"><a href="#cb8-9"></a><span class="fu">summary</span>(BtheB_lmer1)</span>
-<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt; Linear mixed model fit by maximum likelihood  ['lmerMod']</span></span>
-<span id="cb8-11"><a href="#cb8-11"></a><span class="co">#&gt; Formula: bdi ~ bdi.pre + time + treatment + drug + length + (1 | subject)</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt;    Data: BtheB_long</span></span>
-<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt; </span></span>
-<span id="cb8-14"><a href="#cb8-14"></a><span class="co">#&gt;      AIC      BIC   logLik deviance df.resid </span></span>
-<span id="cb8-15"><a href="#cb8-15"></a><span class="co">#&gt;   1887.5   1916.6   -935.7   1871.5      272 </span></span>
-<span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt; </span></span>
-<span id="cb8-17"><a href="#cb8-17"></a><span class="co">#&gt; Scaled residuals: </span></span>
-<span id="cb8-18"><a href="#cb8-18"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
-<span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; -2.6975 -0.5026 -0.0638  0.4124  3.8203 </span></span>
-<span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; </span></span>
-<span id="cb8-21"><a href="#cb8-21"></a><span class="co">#&gt; Random effects:</span></span>
-<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt;  Groups   Name        Variance Std.Dev.</span></span>
-<span id="cb8-23"><a href="#cb8-23"></a><span class="co">#&gt;  subject  (Intercept) 48.78    6.984   </span></span>
-<span id="cb8-24"><a href="#cb8-24"></a><span class="co">#&gt;  Residual             25.14    5.014   </span></span>
-<span id="cb8-25"><a href="#cb8-25"></a><span class="co">#&gt; Number of obs: 280, groups:  subject, 97</span></span>
-<span id="cb8-26"><a href="#cb8-26"></a><span class="co">#&gt; </span></span>
-<span id="cb8-27"><a href="#cb8-27"></a><span class="co">#&gt; Fixed effects:</span></span>
-<span id="cb8-28"><a href="#cb8-28"></a><span class="co">#&gt;                Estimate Std. Error t value</span></span>
-<span id="cb8-29"><a href="#cb8-29"></a><span class="co">#&gt; (Intercept)     5.59239    2.24244   2.494</span></span>
-<span id="cb8-30"><a href="#cb8-30"></a><span class="co">#&gt; bdi.pre         0.63968    0.07789   8.212</span></span>
-<span id="cb8-31"><a href="#cb8-31"></a><span class="co">#&gt; time           -0.70476    0.14639  -4.814</span></span>
-<span id="cb8-32"><a href="#cb8-32"></a><span class="co">#&gt; treatmentBtheB -2.32908    1.67036  -1.394</span></span>
-<span id="cb8-33"><a href="#cb8-33"></a><span class="co">#&gt; drugYes        -2.82495    1.72684  -1.636</span></span>
-<span id="cb8-34"><a href="#cb8-34"></a><span class="co">#&gt; length&gt;6m       0.19708    1.63832   0.120</span></span>
-<span id="cb8-35"><a href="#cb8-35"></a><span class="co">#&gt; </span></span>
-<span id="cb8-36"><a href="#cb8-36"></a><span class="co">#&gt; Correlation of Fixed Effects:</span></span>
-<span id="cb8-37"><a href="#cb8-37"></a><span class="co">#&gt;             (Intr) bdi.pr time   trtmBB drugYs</span></span>
-<span id="cb8-38"><a href="#cb8-38"></a><span class="co">#&gt; bdi.pre     -0.682                            </span></span>
-<span id="cb8-39"><a href="#cb8-39"></a><span class="co">#&gt; time        -0.238  0.020                     </span></span>
-<span id="cb8-40"><a href="#cb8-40"></a><span class="co">#&gt; tretmntBthB -0.390  0.121  0.018              </span></span>
-<span id="cb8-41"><a href="#cb8-41"></a><span class="co">#&gt; drugYes     -0.073 -0.237 -0.022 -0.323       </span></span>
-<span id="cb8-42"><a href="#cb8-42"></a><span class="co">#&gt; length&gt;6m   -0.243 -0.242 -0.036  0.002  0.157</span></span>
-<span id="cb8-43"><a href="#cb8-43"></a><span class="fu">summ</span>(BtheB_lmer1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; Warning: package 'lme4' was built under R version 4.3.2</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>BtheB_lmer1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> time <span class="sc">+</span> treatment <span class="sc">+</span> drug <span class="sc">+</span>length </span>
+<span id="cb8-5"><a href="#cb8-5"></a>                    <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">data =</span> BtheB_long, <span class="at">REML =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb8-6"><a href="#cb8-6"></a>                    <span class="at">na.action =</span> na.omit)</span>
+<span id="cb8-7"><a href="#cb8-7"></a></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="fu">summary</span>(BtheB_lmer1)</span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt; Linear mixed model fit by maximum likelihood  ['lmerMod']</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt; Formula: bdi ~ bdi.pre + time + treatment + drug + length + (1 | subject)</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="co">#&gt;    Data: BtheB_long</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt; </span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt;      AIC      BIC   logLik deviance df.resid </span></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co">#&gt;   1887.5   1916.6   -935.7   1871.5      272 </span></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="co">#&gt; </span></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt; Scaled residuals: </span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="co">#&gt; -2.6975 -0.5026 -0.0638  0.4124  3.8203 </span></span>
+<span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; </span></span>
+<span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; Random effects:</span></span>
+<span id="cb8-21"><a href="#cb8-21"></a><span class="co">#&gt;  Groups   Name        Variance Std.Dev.</span></span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="co">#&gt;  subject  (Intercept) 48.78    6.984   </span></span>
+<span id="cb8-23"><a href="#cb8-23"></a><span class="co">#&gt;  Residual             25.14    5.014   </span></span>
+<span id="cb8-24"><a href="#cb8-24"></a><span class="co">#&gt; Number of obs: 280, groups:  subject, 97</span></span>
+<span id="cb8-25"><a href="#cb8-25"></a><span class="co">#&gt; </span></span>
+<span id="cb8-26"><a href="#cb8-26"></a><span class="co">#&gt; Fixed effects:</span></span>
+<span id="cb8-27"><a href="#cb8-27"></a><span class="co">#&gt;                Estimate Std. Error t value</span></span>
+<span id="cb8-28"><a href="#cb8-28"></a><span class="co">#&gt; (Intercept)     5.59239    2.24244   2.494</span></span>
+<span id="cb8-29"><a href="#cb8-29"></a><span class="co">#&gt; bdi.pre         0.63968    0.07789   8.212</span></span>
+<span id="cb8-30"><a href="#cb8-30"></a><span class="co">#&gt; time           -0.70476    0.14639  -4.814</span></span>
+<span id="cb8-31"><a href="#cb8-31"></a><span class="co">#&gt; treatmentBtheB -2.32908    1.67036  -1.394</span></span>
+<span id="cb8-32"><a href="#cb8-32"></a><span class="co">#&gt; drugYes        -2.82495    1.72684  -1.636</span></span>
+<span id="cb8-33"><a href="#cb8-33"></a><span class="co">#&gt; length&gt;6m       0.19708    1.63832   0.120</span></span>
+<span id="cb8-34"><a href="#cb8-34"></a><span class="co">#&gt; </span></span>
+<span id="cb8-35"><a href="#cb8-35"></a><span class="co">#&gt; Correlation of Fixed Effects:</span></span>
+<span id="cb8-36"><a href="#cb8-36"></a><span class="co">#&gt;             (Intr) bdi.pr time   trtmBB drugYs</span></span>
+<span id="cb8-37"><a href="#cb8-37"></a><span class="co">#&gt; bdi.pre     -0.682                            </span></span>
+<span id="cb8-38"><a href="#cb8-38"></a><span class="co">#&gt; time        -0.238  0.020                     </span></span>
+<span id="cb8-39"><a href="#cb8-39"></a><span class="co">#&gt; tretmntBthB -0.390  0.121  0.018              </span></span>
+<span id="cb8-40"><a href="#cb8-40"></a><span class="co">#&gt; drugYes     -0.073 -0.237 -0.022 -0.323       </span></span>
+<span id="cb8-41"><a href="#cb8-41"></a><span class="co">#&gt; length&gt;6m   -0.243 -0.242 -0.036  0.002  0.157</span></span>
+<span id="cb8-42"><a href="#cb8-42"></a><span class="fu">summ</span>(BtheB_lmer1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
@@ -1597,12 +1586,13 @@ Important
 </ul>
 </div>
 </div>
-<div class="cell" data-hash="longitudinal1_cache/html/random2_29f8f83d58ea976a6d02aa8e4cce5554">
+<div class="cell" data-hash="longitudinal1_cache/html/random2_13d09cc010c4c04a686d0efbdc3875fa">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb9-2"><a href="#cb9-2"></a>BtheB_longna <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(BtheB_long)</span>
-<span id="cb9-3"><a href="#cb9-3"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">time=</span>BtheB_longna<span class="sc">$</span>time,<span class="at">pred=</span><span class="fu">fitted</span>(BtheB_lmer1),<span class="at">Subject=</span> BtheB_longna<span class="sc">$</span>subject)</span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="fu">ggplot</span>(<span class="at">data=</span>dat,<span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>pred, <span class="at">group=</span>Subject, <span class="at">color=</span>Subject)) <span class="sc">+</span> <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a>    <span class="fu">geom_line</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.2</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>BtheB_longna <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(BtheB_long)</span>
+<span id="cb9-4"><a href="#cb9-4"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">time=</span>BtheB_longna<span class="sc">$</span>time,<span class="at">pred=</span><span class="fu">fitted</span>(BtheB_lmer1),<span class="at">Subject=</span> BtheB_longna<span class="sc">$</span>subject)</span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="fu">ggplot</span>(<span class="at">data=</span>dat,<span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>pred, <span class="at">group=</span>Subject, <span class="at">color=</span>Subject)) <span class="sc">+</span> <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a>    <span class="fu">geom_line</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="longitudinal1_files/figure-html/random2-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1610,7 +1600,7 @@ Important
 <p>As we can see, for each individual, we have different intercepts but the slope over follow-up time is the same. Next, we will fit the model with random intercept and random slope.</p>
 </section><section id="random-intercept-and-random-slope" class="level4"><h4 class="anchored" data-anchor-id="random-intercept-and-random-slope">Random intercept and random slope</h4>
 <p>In the codes below, we fitted a mixed effects model with both random intercept and random slope:</p>
-<div class="cell" data-hash="longitudinal1_cache/html/random3_f35cffebb05c606754d97aa29b7ae727">
+<div class="cell" data-hash="longitudinal1_cache/html/random3_6050327661a81a02013ab346f1a3081f">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="do">## We can fit a random slope and intercept model using lme4 package and treat variable time as random slope. </span></span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3"></a>BtheB_lmer2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> time <span class="sc">+</span> treatment <span class="sc">+</span> drug <span class="sc">+</span>length <span class="sc">+</span> </span>
@@ -1762,7 +1752,7 @@ Important
 </div>
 </div>
 <p>The interpretation of the model outputs will be similar to the model with only random intercepts. Let us plot the data:</p>
-<div class="cell" data-hash="longitudinal1_cache/html/random5_d2b2e2f78122bfc1c77f39a6d063763a">
+<div class="cell" data-hash="longitudinal1_cache/html/random5_72800ae58fe7cf9a19faa3ea4cb494aa">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb11-2"><a href="#cb11-2"></a>BtheB_longna <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(BtheB_long)</span>
 <span id="cb11-3"><a href="#cb11-3"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">time=</span>BtheB_longna<span class="sc">$</span>time,<span class="at">pred=</span><span class="fu">fitted</span>(BtheB_lmer2),<span class="at">Subject=</span> BtheB_longna<span class="sc">$</span>subject)</span>
@@ -1780,7 +1770,7 @@ Important
 <li><p>When choosing between random intercept and random slope, a quick solution is to fit all possible models then do likelihood ratio tests.</p></li>
 <li><p>For example, I am not sure whether I should use random intercept only or random intercept + random slope. I could fit both model, then do a likelihood ratio test:</p></li>
 </ul>
-<div class="cell" data-hash="longitudinal1_cache/html/model_2ee7e71fc3efdd5d0be71c90a535d611">
+<div class="cell" data-hash="longitudinal1_cache/html/model_22ffdd3681dfb4ca3f24273ae2a0b7d9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">anova</span>(BtheB_lmer1, BtheB_lmer2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
@@ -1805,7 +1795,7 @@ Important
 <li><p>Also, the predicted random effects can be used to examine the assumptions we have for linear mixed effect model.</p></li>
 </ul>
 <p>The <strong>ranef</strong> function is used to predict the random effect in R</p>
-<div class="cell" data-hash="longitudinal1_cache/html/pred_9bfc17be426a9cc9107639c6ba2361ad">
+<div class="cell" data-hash="longitudinal1_cache/html/pred_956223a1a2a1dfcb862fdf962734b5a4">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>qint <span class="ot">&lt;-</span> <span class="fu">ranef</span>(BtheB_lmer1)<span class="sc">$</span>subject[[<span class="st">"(Intercept)"</span>]]</span>
 <span id="cb14-2"><a href="#cb14-2"></a>qint</span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt;  [1] -16.36173411  -2.44276827  -3.81655251   3.05333928   3.45142248</span></span>
@@ -1837,7 +1827,7 @@ Important
 <li>beta for subject <span class="math inline">\(i\)</span> follows normal distribution</li>
 </ul>
 <p>We have predict the values of random effect and we could extract residuals from the fitted model. Therefore, we can use QQ-plot to check their normality</p>
-<div class="cell" data-hash="longitudinal1_cache/html/assumption_be75c85308b5cefc9310209c9629c50b">
+<div class="cell" data-hash="longitudinal1_cache/html/assumption_b7c351bd1efc87f81ba0ae35a041f730">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Assumption 1</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a>qres <span class="ot">&lt;-</span> <span class="fu">residuals</span>(BtheB_lmer1)</span>
 <span id="cb15-3"><a href="#cb15-3"></a><span class="fu">qqnorm</span>(qres, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="dv">20</span>), <span class="at">ylab =</span> <span class="st">"Estimated residuals"</span>,</span>
@@ -1872,11 +1862,7 @@ Tip
 </div>
 </div>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-<iframe src="https://www.youtube.com/embed/x7bTkZmyBkw" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
-</iframe>
-</div>
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-<iframe src="https://www.youtube.com/embed/SqSjejvTtdk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
+<iframe src="https://www.youtube.com/embed/kocX69kMX0s" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
 </iframe>
 </div>
 </section><section id="reference" class="level3"><h3 class="anchored" data-anchor-id="reference">Reference</h3>
@@ -1884,7 +1870,7 @@ Tip
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-faraway2016extending" class="csl-entry" role="doc-biblioentry">
-Faraway, Julian J. 2016. <em>Extending the Linear Model with r: Generalized Linear, Mixed Effects and Nonparametric Regression Models</em>. CRC press.
+Faraway, Julian J. 2016. <em><span class="nocase">Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models</span></em>. CRC press.
 </div>
 <div id="ref-hothorn2014handbook" class="csl-entry" role="doc-biblioentry">
 Hothorn, Torsten, and Brian S Everitt. 2014. <em>A Handbook of Statistical Analyses Using r</em>. CRC press.

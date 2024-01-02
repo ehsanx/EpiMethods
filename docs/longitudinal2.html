@@ -404,16 +404,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding7.html" class="sidebar-item-text sidebar-link">Effect modifier</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./confounding8.html" class="sidebar-item-text sidebar-link">Table 2 fallacy</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
   </div>
 </li>
@@ -946,7 +936,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 </header><p>In this section, we will learn about generalized estimating equation (GEE). GEE is another popular method for modeling longitudinal or clustered data. In contrast to the mixed effects models where we assume error term and beta coefficients for subject <span class="math inline">\(i\)</span> both follow normal distribution, GEE is distribution free. However, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.</p>
-<div class="cell" data-hash="longitudinal2_cache/html/setup_6333dae9ba0ceffab9d38e23af58751e">
+<div class="cell" data-hash="longitudinal2_cache/html/setup_e585af0477e2f2cb212a408ae8a36eb0">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(HSAUR2)</span>
@@ -963,7 +953,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>Other covariates are: treatment, age, gender, the study center</li>
 <li>The response has been measured at 0, 1, 2, 3, 4 mths for each subject</li>
 </ul>
-<div class="cell" data-hash="longitudinal2_cache/html/load_99283276f39b43df1ec4e1a3e99bf10d">
+<div class="cell" data-hash="longitudinal2_cache/html/load_93f8d6cab40b506b4dd600f4fb8f4c94">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">data</span>(<span class="st">"respiratory"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">head</span>(respiratory)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1039,7 +1029,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <section id="binary-response" class="level4"><h4 class="anchored" data-anchor-id="binary-response">Binary response</h4>
 <p>We started with binary response using respiratory dataset:</p>
-<div class="cell" data-hash="longitudinal2_cache/html/gee1_7d5e1da0e27b26919d6a07d7e8de9e62">
+<div class="cell" data-hash="longitudinal2_cache/html/gee1_0ed79b0454b5ca67e3603437f6b2e0f8">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(gee)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">data</span>(<span class="st">"respiratory"</span>, <span class="at">package =</span> <span class="st">"HSAUR2"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="do">## Data manipulation</span></span>
@@ -1050,7 +1040,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb3-8"><a href="#cb3-8"></a>resp<span class="sc">$</span>month <span class="ot">&lt;-</span> resp<span class="sc">$</span>month[, drop <span class="ot">=</span> <span class="cn">TRUE</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will fit a regular glm, i.e., model without random effect or any correlation structures. For binary outcomes, the estimated coefficients are log odds.</p>
-<div class="cell" data-hash="longitudinal2_cache/html/gee2_a91915f6f777365d3b80b8b691ff3571">
+<div class="cell" data-hash="longitudinal2_cache/html/gee2_939e8073554ca7d2590d9773be0cc68b">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="do">## Regular GLM </span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>resp_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(status <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline<span class="sc">+</span> age, </span>
 <span id="cb4-3"><a href="#cb4-3"></a>                <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
@@ -1080,7 +1070,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will fit GEE with independent correlation structure:</p>
-<div class="cell" data-hash="longitudinal2_cache/html/gee3_4484726709f384097e6e9b1d85153a97">
+<div class="cell" data-hash="longitudinal2_cache/html/gee3_ce79a2bcfde18545d633c48473aeb3c6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="do">## GEE with identity matrix</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>resp_gee.in <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline <span class="sc">+</span> age, </span>
 <span id="cb5-3"><a href="#cb5-3"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
@@ -1139,7 +1129,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li><p>Working Correlation is the correlation structure estimated from the data (identity matrix for independence).</p></li>
 </ul>
 <p>Let fit the GEE model with exchangeable correlation structure:</p>
-<div class="cell" data-hash="longitudinal2_cache/html/geeex_7bf08876572249e14a2686b9335f9230">
+<div class="cell" data-hash="longitudinal2_cache/html/geeex_924a263115ad7a2ce62a424c382065c2">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="do">## GEE with exchangeable matrix</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>resp_gee.ex <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> centre <span class="sc">+</span> treatment <span class="sc">+</span> gender <span class="sc">+</span> baseline<span class="sc">+</span> age, </span>
 <span id="cb6-3"><a href="#cb6-3"></a>                 <span class="at">data =</span> resp, <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
@@ -1198,7 +1188,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li><p>Working Correlation is the correlation structure estimated from the data</p></li>
 </ul>
 <p>Let’s check the estimated coefficients from all three models.</p>
-<div class="cell" data-hash="longitudinal2_cache/html/summ_d40d8fc800fe119fd600a3e5b3cedefa">
+<div class="cell" data-hash="longitudinal2_cache/html/summ_6ceb4233491f88d229f981e85160e63e">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">summary</span>(resp_glm)<span class="sc">$</span>coefficients</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt;                       Estimate  Std. Error    z value     Pr(&gt;|z|)</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; (Intercept)        -0.90017133 0.337652992 -2.6659658 7.676750e-03</span></span>
@@ -1228,7 +1218,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>GEE with identity matrix is the same as GLM model. If we change the correlation structure to exchangeable does not change the beta estimates, but the naive SEs are closer to Robust SE, which indicates that the exchangeable correlation structure is a better reflection of the correlation structures.</p>
 </section><section id="gaussian-response" class="level4"><h4 class="anchored" data-anchor-id="gaussian-response">Gaussian response</h4>
 <p>GEE can also be applied to Gaussian response</p>
-<div class="cell" data-hash="longitudinal2_cache/html/gaus_14acb07d6181d1525ffd157f31545295">
+<div class="cell" data-hash="longitudinal2_cache/html/gaus_2184400979d3fd42254015f36490aa5d">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">library</span>(gee)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">library</span>(HSAUR2)</span>
 <span id="cb8-3"><a href="#cb8-3"></a>BtheB<span class="sc">$</span>subject <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rownames</span>(BtheB))</span>
@@ -1292,7 +1282,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li><p>Working Correlation is the correlation struture estimated from the data (identity matrix for indepedence)</p></li>
 </ul>
 <p>With exchangeable correlation matrix:</p>
-<div class="cell" data-hash="longitudinal2_cache/html/gausex_66fe70cd53f1a5cf812e4a4231c968b6">
+<div class="cell" data-hash="longitudinal2_cache/html/gausex_074435b23809fb4ec09d4dcb882d0847">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>btb_gee.ex <span class="ot">&lt;-</span> <span class="fu">gee</span>(bdi <span class="sc">~</span> bdi.pre <span class="sc">+</span> treatment <span class="sc">+</span> length <span class="sc">+</span> drug,</span>
 <span id="cb9-2"><a href="#cb9-2"></a>                <span class="at">data =</span> BtheB_long, <span class="at">id =</span> subject, </span>
 <span id="cb9-3"><a href="#cb9-3"></a>                <span class="at">family =</span> gaussian, <span class="at">corstr =</span> <span class="st">"exchangeable"</span>)</span>
@@ -1347,7 +1337,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>ref: <span class="citation" data-cites="hothorn2014handbook">(<a href="#ref-hothorn2014handbook" role="doc-biblioref">Hothorn and Everitt 2014</a>)</span> Section 13.4 We then use the conditional models (i.e., adding random effect) with non-normal response</li>
 </ul>
 <p>Let us compare the GEE models with the mixed effect models.</p>
-<div class="cell" data-hash="longitudinal2_cache/html/comp_0f4b290426cd8cb2ce71d619cab31e5d">
+<div class="cell" data-hash="longitudinal2_cache/html/comp_1888e28a1ead643bb7681538f4697b21">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="do">## Generalized mixed effect model model</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3"></a>resp_lmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
@@ -1357,7 +1347,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
 <span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.197453 (tol = 0.002, component 1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="longitudinal2_cache/html/comp2_f531cf739ce75ef04e849a7d92ac98c3">
+<div class="cell" data-hash="longitudinal2_cache/html/comp2_fb76b49a90f4f117d536e994097e8ef5">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">require</span>(afex)</span>
 <span id="cb11-2"><a href="#cb11-2"></a>resp_afex <span class="ot">&lt;-</span> <span class="fu">mixed</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
 <span id="cb11-3"><a href="#cb11-3"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span> </span>
@@ -1377,7 +1367,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb11-17"><a href="#cb11-17"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
 <span id="cb11-18"><a href="#cb11-18"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.041661 (tol = 0.002, component 1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="longitudinal2_cache/html/comp3_affe3a131cd5439e5e0f9b5164f917c9">
+<div class="cell" data-hash="longitudinal2_cache/html/comp3_814db3d39801adc01abb1100e03b56ee">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="do">## GEE model</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>resp_gee3 <span class="ot">&lt;-</span> <span class="fu">gee</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
 <span id="cb12-3"><a href="#cb12-3"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre, </span>
@@ -1468,7 +1458,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb12-88"><a href="#cb12-88"></a><span class="co">#&gt; 586.1581</span></span>
 <span id="cb12-89"><a href="#cb12-89"></a><span class="co"># Covariates are selected based on the QICu criteria</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="longitudinal2_cache/html/compsumm_9fd0a47cf7d4c1361464409d4736fa38">
+<div class="cell" data-hash="longitudinal2_cache/html/compsumm_ae15612359c252649bd660892f8269e6">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="do">## compare estimates (conditional vs. marginal)</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="fu">summary</span>(resp_lmer)<span class="sc">$</span>coefficients <span class="co"># Model failed to converge</span></span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt;                       Estimate Std. Error    z value     Pr(&gt;|z|)</span></span>
@@ -1529,7 +1519,7 @@ Tip
 </div>
 </div>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-<iframe src="https://www.youtube.com/embed/qoqhPq_VILc" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
+<iframe src="https://www.youtube.com/embed/rF8pgvfMqo0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
 </iframe>
 </div>
 </section><section id="reference" class="level3"><h3 class="anchored" data-anchor-id="reference">Reference</h3>
@@ -1537,7 +1527,7 @@ Tip
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-faraway2016extending" class="csl-entry" role="doc-biblioentry">
-Faraway, Julian J. 2016. <em>Extending the Linear Model with r: Generalized Linear, Mixed Effects and Nonparametric Regression Models</em>. CRC press.
+Faraway, Julian J. 2016. <em><span class="nocase">Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models</span></em>. CRC press.
 </div>
 <div id="ref-hothorn2014handbook" class="csl-entry" role="doc-biblioentry">
 Hothorn, Torsten, and Brian S Everitt. 2014. <em>A Handbook of Statistical Analyses Using r</em>. CRC press.
