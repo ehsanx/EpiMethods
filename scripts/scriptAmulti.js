@@ -1,12 +1,11 @@
 function selectAnswer(quizId, selectedAnswer, element) {
     let correctAnswers = {
-        "quiz1": ["A", "C"], // Assuming quiz1 has A and C as correct answers
+        "quiz1": ["A", "C"], 
         "quiz2": ["C"],      
         "quiz3": ["A"],      
         "quiz4": ["C"]
     };
 
-    // Remove any existing 'correct-answer' or 'wrong-answer' classes from the options
     document.querySelectorAll(`#${quizId} ul li`).forEach(li => {
         li.classList.remove('correct-answer', 'wrong-answer');
     });
