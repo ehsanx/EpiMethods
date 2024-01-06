@@ -1,0 +1,67 @@
+---
+title: "Quiz on machine learning"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+# Load required packages
+library(learnr)
+library(xfun)
+```
+
+```{r machinelearning_quiz1, echo=FALSE}
+question("Q1. Say, you are interested in predicting body mass index (bmi in kg/m2) with the following outcome model: model <- as.formula(paste('bmi ~ age + sex + race + income + diet + smoking')). The name of the analytic, training, and testing datasets are data.analytic, data.train, and data.test, respectively. Which function can be used to fit 10-fold cross-validation in R?",
+  answer("fit <- predict(lm(model, data = data.train), newdata = data.test)", message = "This method is the data spliting approach."),
+  answer("fit <- caret::train(model, trControl = trainControl(method = 'cv', number = 10), data = data.train, method = 'lm')", message = "Check whether you are providing the correct dataset."),
+  answer("fit <- caret::train(model, trControl = trainControl(method = 'cv', number = 10), data = data.analytic, method = 'lm')", correct = TRUE),
+  answer("fit <- caret::train(model, trControl = trainControl(method = 'cv', number = 10), data = data.test, method = 'lm", message = "Check whether you are providing the correct dataset."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r machinelearning_quiz2, echo=FALSE}
+question("Q2. Say, 'bmi' is a binary variable in Q1, defined as bmi > 30kg/m2 or not. Which function would you likely use to fit 10-fold cross-validation?",
+  answer("fit <- predict(glm(model, data = data.train, family = 'binomial'), newdata = data.test)", message = "This method is the data spliting approach."),
+  answer("fit <- caret::train(model, trControl = trainControl(method = 'cv', number = 10), data = data.train, method = 'glm')", message = "Check whether you are providing the correct dataset."),
+  answer("fit <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'glm')", correct = TRUE),
+  answer("fit <- caret::train(model, trControl = trainControl(method = 'cv', number = 10), data = data.analytic, method = 'glm)", message = "Check the trControl argument with a binary outcome variable."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r machinelearning_quiz3, echo=FALSE}
+question("Q3.  Which function would you likely use in Q2 if you are interested in fitting LASSO with 10-fold cross-validation?",
+  answer("fit.lasso <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'glmnet', lambda = 0, tuneGrid = expand.grid(alpha = 0, lambda = 1), verbose = FALSE, metric = 'ROC')", message = "Check the difference between LASSO and Ridge."),
+  answer("fit.lasso <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'glmnet', lambda = 0, tuneGrid = expand.grid(alpha = seq(0.1, 0.5,by = 0.05), lambda = seq(0.05, 0.9, by = 0.05)), verbose = FALSE, metric = 'ROC')", message = "Check the difference between LASSO, Ridge, and Elastic net."),
+  answer("fit.lasso <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'glmnet', lambda = 0, tuneGrid = expand.grid(alpha = 1, lambda = 0), verbose = FALSE, metric = 'ROC')", correct = TRUE),
+  answer("fit.lasso <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'glmnet', lambda = 0, tuneGrid = expand.grid(alpha = 0, lambda = 0), verbose = FALSE, metric = 'ROC')", message = "Check the difference between LASSO and Ridge."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r machinelearning_quiz4, echo=FALSE}
+question("Q4. Which of the following is an ensemble method?",
+  answer("fit.ensemble <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'glm', verbose = FALSE, metric = 'ROC')", message = "Logistic regression with k-fold CV is a single learner."),
+  answer("fit.ensemble <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'rpart', verbose = FALSE, metric = 'ROC')", message = "CART is a single learner"),
+  answer("fit.ensemble <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'bag', verbose = FALSE, bagControl = bagControl(fit = ldaBag$fit, predict = ldaBag$pred, aggregate = ldaBag$aggregate), metric = 'ROC')", correct = TRUE, message = "Bagging is a type-I ensemble method."),
+  answer("fit.lasso <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'glmnet', lambda = 0, tuneGrid = expand.grid(alpha = 1, lambda = 0), verbose = FALSE, metric = 'ROC')", message = "LASSO is a single learner"),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r machinelearning_quiz5, echo=FALSE}
+question("Q5. Which is an example of unsupervised learning? (Select All that apply)",
+  answer("fit.unsupervised <- caret::train(model, trControl = trainControl(method = 'cv', number = 10, classProbs = TRUE, summaryFunction = twoClassSummary), data = data.analytic, method = 'rpart', verbose = FALSE, metric = 'ROC')", message = "CART is a type of supervised learning"),
+  answer("fit.unsupervised <- varclus(model, data = data.analytic)", correct = TRUE),
+  answer("fit.unsupervised <- kmeans(data.analytic, centers = 2)", correct = TRUE),
+  answer("fit.unsupervised <- glm(model, data = data.analytic, family = binomial)", message = "Logistic regression is a type of supervised learning"),
+  incorrect = "See the difference between supervised and unsupervised learning. Also, select all that apply.",
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
