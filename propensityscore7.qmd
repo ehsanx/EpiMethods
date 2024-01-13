@@ -1,0 +1,460 @@
+## PSM with MI for subpopulation {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
+# Load required packages
+library(dplyr)
+library(kableExtra)
+library(tableone)
+library(survey)
+library(Publish)
+library(DataExplorer)
+library(mice)
+library(mitools)
+library(MatchIt)
+library(optmatch)
+library(data.table)
+```
+
+### Problem
+
+In this chapter, we will use **propensity score matching (PSM)** with **multiple imputation**, focusing on specific subpopulations defined by the study's eligibility criteria. We will use PSM as per @dugoff2014generalizing recommendation, with SMD cut-point 0.2 and adjust for imbalanced and/or all covariates in the outcome model, if any. 
+
+The modified dataset from NHANES 2017- 2018, which was also used in **missing data** [subpopulations chapter](missingdata5.html), will be used. This example aims to *demonstrate how to do the missing data analysis using multiple imputation with PSM in the context of complex surveys*.
+
+### Pre-processing
+
+#### Load data
+
+Let us import the dataset:
+
+```{r load, cache=TRUE}
+load("Data/missingdata/MIexample.RData")
+ls()
+```
+
+#### Variables
+
+The dataset (`dat.full`) contains 9,254 subjects with 15 variables:
+
+**Survey information**
+
+-   `studyid`: Respondent sequence number
+-   `survey.weight`: Full sample 2 year interview weight
+-   `psu`: Masked pseudo PSU
+-   `strata`: Masked pseudo strata
+
+**Outcome variable**
+
+-   `cvd`: Whether having cardiovascular disease
+
+**Exposure variable**
+
+-   `rheumatoid`: Whether having rheumatoid arthritis
+
+**Covariates**
+
+-   `age`: age in years at screening
+-   `sex`
+-   `education`
+-   `race`: Race/Ethnicity
+-   `income`: Family income in \$
+-   `bmi`: Body Mass Index in kg/m$^2$
+-   `smoking`: Smoking status
+-   `htn`: Having hypertension
+-   `diabetes`: Having diabetes
+
+#### Data pre-processng
+
+```{r dataprocess, cache=TRUE}
+# Categorical age
+dat.full$age.cat <- with(dat.full, ifelse(age >= 20 & age < 50, "20-49", 
+                                  ifelse(age >= 50 & age < 65, "50-64", "65+")))
+dat.full$age.cat <- factor(dat.full$age.cat, levels = c("20-49", "50-64", "65+"))
+table(dat.full$age.cat, useNA = "always")
+
+# Recode rheumatoid to arthritis
+dat.full$arthritis <- car::recode(dat.full$rheumatoid, " 'No' = 'No arthritis';
+                                      'Yes' = 'Rheumatoid arthritis' ", as.factor = T)
+table(dat.full$arthritis, useNA = "always")
+```
+
+#### Subsetting according to eligibility
+
+We will create the analytic dataset with
+
+-   adults aged 20 years or more
+-   without missing values in outcome (cvd) or exposure (rheumatoid arthritis).
+
+```{r analytic0, cache=TRUE}
+# Drop < 20 years
+dat.with.miss <- subset(dat.full, age >= 20)
+
+# Frequency for outcome and exposure 
+table(dat.with.miss$cvd, useNA = "always") # 6 missing
+table(dat.with.miss$rheumatoid, useNA = "always") # 1375 missing
+
+# Drop missing in outcome and exposure - dataset with missing values only in covariates
+dat.analytic <- dat.with.miss[complete.cases(dat.with.miss$cvd),]
+dat.analytic <- dat.analytic[complete.cases(dat.analytic$rheumatoid),]
+nrow(dat.analytic)
+```
+
+We have 4,191 participants in our analytic dataset. The **general strategy of solution** to implement PSM with MI is as follows:
+
+-   We will build the imputation model on 4,191 eligible subjects, and
+-   Apply PSM on each of the imputed datasets, where we will utilize survey features for population-level estimate
+-   Pool the estimates using Rubin's rule
+
+
+#### variable summary
+
+Let us see the summary statistics as we did in the missing data analysis:
+
+```{r analytic2, cache=TRUE}
+# Keep only relevant variables
+vars <-  c("studyid", "survey.weight", "psu", "strata", "cvd", "arthritis", "age.cat", 
+           "sex", "education", "race", "income", "bmi", "smoking", "htn", "diabetes")
+dat.analytic2 <- dat.analytic[, vars]
+
+# Create Table 1
+vars <- c("arthritis", "age.cat", "sex", "education", "race", "income", "bmi", "smoking",
+          "htn", "diabetes")
+tab1 <- CreateTableOne(vars = vars, strata = "cvd", data = dat.analytic2, includeNA = F,
+                       addOverall = T, test = F)
+print(tab1, format = "f", showAllLevels = T)
+```
+
+```{r miss0, out.width = '80%'}
+# missingness
+DataExplorer::plot_missing(dat.analytic2)
+```
+
+### Dealing with missing values in covariates
+
+Similar to the [previous exercise](missingdata5.html), we will create 5 imputed datasets with 3 iterations, and the predictive mean matching method for bmi and income. We will use the strata variable as an auxiliary variable in the imputation model but not the survey weight or PSU variable.
+
+#### Step 0: Set up the imputation model
+
+```{r step0, cache=TRUE}
+# Step 0: Set imputation model
+ini <- mice(data = dat.analytic2, maxit = 0, print = FALSE)
+pred <- ini$pred
+
+# Use the strata variable as an auxiliary variable in the imputation model
+pred["strata",] <- 0
+
+# Do not use survey weight or PSU variable as auxiliary variables
+pred[,"studyid"] <- pred["studyid",] <- 0
+pred[,"psu"] <- pred["psu",] <- 0
+pred[,"survey.weight"] <- pred["survey.weight",] <- 0
+
+# Set imputation method
+meth <- ini$meth
+meth["bmi"] <- "pmm"
+meth["income"] <- "pmm"
+meth
+```
+
+#### Step 1: Imputing missing values using mice for eligible subjects
+
+```{r step1aSave1, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE, echo=FALSE}
+# Step 1: impute the incomplete data
+imputation <- mice(data = dat.analytic2,
+                   seed = 123,
+                   predictorMatrix = pred,
+                   method = meth,
+                   m = 5,
+                   maxit = 3,
+                   print = FALSE)
+save(imputation, file = "Data/propensityscore/impPS.RData")
+```
+
+```{r step1aSave2, warning=FALSE, message=FALSE, cache=TRUE, eval=TRUE, echo=FALSE}
+load("Data/propensityscore/impPS.RData")
+```
+
+```{r step1a, warning=FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+# Step 1: impute the incomplete data
+imputation <- mice(data = dat.analytic2,
+                   seed = 123,
+                   predictorMatrix = pred,
+                   method = meth,
+                   m = 5,
+                   maxit = 3,
+                   print = FALSE)
+```
+
+Let us save the datasets.
+
+```{r saveData, cache=TRUE}
+save(dat.full, dat.analytic, dat.analytic2, imputation, 
+     file = "Data/propensityscore/analytic_imputed.RData")
+```
+
+Now we will combine m = 5 datasets and create a stacked dataset. This dataset should contain 5\*4,191 = 20,955 rows.
+
+```{r step1b, cache=TRUE}
+impdata <- mice::complete(imputation, action="long")
+dim(impdata)
+```
+
+```{r step1c, cache=TRUE}
+#Remove .id variable from the model as it was created in an intermediate step
+impdata$.id <- NULL
+
+# Number of subjects
+nrow(impdata)
+
+# Missing after imputation
+DataExplorer::plot_missing(impdata)
+```
+
+There is no missing value after imputation. There is an additional variable (`.imp`) in the imputed dataset, which goes from 1 to m = 5, indicating the first to the fifth imputed datasets.
+
+#### Step 2: PSM steps 1-3 by DuGoff et al. (2014)
+Our next step is to use steps 1-3 of the PSM analysis: 
+
+-   Step 2.1: Fit the PS model by considering survey features as covariates. 
+-   Step 2.2: Match an exposed subject without replacement within the caliper of 0.2 times the standard deviation of the logit of PS. 
+-   Step 2.3: Balance checking using SMD. Consider SMD <0.2 as a good covariate balancing.
+
+##### Step 2.1: PS model specification
+
+```{r duGstep1, cache=TRUE}
+# Specify the PS model to estimate propensity scores
+ps.formula <- as.formula(I(arthritis == "Rheumatoid arthritis") ~ age.cat + sex + 
+                           education + race + income + bmi + smoking + htn + 
+                           diabetes + psu + strata + survey.weight)
+```
+
+##### Step 2.2: Estimating PS and matching for each imputed dataset
+
+```{r duGstep2, cache=TRUE}
+# Null vector or list to store values
+caliper <- NULL
+dat.matched <- match.obj <- list(NULL)
+
+m <- 5 # 5 imputed dataset
+
+# PSM on each of the imputed datasets
+for (ii in 1:m) {
+  # Imputed dataset
+  dat.imputed <- subset(impdata, .imp == ii)
+  
+  # Propensity scores
+  ps.fit <- glm(ps.formula, data = dat.imputed, family = binomial("logit"))
+  dat.imputed$ps <- fitted(ps.fit)
+  
+  # Caliper fixing to 0.2*sd(logit of PS)
+  caliper[ii] <- 0.2*sd(log(dat.imputed$ps/(1-dat.imputed$ps)))
+  
+  # 1:1 PS matching  
+  set.seed(504)
+  match.obj[[ii]] <- matchit(ps.formula, data = dat.imputed,
+                        distance = dat.imputed$ps, 
+                        method = "nearest", 
+                        replace = FALSE,
+                        caliper = caliper[ii], 
+                        ratio = 1)
+  dat.imputed$ps <- match.obj[[ii]]$distance
+  
+  # Extract matched data
+  dat.matched[[ii]] <- match.data(match.obj[[ii]]) 
+}
+match.obj
+```
+
+```{r duGstep2b, cache=TRUE}
+# Dimension of each of the matched dataset
+lapply(dat.matched, dim)
+```
+
+##### Step 2.3: Balance checking for each imputed dataset
+
+Now we will check balance in terms of SMD on each dataset.
+
+```{r duGstep3, cache=TRUE}
+tab1m <- list(NULL)
+for (ii in 1:m) {
+  # Matched data
+  dat <- dat.matched[[ii]]
+  
+  # Covariates
+  vars <- c("age.cat", "sex", "education", "race", "income", "bmi", "smoking", 
+            "htn", "diabetes")
+  
+  # Balance checking 
+  tab1m[[ii]] <- CreateTableOne(strata = "arthritis", vars = vars, data = dat, test = F)
+}
+print(tab1m, smd = TRUE)
+```
+
+For each of the datasets, all SMDs are less than our specified cut-point of 0.2.
+
+#### Step 3: Outcome modelling 
+Our next step is to fit the outcome model on each of the imputed dataset. Remember, we must utilize survey features to correctly estimate the standard error. 
+
+##### 3.1 Preparing dataset for ineligible subjects
+
+Now we will add the **ineligible subjects**(ineligible by study restriction and unmatched) with the matched datasets, so that we can set up the survey design on the full dataset and then subset the design. 
+
+Let us subset the data for ineligible subjects: 
+
+```{r step3a, cache=TRUE}
+# Subset for ineligible
+dat.ineligible <- list(NULL)
+
+for(ii in 1:m){
+  # Matched dataset
+  dat <- dat.matched[[ii]]
+  
+  # Create an indicator variable in the full dataset
+  dat.full$ineligible <- 1
+  dat.full$ineligible[dat.full$studyid %in% dat$studyid] <- 0
+  
+  # Subset for ineligible
+  dat.ineligible[[ii]] <- subset(dat.full, ineligible == 1)
+  
+  # Create the .imp variable on each dataset with .imp 1 to m = 5
+  dat.ineligible[[ii]]$.imp <- ii
+}
+
+# Dimension of each dataset
+lapply(dat.ineligible, dim)
+```
+
+The next step is combining matched and ineligible datasets. Before merging, we must ensure the variable names are the same.
+
+```{r step3b, cache=TRUE}
+# Variables in the matched datasets
+names(dat.matched[[3]])
+
+# Variables in the ineligible datasets
+names(dat.ineligible[[3]])
+```
+
+Four variables (ps, distance, weights, and subclass) are unavailable in our full, analytic, or ineligible datasets but in the matched datasets. We need to create these 4 variables in the ineligible datasets. 
+
+```{r step3c, cache=TRUE}
+dat.ineligible2 <- list(NULL)
+
+for (ii in 1:m) {
+  dat <- dat.ineligible[[ii]]
+  
+  # Drop the ineligible variable from the dataset
+  dat$ineligible <- NULL
+  
+  # Create ps, distance, weights, and subclass
+  dat$ps <- NA
+  dat$distance <- NA
+  dat$weights <- NA
+  dat$subclass <- NA
+  
+  # Keep only those variables available in the matched dataset
+  vars <- names(dat.matched[[1]])
+  dat <- dat[,vars]
+  
+  # Ineligible datasets in list format
+  dat.ineligible2[[ii]] <- dat
+}
+```
+
+We created ps, distance, weights, and subclass with missing values for the ineligible participants. Note that it doesn't matter whether there are missing covariate values for ineligible. Since we will create the design on the full dataset and subset the design for only eligible (i.e., matched participants), missing covariate values for ineligible will not impact our analysis.
+
+##### 3.2 Combining eligible (matched) and ineligible (unimputed + unmatched) subjects
+
+Now, we will merge matched eligible and unimputed and unmatched ineligible subjects. We should have m = 5 copies of the full dataset with 9,254 subjects on each.
+
+```{r step3d, cache=TRUE}
+dat.full2 <- list(NULL)
+
+for (ii in 1:m) {
+  # Eligible
+  d1 <- data.frame(dat.matched[[ii]])
+  d1$eligible <- 1
+  
+  # Ineligible
+  d2 <- data.frame(dat.ineligible2[[ii]])
+  d2$eligible <- 0
+  
+  # Full data
+  d3 <- rbind(d1, d2)
+  dat.full2[[ii]] <- d3
+}
+lapply(dat.full2, dim)
+
+# Stacked dataset
+dat.stacked <- rbindlist(dat.full2)
+dim(dat.stacked)
+```
+
+##### 3.3 Prepating Survey design and subpopulation of eligible
+
+The next step is to create the design on the combined dataset.
+
+```{r step33, cache=TRUE}
+allImputations <- imputationList(lapply(1:m, function(n) subset(dat.stacked, subset=.imp==n)))
+
+# Design on full data
+w.design0 <- svydesign(ids = ~psu, 
+                       weights = ~survey.weight, 
+                       strata = ~strata,
+                      data = allImputations, 
+                      nest = TRUE) 
+
+# Subset the design
+w.design <- subset(w.design0, eligible == 1) 
+```
+
+We can see the length of the subsetted design:
+
+```{r step33b, cache=TRUE}
+lapply(w.design$designs, dim)
+```
+
+Now we will run the design-adjusted logistic regression on and pool the estimate using Rubin's rule:
+
+##### Step 3.4: Design adjusted regression analysis
+
+```{r step34, cache=TRUE}
+# Design-adjusted logistic regression
+fit <- with(w.design, svyglm(I(cvd == "Yes") ~ arthritis, family = quasibinomial))
+res <- exp(as.data.frame(cbind(coef(fit[[1]]),
+                               coef(fit[[2]]),
+                               coef(fit[[3]]),
+                               coef(fit[[4]]),
+                               coef(fit[[5]]))))
+names(res) <- paste("OR from m =", 1:m)
+round(t(res),2)
+```
+
+##### Step 3.5: Pooling estimates
+
+```{r step35, cache=TRUE}
+# Pooled estimate
+pooled.estimates <- MIcombine(fit)
+OR <- round(exp(pooled.estimates$coefficients), 2)
+OR <- as.data.frame(OR)
+CI <- round(exp(confint(pooled.estimates)), 2)
+OR <- cbind(OR, CI)
+OR
+```
+
+##### Double adjustment
+
+```{r Ausdoubleadj, warning=F, message=F, cache=TRUE}
+# Outcome model with covariates adjustment
+fit2 <- with(w.design, svyglm(I(cvd == "Yes") ~ arthritis + age.cat + sex + education + 
+                               race + income + bmi + smoking + htn + diabetes, 
+                             family = quasibinomial))
+
+# Pooled estimate
+pooled.estimates <- MIcombine(fit2)
+OR <- round(exp(pooled.estimates$coefficients), 2)
+OR <- as.data.frame(OR)
+CI <- round(exp(confint(pooled.estimates)), 2)
+OR <- cbind(OR, CI)
+OR
+```
+
+### References

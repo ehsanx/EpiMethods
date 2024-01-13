@@ -1,0 +1,448 @@
+## PS weighting {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
+# Load required packages
+library(MatchIt)
+require(tableone)
+require(survey)
+require(cobalt)
+require(Publish)
+require(optmatch)
+require(data.table)
+require(ggstance)
+require(DataExplorer)
+require(jtools)
+library(dplyr)
+```
+
+### Propensity analysis problem
+
+In this chapter, we will use **propensity score weighting** (using SMD cut-point 0.2, may adjust for imbalanced and/or all covariates in the outcome model, if any) analysis as per the following recommendations
+    -   [@zanutto2006comparison]
+    -   [@dugoff2014generalizing]
+    -   [@austin2018propensity]
+
+#### Dataset
+
+-   The following modified NHANES dataset
+    -   NHANES15lab5.RData
+-   use the data set "analytic.with.miss" within this file.
+    -   for obtaining the final treatment effect estimates, you can omit missing values, but only after creating the design (e.g., subset the design, not the data itself directly).
+- The same dataset was used for **[propensity score weighting](propensityscore4.html)**
+
+#### Variables
+
+-   Outcome: diabetes
+    -   'No' as the reference category
+-   Exposure: bmi
+    -   convert to binary with \>25 vs. \<= 25,
+    -   with \> 25 as the reference category
+-   Confounder list:
+    -   gender
+    -   age
+        -   assume continuous
+    -   race
+    -   income
+    -   education
+    -   married
+    -   cholesterol
+    -   diastolicBP
+    -   systolicBP
+-   Mediator:
+    -   physical.work
+        -   'No' as the reference category
+-   Survey features
+    -   psu
+    -   strata
+    -   weight
+
+### Pre-processing
+
+#### Load data
+
+```{r data, cache=TRUE}
+load(file="Data/propensityscore/NHANES15lab5.RData")
+```
+
+#### Variable summary
+
+```{r varsum, cache=TRUE}
+# Full data
+dat.full <- analytic.with.miss
+
+# Exposure
+dat.full$bmi <- with(dat.full, ifelse(bmi>25, "Overweight", 
+                                      ifelse(bmi<=25, "Not overweight", NA)))
+dat.full$bmi <- as.factor(dat.full$bmi)
+dat.full$bmi <- relevel(dat.full$bmi, ref = "Overweight")
+
+# Drop unnecessary variables 
+dat.full$born <- NULL
+dat.full$physical.work <- NULL
+
+# Rename the weight variable into interview.weight
+names(dat.full)[names(dat.full) == "weight"] <- "interview.weight"
+```
+
+#### Complete case data
+We will use the complete case data to perform the analysis.
+
+```{r ccdata, cache=TRUE}
+# Complete case data 
+analytic.data <- dat.full[complete.cases(dat.full),]
+dim(analytic.data)
+```
+
+#### Reproducibility
+
+```{r seed, cache=TRUE}
+set.seed(504)
+```
+
+### Approach by Zanutto (2006)
+
+#### Step 1
+
+```{r Zanstep1, cache=TRUE}
+# Specify the PS model to estimate propensity scores
+ps.formula <- as.formula(I(bmi=="Not overweight") ~ gender + age + race + income + education + 
+                           married + cholesterol + diastolicBP + systolicBP)
+```
+
+#### Step 2
+For the second step, we will calculate the both unstabilized and stabilized weights. However, stabilized inverse probability weight is often recommended to prevent from extreme weights [@hernan2006estimating]. 
+
+```{r Zanstep2, cache=TRUE}
+# Propensity scores
+ps.fit <- glm(ps.formula, data = analytic.data, family = binomial("logit"))
+analytic.data$ps <- predict(ps.fit, type = "response", newdata = analytic.data)
+
+# Unstabilized weight
+analytic.data$usweight <- with(analytic.data, ifelse(I(bmi=="Not overweight"), 
+                                                     1/ps, 1/(1-ps)))
+
+# Unstabilized weight summary
+round(summary(analytic.data$usweight), 2)
+
+# Stabilized weight
+analytic.data$sweight <- with(analytic.data, ifelse(I(bmi=="Not overweight"), 
+                                                    mean(I(bmi=="Not overweight"))/ps, 
+                                                    (1-mean(I(bmi=="Not overweight")))/(1-ps)))
+
+# Stabilized weight summary
+round(summary(analytic.data$sweight), 2)
+```
+
+We can see that the mean of stabilized weights is 1, while it is approximately 2.1 for unstabilized weights. For both unstabilized and stabilized weights, it seems there are extreme weights, particularly for the unstabilized weights. Extreme weights could be dealt with weight truncation, typically truncated at the 1st and 99th percentiles [@cole2008constructing].
+
+Let us truncate the weights at the 1st and 99th percentiles
+
+```{r wgttruc, cache=TRUE}
+# Truncating unstabilized weight
+analytic.data <- analytic.data %>% 
+  mutate(usweight_t = pmin(pmax(usweight, quantile(usweight, 0.01)), 
+                           quantile(usweight, 0.99)))
+summary(analytic.data$usweight_t)
+
+# Truncating stabilized weight
+analytic.data <- analytic.data %>% 
+  mutate(sweight_t = pmin(pmax(sweight, quantile(sweight, 0.01)), 
+                          quantile(sweight, 0.99)))
+summary(analytic.data$sweight_t)
+```
+
+#### Step 3
+
+Now we will check the distribution of the covariates by the exposure status on the pseudo population in terms of pre-specified SMD. 
+
+```{r Zanstep3, cache=TRUE}
+# Covariates
+vars <- c("gender", "age", "race", "income", "education", "married", "cholesterol", 
+         "diastolicBP", "systolicBP")
+
+# Design with truncated unstabilized weight
+design.unstab <- svydesign(ids = ~ID, weights = ~usweight_t, data = analytic.data)
+
+# Design with truncated stabilized weight
+design.stab <- svydesign(ids = ~ID, weights = ~sweight_t, data = analytic.data)
+
+# Balance checking with truncated unstabilized weight
+tab.unstab <- svyCreateTableOne(vars = vars, strata = "bmi", data = design.unstab, test = F)
+print(tab.unstab, smd = T)
+
+# Balance checking with truncated stabilized weight
+tab.stab <- svyCreateTableOne(vars = vars, strata = "bmi", data = design.stab, test = F)
+print(tab.stab, smd = T)
+```
+
+As we can see, all SMDs are less than our specified cut-point of 0.2, indicating that there is good covariate balancing. next, we will fit the outcome model on the pseudo population (i.e., weighted data). Note that we must utilize the survey feature as the design for the population-level estimate. For this step, we will multiply propensity score weight and survey weight and create a `new weight` variable. 
+
+#### Step 4 - with unstabilized weight
+
+```{r Zanstep4, warning=F, message=F, cache=TRUE}
+require(survey)
+require(jtools)
+
+# Create an indicator variable in the full dataset
+dat.full$ind <- 0
+dat.full$ind[dat.full$ID %in% analytic.data$ID] <- 1
+
+# New weight = interview weight * unstabilized weight 
+analytic.data$new.usweight_t <- with(analytic.data, interview.weight * usweight_t)
+summary(analytic.data$new.usweight_t)
+
+#  New weight variable in the full dataset
+dat.full$new.usweight_t <- 0
+dat.full$new.usweight_t[dat.full$ID %in% analytic.data$ID] <- 
+  analytic.data$new.usweight_t
+summary(dat.full$new.usweight_t)
+
+# Survey setup with full data 
+w.design0 <- svydesign(id = ~psu, strata = ~strata, weights = ~new.usweight_t, 
+                      data = dat.full, nest = TRUE)
+
+# Subset the design for analytic sample
+w.design.s <- subset(w.design0, ind == 1)
+
+# Outcome model
+out.formula <- as.formula(I(diabetes == "Yes") ~ bmi)
+fit <- svyglm(out.formula, design = w.design.s, family = binomial("logit"))
+summ(fit, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+#### Step 4 - with stabilized weight
+Similarly, we can fit the outcome model with stabilized weights.
+
+```{r Zanstep4stab, warning=F, message=F, cache=TRUE}
+# Create an indicator variable in the full dataset
+dat.full$ind <- 0
+dat.full$ind[dat.full$ID %in% analytic.data$ID] <- 1
+
+# New weight = interview weight * stabilized weight
+analytic.data$new.sweight_t <- with(analytic.data, interview.weight * sweight_t)
+summary(analytic.data$new.sweight_t)
+
+#  New weight variable in the full dataset
+dat.full$new.sweight_t <- 0
+dat.full$new.sweight_t[dat.full$ID %in% analytic.data$ID] <- analytic.data$new.sweight_t
+summary(dat.full$new.sweight_t)
+
+# Survey setup with full data 
+w.design0 <- svydesign(id = ~psu, strata = ~strata, weights = ~new.sweight_t, 
+                       data = dat.full, nest = TRUE)
+
+# Subset the design for analytic sample
+w.design.s2 <- subset(w.design0, ind == 1)
+
+# Outcome model
+out.formula <- as.formula(I(diabetes == "Yes") ~ bmi)
+fit.stab <- svyglm(out.formula, design = w.design.s2, family = binomial("logit"))
+summ(fit.stab, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+#### Double adjustment
+
+```{r Zandoubleadj, message=F, warning=F, cache=TRUE}
+library(survey)
+# Outcome model with covariates adjustment
+fit.DA <- svyglm(I(diabetes == "Yes") ~ bmi + gender + age + race + income + 
+                 education + married + cholesterol + diastolicBP + systolicBP, 
+               design = w.design.s2, family = binomial("logit"))
+summ(fit.DA, exp = TRUE, confint = TRUE, digits = 3)
+
+# Log odds ratio with p-values
+summary(fit.DA, df.resid = degf(w.design.s2))
+```
+
+::: callout-tip
+**Double adjustment**:
+
+As explained in the [previous chapter](propensityscore4.html), double adjustment should be applied thoughtfully, with careful consideration of model specification, covariate selection, and underlying assumptions to ensure valid and reliable results. Always consider the specific context of the study and consult statistical guidelines or experts when applying advanced methods like double adjustment in propensity score analysis.
+::: 
+
+
+### Approach by DuGoff et al. (2014)
+
+#### Step 1
+
+```{r duGstep1, cache=TRUE}
+# Specify the PS model to estimate propensity scores
+ps.formula2 <- as.formula(I(bmi == "Not overweight") ~ gender + age + race + income + education + 
+                           married + cholesterol + diastolicBP + systolicBP + 
+                           psu + strata + interview.weight)
+```
+
+#### Step 2
+
+```{r duGstep2, cache=TRUE}
+# Propensity scores
+ps.fit2 <- glm(ps.formula2, data = analytic.data, family = binomial("logit"))
+analytic.data$ps2 <- fitted(ps.fit2)
+
+# Stabilized weight
+analytic.data$sweight.dug <- with(analytic.data, ifelse(I(bmi=="Not overweight"), 
+                                                    mean(I(bmi=="Not overweight"))/ps2, 
+                                                    (1-mean(I(bmi=="Not overweight")))/(1-ps2)))
+summary(analytic.data$sweight.dug)
+
+# Truncating stabilized weight
+analytic.data <- analytic.data %>% 
+  mutate(sweight.dug_t = pmin(pmax(sweight.dug, quantile(sweight.dug, 0.01)), 
+                          quantile(sweight.dug, 0.99)))
+summary(analytic.data$sweight.dug_t)
+```
+
+#### Step 3
+
+```{r duGstep3, cache=TRUE}
+# Balance checking
+cov2 <- c("gender", "age", "race", "income", "education", "married", "cholesterol", 
+         "diastolicBP", "systolicBP")
+
+# Design with truncated stabilized weight
+design.stab <- svydesign(ids = ~ID, weights = ~sweight.dug_t, data = analytic.data)
+
+# Balance checking with truncated stabilized weight
+tab.stab2 <- svyCreateTableOne(vars = cov2, strata = "bmi", data = design.stab, test = F)
+print(tab.stab2, smd = T)
+```
+
+All SMDs are less than our specified cut-point of 0.2.
+
+#### Step 4
+
+```{r duGstep4, message=F, warning=F, cache=TRUE}
+# Create an indicator variable in the full dataset
+dat.full$ind <- 0
+dat.full$ind[dat.full$ID %in% analytic.data$ID] <- 1
+
+# New weight = interview weight * stabilized weight
+analytic.data$new.sweight.dug_t <- with(analytic.data, interview.weight * sweight.dug_t)
+summary(analytic.data$new.sweight.dug_t)
+
+#  New weight variable in the full dataset
+dat.full$new.sweight.dug_t <- 0
+dat.full$new.sweight.dug_t[dat.full$ID %in% analytic.data$ID] <- analytic.data$new.sweight.dug_t
+summary(dat.full$new.sweight.dug_t)
+
+# Survey setup with full data 
+w.design0 <- svydesign(id = ~psu, strata = ~strata, weights = ~new.sweight.dug_t, 
+                       data = dat.full, nest = TRUE)
+
+# Subset the design for analytic sample
+w.design.s2 <- subset(w.design0, ind == 1)
+
+# Outcome model
+out.formula <- as.formula(I(diabetes == "Yes") ~ bmi)
+fit.stab.dug <- svyglm(out.formula, design = w.design.s2, family = binomial("logit"))
+summ(fit.stab.dug, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+#### Double adjustment
+
+```{r duGdoubleadj2, warning=F, message=F, cache=TRUE}
+# Outcome model with covariates adjustment
+fit2.DA <- svyglm(I(diabetes == "Yes") ~ bmi + gender + age + race + income + 
+                 education + married + cholesterol + diastolicBP + systolicBP, 
+               design = w.design.s2, family = binomial("logit"))
+summ(fit2.DA, exp = TRUE, confint = TRUE, digits = 3)
+
+# Log odds ratio with p-values
+summary(fit2.DA, df.resid = degf(w.design.s2))
+```
+
+### Approach by Austin et al. (2018)
+
+#### Step 1
+
+```{r Ausstep1, cache=TRUE}
+# Specify the PS model to estimate propensity scores
+ps.formula3 <- as.formula(I(bmi == "Not overweight") ~ gender + age + race + income + education + 
+                           married + cholesterol + diastolicBP + systolicBP)
+
+# Survey design
+require(survey)
+analytic.design <- svydesign(id = ~psu, weights = ~interview.weight, strata = ~strata,
+                             data = analytic.data, nest = TRUE)
+```
+
+#### Step 2
+
+```{r Ausstep2, warning=F, message=F, cache=TRUE}
+# Propensity scores
+ps.fit3 <- svyglm(ps.formula3, design = analytic.design, family = binomial("logit"))
+analytic.data$ps3 <- fitted(ps.fit3)
+
+# Stabilized weight
+analytic.data$sweight.aus <- with(analytic.data, ifelse(I(bmi=="Not overweight"), 
+                                                    mean(I(bmi=="Not overweight"))/ps3, 
+                                                    (1-mean(I(bmi=="Not overweight")))/(1-ps3)))
+summary(analytic.data$sweight.aus)
+
+# Truncating stabilized weight
+analytic.data <- analytic.data %>% 
+  mutate(sweight.aus_t = pmin(pmax(sweight.aus, quantile(sweight.aus, 0.01)), 
+                          quantile(sweight.aus, 0.99)))
+summary(analytic.data$sweight.aus_t)
+```
+
+#### Step 3
+
+```{r Ausstep, cache=TRUE}
+# Balance checking
+vars <- c("gender", "age", "race", "income", "education", "married", "cholesterol", 
+          "diastolicBP", "systolicBP")
+
+# Design with truncated stabilized weight
+design.stab <- svydesign(ids = ~ID, weights = ~sweight.aus_t, data = analytic.data)
+
+# Balance checking with truncated stabilized weight
+tab.stab.aus <- svyCreateTableOne(vars = vars, strata = "bmi", data = design.stab, test = F)
+print(tab.stab.aus, smd = T)
+```
+
+All SMDs are less than our specified cut-point of 0.2. 
+
+#### Step 4
+
+```{r Ausstep4, warning=F, message=F, cache=TRUE}
+# Create an indicator variable in the full dataset
+dat.full$ind <- 0
+dat.full$ind[dat.full$ID %in% analytic.data$ID] <- 1
+
+# New weight = interview weight * stabilized weight
+analytic.data$new.sweight.aus_t <- with(analytic.data, interview.weight * sweight.aus_t)
+summary(analytic.data$new.sweight.aus_t)
+
+#  New weight variable in the full dataset
+dat.full$new.sweight.aus_t <- 0
+dat.full$new.sweight.aus_t[dat.full$ID %in% analytic.data$ID] <- analytic.data$new.sweight.aus_t
+summary(dat.full$new.sweight.aus_t)
+
+# Survey setup with full data 
+w.design0 <- svydesign(id = ~psu, strata = ~strata, weights = ~new.sweight.aus_t, 
+                       data = dat.full, nest = TRUE)
+
+# Subset the design for analytic sample
+w.design.s2 <- subset(w.design0, ind == 1)
+
+# Outcome model
+out.formula <- as.formula(I(diabetes == "Yes") ~ bmi)
+fit.stab.aus <- svyglm(out.formula, design = w.design.s2, family = binomial("logit"))
+summ(fit.stab.aus, exp = TRUE, confint = TRUE, digits = 3)
+```
+
+#### Double adjustment
+
+```{r Ausdoubleadj, warning=F, message=F, cache=TRUE}
+# Outcome model with covariates adjustment
+fit3.DA <- svyglm(I(diabetes == "Yes") ~ bmi + gender + age + race + income + 
+                 education + married + cholesterol + diastolicBP + systolicBP, 
+               design = w.design.s2, family = binomial("logit"))
+summ(fit3.DA, exp = TRUE, confint = TRUE, digits = 3)
+
+# Log odds ratio with p-values
+summary(fit3.DA, df.resid = degf(w.design.s2))
+```
+
+### References
