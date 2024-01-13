@@ -1,4 +1,4 @@
-## PS weighting {.unnumbered}
+## PSW  {.unnumbered}
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
 # Load required packages
@@ -17,10 +17,7 @@ library(dplyr)
 
 ### Propensity analysis problem
 
-In this chapter, we will use **propensity score weighting** (using SMD cut-point 0.2, may adjust for imbalanced and/or all covariates in the outcome model, if any) analysis as per the following recommendations
-    -   [@zanutto2006comparison]
-    -   [@dugoff2014generalizing]
-    -   [@austin2018propensity]
+In this chapter, we will use **propensity score weighting** (using SMD cut-point 0.2, may adjust for imbalanced and/or all covariates in the outcome model, if any) analysis as per the following recommendations - [@zanutto2006comparison] - [@dugoff2014generalizing] - [@austin2018propensity]
 
 #### Dataset
 
@@ -28,7 +25,7 @@ In this chapter, we will use **propensity score weighting** (using SMD cut-point
     -   NHANES15lab5.RData
 -   use the data set "analytic.with.miss" within this file.
     -   for obtaining the final treatment effect estimates, you can omit missing values, but only after creating the design (e.g., subset the design, not the data itself directly).
-- The same dataset was used for **[propensity score weighting](propensityscore4.html)**
+-   The same dataset was used for [**propensity score weighting**](propensityscore4.html)
 
 #### Variables
 
@@ -85,6 +82,7 @@ names(dat.full)[names(dat.full) == "weight"] <- "interview.weight"
 ```
 
 #### Complete case data
+
 We will use the complete case data to perform the analysis.
 
 ```{r ccdata, cache=TRUE}
@@ -110,7 +108,8 @@ ps.formula <- as.formula(I(bmi=="Not overweight") ~ gender + age + race + income
 ```
 
 #### Step 2
-For the second step, we will calculate the both unstabilized and stabilized weights. However, stabilized inverse probability weight is often recommended to prevent from extreme weights [@hernan2006estimating]. 
+
+For the second step, we will calculate the both unstabilized and stabilized weights. However, stabilized inverse probability weight is often recommended to prevent from extreme weights [@hernan2006estimating].
 
 ```{r Zanstep2, cache=TRUE}
 # Propensity scores
@@ -153,7 +152,7 @@ summary(analytic.data$sweight_t)
 
 #### Step 3
 
-Now we will check the distribution of the covariates by the exposure status on the pseudo population in terms of pre-specified SMD. 
+Now we will check the distribution of the covariates by the exposure status on the pseudo population in terms of pre-specified SMD.
 
 ```{r Zanstep3, cache=TRUE}
 # Covariates
@@ -175,7 +174,7 @@ tab.stab <- svyCreateTableOne(vars = vars, strata = "bmi", data = design.stab, t
 print(tab.stab, smd = T)
 ```
 
-As we can see, all SMDs are less than our specified cut-point of 0.2, indicating that there is good covariate balancing. next, we will fit the outcome model on the pseudo population (i.e., weighted data). Note that we must utilize the survey feature as the design for the population-level estimate. For this step, we will multiply propensity score weight and survey weight and create a `new weight` variable. 
+As we can see, all SMDs are less than our specified cut-point of 0.2, indicating that there is good covariate balancing. next, we will fit the outcome model on the pseudo population (i.e., weighted data). Note that we must utilize the survey feature as the design for the population-level estimate. For this step, we will multiply propensity score weight and survey weight and create a `new weight` variable.
 
 #### Step 4 - with unstabilized weight
 
@@ -211,6 +210,7 @@ summ(fit, exp = TRUE, confint = TRUE, digits = 3)
 ```
 
 #### Step 4 - with stabilized weight
+
 Similarly, we can fit the outcome model with stabilized weights.
 
 ```{r Zanstep4stab, warning=F, message=F, cache=TRUE}
@@ -258,8 +258,7 @@ summary(fit.DA, df.resid = degf(w.design.s2))
 **Double adjustment**:
 
 As explained in the [previous chapter](propensityscore4.html), double adjustment should be applied thoughtfully, with careful consideration of model specification, covariate selection, and underlying assumptions to ensure valid and reliable results. Always consider the specific context of the study and consult statistical guidelines or experts when applying advanced methods like double adjustment in propensity score analysis.
-::: 
-
+:::
 
 ### Approach by DuGoff et al. (2014)
 
@@ -401,7 +400,7 @@ tab.stab.aus <- svyCreateTableOne(vars = vars, strata = "bmi", data = design.sta
 print(tab.stab.aus, smd = T)
 ```
 
-All SMDs are less than our specified cut-point of 0.2. 
+All SMDs are less than our specified cut-point of 0.2.
 
 #### Step 4
 

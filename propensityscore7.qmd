@@ -1,4 +1,4 @@
-## PSM with MI for subpopulation {.unnumbered}
+## PSM with MI in subset {.unnumbered}
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
 # Load required packages
@@ -17,7 +17,7 @@ library(data.table)
 
 ### Problem
 
-In this chapter, we will use **propensity score matching (PSM)** with **multiple imputation**, focusing on specific subpopulations defined by the study's eligibility criteria. We will use PSM as per @dugoff2014generalizing recommendation, with SMD cut-point 0.2 and adjust for imbalanced and/or all covariates in the outcome model, if any. 
+In this chapter, we will use **propensity score matching (PSM)** with **multiple imputation**, focusing on specific subpopulations defined by the study's eligibility criteria. We will use PSM as per @dugoff2014generalizing recommendation, with SMD cut-point 0.2 and adjust for imbalanced and/or all covariates in the outcome model, if any.
 
 The modified dataset from NHANES 2017- 2018, which was also used in **missing data** [subpopulations chapter](missingdata5.html), will be used. This example aims to *demonstrate how to do the missing data analysis using multiple imputation with PSM in the context of complex surveys*.
 
@@ -104,7 +104,6 @@ We have 4,191 participants in our analytic dataset. The **general strategy of so
 -   We will build the imputation model on 4,191 eligible subjects, and
 -   Apply PSM on each of the imputed datasets, where we will utilize survey features for population-level estimate
 -   Pool the estimates using Rubin's rule
-
 
 #### variable summary
 
@@ -212,11 +211,12 @@ DataExplorer::plot_missing(impdata)
 There is no missing value after imputation. There is an additional variable (`.imp`) in the imputed dataset, which goes from 1 to m = 5, indicating the first to the fifth imputed datasets.
 
 #### Step 2: PSM steps 1-3 by DuGoff et al. (2014)
-Our next step is to use steps 1-3 of the PSM analysis: 
 
--   Step 2.1: Fit the PS model by considering survey features as covariates. 
--   Step 2.2: Match an exposed subject without replacement within the caliper of 0.2 times the standard deviation of the logit of PS. 
--   Step 2.3: Balance checking using SMD. Consider SMD <0.2 as a good covariate balancing.
+Our next step is to use steps 1-3 of the PSM analysis:
+
+-   Step 2.1: Fit the PS model by considering survey features as covariates.
+-   Step 2.2: Match an exposed subject without replacement within the caliper of 0.2 times the standard deviation of the logit of PS.
+-   Step 2.3: Balance checking using SMD. Consider SMD \<0.2 as a good covariate balancing.
 
 ##### Step 2.1: PS model specification
 
@@ -291,14 +291,15 @@ print(tab1m, smd = TRUE)
 
 For each of the datasets, all SMDs are less than our specified cut-point of 0.2.
 
-#### Step 3: Outcome modelling 
-Our next step is to fit the outcome model on each of the imputed dataset. Remember, we must utilize survey features to correctly estimate the standard error. 
+#### Step 3: Outcome modelling
+
+Our next step is to fit the outcome model on each of the imputed dataset. Remember, we must utilize survey features to correctly estimate the standard error.
 
 ##### 3.1 Preparing dataset for ineligible subjects
 
-Now we will add the **ineligible subjects**(ineligible by study restriction and unmatched) with the matched datasets, so that we can set up the survey design on the full dataset and then subset the design. 
+Now we will add the **ineligible subjects**(ineligible by study restriction and unmatched) with the matched datasets, so that we can set up the survey design on the full dataset and then subset the design.
 
-Let us subset the data for ineligible subjects: 
+Let us subset the data for ineligible subjects:
 
 ```{r step3a, cache=TRUE}
 # Subset for ineligible
@@ -333,7 +334,7 @@ names(dat.matched[[3]])
 names(dat.ineligible[[3]])
 ```
 
-Four variables (ps, distance, weights, and subclass) are unavailable in our full, analytic, or ineligible datasets but in the matched datasets. We need to create these 4 variables in the ineligible datasets. 
+Four variables (ps, distance, weights, and subclass) are unavailable in our full, analytic, or ineligible datasets but in the matched datasets. We need to create these 4 variables in the ineligible datasets.
 
 ```{r step3c, cache=TRUE}
 dat.ineligible2 <- list(NULL)

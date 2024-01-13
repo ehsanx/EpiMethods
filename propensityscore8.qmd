@@ -1,4 +1,4 @@
-## PS weighting with MI for subpopulation {.unnumbered}
+## PSW with MI in subset {.unnumbered}
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
 # Load required packages
@@ -17,7 +17,7 @@ library(data.table)
 
 ### Problem
 
-In this chapter, we will use **propensity score (PS) weighting** with **multiple imputation (MI)**, focusing on specific subpopulations defined by the study's eligibility criteria. Similar to the previous chapter on [PSM with MI for subpopulation](propensityscore7.html), the modified dataset from NHANES 2017- 2018, will be used. 
+In this chapter, we will use **propensity score (PS) weighting** with **multiple imputation (MI)**, focusing on specific subpopulations defined by the study's eligibility criteria. Similar to the previous chapter on [PSM with MI for subpopulation](propensityscore7.html), the modified dataset from NHANES 2017- 2018, will be used.
 
 ### Load data
 
@@ -42,6 +42,7 @@ The **general strategy of solution** to implement PS weighting with MI is as fol
 ### Dealing with missing values in covariates
 
 #### Step 1: Imputing missing values using mice for eligible subjects
+
 We already completed this step in the [previous chapter](propensityscore7.html), where we imputed m = 5 datasets using MI.
 
 Now we will combine 5 datasets and create a stacked dataset. This dataset should contain 5\*4,191 = 20,955 rows.
@@ -59,11 +60,12 @@ DataExplorer::plot_missing(impdata)
 ```
 
 #### Step 2: PS weighting steps 1-3 by DuGoff et al. (2014)
-Our next step is to use steps 1-3 of the PS weighting analysis: 
 
--   Step 2.1: Fit the PS model by considering survey features as covariates. 
--   Step 2.2: Calculate PS weights 
--   Step 2.3: Balance checking using SMD. Consider SMD <0.2 as a good covariate balancing.
+Our next step is to use steps 1-3 of the PS weighting analysis:
+
+-   Step 2.1: Fit the PS model by considering survey features as covariates.
+-   Step 2.2: Calculate PS weights
+-   Step 2.3: Balance checking using SMD. Consider SMD \<0.2 as a good covariate balancing.
 
 ##### Step 2.1: PS model specification
 
@@ -74,7 +76,7 @@ ps.formula <- as.formula(I(arthritis == "Rheumatoid arthritis") ~ age.cat + sex 
                            diabetes + psu + strata + survey.weight)
 ```
 
-##### Step 2.2: Estimating PS and calculating weights 
+##### Step 2.2: Estimating PS and calculating weights
 
 ```{r duGstep2, cache=TRUE}
 dat.ps <- list(NULL)
@@ -133,10 +135,11 @@ for (ii in 1:m) {
 print(tab1m, smd = TRUE)
 ```
 
-For each of the datasets, all SMDs except for smoking are less than our specified cut-point of 0.2. We will adjust our outcome model for smoking. 
+For each of the datasets, all SMDs except for smoking are less than our specified cut-point of 0.2. We will adjust our outcome model for smoking.
 
-#### Step 3: Outcome modelling 
-Our next step is to fit the outcome model on each of the imputed dataset. Note that, we must utilize survey features to correctly estimate the standard error. For this step, we will multiply PS weight and survey weight and create a `new weight` variable. 
+#### Step 3: Outcome modelling
+
+Our next step is to fit the outcome model on each of the imputed dataset. Note that, we must utilize survey features to correctly estimate the standard error. For this step, we will multiply PS weight and survey weight and create a `new weight` variable.
 
 ##### 3.1 Calculating new weights
 
@@ -156,9 +159,9 @@ for (ii in 1:m) {
 
 ##### 3.2 Preparing dataset for ineligible subjects
 
-Now we will add the **ineligible subjects**(ineligible by study restriction) with the PS weighted datasets, so that we can set up the survey design on the full dataset and then subset the design. 
+Now we will add the **ineligible subjects**(ineligible by study restriction) with the PS weighted datasets, so that we can set up the survey design on the full dataset and then subset the design.
 
-Let us subset the data for ineligible subjects: 
+Let us subset the data for ineligible subjects:
 
 ```{r step3a, cache=TRUE}
 # Subset for ineligible
@@ -251,7 +254,7 @@ dim(dat.stacked)
 
 ##### 3.3 Prepating Survey design and subpopulation of eligible
 
-The next step is to create the design on the combined dataset. Make sure to use the `new weight` variable that combines survey weights and PS weights. 
+The next step is to create the design on the combined dataset. Make sure to use the `new weight` variable that combines survey weights and PS weights.
 
 ```{r step33, cache=TRUE}
 allImputations <- imputationList(lapply(1:m, function(n) subset(dat.stacked, subset=.imp==n)))
@@ -273,7 +276,7 @@ We can see the length of the subsetted design:
 lapply(w.design$designs, dim)
 ```
 
-Now we will run the design-adjusted logistic regression, adjusting for smoking since smoking was not balanced in terms of SMD. 
+Now we will run the design-adjusted logistic regression, adjusting for smoking since smoking was not balanced in terms of SMD.
 
 ##### Step 3.4: Design adjusted regression analysis
 
@@ -291,7 +294,7 @@ round(t(res),2)
 
 ##### Step 3.5: Pooling estimates
 
-Now, we will  pool the estimate using Rubin's rule:
+Now, we will pool the estimate using Rubin's rule:
 
 ```{r step35, cache=TRUE}
 # Pooled estimate

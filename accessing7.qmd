@@ -1,16 +1,16 @@
 ## Linking mortality data {.unnumbered}
 
-This tutorial provides instructions on linking public-use US mortality data with National Health and (Nutrition Examination Survey (NHANES))[https://www.cdc.gov/nchs/nhanes/index.htm] dataset. One can also follow the same steps to link the mortality data with (National Health Interview Survey (NHIS))[https://www.cdc.gov/nchs/nhis/index.htm] 
+This tutorial provides instructions on linking public-use US mortality data with the [NHANES](https://www.cdc.gov/nchs/nhanes/index.htm) dataset. One can also follow the same steps to link the mortality data with the [NHIS](https://www.cdc.gov/nchs/nhis/index.htm).
 
 ### Download mortality data
 
-The public-use mortality data can be downloaded directly from the (CDC website)[https://ftp.cdc.gov/pub/Health_Statistics/NCHS/datalinkage/linked_mortality/]. Datasets are available in `.dat` format, separately for each cycle of NHANES and NHIS.
+The public-use mortality data can be downloaded directly from the [CDC website](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/datalinkage/linked_mortality/). Datasets are available in .dat format, separately for each cycle of NHANES and NHIS.
 
 ```{r mort1, echo=FALSE, cache=TRUE, out.width = '100%'}
 knitr::include_graphics("Images/accessing/mortality_link.png")
 ```
 
-On the same website, CDC also provided R, SAS, and Stata codes with instructions on how to download the datasets directly from the website. 
+On the same website, CDC also provided R, SAS, and Stata codes with instructions on how to download the datasets directly from the website.
 
 ```{r mort2, echo=FALSE, cache=TRUE, out.width = '70%'}
 knitr::include_graphics("Images/accessing/codes.png")
@@ -24,7 +24,7 @@ knitr::include_graphics("Images/accessing/mortSave.png")
 
 Note that the data file is saved as `<survey name>_MORT_2019_PUBLIC.dat`. In our example, we downloaded mortality data for the NHANES 2013-14 participants. Hence, the name of the file should be `NHANES_2013_2014_MORT_2019_PUBLIC.dat`.
 
-```{r mort4, echo=FALSE, cache=TRUE, out.width = '60%'}
+```{r mort4, echo=FALSE, cache=TRUE, out.width = '30%'}
 knitr::include_graphics("Images/accessing/mortSaveData.png")
 ```
 
@@ -33,17 +33,17 @@ knitr::include_graphics("Images/accessing/mortSaveData.png")
 Let us link the mortality data to the NHANES 2013-14 cycle. The steps are as follows:
 
 -   Download morality data for the NHANES 2013-14 cycle
--   Load the morality data on the R environment 
+-   Load the morality data on the R environment
 -   Load NHANES 2013-14 cycle
 -   Merge two datasets using the unique identifier
 
 #### Download morality data
 
-We can follow the steps described above to download the mortality dataset directly from the CDC website. 
+We can follow the steps described above to download the mortality dataset directly from the CDC website.
 
 #### Load the morality data on the R environment
 
-To load the dataset, we can use the `read_fwf` function from the `readr` package. 
+To load the dataset, we can use the `read_fwf` function from the `readr` package.
 
 ```{r mortdataload, cache=TRUE}
 library(readr)
@@ -65,44 +65,50 @@ dat.mort <- read_fwf(
 head(dat.mort)
 ```
 
-In the code chuck above, 
+In the code chuck above,
 
 -   SEQN: unique identifier for NHANES
 
--   eligstat: Eligibility Status for Mortality Follow-up 
+-   eligstat: Eligibility Status for Mortality Follow-up
+
     -   1 = Eligible
     -   2 = Under age 18, not available for public release
     -   3 = Ineligible
 
 -   mortstat: Mortality Status
+
     -   0 = Assumed alive
     -   1 = Assumed deceased
     -   NA = Ineligible or under age 18
 
 -   ucod_leading: Underlying Cause of Death
-    -  1 = Diseases of heart (I00-I09, I11, I13, I20-I51)
-    -  2 = Malignant neoplasms (C00-C97)
-    -  3 = Chronic lower respiratory diseases (J40-J47)
-    -  4 = Accidents (unintentional injuries) (V01-X59, Y85-Y86)
-    -  5 = Cerebrovascular diseases (I60-I69)
-    -  6 = Alzheimer's disease (G30)
-    -  7 = Diabetes mellitus (E10-E14)
-    -  8 = Influenza and pneumonia (J09-J18)
-    -  9 = Nephritis, nephrotic syndrome and nephrosis (N00-N07, N17-N19, N25-N27)
-    -  10 = All other causes 
-    -  NA = Ineligible, under age 18, assumed alive, or no cause of death data available
+
+    -   1 = Diseases of heart (I00-I09, I11, I13, I20-I51)
+    -   2 = Malignant neoplasms (C00-C97)
+    -   3 = Chronic lower respiratory diseases (J40-J47)
+    -   4 = Accidents (unintentional injuries) (V01-X59, Y85-Y86)
+    -   5 = Cerebrovascular diseases (I60-I69)
+    -   6 = Alzheimer's disease (G30)
+    -   7 = Diabetes mellitus (E10-E14)
+    -   8 = Influenza and pneumonia (J09-J18)
+    -   9 = Nephritis, nephrotic syndrome and nephrosis (N00-N07, N17-N19, N25-N27)
+    -   10 = All other causes
+    -   NA = Ineligible, under age 18, assumed alive, or no cause of death data available
 
 -   diabetes: Diabetes Flag from Multiple Cause of Death (MCOD)
-    -  0 = No - Condition not listed as a multiple cause of death
-    -  1 = Yes - Condition listed as a multiple cause of death
-    -  NA = Assumed alive, under age 18, ineligible for mortality follow-up, or MCOD not available
+
+    -   0 = No - Condition not listed as a multiple cause of death
+    -   1 = Yes - Condition listed as a multiple cause of death
+    -   NA = Assumed alive, under age 18, ineligible for mortality follow-up, or MCOD not available
 
 -   hyperten: Hypertension Flag from Multiple Cause of Death (MCOD)
-    -  0 = No - Condition not listed as a multiple cause of death
-    -  1 = Yes - Condition listed as a multiple cause of death
-    -  NA = Assumed alive, under age 18, ineligible for mortality follow-up, or MCOD not available
+
+    -   0 = No - Condition not listed as a multiple cause of death
+    -   1 = Yes - Condition listed as a multiple cause of death
+    -   NA = Assumed alive, under age 18, ineligible for mortality follow-up, or MCOD not available
 
 -   permth_int: Person-Months of Follow-up from NHANES Interview date
+
 -   permth_exm: Person-Months of Follow-up from NHANES Mobile Examination Center (MEC) Date
 
 Let us see the basic summary statistics of some variables:
@@ -120,7 +126,7 @@ table(dat.mort$ucod_leading, useNA = "always")
 
 #### Load NHANES 2013-14 cycle
 
-Let the open the NHANES 2013-14 dataset we created in the previous chapter on (Reproducing results)[accessing4.html]. 
+Let the open the NHANES 2013-14 dataset we created in the previous chapter on (Reproducing results)\[accessing4.html\].
 
 ```{r openNHANES, cache=TRUE}
 # Load data
@@ -134,7 +140,7 @@ dim(analytic.data3)
 
 #### Merge mortality data and NHANES 2013-14 using unique identifier
 
-Let us merge the mortality and NHANES datasets using the `SEQN` variable. 
+Let us merge the mortality and NHANES datasets using the `SEQN` variable.
 
 ```{r joinNHANES, cache=TRUE}
 # Merge datasets
