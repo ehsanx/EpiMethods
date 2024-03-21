@@ -229,7 +229,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -268,7 +268,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1093,16 +1093,16 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </div>
   
 
-</header><p>We focuse on statistical analysis and modeling of a binary outcome, cholesterol levels that are categorized as either “healthy” or “unhealthy.”</p>
+</header><p>We focus on statistical analysis and modeling of a binary outcome (cholesterol level) that is categorized as either “healthy” or “unhealthy.”</p>
 <section id="explore-relationships-for-binary-outcome-variable" class="level3"><h3 class="anchored" data-anchor-id="explore-relationships-for-binary-outcome-variable">Explore relationships for binary outcome variable</h3>
 <section id="load-data" class="level4"><h4 class="anchored" data-anchor-id="load-data">Load data</h4>
-<div class="cell" data-hash="predictivefactors3_cache/html/load_e5fcadca6b3086b406f3fd8950b24a02">
+<div class="cell" data-hash="predictivefactors3_cache/html/load_9e706ce49bd1e37ce922bd8acca5386b">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part1.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="creating-binary-variable" class="level4"><h4 class="anchored" data-anchor-id="creating-binary-variable">Creating binary variable</h4>
 <p><strong>Binary categorization</strong>: The cholesterol variable is converted into a binary outcome (“healthy” or “unhealthy”) using the <code>ifelse</code> function based on a threshold value of 200.</p>
 <p><strong>Re-leveling</strong>: The reference category for the binary variable is changed to “unhealthy.”</p>
-<div class="cell" data-hash="predictivefactors3_cache/html/binary_f441bd4901779ec67b1677819004c21b">
+<div class="cell" data-hash="predictivefactors3_cache/html/binary_43be5544fe2e46db21063014daf5ea58">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Binary variable</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>analytic3<span class="sc">$</span>cholesterol.bin <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(analytic3<span class="sc">$</span>cholesterol <span class="sc">&lt;</span> <span class="dv">200</span>, <span class="st">"healthy"</span>, <span class="st">"unhealthy"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="fu">table</span>(analytic3<span class="sc">$</span>cholesterol.bin)</span>
@@ -1133,7 +1133,7 @@ Tip
 <p>We use the <code>glm</code> function to run generalized linear models. The default family is gaussian with identity link. Setting binomial family with logit link (logit link is default for binomial family) means fitting logistic regression.</p>
 </div>
 </div>
-<div class="cell" data-hash="predictivefactors3_cache/html/glm_fcb557b4863c0a4bee08c0ac8f2f1daa">
+<div class="cell" data-hash="predictivefactors3_cache/html/glm_04e0238f2bfc77131a6b952cdd292ba1">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Regression model</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>formula5x <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol.bin~gender + age + born + </span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="st">             race + education + married + </span></span>
@@ -1219,7 +1219,8 @@ Tip
 <span id="cb3-83"><a href="#cb3-83"></a><span class="co">#&gt; diabetes                1.212365  1        1.101074</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="auc" class="level4"><h4 class="anchored" data-anchor-id="auc">AUC</h4>
-<p>The Area Under the Receiver Operating Characteristic (ROC) Curve (AUC) is calculated to assess the model’s predictive performance. Let us measure the accuracy for classification models <code>fit5x</code>.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">Area Under the Receiver Operating Characteristic (ROC) Curve (AUC)</a> is calculated to assess the model’s predictive performance in terms of discrimination. The AUC would tell how much the model is capable of distinguishing between healthy and unhealthy levels.</p>
+<p>Let us measure the accuracy for classification models <code>fit5x</code>.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1233,7 +1234,7 @@ Tip
 <p>We can use the <code>roc</code> function to build a ROC curve and <code>auc</code> function to calculate the AUC (are under the ROC curve) value.</p>
 </div>
 </div>
-<div class="cell" data-hash="predictivefactors3_cache/html/auc1_8ab7f0ba46b9f86c1a52aebf7f2661fa">
+<div class="cell" data-hash="predictivefactors3_cache/html/auc1_09427e561a37f9b446a6367e5595720a">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(pROC)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit5x, <span class="at">type =</span> <span class="st">"response"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(analytic3<span class="sc">$</span>cholesterol.bin, pred.y)</span>
@@ -1252,7 +1253,7 @@ Tip
 </div>
 </section><section id="re-modelling" class="level4"><h4 class="anchored" data-anchor-id="re-modelling">Re-modelling</h4>
 <p>Let us re-fit the model and measure the AUC. VIF is calculated again for this new model.</p>
-<div class="cell" data-hash="predictivefactors3_cache/html/refit1_2db6b1cb635bb0ecc42223301566941c">
+<div class="cell" data-hash="predictivefactors3_cache/html/refit1_7b2d73f4abc460f2d8eb83f93eed85ef">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>formula5 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol.bin~gender + age + born + </span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="st">             race + education + married + </span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
@@ -1329,7 +1330,7 @@ Tip
 <span id="cb5-74"><a href="#cb5-74"></a><span class="co">#&gt; diabetes              1.200402  1        1.095629</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The AUC for this new model is also calculated.</p>
-<div class="cell" data-hash="predictivefactors3_cache/html/auc2_92980eeca74734e218f0799160c02adb">
+<div class="cell" data-hash="predictivefactors3_cache/html/auc2_5b5b8ccaa6233f4e3a2411905cba6406">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="do">#### AUC</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>pred.y <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit5, <span class="at">type =</span> <span class="st">"response"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(analytic3<span class="sc">$</span>cholesterol.bin, pred.y)</span>
@@ -1346,7 +1347,7 @@ Tip
 <span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; Area under the curve: 0.7406</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="save-data" class="level3"><h3 class="anchored" data-anchor-id="save-data">Save data</h3>
-<div class="cell" data-hash="predictivefactors3_cache/html/save_de2e59fd6bcc7b3c534f78f36d277ce2">
+<div class="cell" data-hash="predictivefactors3_cache/html/save_05e0be11f468a35bcdfcc55d06f2b358">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">save.image</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>

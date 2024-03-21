@@ -100,7 +100,7 @@ Generally try to include basic demographics (e.g., age, sex, education etc. are 
 | Hypertension                | Covariate        | Binary     |                                                         |
 | COPD                        | Covariate        | Binary     |                                                         |
 | Diabetes                    | Covariate        | Binary     |                                                         |
-| Education                   | Covariate        | Category   | \<2ndary; 2ndary graduate; Post2ndary+; Post2ndary grad |
+| Education                   | Covariate        | Category   | \<Secondary; Secondary graduate; PostSecondary+; PostSecondary grad |
 | Weight                      | Sampling weights | Continuous |                                                         |
 
 #### Variables under consideration
@@ -187,19 +187,19 @@ table(cc31$arthritis)
 
 Note that, not only the names of the variables are different, sometimes, the categorization labels are also different. Note the BMI (Category) in the three cycles: `HWTAGSW` from cycle 1:
 
-```{r bmicat1, echo=FALSE, out.width = '65%'}
+```{r bmicat1, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/bmicat1.png")
 ```
 
 `HWTCGISW` from cycle 2:
 
-```{r bmicat2, echo=FALSE, out.width = '65%'}
+```{r bmicat2, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/bmicat2.png")
 ```
 
 `HWTEGISW` from cycle 3:
 
-```{r bmicat3, echo=FALSE, out.width = '65%'}
+```{r bmicat3, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/bmicat3.png")
 ```
 
@@ -213,29 +213,29 @@ In cycle 1.1, the second response (code 2) label was named as "Acceptable weight
 
 Similarly look for age categories:
 
-```{r age1, echo=FALSE, out.width = '65%'}
+```{r age1, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/age1.png")
 ```
 
-```{r age2, echo=FALSE, out.width = '65%'}
+```{r age2, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/age2.png")
 ```
 
-```{r age3, echo=FALSE, out.width = '65%'}
+```{r age3, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/age3.png")
 ```
 
 Similarly look for income categories:
 
-```{r income1, echo=FALSE, out.width = '65%'}
+```{r income1, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/income1.png")
 ```
 
-```{r income2, echo=FALSE, out.width = '65%'}
+```{r income2, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/income2.png")
 ```
 
-```{r income3, echo=FALSE, out.width = '65%'}
+```{r income3, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/income3.png")
 ```
 
@@ -304,7 +304,7 @@ Check out 'Universe' for all the variables under consideration. Is there a possi
 
 For example, the 'Universe' for BMI or BMI category includes 'Respondents aged 20 to 64'.
 
-```{r bmi1, echo=FALSE, out.width = '65%'}
+```{r bmi1, echo=FALSE, out.width = '95%'}
 knitr::include_graphics("Images/researchquestion/bmi1.png")
 ```
 
@@ -339,12 +339,15 @@ c123sub2$age <- recode(c123sub2$age,
                          as.factor = FALSE)
 table(c123sub2$age)
 dim(c123sub2)
-c123sub3 <- subset(c123sub2, age != 'teen' & age != '65 years and over')
+c123sub3 <- subset(c123sub2, age != 'teen' & 
+                     age != '65 years and over')
 table(c123sub3$age, useNA = "always")
 dim(c123sub3)
 ```
 
 #### Criteria 4: Assign missing to the invalid covariate responses
+
+We have invalid covariate responses, such as refused, not ascertained, and don't know responses. Let's assign missing values for these invalid responses. 
 
 ```{r recode2, eval=TRUE, cache=use.saved.chche }
 # sex
@@ -369,12 +372,13 @@ table(c123sub3$income)
 # cycle 1.1 has: 'NO INCOME','LESS THAN 15,000'
 # Other cycles have: 'NO OR <$15,000'
 c123sub3$income <- car::recode(c123sub3$income, 
-                        "c('NO OR <$15,000', 'NO INCOME','LESS THAN 15,000',
-                           '$15,000-$29,999')='$29,999 or less';
-                           '$30,000-$49,999' = '$30,000-$49,999';
-                           '$50,000-$79,999' = '$50,000-$79,999';
-                           '$80,000 OR MORE' = '$80,000 or more';
-                           else = NA",  
+                        "c('NO OR <$15,000', 'NO INCOME',
+                        'LESS THAN 15,000',
+                        '$15,000-$29,999')='$29,999 or less';
+                        '$30,000-$49,999' = '$30,000-$49,999';
+                        '$50,000-$79,999' = '$50,000-$79,999';
+                        '$80,000 OR MORE' = '$80,000 or more';
+                        else = NA",  
                           as.factor = FALSE)
 table(c123sub3$income, useNA = "always")
 # BMI
@@ -496,21 +500,21 @@ plot_missing(analytic)
 
 Let us investigate why pain medication has so much missing
 
-```{r pain1, echo=FALSE, out.width = '80%'}
+```{r pain1, echo=FALSE, out.width = '90%'}
 knitr::include_graphics("Images/researchquestion/pain1.png")
 ```
 
-```{r pain2, echo=FALSE, out.width = '80%'}
+```{r pain2, echo=FALSE, out.width = '90%'}
 knitr::include_graphics("Images/researchquestion/pain2.png")
 ```
 
-```{r pain3, echo=FALSE, out.width = '80%'}
+```{r pain3, echo=FALSE, out.width = '90%'}
 knitr::include_graphics("Images/researchquestion/pain3.png")
 ```
 
 Optional content respondent (cycle 3.1):
 
-```{r optional3, echo=FALSE, out.width = '80%'}
+```{r optional3, echo=FALSE, out.width = '90%'}
 knitr::include_graphics("Images/researchquestion/optional3.png")
 ```
 

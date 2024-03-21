@@ -33,7 +33,8 @@ fake.data
 ```
 
 ```{r sample, warning=FALSE, cache=TRUE}
-resampled.fake.data <- sample(fake.data, size = length(fake.data), replace = TRUE)
+resampled.fake.data <- sample(fake.data, size = length(fake.data), 
+                              replace = TRUE)
 resampled.fake.data
 
 selected.fake.data <- unique(resampled.fake.data)
@@ -47,7 +48,8 @@ The samples not selected are known as the out-of-bag samples
 ```{r oob, warning=FALSE, cache=TRUE}
 B <- 10
 for (i in 1:B){
-  new.boot.sample <- sample(fake.data, size = length(fake.data), replace = TRUE)
+  new.boot.sample <- sample(fake.data, size = length(fake.data), 
+                            replace = TRUE)
   print(new.boot.sample)
 }
 ```
@@ -68,7 +70,8 @@ Idea:
 ```{r sd, warning=FALSE, cache=TRUE}
 mean(fake.data)
 B <- 5
-resamples <- lapply(1:B, function(i) sample(fake.data, replace = TRUE))
+resamples <- lapply(1:B, function(i) sample(fake.data, 
+                                            replace = TRUE))
 str(resamples)
 
 B.means <- sapply(resamples, mean)
@@ -82,7 +85,8 @@ sd(B.means)
 ```{r sd2, warning=FALSE, cache=TRUE}
 mean(fake.data)
 B <- 200
-resamples <- lapply(1:B, function(i) sample(fake.data, replace = TRUE))
+resamples <- lapply(1:B, function(i) sample(fake.data, 
+                                            replace = TRUE))
 # str(resamples)
 
 B.means <- sapply(resamples, mean)
@@ -150,7 +154,11 @@ sd(fit4.boot2$resample$Rsquared)
 
 ### Method boot632
 
-A specific bootstrapping method called "boot632", which aims to reduce bias but can provide unstable results if the sample size is small.
+A specific bootstrapping method called "boot632", which aims to reduce bias but can provide unstable results if the sample size is small. Compared to the original bootstrap method, boot632 addressed the bias that is due to this the sampling with replacement. 
+
+::: column-margin
+See @boot632
+:::
 
 ```{r b2, cache= TRUE}
 ctrl<-trainControl(method = "boot632", number = 50)
@@ -178,7 +186,8 @@ Bias is reduced with 632 bootstrap, but may provide unstable results with a smal
 ```{r b3, cache= TRUE}
 ctrl <- trainControl(method = "boot632", number = 50)
 fit4.boot2b<-train(formula4, trControl = ctrl,
-                  data = analytic3, method = "lmStepAIC", trace = 0)
+                  data = analytic3, method = "lmStepAIC", 
+                  trace = 0)
 fit4.boot2b
 
 head(fit4.boot2b$resample)
@@ -193,7 +202,8 @@ ctrl<-trainControl(method = "boot632", number = 50)
 
 # formula3 includes collinear variables
 fit4.boot2b<-train(formula3, trControl = ctrl,
-                  data = analytic3, method = "lmStepAIC", trace = 0)
+                  data = analytic3, method = "lmStepAIC", 
+                  trace = 0)
 fit4.boot2b
 
 head(fit4.boot2b$resample)
@@ -274,9 +284,11 @@ R2x
 
 Here, bootstrapping and cross-validation are used for a logistic regression model. It calculates the Area Under the Receiver Operating Characteristic Curve (AUC-ROC), a measure for the performance of classification models.
 
-AUC from Receiver Operating Characteristic (ROC) = Measure of accuracy for classification models.
+-   AUC from Receiver Operating Characteristic (ROC) = Measure of accuracy for classification models.
 
-AUC = 1 (perfect classification) AUC = 0.5 (random classification)
+-   AUC = 1 (perfect classification) 
+
+-   AUC = 0.5 (random classification such as a coin toss)
 
 ```{r bin, cache=TRUE}
 set.seed(234)
@@ -316,7 +328,7 @@ mean(fit5.cv$resample$ROC)
 sd(fit5.cv$resample$ROC)
 ```
 
-Brier Score is another metric for evaluating the performance of binary classification models.
+[Brier Score](https://en.wikipedia.org/wiki/Brier_score) is another metric for evaluating the performance of binary classification models. Brier Score is equivalent to the mean squared error, which we calculate for a continuous outcome. A Brier score of 0 indicates perfect accuracy and a score of 1 indicates perfect inaccuracy. 
 
 ```{r brier, warning=FALSE, cache=TRUE}
 require(DescTools)

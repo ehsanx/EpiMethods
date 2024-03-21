@@ -229,7 +229,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -268,7 +268,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1098,7 +1098,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 </header><p>The following tutorial is performing bivariate analysis on our CCHS analytic dataset to examine relationships between two variables (association question).</p>
 <p>We load several R packages required for bivariate analysis, statistical tests, and data visualization.</p>
-<div class="cell" data-hash="surveydata3_cache/html/setup_54e82d4ca646ba98d9524a0b52bb46a5">
+<div class="cell" data-hash="surveydata3_cache/html/setup_4c797e4c1226c123debebe1d89a16543">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(survey)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(knitr)</span>
@@ -1112,20 +1112,20 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>We load the dataset into the R environment and lists all available variables and objects.</p>
-<div class="cell" data-hash="surveydata3_cache/html/load_51a3aae98ac2989938acaff29d4684a1">
+<div class="cell" data-hash="surveydata3_cache/html/load_10b9018a5ee6f7e7ffa668c5389a630c">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/surveydata/cchs123b.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic.miss" "analytic2"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic.miss"   "analytic2"       "has_annotations"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="preparing-data" class="level3"><h3 class="anchored" data-anchor-id="preparing-data">Preparing data</h3>
 <section id="weights" class="level4"><h4 class="anchored" data-anchor-id="weights">Weights</h4>
 <p>Here, the weights of survey respondents are accumulated, to account for the combination of different cycles of the data.</p>
-<div class="cell" data-hash="surveydata3_cache/html/wgt_6abb095a9818c20c45a90e4f07ed322d">
+<div class="cell" data-hash="surveydata3_cache/html/wgt_df3c28a68904ba0426323909f7c5f54b">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>analytic.miss<span class="sc">$</span>weight <span class="ot">&lt;-</span> analytic.miss<span class="sc">$</span>weight<span class="sc">/</span><span class="dv">3</span> <span class="co"># 3 cycles combined</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="fixing-variable-types" class="level4"><h4 class="anchored" data-anchor-id="fixing-variable-types">Fixing variable types</h4>
 <p>We convert several variables to categorical or “factor” types, which are better suited for some statistical analysis when variables have categories.</p>
-<div class="cell" data-hash="surveydata3_cache/html/vartype_0b194cd99aaa34d493841b423e1c22a7">
+<div class="cell" data-hash="surveydata3_cache/html/vartype_1a69c4442fcd57ae0f45e60dc66c22b0">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CVD"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"married"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>, </span>
 <span id="cb4-2"><a href="#cb4-2"></a>               <span class="st">"phyact"</span>, <span class="st">"doctor"</span>, <span class="st">"stress"</span>, <span class="st">"smoke"</span>, <span class="st">"drink"</span>, <span class="st">"fruit"</span>, <span class="st">"bp"</span>, </span>
 <span id="cb4-3"><a href="#cb4-3"></a>               <span class="st">"diab"</span>, <span class="st">"province"</span>, <span class="st">"OA"</span>, <span class="st">"immigrate"</span>)</span>
@@ -1156,7 +1156,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt;  $ immigrate: Factor w/ 3 levels "not immigrant",..: 1 1 3 1 1 1 1 1 1 1 ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The code identifies rows where data is missing and labels them for later analyses.</p>
-<div class="cell" data-hash="surveydata3_cache/html/vartype2_a52a01c08b46b83bbb90af1f7e224e54">
+<div class="cell" data-hash="surveydata3_cache/html/vartype2_c627f960293d815d6a2c77f54c5a5489">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>analytic.miss<span class="sc">$</span>miss <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="fu">head</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span>
@@ -1172,7 +1172,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="setting-design" class="level3"><h3 class="anchored" data-anchor-id="setting-design">Setting Design</h3>
 <p>The code sets up the survey design, specifying weights (but no specific clustering and stratification, as they are unavailable for CCHS public access data), for use in survey-weighted analyses.</p>
-<div class="cell" data-hash="surveydata3_cache/html/desgin0_d2090af5d9aa064a06d9a7089bb03be9">
+<div class="cell" data-hash="surveydata3_cache/html/desgin0_f6ac381bf207894e46ade403e49187d3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">summary</span>(analytic.miss<span class="sc">$</span>weight)</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
@@ -1186,7 +1186,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; [1] 80.34263</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This creates a subset of the data where there are no missing values. Note that subset was done to the design object <code>w.design0</code>, not the data <code>analytic.miss</code>.</p>
-<div class="cell" data-hash="surveydata3_cache/html/desgin1_0d2010b80811d2b1e1f271594fe03756">
+<div class="cell" data-hash="surveydata3_cache/html/desgin1_a67e84146e60daa1e1212b62a3b009f3">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, miss <span class="sc">==</span> <span class="dv">0</span>)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">summary</span>(<span class="fu">weights</span>(w.design))</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
@@ -1198,7 +1198,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="table-1-weighted" class="level4"><h4 class="anchored" data-anchor-id="table-1-weighted">Table 1 (weighted)</h4>
 <section id="stratified-by-exposure" class="level5"><h5 class="anchored" data-anchor-id="stratified-by-exposure">Stratified by exposure</h5>
 <p>These tables contain descriptive statistics, stratified by different categories. They can be useful for understanding how variables relate to the exposure or outcome in the data.</p>
-<div class="cell" data-hash="surveydata3_cache/html/tab2_89890a76a345a3e0836ceabe3a639894">
+<div class="cell" data-hash="surveydata3_cache/html/tab2_33fde99e162e9fab4aacf053a5721551">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">require</span>(tableone)</span>
 <span id="cb8-2"><a href="#cb8-2"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CVD"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"married"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>, </span>
 <span id="cb8-3"><a href="#cb8-3"></a>               <span class="st">"phyact"</span>, <span class="st">"doctor"</span>, <span class="st">"stress"</span>, <span class="st">"smoke"</span>, <span class="st">"drink"</span>, <span class="st">"fruit"</span>, <span class="st">"bp"</span>, </span>
@@ -1265,7 +1265,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="stratified-by-outcome" class="level5"><h5 class="anchored" data-anchor-id="stratified-by-outcome">Stratified by outcome</h5>
 <p>This table is generally useful for logistic regression analysis</p>
-<div class="cell" data-hash="surveydata3_cache/html/tab3_1d8c16a1902a193a04f660217c1c1fdb">
+<div class="cell" data-hash="surveydata3_cache/html/tab3_2b98967c136b6c1f81993e8e0f9fe7b9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"OA"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"married"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>, </span>
 <span id="cb9-2"><a href="#cb9-2"></a>               <span class="st">"phyact"</span>, <span class="st">"doctor"</span>, <span class="st">"stress"</span>, <span class="st">"smoke"</span>, <span class="st">"drink"</span>, <span class="st">"fruit"</span>, <span class="st">"bp"</span>, </span>
 <span id="cb9-3"><a href="#cb9-3"></a>               <span class="st">"diab"</span>, <span class="st">"province"</span>, <span class="st">"immigrate"</span>) <span class="co"># exclude "CVD"</span></span>
@@ -1329,7 +1329,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>How did they calculate the p-values? Hint: <code>svychisq</code> (see below).</p>
 </section></section><section id="proportions-and-design-effect" class="level4"><h4 class="anchored" data-anchor-id="proportions-and-design-effect">Proportions and Design Effect</h4>
 <p>This part computes proportions and design effects, which help understand the influence of the sampling design on the estimated statistics.</p>
-<div class="cell" data-hash="surveydata3_cache/html/fit0_7658f7f6a8bbbe450133c4491e3109cf">
+<div class="cell" data-hash="surveydata3_cache/html/fit0_28a593fbea4fd4093c365604d3f0f2eb">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="co"># Computing survey statistics on subsets of a survey defined by factor(s).</span></span>
 <span id="cb10-3"><a href="#cb10-3"></a>fit0a <span class="ot">&lt;-</span> <span class="fu">svyby</span>(<span class="sc">~</span>CVD,<span class="sc">~</span>OA,<span class="at">design=</span>w.design, svymean,<span class="at">deff=</span><span class="cn">TRUE</span>)</span>
@@ -1371,7 +1371,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>NHANES has more things to worry about (strata, PSU)</li>
 </ol>
 <p>DEFF = 2 means that the variance of the sample proportion, when choosing the sample by complex survey sampling, is nearly 2 times as large as the variance of the same estimator under simple random sampling/SRS.</p>
-<div class="cell" data-hash="surveydata3_cache/html/fit1_e35afc9cbf2cc2055f7d7f3209bdbe8b">
+<div class="cell" data-hash="surveydata3_cache/html/fit1_ee19adebcba157146276a05c3246228b">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>fit0b <span class="ot">&lt;-</span> <span class="fu">svyby</span>(<span class="sc">~</span>CVD,<span class="sc">~</span>diab,<span class="at">design=</span>w.design, svymean,<span class="at">deff=</span><span class="cn">TRUE</span>)</span>
 <span id="cb12-2"><a href="#cb12-2"></a>fit0b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1399,7 +1399,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 </li>
 </ul>
-<div class="cell" data-hash="surveydata3_cache/html/testchisq_9f79bfc1a5b0a2d3bebfce03625c2ab5">
+<div class="cell" data-hash="surveydata3_cache/html/testchisq_43bb306df3b6da3e4c8e34e6bfdb61e4">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Rao-Scott modifications (chi-sq)</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="fu">svychisq</span>(<span class="sc">~</span>CVD<span class="sc">+</span>OA,<span class="at">design=</span>w.design, <span class="at">statistic=</span><span class="st">"Chisq"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; </span></span>
@@ -1434,7 +1434,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="saving-data" class="level3"><h3 class="anchored" data-anchor-id="saving-data">Saving data</h3>
 <p>Finally, the dataset, along with any new variables or subsets created during the analysis, is saved for future use.</p>
-<div class="cell" data-hash="surveydata3_cache/html/save_7f7ee401d0c751ba6189c0ddb0954559">
+<div class="cell" data-hash="surveydata3_cache/html/save_aa9bb9098a83e59a8d49170de71aa10c">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">save</span>(w.design, analytic.miss, analytic2, <span class="at">file =</span> <span class="st">"Data/surveydata/cchs123w.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>

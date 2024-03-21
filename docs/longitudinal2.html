@@ -248,7 +248,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -287,7 +287,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1117,7 +1117,23 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </div>
   
 
-</header><p>In this section, we will learn about generalized estimating equation (GEE). GEE is another popular method for modeling longitudinal or clustered data. In contrast to the mixed effects models where we assume error term and beta coefficients for subject <span class="math inline">\(i\)</span> both follow normal distribution, GEE is distribution free. However, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.</p>
+</header><p>In this section, we will learn about generalized estimating equation (GEE). GEE is another popular method for modeling longitudinal or clustered data.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>GEE is a population-averaged (e.g., marginal) model, whereas mixed effects models are subject/cluster-specific. For example, we can use GEE when we are interested in exploring the population average effect. On the other hand, when we are interested in individual/cluster-specific effects, we can use the mixed effects models.</p></li>
+<li><p>Also, in contrast to the mixed effects models where we assume error term and beta coefficients for subject <span class="math inline">\(i\)</span> both follow normal distribution, GEE is distribution free. However, in GEE, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.</p></li>
+</ul>
+</div>
+</div>
 <div class="cell" data-hash="longitudinal2_cache/html/setup_e585af0477e2f2cb212a408ae8a36eb0">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
@@ -1232,24 +1248,28 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; glm(formula = status ~ centre + treatment + gender + baseline + </span></span>
 <span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt;     age, family = "binomial", data = resp)</span></span>
 <span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; </span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;                     Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; (Intercept)        -0.900171   0.337653  -2.666  0.00768 ** </span></span>
-<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; centre2             0.671601   0.239567   2.803  0.00506 ** </span></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt; treatmenttreatment  1.299216   0.236841   5.486 4.12e-08 ***</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; gendermale          0.119244   0.294671   0.405  0.68572    </span></span>
-<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; baselinegood        1.882029   0.241290   7.800 6.20e-15 ***</span></span>
-<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; age                -0.018166   0.008864  -2.049  0.04043 *  </span></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; ---</span></span>
-<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; </span></span>
-<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; </span></span>
-<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt;     Null deviance: 608.93  on 443  degrees of freedom</span></span>
-<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; Residual deviance: 483.22  on 438  degrees of freedom</span></span>
-<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; AIC: 495.22</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; Deviance Residuals: </span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; -2.3146  -0.8551   0.4336   0.8953   1.9246  </span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; </span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt;                     Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; (Intercept)        -0.900171   0.337653  -2.666  0.00768 ** </span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; centre2             0.671601   0.239567   2.803  0.00506 ** </span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; treatmenttreatment  1.299216   0.236841   5.486 4.12e-08 ***</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; gendermale          0.119244   0.294671   0.405  0.68572    </span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; baselinegood        1.882029   0.241290   7.800 6.20e-15 ***</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; age                -0.018166   0.008864  -2.049  0.04043 *  </span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; ---</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; </span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
 <span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; </span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt;     Null deviance: 608.93  on 443  degrees of freedom</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; Residual deviance: 483.22  on 438  degrees of freedom</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt; AIC: 495.22</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt; </span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will fit GEE with independent correlation structure:</p>
 <div class="cell" data-hash="longitudinal2_cache/html/gee3_ce79a2bcfde18545d633c48473aeb3c6">

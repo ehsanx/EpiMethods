@@ -96,7 +96,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
-<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - Collinear predictors">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="predictivefactors1_files/figure-html/collinear-1.png">
@@ -230,7 +230,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -269,7 +269,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1097,14 +1097,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 </header><p>In this tutorial, we’ll continue with the data analysis. We’ll focus on an analysis of an NHANES data. This data contains over 1200 observations and 33 variables. These variables come in various types: numeric, categorical, and binary. Our primary goal is to fit a linear regression model to predict cholesterol levels.</p>
-<div class="cell" data-hash="predictivefactors1_cache/html/setup_1e24782f1267b31ee9e8b54edd0b3c9b">
+<div class="cell" data-hash="predictivefactors1_cache/html/setup_ada1c387083defe0ac5d7b2f28aabc48">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(rms)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(Hmisc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>Let us load the dataset and see structure of the variables:</p>
-<div class="cell" data-hash="predictivefactors1_cache/html/load_bea8db69b0174b7b329c4ee3c60ab97f">
+<div class="cell" data-hash="predictivefactors1_cache/html/load_c8e3069978f01f6ac0e29c3c4422aec8">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/predictivefactors/cholesterolNHANES15.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="co">#head(analytic)</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="fu">str</span>(analytic)</span>
@@ -1146,7 +1146,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-39"><a href="#cb2-39"></a><span class="co">#&gt;   ..- attr(*, "names")= chr [1:3739] "3" "4" "5" "6" ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="describe-the-data" class="level3"><h3 class="anchored" data-anchor-id="describe-the-data">Describe the data</h3>
-<div class="cell" data-hash="predictivefactors1_cache/html/data_90826642f310018ca6ede7d1c0cb8039">
+<div class="cell" data-hash="predictivefactors1_cache/html/data_239a149da818fe44f8e70a8ee9e2b933">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">require</span>(rms)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">describe</span>(analytic) </span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; analytic </span></span>
@@ -1447,20 +1447,20 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>Avoiding collinear variables can result in a more interpretable, stable, and efficient predictive model. Collinearity refers to a situation in which two or more predictor variables in a multiple regression model are highly correlated, meaning that one can be linearly predicted from the others with substantial accuracy. Collinearity poses several issues for predictive analysis:</p>
 <p><strong>Reduced Interpretability</strong>: When predictor variables are highly correlated, it becomes challenging to isolate the impact of individual predictors on the response variable. In other words, it is difficult to determine which predictor is genuinely influential in explaining variance in the response variable. This reduces the interpretability of the model.</p>
 <p><strong>Unstable Coefficients</strong>: Collinearity can lead to inflated standard errors of the regression coefficients. This means that the coefficients can be very sensitive to small changes in the data, making the model unstable and less generalizable to new, unseen data.</p>
-<p><strong>Overfitting</strong>: When predictors are collinear, the model is more likely to fit to the noise in the data rather than the actual signal. This is a manifestation of overfitting, where the model becomes too complex and captures random noise. Overfit models will perform poorly on new, unseen data.</p>
+<p><strong>Overfitting</strong>: When predictors are collinear, the model is more likely to fit to the noise in the data rather than the actual signal. This is a manifestation of overfitting, where the model becomes too complex and captures random noise. Overfitted models will perform poorly on new, unseen data.</p>
 <p><strong>Inefficiency</strong>: Including redundant variables (collinear variables) does not add additional information to the model. This could be inefficient, especially when dealing with large datasets, as it increases computational costs without improving model performance.</p>
 <section id="multicollinearity-diagnostics" class="level4"><h4 class="anchored" data-anchor-id="multicollinearity-diagnostics">Multicollinearity Diagnostics</h4>
 <p>Several techniques are available for diagnosing multicollinearity, including:</p>
 <ul>
-<li>Variance Inflation Factor (VIF)</li>
-<li>Eigenvalues and Eigenvectors of the correlation/covariance matrix</li>
-<li>Pairwise correlation matrices</li>
+<li><p><a href="https://en.wikipedia.org/wiki/Variance_inflation_factor">Variance Inflation Factor (VIF)</a>: The VIF is a measure of multicollinearity, which measures how much the variance of a regression coefficient is increased because of multicollinearity. A general rule of thumb is that if VIF exceeds 4 or 5, multicollinearity is present.</p></li>
+<li><p><a href="https://sam-black.medium.com/analyzing-the-eigenvalues-of-a-covariance-matrix-to-identify-multicollinearity-de488c719e1b">Eigenvalues and Eigenvectors of the correlation/covariance matrix</a>: The eigenvalues of the correlation matrix can also be used to measure the presence of multicollinearity, with one or more eigenvalues close to zero indicating multicollinearity.</p></li>
+<li><p>Pairwise correlation matrices: Large correlation coefficients in the correlation matrix of predictors indicate the possibility of multicollinearity.</p></li>
 </ul></section><section id="remedies" class="level4"><h4 class="anchored" data-anchor-id="remedies">Remedies</h4>
 <p>Some common ways to handle collinearity include:</p>
 <ul>
 <li>Removing one of the correlated predictors</li>
 <li>Combining correlated predictors into a single composite predictor</li>
-<li>Using regularization techniques like Ridge Regression, which can help handle collinearity by adding a penalty term</li>
+<li>Using regularization techniques like <a href="https://en.wikipedia.org/wiki/Ridge_regression">Ridge Regression</a>, which can help handle collinearity by adding a penalty term. Ridge regression adds a small amount of bias to the regression estimates, which in turn reduces the standard error, addresses the collinearity issue to some extent, and makes the results more reliable.</li>
 </ul></section></section><section id="identify-collinear-predictors" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="identify-collinear-predictors">Identify collinear predictors</h3>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1478,22 +1478,24 @@ Tip
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p><code>hclust</code> is the hierarchical clustering function where default is squared Spearman correlation coefficients to detect monotonic but nonlinear relationships.</p>
-</div></div><div class="cell" data-hash="predictivefactors1_cache/html/collinear_c5c4bee26417c06697322eb867b4f16a">
+</div></div><div class="cell" data-hash="predictivefactors1_cache/html/collinear_5ef87d3c2bfc90c9b3cbd8c6aa4e6e50">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(Hmisc)</span>
-<span id="cb4-2"><a href="#cb4-2"></a>sel.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, <span class="st">"married"</span>, </span>
-<span id="cb4-3"><a href="#cb4-3"></a>               <span class="st">"income"</span>, <span class="st">"diastolicBP"</span>, <span class="st">"systolicBP"</span>, </span>
-<span id="cb4-4"><a href="#cb4-4"></a>               <span class="st">"bodyweight"</span>, <span class="st">"bodyheight"</span>, <span class="st">"bmi"</span>, <span class="st">"waist"</span>, <span class="st">"smoke"</span>, <span class="st">"alcohol"</span>, </span>
-<span id="cb4-5"><a href="#cb4-5"></a>               <span class="st">"cholesterol"</span>, <span class="st">"triglycerides"</span>, <span class="st">"uric.acid"</span>, </span>
-<span id="cb4-6"><a href="#cb4-6"></a>               <span class="st">"protein"</span>, <span class="st">"bilirubin"</span>, <span class="st">"phosphorus"</span>, <span class="st">"sodium"</span>, <span class="st">"potassium"</span>, </span>
-<span id="cb4-7"><a href="#cb4-7"></a>               <span class="st">"globulin"</span>, <span class="st">"calcium"</span>, <span class="st">"physical.work"</span>, <span class="st">"physical.recreational"</span>, </span>
-<span id="cb4-8"><a href="#cb4-8"></a>               <span class="st">"diabetes"</span>)</span>
-<span id="cb4-9"><a href="#cb4-9"></a>var.cluster <span class="ot">&lt;-</span> <span class="fu">varclus</span>(<span class="sc">~</span>., <span class="at">data =</span> analytic[sel.names])</span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># var.cluster</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="fu">plot</span>(var.cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2"></a>sel.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, </span>
+<span id="cb4-3"><a href="#cb4-3"></a>               <span class="st">"married"</span>, <span class="st">"income"</span>, <span class="st">"diastolicBP"</span>, <span class="st">"systolicBP"</span>, </span>
+<span id="cb4-4"><a href="#cb4-4"></a>               <span class="st">"bodyweight"</span>, <span class="st">"bodyheight"</span>, <span class="st">"bmi"</span>, <span class="st">"waist"</span>, <span class="st">"smoke"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5"></a>               <span class="st">"alcohol"</span>,  <span class="st">"cholesterol"</span>, <span class="st">"triglycerides"</span>, </span>
+<span id="cb4-6"><a href="#cb4-6"></a>               <span class="st">"uric.acid"</span>, <span class="st">"protein"</span>, <span class="st">"bilirubin"</span>, <span class="st">"phosphorus"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7"></a>               <span class="st">"sodium"</span>, <span class="st">"potassium"</span>, <span class="st">"globulin"</span>, <span class="st">"calcium"</span>, </span>
+<span id="cb4-8"><a href="#cb4-8"></a>               <span class="st">"physical.work"</span>, <span class="st">"physical.recreational"</span>, </span>
+<span id="cb4-9"><a href="#cb4-9"></a>               <span class="st">"diabetes"</span>)</span>
+<span id="cb4-10"><a href="#cb4-10"></a>var.cluster <span class="ot">&lt;-</span> <span class="fu">varclus</span>(<span class="sc">~</span>., <span class="at">data =</span> analytic[sel.names])</span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co"># var.cluster</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="fu">plot</span>(var.cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="predictivefactors1_files/figure-html/collinear-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>In this plot, <a href="https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient">Spearman correlation</a> or Spearman’s <span class="math inline">\(\rho\)</span>(rho) assesses the monotonic but nonlinear relationships predictors. We can also specify linear relationships such as Pearson correlation. A high correlation coefficient indicates predictors are highly correlated. For example, Spearman’s <span class="math inline">\(\rho\)</span> is more than 0.8 for bodyweight, BMI, and waist, indicating high collinearity between these predictors.</p>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

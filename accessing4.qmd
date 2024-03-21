@@ -1,4 +1,4 @@
-## Reproducing results {.unnumbered}
+## Reproducing NHANES results {.unnumbered}
 
 The section instructs on reproducing the results from a specific article, detailing the eligibility criteria and variables of interest, guiding the user through accessing, merging, and filtering relevant NHANES data, and then recoding and comparing the results to ensure they match with the original article's findings, all supported with visual aids and R code examples.
 
@@ -116,7 +116,7 @@ demo13select <- Demo13[c("SEQN", # Respondent sequence number
                          "RIDEXPRG", # Pregnancy status at exam
                          "RIAGENDR", # Gender
                          "RIDAGEYR", # Age in years at screening
-                         "RIDRETH3")]  # Race/Hispanic origin w/ NH Asian
+                         "RIDRETH3")]  # Race/Ethnicity
 exam13select <- Exam13[c("SEQN", # Respondent sequence number
                          "BMXBMI")] # Body Mass Index (kg/m**2)
 ```
@@ -139,7 +139,8 @@ Within NHANES datasets in a given cycle, each person has an unique identifier nu
 :::
 
 ```{r merge, cache=TRUE}
-merged.data <- merge(demo13select, exam13select, by = c("SEQN"), all=TRUE)
+merged.data <- merge(demo13select, exam13select, by = c("SEQN"), 
+                     all=TRUE)
 head(merged.data)
 dim(merged.data)
 merged.data$SEQN <- NULL
@@ -184,8 +185,9 @@ dim(analytic.data2)
 
 table(analytic.data2$RIDEXPRG,useNA = "always")
 # Pregnant women excluded
-analytic.data3 <- subset(analytic.data2,  is.na(RIDEXPRG) | RIDEXPRG != 
-                           "Yes, positive lab pregnancy test")
+analytic.data3 <- 
+  subset(analytic.data2, is.na(RIDEXPRG) | 
+           RIDEXPRG != "Yes, positive lab pregnancy test")
 dim(analytic.data3)
 ```
 
@@ -198,7 +200,8 @@ Recode similar to the JAMA paper by @flegal2016trends (see above)
 :::
 
 ```{r analytic1, cache=TRUE}
-analytic.data3$AgeCat<-cut(analytic.data3$RIDAGEYR, c(0,20,40,60,Inf), 
+analytic.data3$AgeCat <- cut(analytic.data3$RIDAGEYR, 
+                           c(0,20,40,60,Inf), 
                            right = FALSE)
 analytic.data3$Gender <- car::recode(analytic.data3$RIAGENDR, 
                                 "'1'='Male'; '2'='Female'")
@@ -210,8 +213,9 @@ analytic.data3$Race <- car::recode(analytic.data3$RIDRETH3,
                                 'Non-Hispanic Black'='Black';
                                 'Non-Hispanic Asian'='Asian';
                                 else=NA")
-analytic.data3$Race <- factor(analytic.data3$Race, levels = 
-                                c('White', 'Black', 'Asian', 'Hispanic'))
+analytic.data3$Race <- 
+  factor(analytic.data3$Race, 
+         levels = c('White', 'Black', 'Asian', 'Hispanic'))
 ```
 
 ### Reproducing Table 1

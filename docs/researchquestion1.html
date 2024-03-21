@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1095,7 +1095,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   <ul>
 <li><a href="#working-with-a-predictive-question-using-rhc" id="toc-working-with-a-predictive-question-using-rhc" class="nav-link active" data-scroll-target="#working-with-a-predictive-question-using-rhc">Working with a Predictive question using RHC</a></li>
   <li><a href="#data-download" id="toc-data-download" class="nav-link" data-scroll-target="#data-download">Data download</a></li>
-  <li><a href="#creating-analytic-data" id="toc-creating-analytic-data" class="nav-link" data-scroll-target="#creating-analytic-data">Creating analytic data</a></li>
+  <li><a href="#creating-analytic-dataset" id="toc-creating-analytic-dataset" class="nav-link" data-scroll-target="#creating-analytic-dataset">Creating analytic dataset</a></li>
   <li><a href="#notations" id="toc-notations" class="nav-link" data-scroll-target="#notations">Notations</a></li>
   <li><a href="#basic-data-exploration" id="toc-basic-data-exploration" class="nav-link" data-scroll-target="#basic-data-exploration">Basic data exploration</a></li>
   <li><a href="#predictive-vs.-causal-models" id="toc-predictive-vs.-causal-models" class="nav-link" data-scroll-target="#predictive-vs.-causal-models">Predictive vs.&nbsp;causal models</a></li>
@@ -1118,7 +1118,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </div>
   
 
-</header><div class="cell" data-hash="researchquestion1_cache/html/setup_8845ca562911897dbdad3ad98b3a4274">
+</header><div class="cell" data-hash="researchquestion1_cache/html/setup_568494b3d91771f7627e44ab37b25da5">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">require</span>(tableone)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(Publish)</span>
@@ -1127,7 +1127,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-6"><a href="#cb1-6"></a><span class="fu">require</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="working-with-a-predictive-question-using-rhc" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="working-with-a-predictive-question-using-rhc">Working with a Predictive question using RHC</h3>
-<p>This tutorial delves into processing and understanding the RHC dataset, which pertains to patients in the intensive care unit. The dataset is particularly centered around the implications of using right heart catheterization (RHC) in the early phases of care, with a focus on comparing two patient groups: those who received the RHC procedure and those who did not. The key outcome being analyzed is the 30-day survival rate. We will use this as an example to explain how to work with a predictive research question to build the analytic data.</p>
+<p>This tutorial delves into processing and understanding the right heart catheterization (RHC) dataset, which pertains to patients in the intensive care unit. The dataset is particularly centered around the implications of using RHC in the early phases of care, with a focus on comparing two patient groups: those who received the RHC procedure and those who did not. The key outcome being analyzed is the 30-day survival rate. We will use this as an example to explain how to work with a predictive research question to build the analytic data.</p>
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p><a href="https://search.r-project.org/CRAN/refmans/ATbounds/html/RHC.html">Link for the RHC dataset</a></p>
@@ -1187,21 +1187,22 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div></div>
 
 <p>Let us download the dataset and save it for later use.</p>
-<div class="cell" data-hash="researchquestion1_cache/html/download_18338561cb7e612bb39d036b0f9677ed">
+<div class="cell" data-hash="researchquestion1_cache/html/download_78e86d2844177db820d96b9698040a91">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Load the dataset</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://hbiostat.org/data/repo/rhc.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-3"><a href="#cb2-3"></a></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Save the dataset</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="fu">saveRDS</span>(ObsData, <span class="at">file =</span> <span class="st">"Data/researchquestion/rhc.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://hbiostat.org/data/repo/rhc.csv"</span>, </span>
+<span id="cb2-3"><a href="#cb2-3"></a>                    <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co"># Save the dataset</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="fu">saveRDS</span>(ObsData, <span class="at">file =</span> <span class="st">"Data/researchquestion/rhc.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="creating-analytic-data" class="level3"><h3 class="anchored" data-anchor-id="creating-analytic-data">Creating analytic data</h3>
-<p>Now, we show the process of preparing analytic data, so that the variables generally match with the way the authors were coded in the original article. Below we show the process of creating the analytic data.</p>
+</section><section id="creating-analytic-dataset" class="level3"><h3 class="anchored" data-anchor-id="creating-analytic-dataset">Creating analytic dataset</h3>
+<p>Now, we show the process of preparing our analytic dataset (i.e., ready to use dataset for our analysis), so that the variables generally match with the way the authors were coded in the original article. Below we show the process of creating the analytic dataset.</p>
 <section id="add-column-for-outcome-length-of-stay" class="level4"><h4 class="anchored" data-anchor-id="add-column-for-outcome-length-of-stay">Add column for outcome: length of stay</h4>
-<div class="cell" data-hash="researchquestion1_cache/html/addcol_a05cc55c04b75939ca9de34872474e38">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Length.of.Stay = date of discharge - study admission date</span></span>
+<div class="cell" data-hash="researchquestion1_cache/html/addcol_bb23b9e80c6ed9700c291dd88ba206ed">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Length of Stay = date of discharge - study admission date</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>ObsData<span class="sc">$</span>Length.of.Stay <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>dschdte <span class="sc">-</span> ObsData<span class="sc">$</span>sadmdte</span>
 <span id="cb3-3"><a href="#cb3-3"></a></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># Length.of.Stay = date of death - study admission date if date of discharge not available</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># Length of Stay = date of death - study admission date if date of discharge not available</span></span>
 <span id="cb3-5"><a href="#cb3-5"></a>ObsData<span class="sc">$</span>Length.of.Stay[<span class="fu">is.na</span>(ObsData<span class="sc">$</span>Length.of.Stay)] <span class="ot">&lt;-</span> </span>
 <span id="cb3-6"><a href="#cb3-6"></a>  ObsData<span class="sc">$</span>dthdte[<span class="fu">is.na</span>(ObsData<span class="sc">$</span>Length.of.Stay)] <span class="sc">-</span> </span>
 <span id="cb3-7"><a href="#cb3-7"></a>  ObsData<span class="sc">$</span>sadmdte[<span class="fu">is.na</span>(ObsData<span class="sc">$</span>Length.of.Stay)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1221,7 +1222,7 @@ Tip
 </div>
 </div>
 <p>Let us recode our outcome variable as a binary variable:</p>
-<div class="cell" data-hash="researchquestion1_cache/html/recode_8168ac437189814b692652103be6d25d">
+<div class="cell" data-hash="researchquestion1_cache/html/recode_04c51095883f50e16b84b02ec36a31d6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>ObsData<span class="sc">$</span>death <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(ObsData<span class="sc">$</span>death <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="remove-unnecessary-outcomes" class="level4"><h4 class="anchored" data-anchor-id="remove-unnecessary-outcomes">Remove unnecessary outcomes</h4>
@@ -1239,14 +1240,15 @@ Tip
 <p>There are multiple ways to drop variables from a dataset. E.g., without using any package and using the <code>select</code> function from the dplyr package.</p>
 </div>
 </div>
-<div class="cell" data-hash="researchquestion1_cache/html/remove_40920280e137a14d5a54bb179a5ecb22">
+<div class="cell" data-hash="researchquestion1_cache/html/remove_f6296930f6fe5e3717ba306878c669bc">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>ObsData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(dthdte, lstctdte, dschdte, </span>
 <span id="cb5-2"><a href="#cb5-2"></a>                            t3d30, dth30, surv2md1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="remove-unnecessary-and-problematic-variables" class="level4"><h4 class="anchored" data-anchor-id="remove-unnecessary-and-problematic-variables">Remove unnecessary and problematic variables</h4>
 <p>Now we will drop unnecessary and problematic variables:</p>
-<div class="cell" data-hash="researchquestion1_cache/html/remove2_405bc850e40d8825af50cfe359230cb4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>ObsData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(sadmdte, ptid, X, adld3p, urin1, cat2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="researchquestion1_cache/html/remove2_490ec9077420afbfd52fd7b7cf118634">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>ObsData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(sadmdte, ptid, X, adld3p, </span>
+<span id="cb6-2"><a href="#cb6-2"></a>                                     urin1, cat2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="basic-data-cleanup" class="level4"><h4 class="anchored" data-anchor-id="basic-data-cleanup">Basic data cleanup</h4>
 <p>Now we will do some basic cleanup.</p>
@@ -1263,7 +1265,7 @@ Tip
 <p>We an use the <code>lapply</code> function to convert all categorical variables to factors at once. Not that a similar function to <code>lapply</code> is <code>sapply</code>. The main difference is that sapply attempts to convert the result into a vector or matrix, while lapply returns a list.</p>
 </div>
 </div>
-<div class="cell" data-hash="researchquestion1_cache/html/cleanup_6c42f91f45297a464144b9d6a0f0e069">
+<div class="cell" data-hash="researchquestion1_cache/html/cleanup_457915e564514b7c7c0def18a3bbdc04">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># convert all categorical variables to factors</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>factors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"cat1"</span>, <span class="st">"ca"</span>, <span class="st">"death"</span>, <span class="st">"cardiohx"</span>, <span class="st">"chfhx"</span>, </span>
 <span id="cb7-3"><a href="#cb7-3"></a>             <span class="st">"dementhx"</span>, <span class="st">"psychhx"</span>, <span class="st">"chrpulhx"</span>, <span class="st">"renalhx"</span>, </span>
@@ -1281,37 +1283,44 @@ Tip
 <span id="cb7-15"><a href="#cb7-15"></a><span class="co"># Categorize the variables to match with the original paper</span></span>
 <span id="cb7-16"><a href="#cb7-16"></a>ObsData<span class="sc">$</span>age <span class="ot">&lt;-</span> <span class="fu">cut</span>(ObsData<span class="sc">$</span>age, <span class="at">breaks=</span><span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="dv">50</span>, <span class="dv">60</span>, <span class="dv">70</span>, <span class="dv">80</span>, <span class="cn">Inf</span>),</span>
 <span id="cb7-17"><a href="#cb7-17"></a>                   <span class="at">right=</span><span class="cn">FALSE</span>)</span>
-<span id="cb7-18"><a href="#cb7-18"></a>ObsData<span class="sc">$</span>race <span class="ot">&lt;-</span> <span class="fu">factor</span>(ObsData<span class="sc">$</span>race, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">"white"</span>,<span class="st">"black"</span>,<span class="st">"other"</span>))</span>
-<span id="cb7-19"><a href="#cb7-19"></a>ObsData<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>sex)</span>
-<span id="cb7-20"><a href="#cb7-20"></a>ObsData<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">relevel</span>(ObsData<span class="sc">$</span>sex, <span class="at">ref =</span> <span class="st">"Male"</span>)</span>
-<span id="cb7-21"><a href="#cb7-21"></a>ObsData<span class="sc">$</span>cat1 <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>cat1)</span>
-<span id="cb7-22"><a href="#cb7-22"></a><span class="fu">levels</span>(ObsData<span class="sc">$</span>cat1) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ARF"</span>,<span class="st">"CHF"</span>,<span class="st">"Other"</span>,<span class="st">"Other"</span>,<span class="st">"Other"</span>,</span>
-<span id="cb7-23"><a href="#cb7-23"></a>                          <span class="st">"Other"</span>,<span class="st">"Other"</span>,<span class="st">"MOSF"</span>,<span class="st">"MOSF"</span>)</span>
-<span id="cb7-24"><a href="#cb7-24"></a>ObsData<span class="sc">$</span>ca <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>ca)</span>
-<span id="cb7-25"><a href="#cb7-25"></a><span class="fu">levels</span>(ObsData<span class="sc">$</span>ca) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Metastatic"</span>,<span class="st">"None"</span>,<span class="st">"Localized (Yes)"</span>)</span>
-<span id="cb7-26"><a href="#cb7-26"></a>ObsData<span class="sc">$</span>ca <span class="ot">&lt;-</span> <span class="fu">factor</span>(ObsData<span class="sc">$</span>ca, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">"None"</span>, <span class="st">"Localized (Yes)"</span>,</span>
-<span id="cb7-27"><a href="#cb7-27"></a>                                          <span class="st">"Metastatic"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-18"><a href="#cb7-18"></a>ObsData<span class="sc">$</span>race <span class="ot">&lt;-</span> <span class="fu">factor</span>(ObsData<span class="sc">$</span>race, </span>
+<span id="cb7-19"><a href="#cb7-19"></a>                       <span class="at">levels=</span><span class="fu">c</span>(<span class="st">"white"</span>,<span class="st">"black"</span>,<span class="st">"other"</span>))</span>
+<span id="cb7-20"><a href="#cb7-20"></a>ObsData<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>sex)</span>
+<span id="cb7-21"><a href="#cb7-21"></a>ObsData<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">relevel</span>(ObsData<span class="sc">$</span>sex, <span class="at">ref =</span> <span class="st">"Male"</span>)</span>
+<span id="cb7-22"><a href="#cb7-22"></a>ObsData<span class="sc">$</span>cat1 <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>cat1)</span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="fu">levels</span>(ObsData<span class="sc">$</span>cat1) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ARF"</span>,<span class="st">"CHF"</span>,<span class="st">"Other"</span>,<span class="st">"Other"</span>,<span class="st">"Other"</span>,</span>
+<span id="cb7-24"><a href="#cb7-24"></a>                          <span class="st">"Other"</span>,<span class="st">"Other"</span>,<span class="st">"MOSF"</span>,<span class="st">"MOSF"</span>)</span>
+<span id="cb7-25"><a href="#cb7-25"></a>ObsData<span class="sc">$</span>ca <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>ca)</span>
+<span id="cb7-26"><a href="#cb7-26"></a><span class="fu">levels</span>(ObsData<span class="sc">$</span>ca) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Metastatic"</span>,<span class="st">"None"</span>,<span class="st">"Localized (Yes)"</span>)</span>
+<span id="cb7-27"><a href="#cb7-27"></a>ObsData<span class="sc">$</span>ca <span class="ot">&lt;-</span> <span class="fu">factor</span>(ObsData<span class="sc">$</span>ca, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">"None"</span>, <span class="st">"Localized (Yes)"</span>,</span>
+<span id="cb7-28"><a href="#cb7-28"></a>                                          <span class="st">"Metastatic"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="rename-variables" class="level4"><h4 class="anchored" data-anchor-id="rename-variables">Rename variables</h4>
-<div class="cell" data-hash="researchquestion1_cache/html/rename2_a1df78bc21a30e96d6d46f7e49d2f088">
+<div class="cell" data-hash="researchquestion1_cache/html/rename2_0f8448ac8ecbbc3ea5674f0818e8e4bc">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Rename the variables</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">names</span>(ObsData) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Disease.category"</span>, <span class="st">"Cancer"</span>, <span class="st">"Death"</span>, <span class="st">"Cardiovascular"</span>, </span>
-<span id="cb8-3"><a href="#cb8-3"></a>                    <span class="st">"Congestive.HF"</span>, <span class="st">"Dementia"</span>, <span class="st">"Psychiatric"</span>, <span class="st">"Pulmonary"</span>, </span>
-<span id="cb8-4"><a href="#cb8-4"></a>                    <span class="st">"Renal"</span>, <span class="st">"Hepatic"</span>, <span class="st">"GI.Bleed"</span>, <span class="st">"Tumor"</span>, </span>
-<span id="cb8-5"><a href="#cb8-5"></a>                    <span class="st">"Immunosupperssion"</span>, <span class="st">"Transfer.hx"</span>, <span class="st">"MI"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, </span>
-<span id="cb8-6"><a href="#cb8-6"></a>                    <span class="st">"edu"</span>, <span class="st">"DASIndex"</span>, <span class="st">"APACHE.score"</span>, <span class="st">"Glasgow.Coma.Score"</span>, </span>
-<span id="cb8-7"><a href="#cb8-7"></a>                    <span class="st">"blood.pressure"</span>, <span class="st">"WBC"</span>, <span class="st">"Heart.rate"</span>, <span class="st">"Respiratory.rate"</span>, </span>
-<span id="cb8-8"><a href="#cb8-8"></a>                    <span class="st">"Temperature"</span>, <span class="st">"PaO2vs.FIO2"</span>, <span class="st">"Albumin"</span>, <span class="st">"Hematocrit"</span>, </span>
-<span id="cb8-9"><a href="#cb8-9"></a>                    <span class="st">"Bilirubin"</span>, <span class="st">"Creatinine"</span>, <span class="st">"Sodium"</span>, <span class="st">"Potassium"</span>, <span class="st">"PaCo2"</span>, </span>
-<span id="cb8-10"><a href="#cb8-10"></a>                    <span class="st">"PH"</span>, <span class="st">"Weight"</span>, <span class="st">"DNR.status"</span>, <span class="st">"Medical.insurance"</span>, </span>
-<span id="cb8-11"><a href="#cb8-11"></a>                    <span class="st">"Respiratory.Diag"</span>, <span class="st">"Cardiovascular.Diag"</span>, </span>
-<span id="cb8-12"><a href="#cb8-12"></a>                    <span class="st">"Neurological.Diag"</span>, <span class="st">"Gastrointestinal.Diag"</span>, <span class="st">"Renal.Diag"</span>,</span>
-<span id="cb8-13"><a href="#cb8-13"></a>                    <span class="st">"Metabolic.Diag"</span>, <span class="st">"Hematologic.Diag"</span>, <span class="st">"Sepsis.Diag"</span>, </span>
-<span id="cb8-14"><a href="#cb8-14"></a>                    <span class="st">"Trauma.Diag"</span>, <span class="st">"Orthopedic.Diag"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
-<span id="cb8-15"><a href="#cb8-15"></a>                    <span class="st">"Length.of.Stay"</span>, <span class="st">"RHC.use"</span>)</span>
-<span id="cb8-16"><a href="#cb8-16"></a></span>
-<span id="cb8-17"><a href="#cb8-17"></a><span class="co"># Save the dataset</span></span>
-<span id="cb8-18"><a href="#cb8-18"></a><span class="fu">saveRDS</span>(ObsData, <span class="at">file =</span> <span class="st">"Data/researchquestion/rhcAnalytic.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">names</span>(ObsData) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Disease.category"</span>, <span class="st">"Cancer"</span>, <span class="st">"Death"</span>, </span>
+<span id="cb8-3"><a href="#cb8-3"></a>                    <span class="st">"Cardiovascular"</span>, <span class="st">"Congestive.HF"</span>, </span>
+<span id="cb8-4"><a href="#cb8-4"></a>                    <span class="st">"Dementia"</span>, <span class="st">"Psychiatric"</span>, <span class="st">"Pulmonary"</span>, </span>
+<span id="cb8-5"><a href="#cb8-5"></a>                    <span class="st">"Renal"</span>, <span class="st">"Hepatic"</span>, <span class="st">"GI.Bleed"</span>, <span class="st">"Tumor"</span>, </span>
+<span id="cb8-6"><a href="#cb8-6"></a>                    <span class="st">"Immunosupperssion"</span>, <span class="st">"Transfer.hx"</span>, <span class="st">"MI"</span>, </span>
+<span id="cb8-7"><a href="#cb8-7"></a>                    <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"edu"</span>, <span class="st">"DASIndex"</span>, </span>
+<span id="cb8-8"><a href="#cb8-8"></a>                    <span class="st">"APACHE.score"</span>, <span class="st">"Glasgow.Coma.Score"</span>, </span>
+<span id="cb8-9"><a href="#cb8-9"></a>                    <span class="st">"blood.pressure"</span>, <span class="st">"WBC"</span>, <span class="st">"Heart.rate"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10"></a>                    <span class="st">"Respiratory.rate"</span>,  <span class="st">"Temperature"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11"></a>                    <span class="st">"PaO2vs.FIO2"</span>, <span class="st">"Albumin"</span>, <span class="st">"Hematocrit"</span>, </span>
+<span id="cb8-12"><a href="#cb8-12"></a>                    <span class="st">"Bilirubin"</span>, <span class="st">"Creatinine"</span>, <span class="st">"Sodium"</span>, </span>
+<span id="cb8-13"><a href="#cb8-13"></a>                    <span class="st">"Potassium"</span>, <span class="st">"PaCo2"</span>,  <span class="st">"PH"</span>, <span class="st">"Weight"</span>, </span>
+<span id="cb8-14"><a href="#cb8-14"></a>                    <span class="st">"DNR.status"</span>, <span class="st">"Medical.insurance"</span>, </span>
+<span id="cb8-15"><a href="#cb8-15"></a>                    <span class="st">"Respiratory.Diag"</span>, <span class="st">"Cardiovascular.Diag"</span>, </span>
+<span id="cb8-16"><a href="#cb8-16"></a>                    <span class="st">"Neurological.Diag"</span>, <span class="st">"Gastrointestinal.Diag"</span>,</span>
+<span id="cb8-17"><a href="#cb8-17"></a>                    <span class="st">"Renal.Diag"</span>, <span class="st">"Metabolic.Diag"</span>, </span>
+<span id="cb8-18"><a href="#cb8-18"></a>                    <span class="st">"Hematologic.Diag"</span>, <span class="st">"Sepsis.Diag"</span>, </span>
+<span id="cb8-19"><a href="#cb8-19"></a>                    <span class="st">"Trauma.Diag"</span>, <span class="st">"Orthopedic.Diag"</span>, </span>
+<span id="cb8-20"><a href="#cb8-20"></a>                    <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
+<span id="cb8-21"><a href="#cb8-21"></a>                    <span class="st">"Length.of.Stay"</span>, <span class="st">"RHC.use"</span>)</span>
+<span id="cb8-22"><a href="#cb8-22"></a></span>
+<span id="cb8-23"><a href="#cb8-23"></a><span class="co"># Save the dataset</span></span>
+<span id="cb8-24"><a href="#cb8-24"></a><span class="fu">saveRDS</span>(ObsData, <span class="at">file =</span> <span class="st">"Data/researchquestion/rhcAnalytic.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="notations" class="level3"><h3 class="anchored" data-anchor-id="notations">Notations</h3>
 <p>let us introduce with some notations:</p>
@@ -1340,7 +1349,7 @@ Tip
 </table></section><section id="basic-data-exploration" class="level3"><h3 class="anchored" data-anchor-id="basic-data-exploration">Basic data exploration</h3>
 <section id="dimension" class="level4"><h4 class="anchored" data-anchor-id="dimension">Dimension</h4>
 <p>Let us the how many rows and columns we have:</p>
-<div class="cell" data-hash="researchquestion1_cache/html/dim_e881887cdeabb7eea2b90f5aecaa95de">
+<div class="cell" data-hash="researchquestion1_cache/html/dim_64f3235b9b3dd7e82ace98c1eed9f08c">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">dim</span>(ObsData)</span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt; [1] 5735   52</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1359,11 +1368,9 @@ Tip
 <p>To see the comprehensive summary of the variables, we can use the <code>skim</code> function form skimr package or <code>describe</code> function from rms package</p>
 </div>
 </div>
-<div class="cell" data-hash="researchquestion1_cache/html/summary_98a33827dfbcc73c01b3b05b63eaea27">
+<div class="cell" data-hash="researchquestion1_cache/html/summary_00a2055e0fd72320200ede7e8aec5055">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">require</span>(skimr)</span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt; Loading required package: skimr</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt; Warning: package 'skimr' was built under R version 4.3.1</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="fu">skim</span>(ObsData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="fu">skim</span>(ObsData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <caption>Data summary</caption>

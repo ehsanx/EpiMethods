@@ -230,7 +230,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -269,7 +269,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1097,7 +1097,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><p>Data manipulation is a foundational skill for data analysis. This guide introduces common methods for subsetting datasets, handling variable types, creating summary tables, and dealing with missing values using R.</p>
 <section id="load-dataset" class="level3"><h3 class="anchored" data-anchor-id="load-dataset">Load dataset</h3>
 <p>Understanding the dataset’s structure is the first step in data manipulation. Here, we’re using the <code>mpg</code> dataset, which provides information on various car models:</p>
-<div class="cell" data-hash="wrangling3_cache/html/load1_ace3824a88ed8e4350b2e21b1904037f">
+<div class="cell" data-hash="wrangling3_cache/html/load1_e4430f52967b82c62a41339247cb54ff">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>mpg <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Data/wrangling/mpg.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="subset" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="subset">Subset</h3>
@@ -1115,11 +1115,11 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Option 1: No package needed</strong></p>
-<p>dataset.name[, c(the columns you want to KEEP)]</p>
+<p>dataset.name[, c(columns_names_you_want_to_KEEP)]</p>
 </div>
 </div>
 <p>Say, we want to keep only three variables in the mpg dataset: manufacturer, model and cyl. For Option 1 (without package), we can use the following R codes to keep these three variables:</p>
-<div class="cell" data-hash="wrangling3_cache/html/load2_ad568b4cbb2922fb15eff233e217c6e6">
+<div class="cell" data-hash="wrangling3_cache/html/load2_c7731e2e3fc70c3322f5e3c802e7411e">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>mpg1 <span class="ot">&lt;-</span> mpg[, <span class="fu">c</span>(<span class="st">"manufacturer"</span>, <span class="st">"model"</span>, <span class="st">"cyl"</span>)]</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">head</span>(mpg1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1143,11 +1143,11 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Option 2: use select in dplyr</strong></p>
-<p>select(dataset.name, …(columns names you want to KEEP))</p>
+<p>select(dataset.name, c(columns_names_you_want_to_KEEP))</p>
 </div>
 </div>
 <p>For Option 2, the <code>dplyr</code> package offers the <code>select</code> function, which provides a more intuitive way to subset data.</p>
-<div class="cell" data-hash="wrangling3_cache/html/load3_8ebdee5d1bb023328f5284a05d7b5029">
+<div class="cell" data-hash="wrangling3_cache/html/load3_287f8a3b59afc394a2588d5388d08151">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>mpg2 <span class="ot">&lt;-</span> <span class="fu">select</span>(mpg, <span class="fu">c</span>(<span class="st">"manufacturer"</span>, <span class="st">"model"</span>, <span class="st">"cyl"</span>))</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">head</span>(mpg2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1160,7 +1160,7 @@ Tip
 </div>
 </div>
 <p>We can also exclude any variables from the dataset by using the minus (-) sign with the <code>select</code> function. For example, we we want to drop <code>trans</code>, <code>drv</code>, and <code>cty</code> from the <code>mpg</code> dataset, we can use the following codes:</p>
-<div class="cell" data-hash="wrangling3_cache/html/load4_953b0774bc03fc3cb45abba52b352fa4">
+<div class="cell" data-hash="wrangling3_cache/html/load4_bbc59257f0c26604fc4a528d433501a7">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>mpg3 <span class="ot">&lt;-</span> <span class="fu">select</span>(mpg, <span class="sc">-</span><span class="fu">c</span>(<span class="st">"trans"</span>, <span class="st">"drv"</span>, <span class="st">"cty"</span>))</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="fu">head</span>(mpg3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1186,7 +1186,7 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Option 1: No package needed</strong></p>
-<p>dataset.name[the rows you want to KEEP, ]</p>
+<p>dataset.name[rows_you_want_to_KEEP, ]</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -1200,7 +1200,7 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Option 2: No package needed</strong></p>
-<p>subset(dataset.name, …(logical tests))</p>
+<p>subset(dataset.name, rows_you_want_to_KEEP)</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -1214,9 +1214,10 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Option 3: use select in dplyr</strong></p>
-<p>filter(dataset.name, …(logical tests))</p>
+<p>filter(dataset.name, rows_you_want_to_KEEP)</p>
 </div>
 </div>
+<p>We can use the logical tests for the rows you want to keep or drop.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1263,9 +1264,10 @@ Tip
 </div>
 </div>
 <p>Say, we want to keep the observations for which cars are manufactured in 2008. We can use the following R codes to do it:</p>
-<div class="cell" data-hash="wrangling3_cache/html/keep1_68f37ae3b28144d60f8fb08ea3d50dc7">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>mpg4 <span class="ot">&lt;-</span> mpg[mpg<span class="sc">$</span>year <span class="sc">==</span> <span class="st">"2008"</span>,] <span class="co"># Option 1</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">head</span>(mpg4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="wrangling3_cache/html/keep1_f679e8e7e9c24fe5f08233e5758dee01">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Option 1</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>mpg4 <span class="ot">&lt;-</span> mpg[mpg<span class="sc">$</span>year <span class="sc">==</span> <span class="st">"2008"</span>,]</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="fu">head</span>(mpg4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -1276,9 +1278,10 @@ Tip
 </div>
 </div>
 <p>The following codes with the <code>subset</code> and <code>filter</code> function will do the same:</p>
-<div class="cell" data-hash="wrangling3_cache/html/keep2_66c509aa6c8ebeaa4d1f13357b3d35e5">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>mpg5 <span class="ot">&lt;-</span> <span class="fu">subset</span>(mpg, year <span class="sc">==</span> <span class="st">"2008"</span>) <span class="co"># Option 1</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">head</span>(mpg5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="wrangling3_cache/html/keep2_4e9addad71738ee065855c4038ff38bb">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Option 2</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>mpg5 <span class="ot">&lt;-</span> <span class="fu">subset</span>(mpg, year <span class="sc">==</span> <span class="st">"2008"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">head</span>(mpg5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -1288,9 +1291,10 @@ Tip
 </div>
 </div>
 </div>
-<div class="cell" data-hash="wrangling3_cache/html/keep3_949add135fe2c60abb6211718a152b8e">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>mpg6 <span class="ot">&lt;-</span> <span class="fu">filter</span>(mpg, year <span class="sc">==</span> <span class="st">"2008"</span>) <span class="co"># Option 3</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">head</span>(mpg6)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="wrangling3_cache/html/keep3_6a6d62d823e700a2a6f9f72a8c580613">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Option 3</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>mpg6 <span class="ot">&lt;-</span> <span class="fu">filter</span>(mpg, year <span class="sc">==</span> <span class="st">"2008"</span>) </span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="fu">head</span>(mpg6)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -1363,7 +1367,7 @@ Tip
 </div>
 </div>
 <p>Say, we want to keep the observations for 6 and 8 cylinders (cyl) and engine displacement (displ) greater than or equal to 4 litres. We can use the following codes to do the task:</p>
-<div class="cell" data-hash="wrangling3_cache/html/keep4_b9648cfab9b332659454b87e0249beb2">
+<div class="cell" data-hash="wrangling3_cache/html/keep4_eca795741cb62e47beccaa35a31a5a66">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>mpg7 <span class="ot">&lt;-</span> <span class="fu">filter</span>(mpg, cyl <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"6"</span>,<span class="st">"8"</span>) <span class="sc">&amp;</span> displ <span class="sc">&gt;=</span> <span class="dv">4</span>)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">head</span>(mpg7)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1402,11 +1406,11 @@ Tip
 <li>Identifying Variable Type</li>
 </ol>
 <p>When we analyze the data, we usually just deal with numbers and factors. If there are variables are strings, we could convert them to factors using <strong>as.factors(variable.name)</strong></p>
-<div class="cell" data-hash="wrangling3_cache/html/keep5_7aedbde762ae5e6d4c06ac0174762585">
+<div class="cell" data-hash="wrangling3_cache/html/keep5_16381e098fab98c0b2512bb627d591df">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">mode</span>(mpg<span class="sc">$</span>trans)</span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt; [1] "character"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="wrangling3_cache/html/keep6_488d8a08e42f8c7598873265cae7a4e8">
+<div class="cell" data-hash="wrangling3_cache/html/keep6_29c5ceeb0780344a010ba27d1cb36fe5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">str</span>(mpg<span class="sc">$</span>trans)</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt;  chr [1:234] "auto(l5)" "manual(m5)" "manual(m6)" "auto(av)" "auto(l5)" ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1414,12 +1418,12 @@ Tip
 <li>Converting Characters to Factors</li>
 </ol>
 <p>Sometimes, it’s necessary to treat text data as categorical by converting them into factors. <strong>as.numeric()</strong> converts other types of variables to numbers. For a factor variable, we usually we want to access the categories (or levels) it has. We can use a build-in function to explore: <strong>levels(variable.name)</strong></p>
-<div class="cell" data-hash="wrangling3_cache/html/keep7_670382fb745929f4a506c383b66b0348">
+<div class="cell" data-hash="wrangling3_cache/html/keep7_566e54ffb8740362b0eeb2f7af2d268d">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># no levels for character</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a><span class="fu">levels</span>(mpg<span class="sc">$</span>trans)</span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt; NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="wrangling3_cache/html/keep8_dd3aa7437b50511eb34484aba0ed0114">
+<div class="cell" data-hash="wrangling3_cache/html/keep8_6d3495f240ee402567560dce18bccadb">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="do">## Ex check how many different trans the dataset has</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>mpg<span class="sc">$</span>trans <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(mpg<span class="sc">$</span>trans)</span>
 <span id="cb12-3"><a href="#cb12-3"></a><span class="fu">levels</span>(mpg<span class="sc">$</span>trans)</span>
@@ -1428,7 +1432,7 @@ Tip
 </div>
 <p>The levels usually will be ordered alphabetically. The first level is called “baseline”. However, the users may/may not want to keep this baseline and want to relevel/change the reference group. We can do it using the <code>relevel</code> function:</p>
 <p><strong>relevel(variable.name, ref=)</strong></p>
-<div class="cell" data-hash="wrangling3_cache/html/keep9_7a9e53e26711aa1a4bff8fa48bd6558c">
+<div class="cell" data-hash="wrangling3_cache/html/keep9_30b9a18a6105bf88248a7690688fa455">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>mpg<span class="sc">$</span>trans <span class="ot">&lt;-</span> <span class="fu">relevel</span>(mpg<span class="sc">$</span>trans, <span class="at">ref =</span> <span class="st">"auto(s6)"</span>)</span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="fu">levels</span>(mpg<span class="sc">$</span>trans)</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt;  [1] "auto(s6)"   "auto(av)"   "auto(l3)"   "auto(l4)"   "auto(l5)"  </span></span>
@@ -1437,7 +1441,7 @@ Tip
 <span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; [1] 10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><code>factor</code> function can be also used to combine factors. If the user want to combine multiple factors to one factors</p>
-<div class="cell" data-hash="wrangling3_cache/html/keep10_986bd746d4e74483169267a18272ac05">
+<div class="cell" data-hash="wrangling3_cache/html/keep10_ca4103b59cd5ab34bcb7f7e615af5ea0">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="do">## EX re-group trans to "auto" and "manual"</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="fu">levels</span>(mpg<span class="sc">$</span>trans) <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">auto =</span> <span class="fu">c</span>(<span class="st">"auto(av)"</span>, <span class="st">"auto(l3)"</span>, <span class="st">"auto(l4)"</span>, <span class="st">"auto(l5)"</span>, <span class="st">"auto(l6)"</span>, </span>
 <span id="cb14-3"><a href="#cb14-3"></a>                                   <span class="st">"auto(s4)"</span>, <span class="st">"auto(s5)"</span>, <span class="st">"auto(s6)"</span>), </span>
@@ -1446,7 +1450,7 @@ Tip
 <span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt; [1] "auto"   "manual"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can also change the order of all factors using the following code: <strong>factor(variable.name, levels = c(“new order”))</strong></p>
-<div class="cell" data-hash="wrangling3_cache/html/keep11_13689d7c6e2b9002dde844d224dd06b8">
+<div class="cell" data-hash="wrangling3_cache/html/keep11_4ab8581d2ae55f8571b716e007b5b6ea">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="do">## EX. Change the order of trans to manual</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a>mpg<span class="sc">$</span>trans <span class="ot">&lt;-</span> <span class="fu">factor</span>(mpg<span class="sc">$</span>trans, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"manual"</span>, <span class="st">"auto"</span>))</span>
 <span id="cb15-3"><a href="#cb15-3"></a><span class="fu">levels</span>(mpg<span class="sc">$</span>trans)</span>
@@ -1455,7 +1459,17 @@ Tip
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>In R, the use of factors with multiple levels is primarily a memory optimization strategy. While users may not directly see this, R assigns internal numerical identifiers to each level, which is a more memory-efficient way of handling such data. Unlike some other software packages that generate multiple dummy variables to represent a single variable, R’s approach is generally more resource-efficient.</p>
-</div></div></section><section id="convert-continuous-variables-to-categorical-variables" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="convert-continuous-variables-to-categorical-variables">Convert continuous variables to categorical variables</h4>
+</div></div><ol start="3" type="1">
+<li>Converting back from Factors Characters</li>
+</ol>
+<p>You can also convert factor back to character using the <strong>as.character</strong> function.</p>
+<div class="cell" data-hash="wrangling3_cache/html/convertback_938f9483f336dea6137a5ac76f23b8fb">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Convert factor back to character</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a>mpg<span class="sc">$</span>trans <span class="ot">&lt;-</span> <span class="fu">as.character</span>(mpg<span class="sc">$</span>trans)</span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="fu">levels</span>(mpg<span class="sc">$</span>trans) <span class="co"># no levels for character</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt; NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="convert-continuous-variables-to-categorical-variables" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="convert-continuous-variables-to-categorical-variables">Convert continuous variables to categorical variables</h4>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1470,27 +1484,27 @@ Tip
 </div>
 </div>
 <p>Let’s see the summary of the cty variable first.</p>
-<div class="cell" data-hash="wrangling3_cache/html/convert1_3e986700553aa6d0c853911d5536868b">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">summary</span>(mpg<span class="sc">$</span>cty)</span>
-<span id="cb16-2"><a href="#cb16-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt;    9.00   14.00   17.00   16.86   19.00   35.00</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="wrangling3_cache/html/convert1_ac52fcb4554925ac8104d5871eb9fae1">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">summary</span>(mpg<span class="sc">$</span>cty)</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt;    9.00   14.00   17.00   16.86   19.00   35.00</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>say, we may want to change continuous ‘cty’ into groups 0-14, 15-18, and 18-40. Below is an example with the <code>cut</code> function.</p>
-<div class="cell" data-hash="wrangling3_cache/html/convert2_4bc3c974467eb2928d18261e0a2401bb">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="do">## EX. change the cty into two categories (0,14], (14,18] and (18,40]</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a>mpg<span class="sc">$</span>cty.num <span class="ot">&lt;-</span> <span class="fu">cut</span>(mpg<span class="sc">$</span>cty, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">14</span>, <span class="dv">18</span>, <span class="dv">40</span>), <span class="at">right =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb17-3"><a href="#cb17-3"></a><span class="fu">table</span>(mpg<span class="sc">$</span>cty.num)</span>
-<span id="cb17-4"><a href="#cb17-4"></a><span class="co">#&gt; </span></span>
-<span id="cb17-5"><a href="#cb17-5"></a><span class="co">#&gt;  (0,14] (14,18] (18,40] </span></span>
-<span id="cb17-6"><a href="#cb17-6"></a><span class="co">#&gt;      73      85      76</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-hash="wrangling3_cache/html/convert3_7be7c19dc39b48b0f2211c07a528d972">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="do">## Try this: do you see a difference?: [0,14), [14,18) and [18,40)</span></span>
-<span id="cb18-2"><a href="#cb18-2"></a>mpg<span class="sc">$</span>cty.num2 <span class="ot">&lt;-</span> <span class="fu">cut</span>(mpg<span class="sc">$</span>cty, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">14</span>, <span class="dv">18</span>, <span class="dv">40</span>), <span class="at">right =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">table</span>(mpg<span class="sc">$</span>cty.num2)</span>
+<div class="cell" data-hash="wrangling3_cache/html/convert2_1fe9ec03e78a7468528b8b7454cf5226">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="do">## EX. change the cty into two categories (0,14], (14,18] and (18,40]</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>mpg<span class="sc">$</span>cty.num <span class="ot">&lt;-</span> <span class="fu">cut</span>(mpg<span class="sc">$</span>cty, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">14</span>, <span class="dv">18</span>, <span class="dv">40</span>), <span class="at">right =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">table</span>(mpg<span class="sc">$</span>cty.num)</span>
 <span id="cb18-4"><a href="#cb18-4"></a><span class="co">#&gt; </span></span>
-<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt;  [0,14) [14,18) [18,40) </span></span>
-<span id="cb18-6"><a href="#cb18-6"></a><span class="co">#&gt;      54      78     102</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt;  (0,14] (14,18] (18,40] </span></span>
+<span id="cb18-6"><a href="#cb18-6"></a><span class="co">#&gt;      73      85      76</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="wrangling3_cache/html/convert3_113f9b6bbb12afedc4d7ce982e6c95d4">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="do">## Try this: do you see a difference?: [0,14), [14,18) and [18,40)</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>mpg<span class="sc">$</span>cty.num2 <span class="ot">&lt;-</span> <span class="fu">cut</span>(mpg<span class="sc">$</span>cty, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">14</span>, <span class="dv">18</span>, <span class="dv">40</span>), <span class="at">right =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb19-3"><a href="#cb19-3"></a><span class="fu">table</span>(mpg<span class="sc">$</span>cty.num2)</span>
+<span id="cb19-4"><a href="#cb19-4"></a><span class="co">#&gt; </span></span>
+<span id="cb19-5"><a href="#cb19-5"></a><span class="co">#&gt;  [0,14) [14,18) [18,40) </span></span>
+<span id="cb19-6"><a href="#cb19-6"></a><span class="co">#&gt;      54      78     102</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 <div class="no-row-height column-margin column-container"><div class="">
@@ -1511,11 +1525,11 @@ Tip
 </div>
 <p>We can check how many missing values we have by: <strong>table(is.na(variable.name))</strong></p>
 <p>Let’s us check whether the cty variable contains any missing values:</p>
-<div class="cell" data-hash="wrangling3_cache/html/missval_4fca4e9d73670281a8ee9b64904c0fc2">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">table</span>(<span class="fu">is.na</span>(mpg<span class="sc">$</span>cty))</span>
-<span id="cb19-2"><a href="#cb19-2"></a><span class="co">#&gt; </span></span>
-<span id="cb19-3"><a href="#cb19-3"></a><span class="co">#&gt; FALSE </span></span>
-<span id="cb19-4"><a href="#cb19-4"></a><span class="co">#&gt;   234</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="wrangling3_cache/html/missval_a749a25ffce9b82a30bc64a2cabaf0ab">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">table</span>(<span class="fu">is.na</span>(mpg<span class="sc">$</span>cty))</span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="co">#&gt; </span></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt; FALSE </span></span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt;   234</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>If you want to return all non-missing values, i.e., complete case values: <strong>na.omit(variable.name)</strong>. For more extensive methods on handling missing values, see subsequent tutorials.</p>
 

@@ -121,8 +121,10 @@ summary(analytic.data$blood.pressure)
 The `RIDRETH3` column is recoded to simplify racial categories.
 
 ```{r, cache=TRUE}
-analytic.data$RIDRETH3 <- recode(analytic.data$RIDRETH3, 
-                                 "c('Non-Hispanic Asian','Other Race - Including Multi-Rac')='Other race'")
+analytic.data$RIDRETH3 <- 
+  recode(analytic.data$RIDRETH3,
+         "c('Non-Hispanic Asian',
+         'Other Race - Including Multi-Rac')='Other race'")
 analytic.data$race <- analytic.data$RIDRETH3
 analytic.data$RIDRETH3 <- NULL
 table(analytic.data$race,useNA="always")
@@ -134,7 +136,8 @@ Age values are centered around the mean age for those who are 20 years or older.
 
 ```{r, cache=TRUE}
 summary(analytic.data$RIDAGEYR)
-centre.adult <- mean(analytic.data$RIDAGEYR[analytic.data$RIDAGEYR >= 20], na.rm = TRUE)
+centre.adult <- mean(analytic.data$RIDAGEYR[analytic.data$RIDAGEYR 
+                                            >= 20], na.rm = TRUE)
 centre.adult
 # This is actually not the correct mean age. Guess why?
 # Hint: see the NHANES data dictionary for age variable.
@@ -160,11 +163,13 @@ The marital status is simplified.
 
 ```{r, cache=TRUE}
 summary(analytic.data$DMDMARTL)
-analytic.data$DMDMARTL <- recode(analytic.data$DMDMARTL, 
-                                 "c('Widowed','Divorced','Separated')='Previously married';
-                                 c('Living with partner','Married')='Married'; 
-                                 'Never married' = 'Never married';
-                                 else=NA")
+analytic.data$DMDMARTL <- 
+  recode(analytic.data$DMDMARTL, 
+  "c('Widowed','Divorced','Separated')='Previously married';
+  c('Living with partner','Married')='Married'; 
+  'Never married' = 'Never married';
+  else=NA")
+
 # what happened to 77 and 99? Hint: else
 analytic.data$marital <- analytic.data$DMDMARTL 
 analytic.data$DMDMARTL <- NULL
@@ -212,9 +217,11 @@ names(analytic.data)
 Order is important.
 
 ```{r, cache=TRUE}
-names(analytic.data) <- c("id", "age", "w.all", "w.MEC", "PSU", "STRATA", 
-                          "systolic", "diastolic", "race", "age.centred", 
-                          "gender", "marital", "alcohol", "smoke")
+names(analytic.data) <- c("id", "age", "w.all", "w.MEC", 
+                          "PSU", "STRATA", "systolic", 
+                          "diastolic", "race", "age.centred", 
+                          "gender", "marital", "alcohol", 
+                          "smoke")
 ```
 
 ```{r, cache=TRUE}
@@ -230,7 +237,9 @@ summary(analytic.data$age)
 ```
 
 ```{r, cache=TRUE}
-analytic.data$age.cat <- cut(analytic.data$age, breaks = c(-Inf, 20,50,+Inf), right = FALSE)
+analytic.data$age.cat <- cut(analytic.data$age, 
+                             breaks = c(-Inf, 20,50,+Inf), 
+                             right = FALSE)
 ```
 
 ```{r, cache=TRUE}
@@ -247,7 +256,8 @@ table(analytic.data$age.cat, analytic.data$marital)
 
 ```{r, cache=TRUE}
 dim(analytic.data)
-analytic.data1 <- subset(analytic.data , !is.na(age) & age >= 20)
+analytic.data1 <- subset(analytic.data , 
+                         !is.na(age) & age >= 20)
 dim(analytic.data1)
 ```
 
@@ -286,7 +296,8 @@ table(analytic.data1$marital,useNA = "always")
 ## Saving for further use
 
 ```{r, cache=TRUE}
-save(analytic.data1, file = "Data/researchquestion/NHANESanalytic.Rdata")
+save(analytic.data1, 
+     file = "Data/researchquestion/NHANESanalytic.Rdata")
 ```
 
 ## Regression summary (Optional)
@@ -295,12 +306,12 @@ save(analytic.data1, file = "Data/researchquestion/NHANESanalytic.Rdata")
 This is optional content for this chapter. Later in [confounding](confounding.html) and [predictive factor](predictivefactors.html) chapters, we will learn more about adjustment.
 :::
 
-Different General Linear Models (GLMs) are fit for diastolic blood pressure using variables like gender, marital status, etc.
+Different [Generalized Linear Models (GLMs)](https://en.wikipedia.org/wiki/Generalized_linear_model) are fit for diastolic blood pressure using variables like gender, marital status, etc. Below, we used GLMs with the Gaussian family for the continuous outcome diastolic. Note that `gaussian` is the default family for the `glm` function. Some other family options include binomial, poisson, quasibinomial, and so on. 
 
 ### Bivariate Regression summary (missing values included)
 
 ```{r, cache=TRUE}
-fit1g <- glm(diastolic ~ gender, data=analytic.data1)
+fit1g <- glm(diastolic ~ gender, data = analytic.data1)
 summary(fit1g)
 ```
 
@@ -311,7 +322,9 @@ summary(fit1m)
 
 ```{r, cache=TRUE}
 str(analytic.data1)
-fit13 <- glm(diastolic ~ gender+age.centred+race+marital+systolic+smoke+alcohol, data=analytic.data1)
+fit13 <- glm(diastolic ~ gender + age.centred + race + 
+               marital + systolic + smoke + alcohol, 
+             data = analytic.data1)
 summary(fit13)
 ```
 
@@ -331,7 +344,7 @@ plot_missing(analytic.data1)
 ```{r, cache=TRUE}
 require("tableone")
 vars = c("systolic", "smoke", "diastolic", "race", 
-                       "age.centred", "gender", "marital", "alcohol")
+         "age.centred", "gender", "marital", "alcohol")
 CreateTableOne(data = analytic.data1, includeNA = TRUE, 
                vars = vars)
 ```
@@ -350,19 +363,22 @@ In case it wasn't (often they can get converted to character), then here is the 
 
 ```{r, cache=TRUE}
 # solution 1: one-by-one
-analytic.data1$systolic <- as.numeric(as.character(analytic.data1$systolic))
+analytic.data1$systolic <- 
+  as.numeric(as.character(analytic.data1$systolic))
 summary(analytic.data1$systolic)
 ```
 
 ```{r, cache=TRUE}
 # solution 2: fixing all variable types at once
-numeric.names <- c("systolic", "diastolic", "age.centred", "alcohol")
+numeric.names <- c("systolic", "diastolic", 
+                   "age.centred", "alcohol")
 factor.names <- vars[!vars %in% numeric.names]
 factor.names
-analytic.data1[,factor.names] <- lapply(analytic.data1[,factor.names] , factor)
-analytic.data1[numeric.names] <- apply(X = analytic.data1[numeric.names],
-                                       MARGIN = 2, FUN =function (x) 
-                                         as.numeric(as.character(x)))
+analytic.data1[,factor.names] <- 
+  lapply(analytic.data1[,factor.names] , factor)
+analytic.data1[numeric.names] <- 
+  apply(X = analytic.data1[numeric.names], MARGIN = 2, 
+        FUN =function (x) as.numeric(as.character(x)))
 levels(analytic.data1$marital)
 CreateTableOne(data = analytic.data1, includeNA = TRUE, 
                vars = vars)
@@ -380,15 +396,25 @@ plot_missing(analytic.data2)
 ```
 
 ```{r, cache=TRUE}
-CreateTableOne(data = analytic.data2, includeNA = TRUE, 
+tab1 <- CreateTableOne(data = analytic.data2, includeNA = TRUE, 
                vars = vars)
+print(tab1)
 # For categorical variables, try to see if 
 # any categories have 0% or 100% frequency.
 # If yes, those may create problem in further analysis.
 ```
 
+We can export the tableone to a csv file as follows:
+
+```{r savetable1, cache=TRUE}
+tabl1p <- print(tab1)
+write.csv(tabl1p, file = "Data/researchquestion/table1.csv")
+```
+
 ```{r, cache=TRUE}
-fit23 <- glm(diastolic ~ gender+age.centred+race+marital+systolic+smoke+alcohol, data=analytic.data2)
+fit23 <- glm(diastolic ~ gender + age.centred + race + 
+               marital + systolic + smoke + alcohol, 
+             data = analytic.data2)
 require(Publish)
 publish(fit23)
 ```
@@ -401,8 +427,8 @@ We will learn about proper missing data analysis at a latter class. Currently, w
 require(mice)
 imputation1 <- mice(analytic.data1,
                    method = "sample",  
-                   m = 1, # Number of multiple imputations. 
-                   maxit = 1 # Number of iteration; mostly useful for convergence
+                   m = 1, # Number of multiple imputations
+                   maxit = 1 # #iteration; mostly useful for convergence
                    )
 analytic.data.imputation1 <- complete(imputation1)
 dim(analytic.data.imputation1)
@@ -419,7 +445,9 @@ CreateTableOne(data = analytic.data.imputation1, includeNA = TRUE,
 ```
 
 ```{r, cache=TRUE}
-fit23i <- glm(diastolic ~ gender+age.centred+race+marital+systolic+smoke+alcohol, data=analytic.data.imputation1)
+fit23i <- glm(diastolic ~ gender + age.centred + race + 
+                marital + systolic + smoke + alcohol, 
+              data = analytic.data.imputation1)
 publish(fit23i)
 ```
 

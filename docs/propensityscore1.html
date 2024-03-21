@@ -229,7 +229,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -268,7 +268,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1101,7 +1101,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 </header><p>In the following code chunk, we load the necessary R libraries for our analysis. <code>MatchIt</code> is used for matching methods to find comparable control units, <code>tableone</code> for creating Table 1 to describe baseline characteristics, <code>Publish</code> for generating readable output of regression analysis, and <code>survey</code> for analyzing complex survey samples.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/setup_df0d5ee873ad789a282145dfc7d9bdeb">
+<div class="cell" data-hash="propensityscore1_cache/html/setup_389be1adc848ec1ead4cc6c15f4a879a">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(MatchIt)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(tableone)</span>
@@ -1110,10 +1110,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>In the following code chunk, we load the CCHS dataset which is related to the Canadian Community Health Survey (CCHS). We then use <code><a href="https://rdrr.io/r/base/ls.html">ls()</a></code> to list all objects in the workspace and <code>str</code> to display the structure of the data frame, providing a quick overview of the data and checking for any character variables.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/data_2f3265dabae24957fcf4e263921fa70c">
+<div class="cell" data-hash="propensityscore1_cache/html/data_b6242cd3d8636a1bbdafd29120024f99">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/propensityscore/cchs123b.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic.miss" "analytic2"</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic.miss"   "analytic2"       "has_annotations"</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="fu">str</span>(analytic.miss) <span class="co"># is there any character variable?</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 'data.frame':    397173 obs. of  22 variables:</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;  $ CVD      : chr  "event" "no event" "no event" "no event" ...</span></span>
@@ -1141,7 +1141,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="data-pre-pocessing" class="level3"><h3 class="anchored" data-anchor-id="data-pre-pocessing">Data pre-pocessing</h3>
 <p>In the following code chunk, we define a vector containing the names of variables of interest that needs to be converted to factor variables. We then convert these variables to factors, ensuring they are treated as categorical in subsequent analyses. We also <code>recode</code> the Osteoarthritis (OA) variable into a numeric binary format and display the frequency table of OA before and after the transformation.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/data2_397f20189832d0eac6dc85859927503c">
+<div class="cell" data-hash="propensityscore1_cache/html/data2_b4d1fbf20c03eca84be8a2720add3dd2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stress"</span>, <span class="st">"married"</span>, <span class="st">"income"</span>, <span class="st">"race"</span>, </span>
 <span id="cb3-2"><a href="#cb3-2"></a>               <span class="st">"bmi"</span>, <span class="st">"phyact"</span>, <span class="st">"smoke"</span>, <span class="st">"doctor"</span>, <span class="st">"drink"</span>, <span class="st">"bp"</span>, <span class="st">"province"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3"></a>               <span class="st">"immigrate"</span>, <span class="st">"fruit"</span>, <span class="st">"diab"</span>, <span class="st">"edu"</span>, <span class="st">"CVD"</span>, <span class="st">"OA"</span>)</span>
@@ -1158,7 +1158,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="identify-subjects-with-missing" class="level3"><h3 class="anchored" data-anchor-id="identify-subjects-with-missing">Identify subjects with missing</h3>
 <p>In the following code chunk, we create a new variable <code>miss</code> and initially assign all its values to 1 in the full dataset (that contains some missing observations). We then adjust this assignment by setting miss to 0 for observations that are also present in another complete case dataset. That means any row with <code>miss</code> equal to 0 means that row has no missing observations. Finally, we display the frequency table of the miss variable to check the number of missing and non-missing observations.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/miss_608e153b0f191e91dfe7a55ed1ad2094">
+<div class="cell" data-hash="propensityscore1_cache/html/miss_54bffef0a0ba74b9715e77dd7455b7d6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>analytic.miss<span class="sc">$</span>miss <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="fu">head</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span>
@@ -1176,7 +1176,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section><section id="setting-design" class="level3"><h3 class="anchored" data-anchor-id="setting-design">Setting Design</h3>
 <section id="unconditional-design" class="level4"><h4 class="anchored" data-anchor-id="unconditional-design">Unconditional design</h4>
 <p>In the following code chunk, we explore the summary of the weight variable and establish an unconditional survey design object <code>w.design0</code> using the <code>svydesign</code> function, which will be used for subsequent survey-weighted analyses. We then explore the summary, standard deviation, and sum of the weights within our design object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/design_813cb09071fb6848b16930223ca76af8">
+<div class="cell" data-hash="propensityscore1_cache/html/design_8add528f321be64256c1edf07cdad333">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">summary</span>(analytic.miss<span class="sc">$</span>weight)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;    1.17   65.28  126.63  200.09  243.21 7154.95</span></span>
@@ -1192,7 +1192,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="conditioning-the-design" class="level4"><h4 class="anchored" data-anchor-id="conditioning-the-design">Conditioning the design</h4>
 <p>In the following code chunk, we create a new survey design object <code>w.design</code> by subsetting <code>w.design0</code> to only include observations without missing data <code>(miss == 0)</code>. We then explore the summary, standard deviation, and sum of the weights within this new design object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/design2_7830b45d3407880454463b6b77559763">
+<div class="cell" data-hash="propensityscore1_cache/html/design2_5cbe08638157353fbd7f586743db7d7e">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, miss <span class="sc">==</span> <span class="dv">0</span>)</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">summary</span>(<span class="fu">weights</span>(w.design))</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
@@ -1204,7 +1204,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="subset-data-more" class="level4"><h4 class="anchored" data-anchor-id="subset-data-more">Subset data (more!)</h4>
 <p>We subset the data for fast results (less computation). We will only work with cycle 1.1, and the people from Northern provinces in Canada.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/design3_980c34b0d0bff3f43bc6b23398c1af74">
+<div class="cell" data-hash="propensityscore1_cache/html/design3_e78c0f8f5bdf4b3472fe8a45bdd27239">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>w.design1 <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design, cycle <span class="sc">==</span> <span class="dv">11</span> <span class="sc">&amp;</span> province <span class="sc">==</span> <span class="st">"North"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">sum</span>(<span class="fu">weights</span>(w.design1))</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; [1] 42786.28</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1212,7 +1212,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section></section><section id="priliminary-analysis" class="level3"><h3 class="anchored" data-anchor-id="priliminary-analysis">Priliminary analysis</h3>
 <section id="table-1" class="level4"><h4 class="anchored" data-anchor-id="table-1">Table 1</h4>
 <p>In the following code chunk, we define a new variable vector <code>var.names</code> and create a categorical table using <code>svyCreateCatTable</code> to explore the distribution of <code>age</code> and <code>sex</code> across strata of <code>OA</code> within our subsetted design object <code>w.design1</code>. We then print the table with standardized mean differences (SMD) to assess the balance of these variables across strata.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/tab_e885172eba00a6918ace32db5a2dd1df">
+<div class="cell" data-hash="propensityscore1_cache/html/tab_a87e0ef9900a24f78aa6b427858274f3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"sex"</span>)</span>
 <span id="cb8-2"><a href="#cb8-2"></a>tab0 <span class="ot">&lt;-</span> <span class="fu">svyCreateCatTable</span>(<span class="at">var =</span> var.names, <span class="at">strata=</span> <span class="st">"OA"</span>, <span class="at">data=</span>w.design1,<span class="at">test=</span><span class="cn">FALSE</span>)</span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="fu">print</span>(tab0, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
@@ -1231,7 +1231,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="treatment-effect" class="level4"><h4 class="anchored" data-anchor-id="treatment-effect">Treatment effect</h4>
 <p>In the following code chunk, we fit a logistic regression model using <code>svyglm</code> to estimate the effect of <code>OA</code> and other covariates on the binary outcome <code>CVD</code> (cardiovascular disease). We then use <code>publish</code> to display the results in a readable format.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/tx_559d24cb0d0b05de6941ea4aef07de54">
+<div class="cell" data-hash="propensityscore1_cache/html/tx_b768a08d6f6682d04da92a072debdf8c">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> stress <span class="sc">+</span> married <span class="sc">+</span> </span>
 <span id="cb9-2"><a href="#cb9-2"></a>                         income <span class="sc">+</span> race <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> smoke <span class="sc">+</span></span>
 <span id="cb9-3"><a href="#cb9-3"></a>                         immigrate <span class="sc">+</span> fruit <span class="sc">+</span> diab <span class="sc">+</span> edu,</span>
@@ -1283,7 +1283,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section></section><section id="matching-estimating-treatment-effect" class="level3"><h3 class="anchored" data-anchor-id="matching-estimating-treatment-effect">Matching: Estimating treatment effect</h3>
 <p>Going back to the data (<strong>not working on design here while matching</strong>)</p>
 <p>In the following code chunk, we create a new dataset by omitting <code>NA</code> values from <code>analytic.miss</code> and converting it to a data frame. We then create a subset <code>analytic11n</code> which includes only observations from cycle 1.1 and the Northern provinces. We display the dimensions of this subset, as well as frequency tables of <code>OA</code> and a cross-tabulation of <code>OA</code> and <code>age</code> to understand the distribution of our target variable and a key covariate.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/effect_59d69004eb4eb0d7359600938e9778aa">
+<div class="cell" data-hash="propensityscore1_cache/html/effect_fb5ad33cbfbb4fc2fff2f84aa3fb196d">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Create the dataset without design features</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>analytic2 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">na.omit</span>(analytic.miss))</span>
 <span id="cb10-3"><a href="#cb10-3"></a>analytic11n <span class="ot">&lt;-</span> <span class="fu">subset</span>(analytic2, cycle <span class="sc">==</span> <span class="dv">11</span> <span class="sc">&amp;</span> province <span class="sc">==</span> <span class="st">"North"</span>)</span>
@@ -1305,7 +1305,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="matching-by-1-matching-variable" class="level4"><h4 class="anchored" data-anchor-id="matching-by-1-matching-variable">Matching by 1 matching variable</h4>
 <p>In the following code chunk, we perform exact matching using a single variable, <code>age</code>. We define the matching formula and apply the <code>matchit</code> function to create matched sets of treated and control units. The resulting <code>matching.obj</code> object is displayed to summarize the matching results.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match1_5fb9183c8d8a53f44264acef418bddba">
+<div class="cell" data-hash="propensityscore1_cache/html/match1_afef3d17396fa5ad0f38cb24a13bbd5d">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>match.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(match.formula,</span>
 <span id="cb11-3"><a href="#cb11-3"></a>                        <span class="at">data =</span> analytic11n,</span>
@@ -1319,7 +1319,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="matching-by-2-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-2-matching-variables">Matching by 2 matching variables</h4>
 <p>In the following code chunk, we extend the matching to include two variables, <code>age</code> and <code>sex</code>. We create a new variable <code>var.comb</code> that concatenates these two variables and display its frequency table and the number of unique combinations. We then perform exact matching using both variables and display the resulting object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match2_9fa5130a27031c155448496cb3a3c2aa">
+<div class="cell" data-hash="propensityscore1_cache/html/match2_1bc4a99a512e98b34585732ae998c093">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb12-2"><a href="#cb12-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>)])</span>
 <span id="cb12-3"><a href="#cb12-3"></a><span class="fu">table</span>(var.comb)</span>
@@ -1345,7 +1345,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="matching-by-3-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-3-matching-variables">Matching by 3 matching variables</h4>
 <p>In the following code chunk, we further extend the matching to include three variables: <code>age</code>, <code>sex</code>, and <code>stress</code>. We explore the unique combinations of these variables and their distribution across levels of <code>OA</code>. We then perform exact matching using these three variables and display the resulting object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match3_ed738329016a914d9c6dd2ff7befc4a7">
+<div class="cell" data-hash="propensityscore1_cache/html/match3_91d16b5f7ec48601e916494aad3a243c">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb13-2"><a href="#cb13-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>, <span class="st">'stress'</span>)])</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="fu">table</span>(var.comb)</span>
@@ -1408,7 +1408,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="matching-by-4-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-4-matching-variables">Matching by 4 matching variables</h4>
 <p>The process of matching by 4 variables involves creating combinations of the 4 variables, exploring their distributions, and performing exact matching.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match4_6ee976f16baa1a58831f4814575fcb02">
+<div class="cell" data-hash="propensityscore1_cache/html/match4_b9f24e58776f9503b5d1c09ef78fba25">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb14-2"><a href="#cb14-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>,</span>
 <span id="cb14-3"><a href="#cb14-3"></a>                                    <span class="st">'stress'</span>,<span class="st">'income'</span>)])</span>
@@ -1427,7 +1427,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb14-16"><a href="#cb14-16"></a><span class="co">#&gt;  - covariates: age, sex, stress, income</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="matching-by-5-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-5-matching-variables">Matching by 5 matching variables</h4>
-<div class="cell" data-hash="propensityscore1_cache/html/match5_3f05bf35952317ab2854010d14979ff6">
+<div class="cell" data-hash="propensityscore1_cache/html/match5_ee290ef054223049251f5e5c54764bc1">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb15-2"><a href="#cb15-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>,</span>
 <span id="cb15-3"><a href="#cb15-3"></a>                                    <span class="st">'stress'</span>,<span class="st">'income'</span>,<span class="st">'race'</span>)])</span>
@@ -1445,7 +1445,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb15-15"><a href="#cb15-15"></a><span class="co">#&gt;  - covariates: age, sex, stress, income, race</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="matching-by-6-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-6-matching-variables">Matching by 6 matching variables</h4>
-<div class="cell" data-hash="propensityscore1_cache/html/match6_65bff1c37d0f774c64737710368a1a57">
+<div class="cell" data-hash="propensityscore1_cache/html/match6_1cb51e3c7d3671cb8e83ffa7cd05f66d">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb16-2"><a href="#cb16-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>,</span>
 <span id="cb16-3"><a href="#cb16-3"></a>                                    <span class="st">'stress'</span>,<span class="st">'income'</span>,<span class="st">'race'</span>,<span class="st">'edu'</span>)])</span>
@@ -1493,7 +1493,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section></section><section id="treatment-effect-1" class="level3"><h3 class="anchored" data-anchor-id="treatment-effect-1">Treatment effect</h3>
 <section id="convert-data-to-design" class="level4"><h4 class="anchored" data-anchor-id="convert-data-to-design">Convert data to design</h4>
 <p>In the following code chunk, we create a new variable matched in the <code>analytic.miss</code> dataset to indicate whether an observation was included in the matched dataset <code>OACVD.match.11n</code>. We then create a new survey design object <code>w.design.m</code> that includes only the matched observations for subsequent analyses.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/tx2_83bb869468bccb3c367dd8be3bb1c6f9">
+<div class="cell" data-hash="propensityscore1_cache/html/tx2_e66e2866179c5cc37d58b3a27f27f67a">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb17-2"><a href="#cb17-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -1513,7 +1513,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section><section id="outcome-analysis" class="level4"><h4 class="anchored" data-anchor-id="outcome-analysis">Outcome analysis</h4>
 <p>The subsequent code chunks involve fitting logistic regression models to estimate the treatment effect, both in a crude and adjusted manner, respectively. The models are fitted using the matched survey design object and the results are displayed in a readable format.</p>
 <section id="crude" class="level5"><h5 class="anchored" data-anchor-id="crude">Crude</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/est2_b1a5f25b225daeac210ebaf35e39f90a">
+<div class="cell" data-hash="propensityscore1_cache/html/est2_9fa4571e2fb6e48eba2982d4761bfde4">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA,</span>
 <span id="cb18-2"><a href="#cb18-2"></a>                   <span class="at">design =</span> w.design.m,</span>
 <span id="cb18-3"><a href="#cb18-3"></a>                   <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
@@ -1523,7 +1523,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb18-7"><a href="#cb18-7"></a><span class="co">#&gt;        OA            3.14 [0.80;12.40]   0.1025</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="adjusted" class="level5"><h5 class="anchored" data-anchor-id="adjusted">Adjusted</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/est3_40fada88847b233f19f36a59bda5b3a5">
+<div class="cell" data-hash="propensityscore1_cache/html/est3_5b255853590977a332345bb51961efb3">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> </span>
 <span id="cb19-2"><a href="#cb19-2"></a>                        age <span class="sc">+</span> sex <span class="sc">+</span> stress <span class="sc">+</span> income <span class="sc">+</span> race <span class="sc">+</span> edu,</span>
 <span id="cb19-3"><a href="#cb19-3"></a>                   <span class="at">design =</span> w.design.m,</span>
@@ -1535,8 +1535,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb19-9"><a href="#cb19-9"></a><span class="co">#&gt;        OA                          2.04                 [0.34;12.16]   0.43593 </span></span>
 <span id="cb19-10"><a href="#cb19-10"></a><span class="co">#&gt;       age      20-29 years          Ref                                        </span></span>
 <span id="cb19-11"><a href="#cb19-11"></a><span class="co">#&gt;                30-39 years         0.54                  [0.08;3.51]   0.51962 </span></span>
-<span id="cb19-12"><a href="#cb19-12"></a><span class="co">#&gt;                40-49 years  30148597.85    [7758796.44;117149349.12]   &lt; 1e-04 </span></span>
-<span id="cb19-13"><a href="#cb19-13"></a><span class="co">#&gt;                50-59 years  63290825.96   [12589873.89;318170673.23]   &lt; 1e-04 </span></span>
+<span id="cb19-12"><a href="#cb19-12"></a><span class="co">#&gt;                40-49 years  30148597.83    [7758796.64;117149345.85]   &lt; 1e-04 </span></span>
+<span id="cb19-13"><a href="#cb19-13"></a><span class="co">#&gt;                50-59 years  63290825.92   [12589874.04;318170669.03]   &lt; 1e-04 </span></span>
 <span id="cb19-14"><a href="#cb19-14"></a><span class="co">#&gt;                60-64 years         0.31                  [0.01;9.33]   0.49735 </span></span>
 <span id="cb19-15"><a href="#cb19-15"></a><span class="co">#&gt;       sex           Female          Ref                                        </span></span>
 <span id="cb19-16"><a href="#cb19-16"></a><span class="co">#&gt;                       Male         1.58                  [0.29;8.62]   0.59729 </span></span>
@@ -1549,8 +1549,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb19-23"><a href="#cb19-23"></a><span class="co">#&gt;      race        Non-white          Ref                                        </span></span>
 <span id="cb19-24"><a href="#cb19-24"></a><span class="co">#&gt;                      White         1.02                  [0.11;9.45]   0.98723 </span></span>
 <span id="cb19-25"><a href="#cb19-25"></a><span class="co">#&gt;       edu         &lt; 2ndary          Ref                                        </span></span>
-<span id="cb19-26"><a href="#cb19-26"></a><span class="co">#&gt;                  2nd grad. 845233466.89 [44642865.50;16002996347.89]   &lt; 1e-04 </span></span>
-<span id="cb19-27"><a href="#cb19-27"></a><span class="co">#&gt;             Post-2nd grad.  69867459.42    [9660579.88;505296985.12]   &lt; 1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-26"><a href="#cb19-26"></a><span class="co">#&gt;                  2nd grad. 845233463.16 [44642866.24;16002995941.97]   &lt; 1e-04 </span></span>
+<span id="cb19-27"><a href="#cb19-27"></a><span class="co">#&gt;             Post-2nd grad.  69867459.11    [9660580.05;505296971.72]   &lt; 1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="questions-for-the-students" class="level4"><h4 class="anchored" data-anchor-id="questions-for-the-students">Questions for the students</h4>
 <ul>
@@ -1560,7 +1560,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul></section></section><section id="matching-by-a-lot-of-variables" class="level3"><h3 class="anchored" data-anchor-id="matching-by-a-lot-of-variables">Matching by a lot of variables</h3>
 <p>The code chunks involve performing matching using a large number of variables and estimating the treatment effect using the matched data. The process involves creating matched datasets, converting them to survey design objects, and fitting logistic regression models.</p>
 <section id="matching-part-in-data" class="level4"><h4 class="anchored" data-anchor-id="matching-part-in-data">Matching part in data</h4>
-<div class="cell" data-hash="propensityscore1_cache/html/match10_0329a794dbd3fd1812abc7a0894173a7">
+<div class="cell" data-hash="propensityscore1_cache/html/match10_5305d71ad4fea66ec0da9e3e01112663">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>match.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age + sex + stress + married + </span></span>
 <span id="cb20-2"><a href="#cb20-2"></a><span class="st">                         income + race + bmi + phyact + smoke +</span></span>
 <span id="cb20-3"><a href="#cb20-3"></a><span class="st">                         immigrate + fruit + diab + edu"</span>)</span>
@@ -1627,7 +1627,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="treatment-effect-estimation-in-design" class="level4"><h4 class="anchored" data-anchor-id="treatment-effect-estimation-in-design">Treatment effect estimation in design</h4>
 <section id="create-design" class="level5"><h5 class="anchored" data-anchor-id="create-design">Create design</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/match11_3daea38eb3066e128daf9fb25e9c2547">
+<div class="cell" data-hash="propensityscore1_cache/html/match11_cd2b5e4f583e3bff5366435e716794e1">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>analytic.miss<span class="sc">$</span>matched2 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -1645,7 +1645,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb21-15"><a href="#cb21-15"></a>w.design.m2 <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched2 <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="outcome-analysis-1" class="level5"><h5 class="anchored" data-anchor-id="outcome-analysis-1">outcome analysis</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/match12_d4d04aa2cc26d919a8e15edad8d669df">
+<div class="cell" data-hash="propensityscore1_cache/html/match12_592ee9ec86b4895657d4ab6696ddd2b5">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> stress <span class="sc">+</span> married <span class="sc">+</span></span>
 <span id="cb22-2"><a href="#cb22-2"></a>                         income <span class="sc">+</span> race <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> smoke <span class="sc">+</span></span>
 <span id="cb22-3"><a href="#cb22-3"></a>                         immigrate <span class="sc">+</span> fruit <span class="sc">+</span> diab <span class="sc">+</span> edu,</span>
@@ -1659,7 +1659,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <ul>
 <li>Why the above model not fitting?</li>
 </ul></section></section></section><section id="save-data-for-later-use" class="level3"><h3 class="anchored" data-anchor-id="save-data-for-later-use">Save data for later use</h3>
-<div class="cell" data-hash="propensityscore1_cache/html/savedata_5c1885d9bb90b99236ce1456c698ffac">
+<div class="cell" data-hash="propensityscore1_cache/html/savedata_2325ed7e464d8f009a7dde30240d0b05">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">save</span>(analytic11n, analytic2, analytic.miss, <span class="at">file=</span><span class="st">"Data/propensityscore/cchs123c.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>

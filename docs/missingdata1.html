@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1127,7 +1127,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section><section id="key-reference" class="level3"><h3 class="anchored" data-anchor-id="key-reference">Key reference</h3>
 <p>In this discussion, our primary guide and source of information is the work titled “Flexible Imputation of Missing Data” by Stef van Buuren, denoted here as <span class="citation" data-cites="van2018flexible">(<a href="#ref-van2018flexible" role="doc-biblioref">Van Buuren 2018</a>)</span>. This book is an invaluable resource for anyone looking to delve deeper into the intricacies of handling missing data, especially in the context of statistical analyses. Below we also cited the relevant section numbers.</p>
 <p>First, you need to load the necessary libraries:</p>
-<div class="cell" data-hash="missingdata1_cache/html/setup_ffe4ca00d913ffafc3a2ab667e5fb7ad">
+<div class="cell" data-hash="missingdata1_cache/html/setup_d19b0ceb0b1e0e4c39760ebd6b2baaf4">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(mice)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(DataExplorer)</span>
@@ -1197,7 +1197,7 @@ Important
 </ol>
 </div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/load_6fceb45197f917216c993478b78b3e5e">
+<div class="cell" data-hash="missingdata1_cache/html/load_9fde13208e5057402013c8ae84369a4f">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(VIM)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">load</span>(<span class="st">"Data/missingdata/NHANES17.RData"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3"></a>NHANES17s <span class="ot">&lt;-</span> analytic.with.miss[<span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>,<span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"bmi"</span>, <span class="st">"cholesterol"</span>,<span class="st">"diastolicBP"</span>)]</span>
@@ -1272,7 +1272,7 @@ plot_missing(NHANES17s)</a></code></pre>
 </li>
 </ul>
 <p>Mean imputation is a straightforward method where missing values in a dataset are replaced with the mean of the observed values. While it’s simple and intuitive, this approach can reduce the overall variability of the data, leading to an underestimation of variance. This can be problematic in statistical analyses where understanding data spread is crucial.</p>
-<div class="cell" data-hash="missingdata1_cache/html/meanimp_5a727c4f7e6b4b2261c9eff1d8292b0e">
+<div class="cell" data-hash="missingdata1_cache/html/meanimp_98548533d21c744b6857d27d8622786b">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Replace missing values by mean </span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>imputation1 <span class="ot">&lt;-</span> <span class="fu">mice</span>(NHANES17s, </span>
 <span id="cb10-3"><a href="#cb10-3"></a>                   <span class="at">method =</span> <span class="st">"mean"</span>, <span class="co"># Replace by mean of the other values</span></span>
@@ -1342,7 +1342,7 @@ plot_missing(NHANES17s)</a></code></pre>
 <p>Regression imputation offers a more nuanced approach, especially when dealing with interrelated variables. By building a regression model using observed data, missing values are predicted based on the relationships between variables. This method can provide more accurate estimates for missing values by leveraging the inherent correlations within the data, making it a preferred choice in many scenarios over mean imputation.</p>
 <p><span class="math inline">\(Y \sim X\)</span></p>
 <p><span class="math inline">\(age \sim bmi + cholesterol + diastolicBP\)</span></p>
-<div class="cell" data-hash="missingdata1_cache/html/regimp_d2dddcf419ff066f72cef8f51f15392c">
+<div class="cell" data-hash="missingdata1_cache/html/regimp_15812ab2c427d0e271ecf4cc225b1b6d">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>imputation2 <span class="ot">&lt;-</span> <span class="fu">mice</span>(NHANES17s, </span>
 <span id="cb12-2"><a href="#cb12-2"></a>            <span class="at">method =</span> <span class="st">"norm.predict"</span>, <span class="co"># regression imputation</span></span>
 <span id="cb12-3"><a href="#cb12-3"></a>            <span class="at">seed =</span> <span class="dv">1</span>,</span>
@@ -1456,7 +1456,7 @@ plot_missing(NHANES17s)</a></code></pre>
 <p>Recognizing this limitation, stochastic regression imputation was introduced as an enhancement. Instead of merely using the fitted model, it adds a randomly drawn error term during the imputation process. This error term reintroduces the natural variability that the original regression imputation method missed. By doing so, the imputed values are scattered around the regression line, more accurately reflecting the true correlations and distributions in the dataset. This method, therefore, offers a more realistic representation of the data, ensuring that subsequent analyses are grounded in a dataset that mirrors genuine variability and relationships.</p>
 <p><span class="math inline">\(Y \sim X + e\)</span></p>
 <p><span class="math inline">\(age \sim bmi + cholesterol + diastolicBP + error\)</span></p>
-<div class="cell" data-hash="missingdata1_cache/html/impsto_fe10f7580e354533e1186956afa5209f">
+<div class="cell" data-hash="missingdata1_cache/html/impsto_4aaf9748e98d7443f9050c517716c844">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>imputation3 <span class="ot">&lt;-</span> <span class="fu">mice</span>(NHANES17s, <span class="at">method =</span> <span class="st">"norm.nob"</span>, <span class="co"># stochastic regression imputation</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>                    <span class="at">m =</span> <span class="dv">1</span>, <span class="at">maxit =</span> <span class="dv">1</span>, <span class="at">seed =</span> <span class="dv">504</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb13-3"><a href="#cb13-3"></a></span>
@@ -1584,7 +1584,7 @@ Tip
 </div>
 </div>
 <p>The strength of PMM lies in its approach. Instead of imputing a potentially artificial value based on a prediction, it imputes a real, observed value from the dataset. This ensures that the imputed data retains the original data’s characteristics and doesn’t introduce any unrealistic values. It offers a safeguard against extrapolation, ensuring that the imputed values are always within the plausible range of the dataset.</p>
-<div class="cell" data-hash="missingdata1_cache/html/imppmm_f29c6a13fba4cdaa824f26c24d47ea43">
+<div class="cell" data-hash="missingdata1_cache/html/imppmm_586eb1f50f70a0f4b55cb40ab4033020">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>imputation3b <span class="ot">&lt;-</span> <span class="fu">mice</span>(NHANES17s, <span class="at">method =</span> <span class="st">"pmm"</span>, </span>
 <span id="cb14-2"><a href="#cb14-2"></a>                    <span class="at">m =</span> <span class="dv">1</span>, <span class="at">maxit =</span> <span class="dv">1</span>,</span>
 <span id="cb14-3"><a href="#cb14-3"></a>                    <span class="at">seed =</span> <span class="dv">504</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
@@ -1619,18 +1619,14 @@ Tip
 </ul>
 <p>We have learned different methods of imputation. In this section, we will introduce how to incorporate the data imputation into data analysis. In multiple imputation data analysis, three steps will be taken:</p>
 <ul>
-<li>
-<strong>Step 0: Set imputation model</strong>: Before starting the imputation process, it’s crucial to determine the appropriate imputation model based on the nature of the missing data and the relationships between variables. This model will guide how the missing values are estimated. For instance, if the data is missing at random, a linear regression model might be used for continuous data, while logistic regression might be used for binary data. The choice of model can significantly impact the quality of the imputed data, so it’s essential to understand the underlying mechanisms causing the missingness and select a model accordingly.</li>
-<li>
-<strong>Step 1: The incomplete dataset will be imputed <span class="math inline">\(m\)</span> times</strong>: In this step, the incomplete dataset is imputed multiple times, resulting in <span class="math inline">\(m\)</span> different “complete” datasets. The reason for creating multiple datasets is to capture the uncertainty around the missing values. Each of these datasets will have slightly different imputed values, reflecting the variability and uncertainty in the imputation process. The number of imputations, <span class="math inline">\(m\)</span>, is typically chosen based on the percentage of missing data and the desired level of accuracy. Common choices for <span class="math inline">\(m\)</span> range from 5 to 50, but more imputations provide more accurate results, especially when the percentage of missing data is high.</li>
-<li>
-<strong>Step 2: Each <span class="math inline">\(m\)</span> complete datasets will be analyzed separately by standard analysis (e.g., regression model)</strong>: Once the <span class="math inline">\(m\)</span> complete datasets are generated, each one is analyzed separately using standard statistical methods. For example, if the research question involves understanding the relationship between two variables, a regression model might be applied to each dataset. This step produces <span class="math inline">\(m\)</span> sets of analysis results, one for each imputed dataset.</li>
-<li>
-<strong>Step 3: The analysis results will be pooled / aggregated together by Rubin’s rules (1987)</strong>: The final step involves combining the results from the <span class="math inline">\(m\)</span> separate analyses into a single set of results. This is done using Rubin’s rules (1987), which provide a way to aggregate the estimates and adjust for the variability between the imputed datasets. The pooled results give a more accurate and robust estimate than analyzing a single imputed dataset. Rubin’s rules ensure that the combined results reflect both the within-imputation variability (the variability in results from analyzing each dataset separately) and the between-imputation variability (the differences in results across the imputed datasets).</li>
+<li><p><strong>Step 0: Set imputation model</strong>: Before starting the imputation process, it’s crucial to determine the appropriate imputation model based on the nature of the missing data and the relationships between variables. This model will guide how the missing values are estimated. For instance, if the data is missing at random, a linear regression model might be used for continuous data, while logistic regression might be used for binary data. The choice of model can significantly impact the quality of the imputed data, so it’s essential to understand the underlying mechanisms causing the missingness and select a model accordingly.</p></li>
+<li><p><strong>Step 1: The incomplete dataset will be imputed <span class="math inline">\(m\)</span> times</strong>: In this step, the incomplete dataset is imputed multiple times, resulting in <span class="math inline">\(m\)</span> different “complete” datasets. The reason for creating multiple datasets is to capture the uncertainty around the missing values. Each of these datasets will have slightly different imputed values, reflecting the variability and uncertainty in the imputation process. The number of imputations, <span class="math inline">\(m\)</span>, is typically chosen based on the percentage of missing data and the desired level of accuracy. Common choices for <span class="math inline">\(m\)</span> range from 5 to 50, but more imputations provide more accurate results, especially when the percentage of missing data is high.</p></li>
+<li><p><strong>Step 2: Each <span class="math inline">\(m\)</span> complete datasets will be analyzed separately by standard analysis (e.g., regression model)</strong>: Once the <span class="math inline">\(m\)</span> complete datasets are generated, each one is analyzed separately using standard statistical methods. For example, if the research question involves understanding the relationship between two variables, a regression model might be applied to each dataset. This step produces <span class="math inline">\(m\)</span> sets of analysis results, one for each imputed dataset.</p></li>
+<li><p><strong>Step 3: The analysis results will be pooled / aggregated together by Rubin’s rules (1987)</strong>: The final step involves combining the results from the <span class="math inline">\(m\)</span> separate analyses into a single set of results. This is done using Rubin’s rules (1987) <span class="citation" data-cites="little1987multiple">(<a href="#ref-little1987multiple" role="doc-biblioref">Little and Rubin 1987</a>)</span>, which provide a way to aggregate the estimates and adjust for the variability between the imputed datasets. The pooled results give a more accurate and robust estimate than analyzing a single imputed dataset. Rubin’s rules ensure that the combined results reflect both the within-imputation variability (the variability in results from analyzing each dataset separately) and the between-imputation variability (the differences in results across the imputed datasets).</p></li>
 </ul>
 <section id="step-0" class="level5"><h5 class="anchored" data-anchor-id="step-0">Step 0</h5>
 <p><em>Set imputation model</em>:</p>
-<div class="cell" data-hash="missingdata1_cache/html/mi0_08be45b6588ad0b45dc063ecf186bf56">
+<div class="cell" data-hash="missingdata1_cache/html/mi0_339b39daec34fd92d6ccc70852c6ad92">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>ini <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> NHANES17s, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb15-2"><a href="#cb15-2"></a>pred <span class="ot">&lt;-</span> ini<span class="sc">$</span>pred</span>
 <span id="cb15-3"><a href="#cb15-3"></a>pred</span>
@@ -1655,7 +1651,7 @@ Tip
 </div>
 <p><em>Set imputation method</em>:</p>
 <p>See Table 1 of <span class="citation" data-cites="van2011mice">(<a href="#ref-van2011mice" role="doc-biblioref">Van Buuren and Groothuis-Oudshoorn 2011</a>)</span>.</p>
-<div class="cell" data-hash="missingdata1_cache/html/mi0a_a65eaa6bb99db71697b506d5e476377b">
+<div class="cell" data-hash="missingdata1_cache/html/mi0a_ba418afc64055e606eef5a6e86a89bc4">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>meth <span class="ot">&lt;-</span> ini<span class="sc">$</span>meth</span>
 <span id="cb16-2"><a href="#cb16-2"></a>meth</span>
 <span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt;         age         bmi cholesterol diastolicBP </span></span>
@@ -1674,7 +1670,7 @@ Tip
 <span id="cb16-16"><a href="#cb16-16"></a><span class="co">#&gt;          "pmm"         "mean" "norm.predict"     "norm.nob"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><em>Set imputation model based on correlation alone</em>:</p>
-<div class="cell" data-hash="missingdata1_cache/html/mi0b_4bffe7ca9e6ed51d1ff2ce090a162be6">
+<div class="cell" data-hash="missingdata1_cache/html/mi0b_8442d69bc3f8d48079ef9c79dfdeb66d">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>predictor.selection <span class="ot">&lt;-</span> <span class="fu">quickpred</span>(NHANES17s, </span>
 <span id="cb17-2"><a href="#cb17-2"></a>                                 <span class="at">mincor=</span><span class="fl">0.1</span>, <span class="co"># absolute correlation </span></span>
 <span id="cb17-3"><a href="#cb17-3"></a>                                 <span class="at">minpuc=</span><span class="fl">0.1</span>) <span class="co"># proportion of usable cases</span></span>
@@ -1686,7 +1682,7 @@ Tip
 <span id="cb17-9"><a href="#cb17-9"></a><span class="co">#&gt; diastolicBP   1   1           1           0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-1" class="level5"><h5 class="anchored" data-anchor-id="step-1">Step 1</h5>
-<div class="cell" data-hash="missingdata1_cache/html/mi1_1d40b4b13b3c0d8cf8d65411df065638">
+<div class="cell" data-hash="missingdata1_cache/html/mi1_ab023393b9c41fa7fac081bc37f83542">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Step 1 Impute the incomplete data m=10 times</span></span>
 <span id="cb18-2"><a href="#cb18-2"></a>imputation4 <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data=</span>NHANES17s, </span>
 <span id="cb18-3"><a href="#cb18-3"></a>                    <span class="at">seed=</span><span class="dv">504</span>,</span>
@@ -1830,7 +1826,7 @@ Tip
 <span id="cb21-19"><a href="#cb21-19"></a><span class="co">#&gt;       66.37078       55.63333       25.12857      179.69042       67.60832</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2" class="level5"><h5 class="anchored" data-anchor-id="step-2">Step 2</h5>
-<div class="cell" data-hash="missingdata1_cache/html/mi2_7b166eb0b63a031d6d433b13a5010cbb">
+<div class="cell" data-hash="missingdata1_cache/html/mi2_c596c5ce4ba61f4bb9bc3a823f5e81ac">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>imputation4</span>
 <span id="cb22-2"><a href="#cb22-2"></a><span class="co">#&gt; Class: mids</span></span>
 <span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt; Number of multiple imputations:  10 </span></span>
@@ -1844,7 +1840,7 @@ Tip
 <span id="cb22-11"><a href="#cb22-11"></a><span class="co">#&gt; cholesterol   1   1           0           1</span></span>
 <span id="cb22-12"><a href="#cb22-12"></a><span class="co">#&gt; diastolicBP   1   1           1           0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/mi2a_6999d941f63c1c9400d58e9e9d7f8516">
+<div class="cell" data-hash="missingdata1_cache/html/mi2a_52486215b9953178145778cfd2d0533c">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>imputation4[[<span class="dv">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
@@ -1855,7 +1851,7 @@ Tip
 </div>
 </div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/mi2b_23417fc33143e27155f22fab21f32de1">
+<div class="cell" data-hash="missingdata1_cache/html/mi2b_fa9b6dd57970f265768c9466f320b397">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>mice<span class="sc">::</span><span class="fu">complete</span>(imputation4, <span class="at">action =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
@@ -1866,7 +1862,7 @@ Tip
 </div>
 </div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/mi2c_14c78e444a5ca5b19d0a28fcb6ea417f">
+<div class="cell" data-hash="missingdata1_cache/html/mi2c_569b0ba8ade103e93d47d44e0ca069e8">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>mice<span class="sc">::</span><span class="fu">complete</span>(imputation4, <span class="at">action =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
@@ -1877,7 +1873,7 @@ Tip
 </div>
 </div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/mi2d_d31793a02bff360c810bb3f0223d4fc2">
+<div class="cell" data-hash="missingdata1_cache/html/mi2d_06453ab2c72c541d3995aaeed12bb903">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># Step 2 Analyze the imputed data</span></span>
 <span id="cb26-2"><a href="#cb26-2"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">with</span>(<span class="at">data =</span> imputation4, <span class="at">exp =</span> <span class="fu">lm</span>(cholesterol <span class="sc">~</span> age <span class="sc">+</span> bmi <span class="sc">+</span> diastolicBP))</span>
 <span id="cb26-3"><a href="#cb26-3"></a><span class="do">## fit model with each of 10 datasets separately</span></span>
@@ -1997,7 +1993,7 @@ Tip
 </section><section id="step-3" class="level5"><h5 class="anchored" data-anchor-id="step-3">Step 3</h5>
 <section id="understanding-the-pooled-results" class="level6"><h6 class="anchored" data-anchor-id="understanding-the-pooled-results">Understanding the pooled results</h6>
 <p>We will show the result of entire pool later. First we want to show the pooled results for the <code>age</code> variable only an an example.</p>
-<div class="cell" data-hash="missingdata1_cache/html/mi3a_e1c5e223a020716b1ca6b19720d9ae19">
+<div class="cell" data-hash="missingdata1_cache/html/mi3a_74797995cea5762a43a0500e2ff99353">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">require</span>(dplyr)</span>
 <span id="cb27-2"><a href="#cb27-2"></a>res10 <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit4) <span class="sc">%&gt;%</span> as_tibble <span class="sc">%&gt;%</span> <span class="fu">print</span>(<span class="at">n=</span><span class="dv">40</span>)</span>
 <span id="cb27-3"><a href="#cb27-3"></a><span class="co">#&gt; # A tibble: 40 × 6</span></span>
@@ -2055,7 +2051,7 @@ Tip
 </div>
 </div>
 <p>Let us describe the components of a pool for the <code>age</code> variable only:</p>
-<div class="cell" data-hash="missingdata1_cache/html/mi3b_bddb2764fcc82f5147d4ba7631dad6ae">
+<div class="cell" data-hash="missingdata1_cache/html/mi3b_35f5a0756a9eaf278f2b7d33585e8e67">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>m.number <span class="ot">&lt;-</span> <span class="dv">10</span></span>
 <span id="cb28-2"><a href="#cb28-2"></a><span class="co"># estimate = pooled estimate </span></span>
 <span id="cb28-3"><a href="#cb28-3"></a><span class="co"># = sum of (m “beta-hat” estimates) / m (mean of m estimated statistics)</span></span>
@@ -2240,7 +2236,7 @@ Tip
 <li>Wald (Rubin’s rule): model selection was performed at model fitting step and combine the estimates using Rubin’s rules. This is considered as gold standard.</li>
 </ol>
 <section id="majority-using-nhanes17s" class="level5"><h5 class="anchored" data-anchor-id="majority-using-nhanes17s">Majority using NHANES17s</h5>
-<div class="cell" data-hash="missingdata1_cache/html/varselect0_e7d0642e73a80922f4214931dec839b6">
+<div class="cell" data-hash="missingdata1_cache/html/varselect0_02c5067a0551a2732b22b1430cd3898d">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>data <span class="ot">&lt;-</span> NHANES17s</span>
 <span id="cb30-2"><a href="#cb30-2"></a>imp <span class="ot">&lt;-</span> <span class="fu">mice</span>(data, <span class="at">seed =</span> <span class="dv">504</span>, <span class="at">m =</span> <span class="dv">100</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb30-3"><a href="#cb30-3"></a><span class="do">## Multiple imputation with 100 imputations, resulting in 100 imputed datasets</span></span>
@@ -2260,7 +2256,7 @@ Tip
 <span id="cb30-17"><a href="#cb30-17"></a><span class="co">#&gt;         age         bmi cholesterol </span></span>
 <span id="cb30-18"><a href="#cb30-18"></a><span class="co">#&gt;           6          12           1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/varselect1_f3f5b84ee52b73cf9903da8cf655c49f">
+<div class="cell" data-hash="missingdata1_cache/html/varselect1_77c375bc263364178defdadfecb1aea0">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="do">## Set up the stepwise variable selection, from null model to full model</span></span>
 <span id="cb31-2"><a href="#cb31-2"></a>scope <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">upper =</span> <span class="sc">~</span> age <span class="sc">+</span> bmi <span class="sc">+</span> cholesterol, <span class="at">lower =</span> <span class="sc">~</span> age)</span>
 <span id="cb31-3"><a href="#cb31-3"></a></span>
@@ -2280,7 +2276,7 @@ Tip
 <span id="cb31-17"><a href="#cb31-17"></a><span class="co">#&gt;         100          11           1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="stack-using-nhanes17s" class="level5"><h5 class="anchored" data-anchor-id="stack-using-nhanes17s">Stack using NHANES17s</h5>
-<div class="cell" data-hash="missingdata1_cache/html/varselect2_0809fd4511889881b0f898059d0fcd13">
+<div class="cell" data-hash="missingdata1_cache/html/varselect2_220811f2d627a4f141cd0b7aca9d05cd">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>Stack.data <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imp, <span class="at">action=</span><span class="st">"long"</span>)</span>
 <span id="cb32-2"><a href="#cb32-2"></a><span class="fu">head</span>(Stack.data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2303,15 +2299,13 @@ Tip
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>fitx <span class="ot">&lt;-</span> <span class="fu">lm</span>(diastolicBP <span class="sc">~</span> age <span class="sc">+</span> bmi <span class="sc">+</span> cholesterol, <span class="at">data =</span> Stack.data)</span>
 <span id="cb34-2"><a href="#cb34-2"></a>fity <span class="ot">&lt;-</span> <span class="fu">step</span>(fitx, <span class="at">scope =</span> scope0, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb34-3"><a href="#cb34-3"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb34-4"><a href="#cb34-4"></a><span class="co">#&gt; Loading required package: Publish</span></span>
-<span id="cb34-5"><a href="#cb34-5"></a><span class="co">#&gt; Loading required package: prodlim</span></span>
-<span id="cb34-6"><a href="#cb34-6"></a><span class="fu">publish</span>(fity)</span>
-<span id="cb34-7"><a href="#cb34-7"></a><span class="co">#&gt;     Variable Units Coefficient         CI.95 p-value </span></span>
-<span id="cb34-8"><a href="#cb34-8"></a><span class="co">#&gt;  (Intercept)             63.70 [62.12;65.28] &lt; 1e-04 </span></span>
-<span id="cb34-9"><a href="#cb34-9"></a><span class="co">#&gt;          bmi              0.14   [0.08;0.20] &lt; 1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-4"><a href="#cb34-4"></a><span class="fu">publish</span>(fity)</span>
+<span id="cb34-5"><a href="#cb34-5"></a><span class="co">#&gt;     Variable Units Coefficient         CI.95 p-value </span></span>
+<span id="cb34-6"><a href="#cb34-6"></a><span class="co">#&gt;  (Intercept)             63.70 [62.12;65.28] &lt; 1e-04 </span></span>
+<span id="cb34-7"><a href="#cb34-7"></a><span class="co">#&gt;          bmi              0.14   [0.08;0.20] &lt; 1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="wald-using-nhanes17s" class="level5"><h5 class="anchored" data-anchor-id="wald-using-nhanes17s">Wald using NHANES17s</h5>
-<div class="cell" data-hash="missingdata1_cache/html/varselect3_16e230dc5ba8be374c1367597f4f7012">
+<div class="cell" data-hash="missingdata1_cache/html/varselect3_b2fec9a94121e2df11fc95d5b7f50e70">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># m = 100</span></span>
 <span id="cb35-2"><a href="#cb35-2"></a>fit7 <span class="ot">&lt;-</span> <span class="fu">with</span>(<span class="at">data=</span>imp, <span class="at">expr=</span><span class="fu">lm</span>(diastolicBP <span class="sc">~</span> <span class="dv">1</span>))</span>
 <span id="cb35-3"><a href="#cb35-3"></a><span class="fu">names</span>(fit7)</span>
@@ -2357,7 +2351,7 @@ Tip
 <span id="cb35-43"><a href="#cb35-43"></a><span class="co">#&gt;  1 ~~ 2 0.1215668   1 22.70437    28 0.7305539 0.5550013</span></span>
 <span id="cb35-44"><a href="#cb35-44"></a><span class="co"># which indicates that adding bmi into our model might not be useful</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/varselect4_b3318d26c2e7d017a4eb43c642168bff">
+<div class="cell" data-hash="missingdata1_cache/html/varselect4_da83419d10403a726c4d33c4b9001677">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>fit9 <span class="ot">&lt;-</span> <span class="fu">with</span>(<span class="at">data=</span>imp, <span class="at">expr=</span><span class="fu">lm</span>(diastolicBP <span class="sc">~</span> age <span class="sc">+</span> bmi))</span>
 <span id="cb36-2"><a href="#cb36-2"></a>stat <span class="ot">&lt;-</span> <span class="fu">D1</span>(fit9, fit8)</span>
 <span id="cb36-3"><a href="#cb36-3"></a><span class="do">## use Wald test to see if we should add age into the model</span></span>
@@ -2366,7 +2360,7 @@ Tip
 <span id="cb36-6"><a href="#cb36-6"></a><span class="co">#&gt;  1 ~~ 2 0.006608523   1 22.46746    27 0.9359289 0.4545242</span></span>
 <span id="cb36-7"><a href="#cb36-7"></a><span class="co"># which indicates that adding age into our model might not be useful</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="missingdata1_cache/html/varselect5_e2555e7fc3b0573766b07c75f1d1dd1b">
+<div class="cell" data-hash="missingdata1_cache/html/varselect5_cbf1ce3543b0dcd1eb79cdc29e801b1d">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>fit10 <span class="ot">&lt;-</span> <span class="fu">with</span>(<span class="at">data=</span>imp, <span class="at">expr=</span><span class="fu">lm</span>(diastolicBP <span class="sc">~</span> age <span class="sc">+</span> bmi <span class="sc">+</span> cholesterol))</span>
 <span id="cb37-2"><a href="#cb37-2"></a>stat <span class="ot">&lt;-</span> <span class="fu">D1</span>(fit10, fit9)</span>
 <span id="cb37-3"><a href="#cb37-3"></a><span class="do">## use Wald test to see if we should add cholesterol into the model</span></span>
@@ -2376,7 +2370,7 @@ Tip
 <span id="cb37-7"><a href="#cb37-7"></a><span class="co"># which indicates that adding cholesterol into our model might not be useful</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Try <code>method="likelihood"</code> as well.</p>
-<div class="cell" data-hash="missingdata1_cache/html/varselect6_d1c63dd41b824e0d9d1cb127ea1b224e">
+<div class="cell" data-hash="missingdata1_cache/html/varselect6_dca8ace94ecbabeed84582b1a741957f">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>stat <span class="ot">&lt;-</span> <span class="fu">pool.compare</span>(fit10, fit7, <span class="at">method =</span> <span class="st">"likelihood"</span>, <span class="at">data=</span>imp)</span>
 <span id="cb38-2"><a href="#cb38-2"></a><span class="do">## test to see if we should add all 3 variables into the model</span></span>
 <span id="cb38-3"><a href="#cb38-3"></a>stat<span class="sc">$</span>pvalue</span>
@@ -2408,7 +2402,7 @@ Tip
 <li><p>Bootstrapping the data from a single imputed dataset and do variable selection for each bootstrapping sample. We could evaluate sampling variation using this method</p></li>
 </ol>
 <section id="bootstrap-using-nhanes17s" class="level5"><h5 class="anchored" data-anchor-id="bootstrap-using-nhanes17s">Bootstrap using NHANES17s</h5>
-<div class="cell" data-hash="missingdata1_cache/html/impact1_663635a9dd8dc3746a90ad104d874dd4">
+<div class="cell" data-hash="missingdata1_cache/html/impact1_59eaeb08e231b2e4c175907f08015329">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>impx <span class="ot">&lt;-</span> <span class="fu">mice</span>(NHANES17s, <span class="at">seed =</span> <span class="dv">504</span>, <span class="at">m=</span><span class="dv">1</span>, <span class="at">print=</span><span class="cn">FALSE</span>)</span>
 <span id="cb39-2"><a href="#cb39-2"></a>completedata <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(impx)</span>
 <span id="cb39-3"><a href="#cb39-3"></a>  </span>
@@ -2443,7 +2437,7 @@ Tip
 <li><p><strong>Understanding pattern</strong>: For convergence to be achieved, these chains should mix well with each other, meaning their paths should overlap and crisscross freely. If they show distinct, separate trends or paths, it indicates a lack of convergence, suggesting that the imputation may not be reliable.</p></li>
 <li><p><strong>Visualizing Convergence</strong>: We could plot the imputation object to see the streams.</p></li>
 </ul>
-<div class="cell" data-hash="missingdata1_cache/html/convergence_b155976d82567ec71434ca76711ac793">
+<div class="cell" data-hash="missingdata1_cache/html/convergence_167634e70959fd7b207b24283e4406c9">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="do">## Recall the imputation we have done before</span></span>
 <span id="cb40-2"><a href="#cb40-2"></a>imputation5 <span class="ot">&lt;-</span> <span class="fu">mice</span>(NHANES17s, <span class="at">seed =</span> <span class="dv">504</span>, </span>
 <span id="cb40-3"><a href="#cb40-3"></a>                   <span class="at">m=</span><span class="dv">10</span>,</span>
@@ -2475,7 +2469,7 @@ Tip
 <li>Ref: <span class="citation" data-cites="van2018flexible">(<a href="#ref-van2018flexible" role="doc-biblioref">Van Buuren 2018</a>)</span>, Section 6.6</li>
 </ul>
 <p>Model diagnostics plays a pivotal role in ensuring the robustness and accuracy of model fitting. Particularly in the realm of missing value imputations, where observed data serves as the foundation for estimating absent values, it becomes imperative to rigorously assess the imputation process. A straightforward diagnostic technique involves comparing the distributions of the observed data with the imputed values, especially when segmented or conditioned based on the variables that originally had missing entries. This comparison helps in discerning any discrepancies or biases introduced during the imputation, ensuring that the filled values align well with the inherent patterns of the observed data.</p>
-<div class="cell" data-hash="missingdata1_cache/html/diagnostics_60eee32644803ebe8ad49942c65d1575">
+<div class="cell" data-hash="missingdata1_cache/html/diagnostics_3481f99b30716670ae425a5fdb4655f0">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="do">## We could compare the imputed and observed data using Density plots</span></span>
 <span id="cb42-2"><a href="#cb42-2"></a><span class="fu">densityplot</span>(imputation5, <span class="at">layout =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2524,6 +2518,9 @@ Tip
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-buuren2010mice" class="csl-entry" role="listitem">
 Buuren, S van, and Karin Groothuis-Oudshoorn. 2010. <span>“Mice: Multivariate Imputation by Chained Equations in r.”</span> <em>Journal of Statistical Software</em>, 1–68.
+</div>
+<div id="ref-little1987multiple" class="csl-entry" role="listitem">
+Little, RJA, and DB Rubin. 1987. <span>“Multiple Imputation for Nonresponse in Surveys.”</span> <em>John Wiley &amp; Sons, Inc.. Doi</em> 10: 9780470316696.
 </div>
 <div id="ref-van2018flexible" class="csl-entry" role="listitem">
 Van Buuren, Stef. 2018. <em>Flexible Imputation of Missing Data</em>. Chapman; Hall/CRC.

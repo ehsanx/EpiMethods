@@ -96,7 +96,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
-<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - Confounding">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="confounding1_files/figure-html/dag1-1.png">
@@ -230,7 +230,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -269,7 +269,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1095,7 +1095,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 </header><p>This tutorial aims to delve into the role of confounding variables in data analysis, especially in the context of big data. We will examine each of these using simulations built on Directed Acyclic Graphs (DAGs). The objective is to understand whether a simple regression adjusting for the confounder variable can correctly estimate treatment effects in such a large sample.</p>
-<div class="cell" data-hash="confounding1_cache/html/setup_289c7c205d6a10e14ce878a31f6142a4">
+<div class="cell" data-hash="confounding1_cache/html/setup_0722b4bfc96c3b4ed4972169888682c0">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># devtools::install_github('osofr/simcausal')</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">require</span>(simcausal)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1106,23 +1106,26 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>A is binary treatment</li>
 <li>Y is continuous outcome</li>
 </ul>
+<p>An example of A could be receiving the right heart catheterization (RHC) procedure or not, Y could be the length of hospital stay, and L could be age (<a href="researchquestion1.html">see here</a>).</p>
 <section id="non-null-effect" class="level3"><h3 class="anchored" data-anchor-id="non-null-effect">Non-null effect</h3>
 <ul>
 <li>True treatment effect = 1.3</li>
 </ul>
 <section id="data-generating-process" class="level4"><h4 class="anchored" data-anchor-id="data-generating-process">Data generating process</h4>
 <p>To perform the lab, we’ll need the <code>simcausal</code> R package. This package may not be available on CRAN but can be installed from the author’s GitHub page.</p>
-<div class="cell" data-hash="confounding1_cache/html/dgm1_51794aff5e4387535ce27ca31d30d579">
+<div class="cell" data-hash="confounding1_cache/html/dgm1_7eca5c16d106a0575d8305f65f87dcc5">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb2-2"><a href="#cb2-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
 <span id="cb2-3"><a href="#cb2-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
 <span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">node</span>(<span class="st">"L"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
 <span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">10</span> <span class="sc">+</span> <span class="fl">1.1</span><span class="sc">*</span>L)) <span class="sc">+</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> L <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> A, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> L <span class="sc">+</span> <span class="fl">1.3</span> <span class="sc">*</span> A, <span class="at">sd =</span> <span class="fl">0.1</span>)</span>
 <span id="cb2-7"><a href="#cb2-7"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Note that <code>rnorm</code> and <code>rbern</code> generate random samples from Normal and Bernoulli distributions, respectively. In the above code chuck, we set the parameters to generate L from Normal distribution with a mean of 10 and a standard deviation of 1. Similarly, we set the parameters to generate A from the Bernoulli distribution with the probability of logit of (-10 + 1.1 <span class="math inline">\(\times\)</span> L). Finally, we set the parameters to generate Y from the Normal distribution with a mean of (0.5 <span class="math inline">\(\times\)</span> L + 1.3 <span class="math inline">\(\times\)</span> A) and a standard deviation of 0.1.</p>
 </section><section id="generate-dag" class="level4"><h4 class="anchored" data-anchor-id="generate-dag">Generate DAG</h4>
-<div class="cell" data-hash="confounding1_cache/html/dag1_cc6e0cdeb8f1635cd8f77656326563df">
+<p>Let us draw a <a href="https://doi.org/10.1016%2Fj.jclinepi.2021.08.001">directed acyclic graph (DAG)</a>. Below we use the <code>plotDAG</code> function from the <code>simcausal</code> package. However, we can draw a DAG using <a href="https://www.dagitty.net/">DAGitty</a>.</p>
+<div class="cell" data-hash="confounding1_cache/html/dag1_6008877eeaa9cb7f84c59af3528fb3f2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
 <span id="cb3-2"><a href="#cb3-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
 <span id="cb3-3"><a href="#cb3-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span>
@@ -1134,7 +1137,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p><img src="confounding1_files/figure-html/dag1-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>As per the DAG, L is a confounder. When exploring the relationship between A and Y, we need to adjust our model for L to get an unbiased estimate of A on Y.</p>
 </section><section id="generate-data" class="level4"><h4 class="anchored" data-anchor-id="generate-data">Generate Data</h4>
+<p>Now, let us simulate the data using the defined parameters and the DAG. Below, we generate data for 1,000,000 participants. We set a seed 123 so that one can reproduce the same dataset.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">1000000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
@@ -1149,7 +1154,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="estimate-effect" class="level4"><h4 class="anchored" data-anchor-id="estimate-effect">Estimate effect</h4>
-<div class="cell" data-hash="confounding1_cache/html/est_5de2b1c925dfbba161283d0e6ed0b3a2">
+<p>Now we will fit the generalized linear model (glm), without and with adjusting for L.</p>
+<div class="cell" data-hash="confounding1_cache/html/est_8a28358019f2f9889191d6f344392927">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Not adjusted for L</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A, <span class="at">family=</span><span class="st">"gaussian"</span>, <span class="at">data=</span>Obs.Data)</span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>
@@ -1179,18 +1185,19 @@ Important
 <ul>
 <li>True treatment effect = 0</li>
 </ul>
+<p>Let us see the results when there is no treatment effect, i.s., the true treatment effect is zero.</p>
 <section id="data-generating-process-1" class="level4"><h4 class="anchored" data-anchor-id="data-generating-process-1">Data generating process</h4>
-<div class="cell" data-hash="confounding1_cache/html/dgm2_0b7a92e715a56d3dfd3c619c3553002e">
+<div class="cell" data-hash="confounding1_cache/html/dgm2_9c78b8e0b27aa75351b038f631369d50">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb6-2"><a href="#cb6-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
 <span id="cb6-3"><a href="#cb6-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
 <span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">node</span>(<span class="st">"L"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
 <span id="cb6-5"><a href="#cb6-5"></a>  <span class="fu">node</span>(<span class="st">"A"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">10</span> <span class="sc">+</span> <span class="fl">1.1</span><span class="sc">*</span>L)) <span class="sc">+</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> L, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="fu">node</span>(<span class="st">"Y"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">*</span> L <span class="sc">+</span> <span class="dv">0</span> <span class="sc">*</span> A, <span class="at">sd =</span> .<span class="dv">1</span>)</span>
 <span id="cb6-7"><a href="#cb6-7"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="generate-dag-1" class="level4"><h4 class="anchored" data-anchor-id="generate-dag-1">Generate DAG</h4>
-<div class="cell" data-hash="confounding1_cache/html/dag2_97d7f6ecdebbc67c0c3aac101d1db053">
+<div class="cell" data-hash="confounding1_cache/html/dag2_7d1f91abc875b03ba950a9dabc791471">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
 <span id="cb7-2"><a href="#cb7-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
 <span id="cb7-3"><a href="#cb7-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1213,7 +1220,7 @@ Important
 </div>
 </div>
 </section><section id="estimate-effect-1" class="level4"><h4 class="anchored" data-anchor-id="estimate-effect-1">Estimate effect</h4>
-<div class="cell" data-hash="confounding1_cache/html/est2_8de02d54cd7c3f4f805b6f33ca7c9c70">
+<div class="cell" data-hash="confounding1_cache/html/est2_c41daa00d749215ccd3e3bece663dd1c">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Not adjusted for L</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y <span class="sc">~</span> A, <span class="at">family =</span> <span class="st">"gaussian"</span>, <span class="at">data =</span> Obs.Data)</span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="fu">round</span>(<span class="fu">coef</span>(fit0),<span class="dv">2</span>)</span>

@@ -41,16 +41,18 @@ We can use the `cor` function to see the correlation between numeric variables a
 
 ```{r corr, warning=FALSE, cache=TRUE}
 require(corrplot)
-numeric.names <- c("age", "diastolicBP", "systolicBP", 
-                   "bodyweight", "bodyheight", "bmi", "waist", "alcohol", 
+numeric.names <- c("age", "diastolicBP", "systolicBP", "bodyweight", 
+                   "bodyheight", "bmi", "waist", "alcohol", 
                    "cholesterol", "triglycerides", "uric.acid", 
-                   "protein", "bilirubin", "phosphorus", "sodium", "potassium", 
-                   "globulin", "calcium")
+                   "protein", "bilirubin", "phosphorus", "sodium",
+                   "potassium", "globulin", "calcium")
 correlationMatrix <- cor(analytic[numeric.names])
 mat.num <- round(correlationMatrix,2)
 mat.num[mat.num>0.8 & mat.num < 1]
 corrplot(correlationMatrix, method="number", type="upper")
 ```
+
+As we can see, the correlation between bmi and waist is 0.91, suggesting a high correlation between these two predictors. Similarly, bodyweight is highly correlated with waist (correlation 0.90), bodyweight is highly correlated with bmi (correlation 0.89). Also, there is no linear relationship between age and bmi (correlation -0.02).
 
 #### Examine descriptive associations
 
@@ -73,10 +75,11 @@ mean(analytic$cholesterol[analytic$gender == "Female"])
 library(dplyr)
 analytic %>%
   group_by(gender) %>%
-  summarize(mean.ch=mean(cholesterol), .groups = 'drop') 
+  dplyr::summarize(mean.ch=mean(cholesterol), .groups = 'drop') 
 
 # process 3
-with(analytic, aggregate( analytic$cholesterol, by=list(gender) , FUN=summary))
+with(analytic, aggregate( analytic$cholesterol, by=list(gender), 
+                          FUN=summary))
 
 # process 4
 psych::describeBy(analytic$cholesterol, analytic$gender)
@@ -85,13 +88,14 @@ psych::describeBy(analytic$cholesterol, analytic$gender)
 tapply(analytic$cholesterol, analytic$gender, summary)
 
 # A general process
-sel.names <- c("gender", "age", "born", "race", "education", "married", 
-               "income", "diastolicBP", "systolicBP", 
-               "bodyweight", "bodyheight", "bmi", "waist", "smoke", "alcohol", 
-               "cholesterol", "triglycerides", "uric.acid", 
-               "protein", "bilirubin", "phosphorus", "sodium", "potassium", 
-               "globulin", "calcium", "physical.work", "physical.recreational", 
-               "diabetes")
+sel.names <- c("gender", "age", "born", "race", "education", 
+               "married", "income", "diastolicBP", "systolicBP", 
+               "bodyweight", "bodyheight", "bmi", "waist", 
+               "smoke", "alcohol", "cholesterol", 
+               "triglycerides", "uric.acid", "protein", 
+               "bilirubin", "phosphorus", "sodium", "potassium", 
+               "globulin", "calcium", "physical.work",
+               "physical.recreational", "diabetes")
 var.summ <- summary(cholesterol~ ., data = analytic[sel.names])
 var.summ
 plot(var.summ)
@@ -202,7 +206,7 @@ require(car)
 crPlots(fit0)
 ```
 
-##### polynomial order 2
+##### Polynomial order 2
 
 We fit polynomial models of orders 2 and 3 to explore non-linear relationships between cholesterol and triglycerides.
 
@@ -214,12 +218,17 @@ publish(fit1)
 
 # Partial Residual Plots
 crPlots(fit1)
-
-# compare fit0 and fit1 models
-anova(fit0,fit1)
 ```
 
-##### polynomial order 3
+It seems triglyceride has a quadratic effect on cholesterol. We can compare models fit0 and fit1 using the `anova` function:
+
+```{r refit2b, warning=FALSE, cache=F}
+# compare fit0 and fit1 models
+res0 <- anova(fit0,fit1)
+print(res0)
+```
+
+##### Polynomial order 3
 
 ```{r refit3, warning=FALSE, cache=TRUE}
 # Fit a polynomial of order 3
@@ -230,9 +239,12 @@ publish(fit2)
 
 # Partial Residual Plots
 crPlots(fit2)
+```
 
+```{r refit3b, warning=FALSE, cache=F}
 # compare fit1 and fit2 models
-anova(fit1,fit2)
+res1 <- anova(fit1,fit2)
+print(res1)
 ```
 
 ##### Multiple covariates
@@ -241,14 +253,13 @@ We add more covariates.
 
 ```{r refit4, warning=FALSE, cache=TRUE}
 # include everything!
-formula3 <- as.formula("cholesterol~gender + age + born + 
-             race + education + married + 
-             income + diastolicBP + systolicBP + 
-             bmi + bodyweight + bodyheight + waist +  
-             triglycerides + uric.acid + 
-             protein + bilirubin + phosphorus + sodium + potassium + 
-             globulin + calcium + physical.work + physical.recreational + 
-             diabetes")
+formula3 <- as.formula("cholesterol ~ gender + age + born + race + 
+                       education + married + income + diastolicBP + 
+                       systolicBP + bmi + bodyweight + bodyheight + 
+                       waist +  triglycerides + uric.acid + protein +
+                       bilirubin + phosphorus + sodium + potassium + 
+                       globulin + calcium + physical.work + 
+                       physical.recreational + diabetes")
 fit3 <- lm(formula3, data = analytic3)
 publish(fit3)
 ```
@@ -257,7 +268,7 @@ publish(fit3)
 
 We finally check for multicollinearity among predictors using the Variance Inflation Factor (VIF). 
 
-::: column-margin
+::: callout-note
 Rule of thumb: variables with VIF \> 4 needs further investigation
 :::
 
@@ -271,7 +282,7 @@ collinearity[collinearity$VIF>4,]
 ```
 
 ```{r refit5, warning=FALSE, cache=TRUE}
-formula4 <- as.formula("cholesterol~gender + age + born + 
+formula4 <- as.formula("cholesterol ~ gender + age + born + 
              race + education + married + 
              income + diastolicBP + systolicBP + 
              bmi + # bodyweight + bodyheight + waist +  

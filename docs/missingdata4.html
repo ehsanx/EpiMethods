@@ -229,7 +229,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -268,7 +268,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1097,18 +1097,26 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 </header><p>This is a tutorial of how to estimate model performance while analyzing survey data with missing values (for predictive goals).</p>
-<div class="cell" data-hash="missingdata4_cache/html/setup_30ac7e7b43602203bf95549eee5289d5">
+<div class="cell" data-hash="missingdata4_cache/html/setup_91a8f284348ad7ad95fd2dfe8448f162">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(survey)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(ROCR)</span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(WeightedROC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="useful-functions" class="level3"><h3 class="anchored" data-anchor-id="useful-functions">Useful functions</h3>
-<div class="cell" data-hash="missingdata4_cache/html/setup1_c8c4209e38121c19d6759016ca06fff7">
+<p>The functions below could be helpful in</p>
+<ul>
+<li>
+<code>svyROCw3</code>: calculating area under the ROC curve (AUC) value with survey data with logistic regression<br>
+</li>
+<li>
+<code>AL.gof3</code>: testing Archer-Lemeshow goodness of fit for survey data with logistic regression</li>
+</ul>
+<div class="cell" data-hash="missingdata4_cache/html/setup1_328d4340856a9485f8b1d3059e619228">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a>svyROCw3 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">fit=</span>fit7,<span class="at">outcome=</span>analytic2<span class="sc">$</span>CVD<span class="sc">==</span><span class="st">"event"</span>, <span class="at">weight =</span> <span class="cn">NULL</span>,<span class="at">plot=</span><span class="cn">FALSE</span>){</span>
-<span id="cb2-3"><a href="#cb2-3"></a>  <span class="co"># ROC curve for</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>  <span class="co"># Survey Data with Logistic Regression</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># ROC curve for Survey Data with Logistic Regression</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>svyROCw3 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">fit=</span>fit7,<span class="at">outcome=</span>analytic2<span class="sc">$</span>CVD<span class="sc">==</span><span class="st">"event"</span>, <span class="at">weight =</span> <span class="cn">NULL</span>,<span class="at">plot=</span><span class="cn">FALSE</span>){</span>
 <span id="cb2-5"><a href="#cb2-5"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(weight)){ <span class="co"># require(ROCR)</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a>    prob <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">"response"</span>)</span>
 <span id="cb2-7"><a href="#cb2-7"></a>  pred <span class="ot">&lt;-</span> <span class="fu">prediction</span>(<span class="fu">as.vector</span>(prob), outcome)</span>
@@ -1139,30 +1147,31 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-32"><a href="#cb2-32"></a>  }</span>
 <span id="cb2-33"><a href="#cb2-33"></a>  <span class="fu">return</span>(auc)</span>
 <span id="cb2-34"><a href="#cb2-34"></a>}</span>
-<span id="cb2-35"><a href="#cb2-35"></a>AL.gof3 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">fit=</span>fit7, <span class="at">data =</span> analytic2, <span class="at">weight =</span> <span class="st">"weight"</span>, <span class="at">psu =</span> <span class="st">"psu"</span>, <span class="at">strata=</span> <span class="st">"strata"</span>){</span>
-<span id="cb2-36"><a href="#cb2-36"></a>  <span class="co"># Archer-Lemeshow Goodness of Fit Test for</span></span>
-<span id="cb2-37"><a href="#cb2-37"></a>  <span class="co"># Survey Data with Logistic Regression</span></span>
-<span id="cb2-38"><a href="#cb2-38"></a>  r <span class="ot">&lt;-</span> <span class="fu">residuals</span>(fit, <span class="at">type=</span><span class="st">"response"</span>) </span>
-<span id="cb2-39"><a href="#cb2-39"></a>  f<span class="ot">&lt;-</span><span class="fu">fitted</span>(fit) </span>
-<span id="cb2-40"><a href="#cb2-40"></a>  breaks.g <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="fu">quantile</span>(f,  (<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)<span class="sc">/</span><span class="dv">10</span>), <span class="cn">Inf</span>)</span>
-<span id="cb2-41"><a href="#cb2-41"></a>  breaks.g <span class="ot">&lt;-</span> breaks.g <span class="sc">+</span> <span class="fu">seq_along</span>(breaks.g) <span class="sc">*</span> .Machine<span class="sc">$</span>double.eps</span>
-<span id="cb2-42"><a href="#cb2-42"></a>  g<span class="ot">&lt;-</span> <span class="fu">cut</span>(f, breaks.g)</span>
-<span id="cb2-43"><a href="#cb2-43"></a>  data2g <span class="ot">&lt;-</span> <span class="fu">cbind</span>(data,r,g)</span>
-<span id="cb2-44"><a href="#cb2-44"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(psu)){</span>
-<span id="cb2-45"><a href="#cb2-45"></a>    newdesign <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>,</span>
-<span id="cb2-46"><a href="#cb2-46"></a>                         <span class="at">weights=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,weight)), </span>
-<span id="cb2-47"><a href="#cb2-47"></a>                        <span class="at">data=</span>data2g, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-48"><a href="#cb2-48"></a>  }</span>
-<span id="cb2-49"><a href="#cb2-49"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(psu)) {</span>
-<span id="cb2-50"><a href="#cb2-50"></a>    newdesign <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,psu)),</span>
-<span id="cb2-51"><a href="#cb2-51"></a>                         <span class="at">strata=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,strata)),</span>
-<span id="cb2-52"><a href="#cb2-52"></a>                         <span class="at">weights=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,weight)), </span>
-<span id="cb2-53"><a href="#cb2-53"></a>                        <span class="at">data=</span>data2g, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-54"><a href="#cb2-54"></a>  }</span>
-<span id="cb2-55"><a href="#cb2-55"></a>  decilemodel<span class="ot">&lt;-</span> <span class="fu">svyglm</span>(r<span class="sc">~</span>g, <span class="at">design=</span>newdesign) </span>
-<span id="cb2-56"><a href="#cb2-56"></a>  res <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(decilemodel, <span class="sc">~</span>g)</span>
-<span id="cb2-57"><a href="#cb2-57"></a>  <span class="fu">return</span>(<span class="fu">as.numeric</span>(res<span class="sc">$</span>p)) </span>
-<span id="cb2-58"><a href="#cb2-58"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-35"><a href="#cb2-35"></a></span>
+<span id="cb2-36"><a href="#cb2-36"></a><span class="co"># Archer-Lemeshow Goodness of Fit Test for Survey Data with Logistic Regression</span></span>
+<span id="cb2-37"><a href="#cb2-37"></a>AL.gof3 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">fit=</span>fit7, <span class="at">data =</span> analytic2, <span class="at">weight =</span> <span class="st">"weight"</span>, <span class="at">psu =</span> <span class="st">"psu"</span>, </span>
+<span id="cb2-38"><a href="#cb2-38"></a>                    <span class="at">strata=</span> <span class="st">"strata"</span>){</span>
+<span id="cb2-39"><a href="#cb2-39"></a>  r <span class="ot">&lt;-</span> <span class="fu">residuals</span>(fit, <span class="at">type=</span><span class="st">"response"</span>) </span>
+<span id="cb2-40"><a href="#cb2-40"></a>  f<span class="ot">&lt;-</span><span class="fu">fitted</span>(fit) </span>
+<span id="cb2-41"><a href="#cb2-41"></a>  breaks.g <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="fu">quantile</span>(f,  (<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)<span class="sc">/</span><span class="dv">10</span>), <span class="cn">Inf</span>)</span>
+<span id="cb2-42"><a href="#cb2-42"></a>  breaks.g <span class="ot">&lt;-</span> breaks.g <span class="sc">+</span> <span class="fu">seq_along</span>(breaks.g) <span class="sc">*</span> .Machine<span class="sc">$</span>double.eps</span>
+<span id="cb2-43"><a href="#cb2-43"></a>  g<span class="ot">&lt;-</span> <span class="fu">cut</span>(f, breaks.g)</span>
+<span id="cb2-44"><a href="#cb2-44"></a>  data2g <span class="ot">&lt;-</span> <span class="fu">cbind</span>(data,r,g)</span>
+<span id="cb2-45"><a href="#cb2-45"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(psu)){</span>
+<span id="cb2-46"><a href="#cb2-46"></a>    newdesign <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="sc">~</span><span class="dv">1</span>,</span>
+<span id="cb2-47"><a href="#cb2-47"></a>                         <span class="at">weights=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,weight)), </span>
+<span id="cb2-48"><a href="#cb2-48"></a>                        <span class="at">data=</span>data2g, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-49"><a href="#cb2-49"></a>  }</span>
+<span id="cb2-50"><a href="#cb2-50"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(psu)) {</span>
+<span id="cb2-51"><a href="#cb2-51"></a>    newdesign <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,psu)),</span>
+<span id="cb2-52"><a href="#cb2-52"></a>                         <span class="at">strata=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,strata)),</span>
+<span id="cb2-53"><a href="#cb2-53"></a>                         <span class="at">weights=</span><span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"~"</span>,weight)), </span>
+<span id="cb2-54"><a href="#cb2-54"></a>                        <span class="at">data=</span>data2g, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-55"><a href="#cb2-55"></a>  }</span>
+<span id="cb2-56"><a href="#cb2-56"></a>  decilemodel<span class="ot">&lt;-</span> <span class="fu">svyglm</span>(r<span class="sc">~</span>g, <span class="at">design=</span>newdesign) </span>
+<span id="cb2-57"><a href="#cb2-57"></a>  res <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(decilemodel, <span class="sc">~</span>g)</span>
+<span id="cb2-58"><a href="#cb2-58"></a>  <span class="fu">return</span>(<span class="fu">as.numeric</span>(res<span class="sc">$</span>p)) </span>
+<span id="cb2-59"><a href="#cb2-59"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="load-imputed-5-sets-of-data" class="level3"><h3 class="anchored" data-anchor-id="load-imputed-5-sets-of-data">Load imputed 5 sets of data</h3>
 <p>Saved at the end of Lab 6 part 2.</p>
@@ -1277,7 +1286,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="estimating-treatment-effect" class="level3"><h3 class="anchored" data-anchor-id="estimating-treatment-effect">Estimating treatment effect</h3>
 <section id="individual-beta-estimates" class="level4"><h4 class="anchored" data-anchor-id="individual-beta-estimates">Individual beta estimates</h4>
-<div class="cell" data-hash="missingdata4_cache/html/est1_828c4dcfeb1d7edb0701ad61dd083d2d">
+<div class="cell" data-hash="missingdata4_cache/html/est1_1d3ae990c27e590b6f1e8e3e99dc9d66">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">library</span>(survey)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>w.design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">weights=</span><span class="sc">~</span>weight,</span>
 <span id="cb4-3"><a href="#cb4-3"></a>                           <span class="at">data =</span> allImputations)</span>
@@ -1431,7 +1440,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-151"><a href="#cb4-151"></a><span class="co">#&gt; with(w.design, svyglm(model.formula, family = quasibinomial))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="pooled-averaged-estimates-for-beta-and-or" class="level4"><h4 class="anchored" data-anchor-id="pooled-averaged-estimates-for-beta-and-or">Pooled / averaged estimates for beta and OR</h4>
-<div class="cell" data-hash="missingdata4_cache/html/est2_16c4ef26880caba373e1377fd87aa41d">
+<div class="cell" data-hash="missingdata4_cache/html/est2_af2973f75410347c55f018c3627c6b98">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">library</span>(<span class="st">"mitools"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(estimates)</span>
 <span id="cb5-3"><a href="#cb5-3"></a>pooled.estimates</span>
@@ -1495,7 +1504,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="estimating-model-performance-auc-and-al" class="level3"><h3 class="anchored" data-anchor-id="estimating-model-performance-auc-and-al">Estimating model performance (AUC and AL)</h3>
 <section id="individual-auc-estimates-with-interactions" class="level4"><h4 class="anchored" data-anchor-id="individual-auc-estimates-with-interactions">Individual AUC estimates (with interactions)</h4>
-<div class="cell" data-hash="missingdata4_cache/html/auc1_48b1659637f5654afc6b66b34e7d06ec">
+<div class="cell" data-hash="missingdata4_cache/html/auc1_ded4c7b398c42bb4e2e3dd1fc7e7818e">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">library</span>(ROCR)</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">library</span>(WeightedROC)</span>
 <span id="cb6-3"><a href="#cb6-3"></a>model.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"I(CVD=='event') ~ OA + age + sex +</span></span>
@@ -1548,7 +1557,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb6-50"><a href="#cb6-50"></a><span class="co">#&gt; [1] 0.6049137</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="averaged-estimates-for-auc-with-interactions" class="level4"><h4 class="anchored" data-anchor-id="averaged-estimates-for-auc-with-interactions">Averaged estimates for AUC (with interactions)</h4>
-<div class="cell" data-hash="missingdata4_cache/html/auc2_2da7272a25497061b6b63922791cd94b">
+<div class="cell" data-hash="missingdata4_cache/html/auc2_096bccbc61932f746ecd879557efef17">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># summary of AUC</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">mean</span>(<span class="fu">unlist</span>(AUC.scalar))</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; [1] 0.7973746</span></span>
@@ -1562,7 +1571,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="model-performance-without-interactions" class="level3"><h3 class="anchored" data-anchor-id="model-performance-without-interactions">Model performance without interactions</h3>
 <section id="individual-auc-estimates-al-p-values" class="level4"><h4 class="anchored" data-anchor-id="individual-auc-estimates-al-p-values">Individual AUC estimates / AL p-values</h4>
-<div class="cell" data-hash="missingdata4_cache/html/auc3_03d5c1211b6754fd7472bace97d56b20">
+<div class="cell" data-hash="missingdata4_cache/html/auc3_55c45080c5f52d3108fd10453f104535">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">library</span>(ROCR)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">library</span>(WeightedROC)</span>
 <span id="cb8-3"><a href="#cb8-3"></a>AL.scalar <span class="ot">&lt;-</span> AUC.scalar <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, <span class="dv">5</span>)</span>
@@ -1614,7 +1623,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb8-49"><a href="#cb8-49"></a><span class="co">#&gt; [1] 0.2050434</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="averaged-estimates-for-auc-majority-of-al-p-values" class="level4"><h4 class="anchored" data-anchor-id="averaged-estimates-for-auc-majority-of-al-p-values">Averaged estimates for AUC / majority of AL p-values</h4>
-<div class="cell" data-hash="missingdata4_cache/html/auc4_6125cb7dd6d09e0b6b7935f670c6405d">
+<div class="cell" data-hash="missingdata4_cache/html/auc4_8b4baf0fa4c4af5000ea1cd7e4d2f616">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># summary of AUC</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="fu">mean</span>(<span class="fu">unlist</span>(AUC.scalar))</span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt; [1] 0.7964061</span></span>
@@ -1628,68 +1637,65 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="appendix" class="level3"><h3 class="anchored" data-anchor-id="appendix">Appendix</h3>
 <p>User-written <code>svyROCw3</code> and <code>AL.gof3</code> functions</p>
-<div class="cell" data-hash="missingdata4_cache/html/gof_c3386c6aa3bb617c761a5f2a92da3100">
+<div class="cell" data-hash="missingdata4_cache/html/gof_cb5ef4d003007d040da55c67328f6380">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>svyROCw3</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt; function(fit=fit7,outcome=analytic2$CVD=="event", weight = NULL,plot=FALSE){</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;   # ROC curve for</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;   # Survey Data with Logistic Regression</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt;   if (is.null(weight)){ # require(ROCR)</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt;     prob &lt;- predict(fit, type = "response")</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt;   pred &lt;- prediction(as.vector(prob), outcome)</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt;   perf &lt;- performance(pred, "tpr", "fpr")</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt;   auc &lt;- performance(pred, measure = "auc")</span></span>
-<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt;   auc &lt;- auc@y.values[[1]]</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt;   if (plot == TRUE){</span></span>
-<span id="cb10-12"><a href="#cb10-12"></a><span class="co">#&gt;     roc.data &lt;- data.frame(fpr = unlist(perf@x.values), tpr = unlist(perf@y.values), </span></span>
-<span id="cb10-13"><a href="#cb10-13"></a><span class="co">#&gt;       model = "Logistic")</span></span>
-<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#&gt;     with(data = roc.data,plot(fpr, tpr, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,</span></span>
-<span id="cb10-15"><a href="#cb10-15"></a><span class="co">#&gt;      xlab="1 - specificity", ylab="Sensitivity",</span></span>
-<span id="cb10-16"><a href="#cb10-16"></a><span class="co">#&gt;      main = paste("AUC = ", round(auc,3))))</span></span>
-<span id="cb10-17"><a href="#cb10-17"></a><span class="co">#&gt;   mtext("Unweighted ROC")</span></span>
-<span id="cb10-18"><a href="#cb10-18"></a><span class="co">#&gt;   abline(0,1, lty=2)</span></span>
-<span id="cb10-19"><a href="#cb10-19"></a><span class="co">#&gt;   }</span></span>
-<span id="cb10-20"><a href="#cb10-20"></a><span class="co">#&gt;   } else { # library(WeightedROC)</span></span>
-<span id="cb10-21"><a href="#cb10-21"></a><span class="co">#&gt;     outcome &lt;- as.numeric(outcome)</span></span>
-<span id="cb10-22"><a href="#cb10-22"></a><span class="co">#&gt;   pred &lt;- predict(fit, type = "response")</span></span>
-<span id="cb10-23"><a href="#cb10-23"></a><span class="co">#&gt;   tp.fp &lt;- WeightedROC(pred, outcome, weight)</span></span>
-<span id="cb10-24"><a href="#cb10-24"></a><span class="co">#&gt;   auc &lt;- WeightedAUC(tp.fp)</span></span>
-<span id="cb10-25"><a href="#cb10-25"></a><span class="co">#&gt;   if (plot == TRUE){</span></span>
-<span id="cb10-26"><a href="#cb10-26"></a><span class="co">#&gt;     with(data = tp.fp,plot(FPR, TPR, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,</span></span>
-<span id="cb10-27"><a href="#cb10-27"></a><span class="co">#&gt;      xlab="1 - specificity", ylab="Sensitivity",</span></span>
-<span id="cb10-28"><a href="#cb10-28"></a><span class="co">#&gt;      main = paste("AUC = ", round(auc,3))))</span></span>
-<span id="cb10-29"><a href="#cb10-29"></a><span class="co">#&gt;   abline(0,1, lty=2)</span></span>
-<span id="cb10-30"><a href="#cb10-30"></a><span class="co">#&gt;   mtext("Weighted ROC")</span></span>
-<span id="cb10-31"><a href="#cb10-31"></a><span class="co">#&gt;   }</span></span>
-<span id="cb10-32"><a href="#cb10-32"></a><span class="co">#&gt;   }</span></span>
-<span id="cb10-33"><a href="#cb10-33"></a><span class="co">#&gt;   return(auc)</span></span>
-<span id="cb10-34"><a href="#cb10-34"></a><span class="co">#&gt; }</span></span>
-<span id="cb10-35"><a href="#cb10-35"></a><span class="co">#&gt; &lt;bytecode: 0x0000020309999a40&gt;</span></span>
-<span id="cb10-36"><a href="#cb10-36"></a>AL.gof3</span>
-<span id="cb10-37"><a href="#cb10-37"></a><span class="co">#&gt; function(fit=fit7, data = analytic2, weight = "weight", psu = "psu", strata= "strata"){</span></span>
-<span id="cb10-38"><a href="#cb10-38"></a><span class="co">#&gt;   # Archer-Lemeshow Goodness of Fit Test for</span></span>
-<span id="cb10-39"><a href="#cb10-39"></a><span class="co">#&gt;   # Survey Data with Logistic Regression</span></span>
-<span id="cb10-40"><a href="#cb10-40"></a><span class="co">#&gt;   r &lt;- residuals(fit, type="response") </span></span>
-<span id="cb10-41"><a href="#cb10-41"></a><span class="co">#&gt;   f&lt;-fitted(fit) </span></span>
-<span id="cb10-42"><a href="#cb10-42"></a><span class="co">#&gt;   breaks.g &lt;- c(-Inf, quantile(f,  (1:9)/10), Inf)</span></span>
-<span id="cb10-43"><a href="#cb10-43"></a><span class="co">#&gt;   breaks.g &lt;- breaks.g + seq_along(breaks.g) * .Machine$double.eps</span></span>
-<span id="cb10-44"><a href="#cb10-44"></a><span class="co">#&gt;   g&lt;- cut(f, breaks.g)</span></span>
-<span id="cb10-45"><a href="#cb10-45"></a><span class="co">#&gt;   data2g &lt;- cbind(data,r,g)</span></span>
-<span id="cb10-46"><a href="#cb10-46"></a><span class="co">#&gt;   if (is.null(psu)){</span></span>
-<span id="cb10-47"><a href="#cb10-47"></a><span class="co">#&gt;     newdesign &lt;- svydesign(id=~1,</span></span>
-<span id="cb10-48"><a href="#cb10-48"></a><span class="co">#&gt;                          weights=as.formula(paste0("~",weight)), </span></span>
-<span id="cb10-49"><a href="#cb10-49"></a><span class="co">#&gt;                         data=data2g, nest = TRUE)</span></span>
-<span id="cb10-50"><a href="#cb10-50"></a><span class="co">#&gt;   }</span></span>
-<span id="cb10-51"><a href="#cb10-51"></a><span class="co">#&gt;   if (!is.null(psu)) {</span></span>
-<span id="cb10-52"><a href="#cb10-52"></a><span class="co">#&gt;     newdesign &lt;- svydesign(id=as.formula(paste0("~",psu)),</span></span>
-<span id="cb10-53"><a href="#cb10-53"></a><span class="co">#&gt;                          strata=as.formula(paste0("~",strata)),</span></span>
-<span id="cb10-54"><a href="#cb10-54"></a><span class="co">#&gt;                          weights=as.formula(paste0("~",weight)), </span></span>
-<span id="cb10-55"><a href="#cb10-55"></a><span class="co">#&gt;                         data=data2g, nest = TRUE)</span></span>
-<span id="cb10-56"><a href="#cb10-56"></a><span class="co">#&gt;   }</span></span>
-<span id="cb10-57"><a href="#cb10-57"></a><span class="co">#&gt;   decilemodel&lt;- svyglm(r~g, design=newdesign) </span></span>
-<span id="cb10-58"><a href="#cb10-58"></a><span class="co">#&gt;   res &lt;- regTermTest(decilemodel, ~g)</span></span>
-<span id="cb10-59"><a href="#cb10-59"></a><span class="co">#&gt;   return(as.numeric(res$p)) </span></span>
-<span id="cb10-60"><a href="#cb10-60"></a><span class="co">#&gt; }</span></span>
-<span id="cb10-61"><a href="#cb10-61"></a><span class="co">#&gt; &lt;bytecode: 0x0000020309c11030&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;   if (is.null(weight)){ # require(ROCR)</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;     prob &lt;- predict(fit, type = "response")</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt;   pred &lt;- prediction(as.vector(prob), outcome)</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt;   perf &lt;- performance(pred, "tpr", "fpr")</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt;   auc &lt;- performance(pred, measure = "auc")</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt;   auc &lt;- auc@y.values[[1]]</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt;   if (plot == TRUE){</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt;     roc.data &lt;- data.frame(fpr = unlist(perf@x.values), tpr = unlist(perf@y.values), </span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt;       model = "Logistic")</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="co">#&gt;     with(data = roc.data,plot(fpr, tpr, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="co">#&gt;      xlab="1 - specificity", ylab="Sensitivity",</span></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#&gt;      main = paste("AUC = ", round(auc,3))))</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="co">#&gt;   mtext("Unweighted ROC")</span></span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="co">#&gt;   abline(0,1, lty=2)</span></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co">#&gt;   }</span></span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="co">#&gt;   } else { # library(WeightedROC)</span></span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="co">#&gt;     outcome &lt;- as.numeric(outcome)</span></span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="co">#&gt;   pred &lt;- predict(fit, type = "response")</span></span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="co">#&gt;   tp.fp &lt;- WeightedROC(pred, outcome, weight)</span></span>
+<span id="cb10-22"><a href="#cb10-22"></a><span class="co">#&gt;   auc &lt;- WeightedAUC(tp.fp)</span></span>
+<span id="cb10-23"><a href="#cb10-23"></a><span class="co">#&gt;   if (plot == TRUE){</span></span>
+<span id="cb10-24"><a href="#cb10-24"></a><span class="co">#&gt;     with(data = tp.fp,plot(FPR, TPR, type="l", xlim=c(0,1), ylim=c(0,1), lwd=1,</span></span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="co">#&gt;      xlab="1 - specificity", ylab="Sensitivity",</span></span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="co">#&gt;      main = paste("AUC = ", round(auc,3))))</span></span>
+<span id="cb10-27"><a href="#cb10-27"></a><span class="co">#&gt;   abline(0,1, lty=2)</span></span>
+<span id="cb10-28"><a href="#cb10-28"></a><span class="co">#&gt;   mtext("Weighted ROC")</span></span>
+<span id="cb10-29"><a href="#cb10-29"></a><span class="co">#&gt;   }</span></span>
+<span id="cb10-30"><a href="#cb10-30"></a><span class="co">#&gt;   }</span></span>
+<span id="cb10-31"><a href="#cb10-31"></a><span class="co">#&gt;   return(auc)</span></span>
+<span id="cb10-32"><a href="#cb10-32"></a><span class="co">#&gt; }</span></span>
+<span id="cb10-33"><a href="#cb10-33"></a><span class="co">#&gt; &lt;bytecode: 0x000002492d933ec0&gt;</span></span>
+<span id="cb10-34"><a href="#cb10-34"></a>AL.gof3</span>
+<span id="cb10-35"><a href="#cb10-35"></a><span class="co">#&gt; function(fit=fit7, data = analytic2, weight = "weight", psu = "psu", </span></span>
+<span id="cb10-36"><a href="#cb10-36"></a><span class="co">#&gt;                     strata= "strata"){</span></span>
+<span id="cb10-37"><a href="#cb10-37"></a><span class="co">#&gt;   r &lt;- residuals(fit, type="response") </span></span>
+<span id="cb10-38"><a href="#cb10-38"></a><span class="co">#&gt;   f&lt;-fitted(fit) </span></span>
+<span id="cb10-39"><a href="#cb10-39"></a><span class="co">#&gt;   breaks.g &lt;- c(-Inf, quantile(f,  (1:9)/10), Inf)</span></span>
+<span id="cb10-40"><a href="#cb10-40"></a><span class="co">#&gt;   breaks.g &lt;- breaks.g + seq_along(breaks.g) * .Machine$double.eps</span></span>
+<span id="cb10-41"><a href="#cb10-41"></a><span class="co">#&gt;   g&lt;- cut(f, breaks.g)</span></span>
+<span id="cb10-42"><a href="#cb10-42"></a><span class="co">#&gt;   data2g &lt;- cbind(data,r,g)</span></span>
+<span id="cb10-43"><a href="#cb10-43"></a><span class="co">#&gt;   if (is.null(psu)){</span></span>
+<span id="cb10-44"><a href="#cb10-44"></a><span class="co">#&gt;     newdesign &lt;- svydesign(id=~1,</span></span>
+<span id="cb10-45"><a href="#cb10-45"></a><span class="co">#&gt;                          weights=as.formula(paste0("~",weight)), </span></span>
+<span id="cb10-46"><a href="#cb10-46"></a><span class="co">#&gt;                         data=data2g, nest = TRUE)</span></span>
+<span id="cb10-47"><a href="#cb10-47"></a><span class="co">#&gt;   }</span></span>
+<span id="cb10-48"><a href="#cb10-48"></a><span class="co">#&gt;   if (!is.null(psu)) {</span></span>
+<span id="cb10-49"><a href="#cb10-49"></a><span class="co">#&gt;     newdesign &lt;- svydesign(id=as.formula(paste0("~",psu)),</span></span>
+<span id="cb10-50"><a href="#cb10-50"></a><span class="co">#&gt;                          strata=as.formula(paste0("~",strata)),</span></span>
+<span id="cb10-51"><a href="#cb10-51"></a><span class="co">#&gt;                          weights=as.formula(paste0("~",weight)), </span></span>
+<span id="cb10-52"><a href="#cb10-52"></a><span class="co">#&gt;                         data=data2g, nest = TRUE)</span></span>
+<span id="cb10-53"><a href="#cb10-53"></a><span class="co">#&gt;   }</span></span>
+<span id="cb10-54"><a href="#cb10-54"></a><span class="co">#&gt;   decilemodel&lt;- svyglm(r~g, design=newdesign) </span></span>
+<span id="cb10-55"><a href="#cb10-55"></a><span class="co">#&gt;   res &lt;- regTermTest(decilemodel, ~g)</span></span>
+<span id="cb10-56"><a href="#cb10-56"></a><span class="co">#&gt;   return(as.numeric(res$p)) </span></span>
+<span id="cb10-57"><a href="#cb10-57"></a><span class="co">#&gt; }</span></span>
+<span id="cb10-58"><a href="#cb10-58"></a><span class="co">#&gt; &lt;bytecode: 0x000002492dae1c48&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

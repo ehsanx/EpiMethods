@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1132,7 +1132,7 @@ Note
 <p>Only outcome variable (Length of stay); slightly different than Table 2 in <span class="citation" data-cites="connors1996effectiveness">Connors et al. (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> (means were 20.5 vs.&nbsp;25.7; and medians were 16 vs.&nbsp;17).</p>
 </div>
 </div>
-<div class="cell" data-hash="machinelearningCausal4_cache/html/tab1_801cb97f96d584b6ac0495ecaa2fec30">
+<div class="cell" data-hash="machinelearningCausal4_cache/html/tab1_c782f3af2ed6362963feec2005303050">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"Length.of.Stay"</span>),</span>
 <span id="cb1-2"><a href="#cb1-2"></a>                       <span class="at">data =</span> ObsData, </span>
 <span id="cb1-3"><a href="#cb1-3"></a>                       <span class="at">strata =</span> <span class="st">"RHC.use"</span>, </span>
@@ -1143,7 +1143,7 @@ Note
 <span id="cb1-8"><a href="#cb1-8"></a><span class="co">#&gt;   n                           3551          2184        </span></span>
 <span id="cb1-9"><a href="#cb1-9"></a><span class="co">#&gt;   Length.of.Stay (mean (SD)) 19.53 (23.59) 24.86 (28.90)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="machinelearningCausal4_cache/html/tab1x_fa0367f842eb42a1825a6fdd97e60c29">
+<div class="cell" data-hash="machinelearningCausal4_cache/html/tab1x_7c224f8b4c8895f0621a4c1f96227b60">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">median</span>(ObsData<span class="sc">$</span>Length.of.Stay[ObsData<span class="sc">$</span>RHC.use<span class="sc">==</span><span class="dv">0</span>])</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt; [1] 12</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="fu">median</span>(ObsData<span class="sc">$</span>Length.of.Stay[ObsData<span class="sc">$</span>RHC.use<span class="sc">==</span><span class="dv">1</span>])</span>
@@ -1160,7 +1160,7 @@ Note
 </ul>
 <p>Again the requirements for the exposure and outcome models are the same and we can use the same library for both models. Note that even though one model will have a binary dependent variable, and one will have a continuous dependent variable, most of the available learners automatically adapt to binary and continuous dependent variables.</p>
 <p>For this example, we will use the same SuperLearner library as for the binary outcome example.</p>
-<div class="cell" data-hash="machinelearningCausal4_cache/html/unnamed-chunk-2_7f7b4f074e3bbc210b5427a1f9fbd0cc">
+<div class="cell" data-hash="machinelearningCausal4_cache/html/unnamed-chunk-2_46f7ccaab2a0bd69cb3c7a3ab96accad">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Construct the SuperLearner library</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>SL.library <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.mean"</span>, </span>
 <span id="cb3-3"><a href="#cb3-3"></a>                <span class="st">"SL.glm"</span>, </span>
@@ -1200,9 +1200,10 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <span id="cb6-3"><a href="#cb6-3"></a>                       <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
 <span id="cb6-4"><a href="#cb6-4"></a>                       <span class="at">W =</span> ObsData.noYA, </span>
 <span id="cb6-5"><a href="#cb6-5"></a>                       <span class="at">family =</span> <span class="st">"gaussian"</span>, </span>
-<span id="cb6-6"><a href="#cb6-6"></a>                       <span class="at">V =</span> <span class="dv">10</span>,</span>
-<span id="cb6-7"><a href="#cb6-7"></a>                       <span class="at">Q.SL.library =</span> SL.library,</span>
-<span id="cb6-8"><a href="#cb6-8"></a>                       <span class="at">g.SL.library =</span> SL.library)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-6"><a href="#cb6-6"></a>                       <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
+<span id="cb6-7"><a href="#cb6-7"></a>                       <span class="at">V.g =</span> <span class="dv">10</span>,</span>
+<span id="cb6-8"><a href="#cb6-8"></a>                       <span class="at">Q.SL.library =</span> SL.library,</span>
+<span id="cb6-9"><a href="#cb6-9"></a>                       <span class="at">g.SL.library =</span> SL.library)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Once the <code>tmle</code> method has run, we still have one step to complete to get our final estimate. At this point, we must transform the average treatment effect generated by the <code>tmle</code> method (<span class="math inline">\(\widehat{ATE}\)</span>) back to the outcome’s original scale:</p>
 <p><span class="math display">\[
@@ -1248,17 +1249,18 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <span id="cb11-4"><a href="#cb11-4"></a>  <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
 <span id="cb11-5"><a href="#cb11-5"></a>  <span class="at">W =</span> ObsData.noYA,</span>
 <span id="cb11-6"><a href="#cb11-6"></a>  <span class="at">family =</span> <span class="st">"gaussian"</span>,</span>
-<span id="cb11-7"><a href="#cb11-7"></a>  <span class="at">V =</span> <span class="dv">10</span>)</span>
-<span id="cb11-8"><a href="#cb11-8"></a><span class="co"># Q.SL.library = SL.library.test,  </span></span>
-<span id="cb11-9"><a href="#cb11-9"></a><span class="do">## removed this line</span></span>
-<span id="cb11-10"><a href="#cb11-10"></a><span class="co"># g.SL.library = SL.library.test)  </span></span>
-<span id="cb11-11"><a href="#cb11-11"></a><span class="do">## removed this line</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-7"><a href="#cb11-7"></a>  <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
+<span id="cb11-8"><a href="#cb11-8"></a>  <span class="at">V.g =</span> <span class="dv">10</span>)</span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co"># Q.SL.library = SL.library.test,  </span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="do">## removed this line</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co"># g.SL.library = SL.library.test)  </span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="do">## removed this line</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Transform the average treatment effect generated by the <code>tmle</code> method (<span class="math inline">\(\widehat{ATE}\)</span>) back to the outcome’s original scale:</p>
 <p><span class="math display">\[
 \widehat{ATE}_{rescaled} = (Y_{max}-Y_{min})*\widehat{ATE}
 \]</span></p>
-<div class="cell" data-hash="machinelearningCausal4_cache/html/unnamed-chunk-5_be1dd0a3664db8ae8fea31cda504644f">
+<div class="cell" data-hash="machinelearningCausal4_cache/html/unnamed-chunk-5_9f17e199c256c902da5af798d0e538da">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># transform back the ATE estimate</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>tmle.est.cont.def <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span></span>
 <span id="cb12-3"><a href="#cb12-3"></a>  tmle.fit.cont.def<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
@@ -1274,7 +1276,7 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <p>The estimate using the default SuperLearner library (2.18) is similar to the estimate we got when using our user-specified SuperLearner library (2.95). However, the confidence interval using the default SuperLearner library (1.25, 4.37) was much wider than that using our user-specified SuperLearner library (1.99, 3.91).</p>
 </section><section id="comparison-of-results" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="comparison-of-results">Comparison of results</h3>
 <p>Adjusted regression:</p>
-<div class="cell" data-hash="machinelearningCausal4_cache/html/reg2cont_2c1a402c8129ebf94c287ddb418958d1">
+<div class="cell" data-hash="machinelearningCausal4_cache/html/reg2cont_834377b700fecd55c3cc927dd6f41265">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># adjust the exposure variable </span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co"># (primary interest) + covariates</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a>baselineVars.LoS <span class="ot">&lt;-</span> <span class="fu">c</span>(baselinevars, <span class="st">"Death"</span>)</span>
@@ -1286,7 +1288,7 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <span id="cb14-9"><a href="#cb14-9"></a><span class="fu">publish</span>(fit1.cont, <span class="at">digits=</span><span class="dv">1</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><span class="citation" data-cites="connors1996effectiveness">Connors et al. (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> conducted a propensity score matching analysis. Table 5 showed that, after propensity score pair (1-to-1) matching, means of length of stay (<span class="math inline">\(Y\)</span>), when stratified by RHC (<span class="math inline">\(A\)</span>) were not significantly different (<span class="math inline">\(p = 0.14\)</span>).</p>
-<div class="cell" data-hash="machinelearningCausal4_cache/html/summarytablecont_ff08fdd0a26ac139599cda94bb4f5253">
+<div class="cell" data-hash="machinelearningCausal4_cache/html/summarytablecont_240cabcad01418211dd5f32964e52833">
 <div class="cell-output-display">
 <table data-quarto-postprocess="true" class="table table-sm table-striped small">
 <thead><tr class="header">

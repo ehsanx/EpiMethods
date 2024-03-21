@@ -37,7 +37,7 @@ When predictor variables are highly correlated, it becomes challenging to isolat
 Collinearity can lead to inflated standard errors of the regression coefficients. This means that the coefficients can be very sensitive to small changes in the data, making the model unstable and less generalizable to new, unseen data.
 
 **Overfitting**:
-When predictors are collinear, the model is more likely to fit to the noise in the data rather than the actual signal. This is a manifestation of overfitting, where the model becomes too complex and captures random noise. Overfit models will perform poorly on new, unseen data.
+When predictors are collinear, the model is more likely to fit to the noise in the data rather than the actual signal. This is a manifestation of overfitting, where the model becomes too complex and captures random noise. Overfitted models will perform poorly on new, unseen data.
 
 **Inefficiency**:
 Including redundant variables (collinear variables) does not add additional information to the model. This could be inefficient, especially when dealing with large datasets, as it increases computational costs without improving model performance.
@@ -45,9 +45,11 @@ Including redundant variables (collinear variables) does not add additional info
 #### Multicollinearity Diagnostics
 Several techniques are available for diagnosing multicollinearity, including:
 
-- Variance Inflation Factor (VIF)
-- Eigenvalues and Eigenvectors of the correlation/covariance matrix
-- Pairwise correlation matrices
+- [Variance Inflation Factor (VIF)](https://en.wikipedia.org/wiki/Variance_inflation_factor): The VIF is a measure of multicollinearity, which measures how much the variance of a regression coefficient is increased because of multicollinearity. A general rule of thumb is that if VIF exceeds 4 or 5, multicollinearity is present. 
+
+- [Eigenvalues and Eigenvectors of the correlation/covariance matrix](https://sam-black.medium.com/analyzing-the-eigenvalues-of-a-covariance-matrix-to-identify-multicollinearity-de488c719e1b): The eigenvalues of the correlation matrix can also be used to measure the presence of multicollinearity, with one or more eigenvalues close to zero indicating multicollinearity.
+
+- Pairwise correlation matrices: Large correlation coefficients in the correlation matrix of predictors indicate the possibility of multicollinearity. 
 
 #### Remedies
 
@@ -55,7 +57,7 @@ Some common ways to handle collinearity include:
 
 - Removing one of the correlated predictors
 - Combining correlated predictors into a single composite predictor
-- Using regularization techniques like Ridge Regression, which can help handle collinearity by adding a penalty term
+- Using regularization techniques like [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regression), which can help handle collinearity by adding a penalty term. Ridge regression adds a small amount of bias to the regression estimates, which in turn reduces the standard error, addresses the collinearity issue to some extent, and makes the results more reliable.
 
 ### Identify collinear predictors
 
@@ -69,17 +71,20 @@ We can also use `hclust` and `varclus` or variable clustering, i.e., to identify
 
 ```{r collinear, warning=FALSE, cache=TRUE}
 require(Hmisc)
-sel.names <- c("gender", "age", "born", "race", "education", "married", 
-               "income", "diastolicBP", "systolicBP", 
-               "bodyweight", "bodyheight", "bmi", "waist", "smoke", "alcohol", 
-               "cholesterol", "triglycerides", "uric.acid", 
-               "protein", "bilirubin", "phosphorus", "sodium", "potassium", 
-               "globulin", "calcium", "physical.work", "physical.recreational", 
+sel.names <- c("gender", "age", "born", "race", "education", 
+               "married", "income", "diastolicBP", "systolicBP", 
+               "bodyweight", "bodyheight", "bmi", "waist", "smoke",
+               "alcohol",  "cholesterol", "triglycerides", 
+               "uric.acid", "protein", "bilirubin", "phosphorus",
+               "sodium", "potassium", "globulin", "calcium", 
+               "physical.work", "physical.recreational", 
                "diabetes")
 var.cluster <- varclus(~., data = analytic[sel.names])
 # var.cluster
 plot(var.cluster)
 ```
+
+In this plot, [Spearman correlation](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient) or Spearman's $\rho$(rho) assesses the monotonic but nonlinear relationships predictors. We can also specify linear relationships such as Pearson correlation. A high correlation coefficient indicates predictors are highly correlated. For example, Spearman's $\rho$ is more than 0.8 for bodyweight, BMI, and waist, indicating high collinearity between these predictors.
 
 ### Video content (optional)
 

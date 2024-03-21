@@ -24,8 +24,8 @@ We want to decompose of the "total effect" of a given exposure OA ($A$) on the o
 load("Data/mediation/cchs123pain.RData")
 source("Data/mediation/medFunc.R")
 ls()
-varlist <- c("age", "sex", "income", "race", "bmi", "edu",
-               "phyact", "smoke", "fruit", "diab")
+
+varlist <- c("age", "sex", "income", "race", "bmi", "edu", "phyact", "smoke", "fruit", "diab")
 analytic.miss$mediator <- ifelse(analytic.miss$painmed == "Yes", 1, 0)
 analytic.miss$exposure <- ifelse(analytic.miss$OA == "OA", 1, 0)
 analytic.miss$outcome <- ifelse(analytic.miss$CVD == "event", 1, 0)
@@ -38,16 +38,15 @@ We will utilize this fit in step 3
 ```{r mediatormodel, eval=TRUE, cache=TRUE}
 # A = actual exposure (without any change)
 analytic.miss$exposureTemp <- analytic.miss$exposure
-w.design0 <- svydesign(id=~1, weights=~weight, 
-                      data=analytic.miss)
+
+# Design
+w.design0 <- svydesign(id=~1, weights=~weight, data=analytic.miss)
 w.design <- subset(w.design0, miss == 0)
-# Replace exposure with exposureTemp
-# This will be necessary in step 3
+
+# Replace exposure with exposureTemp. This will be necessary in step 3
 fit.m <- svyglm(mediator ~ exposureTemp + 
-                 age + sex + income + race + bmi + edu +
-                 phyact + smoke + fruit + diab,
-                design = w.design, 
-                family = binomial("logit"))
+                 age + sex + income + race + bmi + edu + phyact + smoke + fruit + diab,
+                design = w.design, family = binomial("logit"))
 publish(fit.m)
 ```
 
@@ -59,13 +58,16 @@ We manipulate and duplicate data here
 dim(analytic.miss)
 dim(analytic.cc)
 nrow(analytic.miss) - nrow(analytic.cc)
+
+# Create counterfactual data. This will be necessary in step 3
 d1 <- d2 <- analytic.miss
-# Create counterfactual data
-# This will be necessary in step 3
+
 # Exposed = Exposed
 d1$exposure.counterfactual <- d1$exposure
+
 # Exposed = Not exposed
 d2$exposure.counterfactual <- !d2$exposure 
+
 # duplicated data (double the amount)
 newd <- rbind(d1, d2)
 newd <- newd[order(newd$ID), ]
@@ -90,16 +92,20 @@ in all data `newd` (fact `d1` + alternative fact `d2`).
 # A = actual exposure (without any change)
 # A = exposure
 newd$exposureTemp <- newd$exposure
+
 # Probability of M given A + C
 w <- predict(fit.m, newdata=newd, type='response') 
 direct <- ifelse(newd$mediator, w, 1-w)
+
 # Second, use counterfactual exposures (all A + all !A):
 # A* = Opposite (counterfactual) values of the exposure
 # A* = exposure.counterfactual
 newd$exposureTemp <- newd$exposure.counterfactual
+
 # Probability of M given A* + C
 w <- predict(fit.m, newdata=newd, type='response') 
 indirect <- ifelse(newd$mediator, w, 1-w)
+
 # Mediator weights
 newd$W.mediator <- indirect/direct
 summary(newd$W.mediator)
@@ -116,12 +122,15 @@ Note: scaling can often be helpful if there exists extreme weights.
 newd$S.w <- with(newd,weight)
 newd$S.w[is.na(newd$S.w)]
 summary(newd$S.w)
+
 # Multiply mediator weights with scaled survey weights
 newd$SM.w <- with(newd,(W.mediator * S.w))
+
 summary(newd$SM.w)
 table(newd$miss[is.na(newd$SM.w)])
 newd$SM.w[is.na(newd$SM.w)] <- 0
 summary(newd$SM.w)
+
 hist(newd$SM.w, main = "", xlab = "Combined weights", 
      ylab = "Frequency", freq = TRUE)
 ```
@@ -138,15 +147,13 @@ after weighting (combination of mediator weight + sampling weight).
 
 ```{r outcome, eval=TRUE, cache=TRUE}
 # Outcome analysis
-w.design0 <- svydesign(id=~1, weights=~SM.w, 
-                      data=newd)
+w.design0 <- svydesign(id=~1, weights=~SM.w, data=newd)
 w.design <- subset(w.design0, miss == 0)
+
 # Fit Y on (A + A* + C)
 fit <- svyglm(outcome ~ exposure + exposure.counterfactual + 
-               age + sex + income + race + bmi + edu +
-                 phyact + smoke + fruit + diab, 
-             design = w.design, 
-               family = binomial("logit"))
+                age + sex + income + race + bmi + edu + phyact + smoke + fruit + diab, 
+             design = w.design, family = binomial("logit"))
 ```
 
 #### Point estimates
@@ -158,20 +165,29 @@ Following are the conditional ORs:
 -   $OR_{NIE}(A^{*}=1,M=0,C=c) = \exp(\theta_2)$
 
 ```{r outcomeextract, eval=TRUE, cache=TRUE}
+# total effect of A-> Y + A -> M -> Y
 TE <- exp(sum(coef(fit)[c('exposure', 'exposure.counterfactual')])) 
-TE # total effect of A-> Y + A -> M -> Y
+TE 
+
+# direct effect of A-> Y (not through M)
 DE <- exp(unname(coef(fit)['exposure']))
-DE # direct effect of A-> Y (not through M)
+DE 
+
+# indirect effect of A-> Y (A -> M -> Y)
 IE <- exp(unname(coef(fit)[c('exposure.counterfactual')])) 
-IE # indirect effect of A-> Y (A -> M -> Y)
-DE * IE # Product of ORs; same as TE 
+IE 
+
+# Product of ORs; same as TE 
+DE * IE 
+
+# Proportion mediated
 PM <- log(IE) / log(TE)
-PM # Proportion mediated
+PM 
 ```
 
 #### Obtaining results fast
 
-User-written funtion `doEffectDecomp()` (specific to OA-CVD problem):
+User-written function `doEffectDecomp()` (specific to OA-CVD problem):
 
 ```{r fastfnc, cache=TRUE}
 doEffectDecomp(analytic.miss, ind = NULL, varlist = varlist)
@@ -210,12 +226,16 @@ bootci4b <- boot.ci(bootresBin,type = "perc",index=4)
 ```{r bootres, cache=TRUE}
 # Number of bootstraps
 bootresBin$R
+
 # Total Effect
 c(bootresBin$t0[1], bootci1b$percent[4:5])
+
 # Direct Effect
 c(bootresBin$t0[2], bootci2b$percent[4:5])
+
 # Indirect Effect
 c(bootresBin$t0[3], bootci3b$percent[4:5])
+
 # Proportion Mediated
 c(bootresBin$t0[4], bootci4b$percent[4:5])
 ```
@@ -229,11 +249,11 @@ require(plotrix)
 TEc <- c(bootresBin$t0[1], bootci1b$percent[4:5])
 DEc <- c(bootresBin$t0[2], bootci2b$percent[4:5])
 IEc <- c(bootresBin$t0[3], bootci3b$percent[4:5])
-mat<- rbind(TEc,DEc,IEc)
+mat <- rbind(TEc,DEc,IEc)
 colnames(mat) <- c("Point", "2.5%", "97.5%")
 mat
-plotCI(1:3, mat[,1], ui=mat[,3], li=mat[,2],
-       xlab = "Estimates", ylab = "", xaxt="n")
+
+plotCI(1:3, mat[,1], ui=mat[,3], li=mat[,2], xlab = "Estimates", ylab = "", xaxt="n")
 axis(1, at=1:3,labels=c("TE","NDE","NIE"))
 abline(h=1, lty = 2)
 ```
@@ -245,7 +265,7 @@ Consider
 -   non-linear relationships (polynomials) and interactions between exposure, demographic/baseline covariates and mediators,
 -   Is misclassification of the mediators possible?
 
-Here we are again using a user-written funtion `doEffectDecomp.int()` (including interaction `phyact*diab` in the mediation model as well as the outcome model):
+Here we are again using a user-written function `doEffectDecomp.int()` (including interaction `phyact*diab` in the mediation model as well as the outcome model):
 
 ```{r fast, cache=TRUE}
 # doEffectDecomp.int is a user-written function

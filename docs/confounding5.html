@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1094,8 +1094,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
    
   <ul>
 <li><a href="#data-generating-process" id="toc-data-generating-process" class="nav-link active" data-scroll-target="#data-generating-process">Data generating process</a></li>
-  <li><a href="#conditional-and-crude-rd" id="toc-conditional-and-crude-rd" class="nav-link" data-scroll-target="#conditional-and-crude-rd">Conditional and crude RD</a></li>
-  <li><a href="#conditional-and-crude-rr" id="toc-conditional-and-crude-rr" class="nav-link" data-scroll-target="#conditional-and-crude-rr">Conditional and crude RR</a></li>
+  <li><a href="#conditional-and-crude-risk-difference-rd" id="toc-conditional-and-crude-risk-difference-rd" class="nav-link" data-scroll-target="#conditional-and-crude-risk-difference-rd">Conditional and crude risk difference (RD)</a></li>
+  <li><a href="#conditional-and-crude-risk-ratio-rr" id="toc-conditional-and-crude-risk-ratio-rr" class="nav-link" data-scroll-target="#conditional-and-crude-risk-ratio-rr">Conditional and crude risk ratio (RR)</a></li>
   <li><a href="#conditional-and-crude-or" id="toc-conditional-and-crude-or" class="nav-link" data-scroll-target="#conditional-and-crude-or">Conditional and crude OR</a></li>
   <li><a href="#marginal-rd-rr-and-or" id="toc-marginal-rd-rr-and-or" class="nav-link" data-scroll-target="#marginal-rd-rr-and-or">Marginal RD, RR and OR</a></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
@@ -1118,8 +1118,21 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </div>
   
 
-</header><p>Explanation of collapsibility property of an estimate (RD, RR and OR: conditional or marginal) in absence of confounding</p>
-<div class="cell" data-hash="confounding5_cache/html/setup_f43e5b8ecc2d9316962c802da4e61e86">
+</header><p>Let us assume we have a regression of hypertension (<span class="math inline">\(Y\)</span>), smoking (<span class="math inline">\(A\)</span>) and a risk factor for outcome, gender (<span class="math inline">\(L\)</span>). Then let us set up 2 regression models:</p>
+<ul>
+<li>1st regression model is <span class="math inline">\(Y \sim \beta \times A + \alpha \times L\)</span>. Here we are conditioning on gender (<span class="math inline">\(L\)</span>).</li>
+<li>2nd regression model is <span class="math inline">\(Y \sim \beta' \times A\)</span>
+</li>
+</ul>
+<p>Then regression is collapsible for <span class="math inline">\(\beta\)</span> over <span class="math inline">\(L\)</span> if <span class="math inline">\(\beta = \beta'\)</span> from the 2nd regression omitting <span class="math inline">\(L\)</span>. <span class="math inline">\(\beta \ne \beta'\)</span> would mean non-collapsibility. A measure of association (say, risk difference) is collapsible if the marginal measure of association is equal to a weighted average of the stratum-specific measures of association. Non-collapsibility is also knows as Simpson’s Paradox (in absence of confounding of course): a statistical phenomenon where an association between two factors (say, hypertension and smoking) in a population (we are talking about marginal estimate here) is different than the associations of same relationship in subpopulations (conditional on some other factor, say, age; hence talking about conditional estimates). Risk ratio and risk difference are collapsible.</p>
+<p>Odds ratio can be non-collapsible. It can produce different treatment effect estimate for different covariate adjustment sets (see example below of when adjusting form age and sex vs.&nbsp;when adjusting none). This is true even in the absence of confounding. However, according to our definition here, OR is collapsible when we consider gender in the adjustment set.</p>
+<p>Note that, OR non-collapsibility is a consequence of the fact that it is estimated via a logit link function (nonlinearity of the logistic transformation).</p>
+<p>Ref:</p>
+<ul>
+<li><span class="citation" data-cites="greenland1999confounding">(<a href="#ref-greenland1999confounding" role="doc-biblioref">Greenland, Pearl, and Robins 1999</a>)</span></li>
+<li><span class="citation" data-cites="mansournia2015relation">(<a href="#ref-mansournia2015relation" role="doc-biblioref">Mansournia and Greenland 2015</a>)</span></li>
+</ul>
+<div class="cell" data-hash="confounding5_cache/html/setup_fde381630425ebb1873a4852648048c0">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(simcausal)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(tableone)</span>
@@ -1127,24 +1140,20 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(lawstat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="data-generating-process" class="level3"><h3 class="anchored" data-anchor-id="data-generating-process">Data generating process</h3>
-<div class="cell" data-hash="confounding5_cache/html/dgm5_d309cee292f9bef213bd2a47b95f01db">
+<p>Let us generate the data with smoking being the exposure and hypertension being the outcome.</p>
+<div class="cell" data-hash="confounding5_cache/html/dgm5_61defa31090b16e599b2769fc496c011">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">require</span>(simcausal)</span>
 <span id="cb2-2"><a href="#cb2-2"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
 <span id="cb2-3"><a href="#cb2-3"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
-<span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">node</span>(<span class="st">"gender"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, </span>
-<span id="cb2-5"><a href="#cb2-5"></a>       <span class="at">prob =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>  <span class="fu">node</span>(<span class="st">"age"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, </span>
-<span id="cb2-7"><a href="#cb2-7"></a>       <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>  <span class="fu">node</span>(<span class="st">"smoking"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, </span>
-<span id="cb2-9"><a href="#cb2-9"></a>       <span class="at">prob =</span> <span class="fu">plogis</span>(.<span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a>  <span class="fu">node</span>(<span class="st">"hypertension"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, </span>
-<span id="cb2-11"><a href="#cb2-11"></a>       <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">3.5</span>) <span class="sc">*</span> smoking </span>
-<span id="cb2-12"><a href="#cb2-12"></a>                     <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">1</span>) <span class="sc">*</span> gender  </span>
-<span id="cb2-13"><a href="#cb2-13"></a>                       <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">7</span>) <span class="sc">*</span> age))</span>
-<span id="cb2-14"><a href="#cb2-14"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">node</span>(<span class="st">"gender"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">node</span>(<span class="st">"age"</span>, <span class="at">distr =</span> <span class="st">"rnorm"</span>, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="fu">node</span>(<span class="st">"smoking"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(.<span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  <span class="fu">node</span>(<span class="st">"hypertension"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, </span>
+<span id="cb2-8"><a href="#cb2-8"></a>       <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">3.5</span>) <span class="sc">*</span> smoking <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">1</span>) <span class="sc">*</span> gender <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">7</span>) <span class="sc">*</span> age))</span>
+<span id="cb2-9"><a href="#cb2-9"></a>Dset <span class="ot">&lt;-</span> <span class="fu">set.DAG</span>(D)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="generate-dag" class="level4"><h4 class="anchored" data-anchor-id="generate-dag">Generate DAG</h4>
-<div class="cell" data-hash="confounding5_cache/html/dag5_af75c6de1aee706f18a7846793419b01">
+<div class="cell" data-hash="confounding5_cache/html/dag5_aca307d19864032bbae7bfd6cd9eba2d">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> .<span class="dv">9</span>,</span>
 <span id="cb3-2"><a href="#cb3-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">arrow.width =</span> <span class="fl">0.4</span>, <span class="at">arrow.size =</span> <span class="fl">0.7</span>),</span>
 <span id="cb3-3"><a href="#cb3-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1153,7 +1162,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="generate-data" class="level4"><h4 class="anchored" data-anchor-id="generate-data">Generate Data</h4>
-<div class="cell" data-hash="confounding5_cache/html/data5_5c83fd2d406da53a9654894b79eeae97">
+<div class="cell" data-hash="confounding5_cache/html/data5_019aaa8e48982a8c6bff6c8ae178ca1d">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>Obs.Data <span class="ot">&lt;-</span> <span class="fu">sim</span>(<span class="at">DAG =</span> Dset, <span class="at">n =</span> <span class="dv">100000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="fu">head</span>(Obs.Data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1166,20 +1175,19 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="balance-check" class="level4"><h4 class="anchored" data-anchor-id="balance-check">Balance check</h4>
-<div class="cell" data-hash="confounding5_cache/html/balance5_38911dea5c1587315c5a446f90ffeba4">
+<div class="cell" data-hash="confounding5_cache/html/balance5_cf5f803db5b753ea9cb24f4fc2d6fc6a">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">require</span>(tableone)</span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">CreateTableOne</span>(<span class="at">data =</span> Obs.Data, </span>
-<span id="cb5-3"><a href="#cb5-3"></a>               <span class="at">strata =</span> <span class="st">"smoking"</span>, </span>
-<span id="cb5-4"><a href="#cb5-4"></a>               <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>))</span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt;                     Stratified by smoking</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;                      0            1            p      test</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt;   n                  47720        52280                   </span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt;   gender (mean (SD))  0.70 (0.46)  0.70 (0.46)  0.403     </span></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt;   age (mean (SD))     2.02 (4.02)  2.01 (4.00)  0.690</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">CreateTableOne</span>(<span class="at">data =</span> Obs.Data, <span class="at">strata =</span> <span class="st">"smoking"</span>, <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>))</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;                     Stratified by smoking</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt;                      0            1            p      test</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt;   n                  47720        52280                   </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;   gender (mean (SD))  0.70 (0.46)  0.70 (0.46)  0.403     </span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt;   age (mean (SD))     2.02 (4.02)  2.01 (4.00)  0.690</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="conditional-and-crude-rd" class="level3"><h3 class="anchored" data-anchor-id="conditional-and-crude-rd">Conditional and crude RD</h3>
+</section></section><section id="conditional-and-crude-risk-difference-rd" class="level3"><h3 class="anchored" data-anchor-id="conditional-and-crude-risk-difference-rd">Conditional and crude risk difference (RD)</h3>
+<p>Since RD is a collapsible measure, the marginal and conditional estimate should be approximately the same.</p>
 <section id="full-list-of-risk-factors-for-outcome-2-variables" class="level4"><h4 class="anchored" data-anchor-id="full-list-of-risk-factors-for-outcome-2-variables">Full list of risk factors for outcome (2 variables)</h4>
-<div class="cell" data-hash="confounding5_cache/html/rd5_24b11519d97ce248ecea591e470cd3d1">
+<div class="cell" data-hash="confounding5_cache/html/rd5_dd299664b149289de381defd868669a7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="do">## RD</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">require</span>(Publish)</span>
 <span id="cb6-3"><a href="#cb6-3"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender <span class="sc">+</span> age, </span>
@@ -1200,7 +1208,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>
 <span class="citation" data-cites="naimi2020estimating">(<a href="#ref-naimi2020estimating" role="doc-biblioref">Naimi and Whitcomb 2020</a>)</span> (“For the risk difference, one may use a GLM with a Gaussian (i.e., normal) distribution and identity link function, or, equivalently, an ordinary least squares estimator …robust variance estimator (or bootstrap) should be used to obtain valid standard errors.”)</li>
 </ul></section><section id="strtatum-specific-2-variables" class="level4"><h4 class="anchored" data-anchor-id="strtatum-specific-2-variables">Strtatum specific (2 variables)</h4>
-<div class="cell" data-hash="confounding5_cache/html/eststrata_1e653b24c1ff3e3abffeb7541952a6c1">
+<div class="cell" data-hash="confounding5_cache/html/eststrata_316d0c683537d87a54325d68e970de1f">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>fitx1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, <span class="at">family=</span><span class="fu">gaussian</span>(<span class="at">link =</span> <span class="st">"identity"</span>), </span>
 <span id="cb7-2"><a href="#cb7-2"></a>             <span class="at">data=</span><span class="fu">subset</span>(Obs.Data, gender <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">2</span>))</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="fu">publish</span>(fitx1, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1254,7 +1262,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Unweighted mean from all strata (for simplicity, 2 variables)</p>
-<div class="cell" data-hash="confounding5_cache/html/unwgtmean_6d12b8703d20b9b410008629fc1b38b5">
+<div class="cell" data-hash="confounding5_cache/html/unwgtmean_7f0d3395fd92440a59fcc6632c2760ae">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">c</span>(<span class="fu">coef</span>(fitx1)[<span class="st">"smoking"</span>],</span>
 <span id="cb11-2"><a href="#cb11-2"></a>             <span class="fu">coef</span>(fitx2)[<span class="st">"smoking"</span>],</span>
 <span id="cb11-3"><a href="#cb11-3"></a>             <span class="fu">coef</span>(fitx3)[<span class="st">"smoking"</span>],</span>
@@ -1262,7 +1270,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb11-5"><a href="#cb11-5"></a><span class="co">#&gt; [1] 0.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="partial-list-of-risk-factors-for-outcome-1-variable" class="level4"><h4 class="anchored" data-anchor-id="partial-list-of-risk-factors-for-outcome-1-variable">Partial list of risk factors for outcome (1 variable)</h4>
-<div class="cell" data-hash="confounding5_cache/html/riskfactor_aa98e57e08990a77e9ef8de75d1a0e0d">
+<div class="cell" data-hash="confounding5_cache/html/riskfactor_b29d6ffdd1dec235a508db0f0d9cfdb0">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender, </span>
 <span id="cb12-2"><a href="#cb12-2"></a>             <span class="at">family=</span><span class="fu">gaussian</span>(<span class="at">link =</span> <span class="st">"identity"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb12-3"><a href="#cb12-3"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1277,7 +1285,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="strtatum-specific-1-variable" class="level4"><h4 class="anchored" data-anchor-id="strtatum-specific-1-variable">Strtatum specific (1 variable)</h4>
-<div class="cell" data-hash="confounding5_cache/html/strata1_6984d894b8e3ea5778243a4225c2edf2">
+<div class="cell" data-hash="confounding5_cache/html/strata1_19534fd8c77b924c017b9d6334c3e90f">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>fitx1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, <span class="at">family=</span><span class="fu">gaussian</span>(<span class="at">link =</span> <span class="st">"identity"</span>), </span>
 <span id="cb13-2"><a href="#cb13-2"></a>             <span class="at">data=</span><span class="fu">subset</span>(Obs.Data, gender <span class="sc">==</span> <span class="dv">1</span>))</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="fu">publish</span>(fitx1, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1304,14 +1312,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
-<p>Unweighted mean from all strata (for simplicity, 1 variables)</p>
-<div class="cell" data-hash="confounding5_cache/html/wmean_40e7dab34ac61bcc37c0d705b266dbeb">
+<p>Unweighted mean from all strata (for simplicity, 1 variable)</p>
+<div class="cell" data-hash="confounding5_cache/html/wmean_6681558268ae99db11316fdaf4e6f318">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">c</span>(<span class="fu">coef</span>(fitx1)[<span class="st">"smoking"</span>],</span>
 <span id="cb15-2"><a href="#cb15-2"></a>             <span class="fu">coef</span>(fitx2)[<span class="st">"smoking"</span>])),<span class="dv">2</span>)</span>
 <span id="cb15-3"><a href="#cb15-3"></a><span class="co">#&gt; [1] 0.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="crude-in-absence-of-confounding" class="level4"><h4 class="anchored" data-anchor-id="crude-in-absence-of-confounding">Crude (in absence of confounding)</h4>
-<div class="cell" data-hash="confounding5_cache/html/crude_82fbca3267e9217156cfd4c57142fd6c">
+<div class="cell" data-hash="confounding5_cache/html/crude_0dcfb9ff0c3a3f459e1f47ffcc5fe69b">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb16-2"><a href="#cb16-2"></a>             <span class="at">family=</span><span class="fu">gaussian</span>(<span class="at">link =</span> <span class="st">"identity"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb16-3"><a href="#cb16-3"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1325,14 +1333,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
-</section></section><section id="conditional-and-crude-rr" class="level3"><h3 class="anchored" data-anchor-id="conditional-and-crude-rr">Conditional and crude RR</h3>
+</section></section><section id="conditional-and-crude-risk-ratio-rr" class="level3"><h3 class="anchored" data-anchor-id="conditional-and-crude-risk-ratio-rr">Conditional and crude risk ratio (RR)</h3>
 <p>Ref:</p>
 <ul>
 <li>
 <span class="citation" data-cites="naimi2020estimating">(<a href="#ref-naimi2020estimating" role="doc-biblioref">Naimi and Whitcomb 2020</a>)</span> (“For the risk ratio, one may use a GLM with a Poisson distribution and log link function …. one should use the robust (or sandwich) variance estimator to obtain valid standard errors (the bootstrap can also be used)”).</li>
 </ul>
 <section id="full-list-of-risk-factors-for-outcome-2-variables-1" class="level4"><h4 class="anchored" data-anchor-id="full-list-of-risk-factors-for-outcome-2-variables-1">Full list of risk factors for outcome (2 variables)</h4>
-<div class="cell" data-hash="confounding5_cache/html/fullrisk_138620ef2fe37a3047d937b53b31f3c0">
+<div class="cell" data-hash="confounding5_cache/html/fullrisk_61fa7720e2f42c441a7d060bf13f6419">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender <span class="sc">+</span> age, </span>
 <span id="cb17-2"><a href="#cb17-2"></a>             <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb17-3"><a href="#cb17-3"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1346,8 +1354,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
+<p>The estimate we see as a <code>hazard ratio</code> is basically a <code>risk ratio</code>.</p>
 </section><section id="strtatum-specific-2-variables-1" class="level4"><h4 class="anchored" data-anchor-id="strtatum-specific-2-variables-1">Strtatum specific (2 variables)</h4>
-<div class="cell" data-hash="confounding5_cache/html/strata2_764c91e2700f6a0e351e71e96519cbd2">
+<div class="cell" data-hash="confounding5_cache/html/strata2_03bb18d460ea960cd83be590dfde1f01">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>fitx1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb18-2"><a href="#cb18-2"></a>             <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), </span>
 <span id="cb18-3"><a href="#cb18-3"></a>             <span class="at">data=</span><span class="fu">subset</span>(Obs.Data, gender <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">2</span>))</span>
@@ -1405,7 +1414,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Unweighted mean from all strata (for simplicity, 2 variables)</p>
-<div class="cell" data-hash="confounding5_cache/html/unwgtmean2_1e3bd3f300304521d8b29306b3daf87c">
+<div class="cell" data-hash="confounding5_cache/html/unwgtmean2_92a338578937459b7db87f12f64152c3">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">mean</span>(<span class="fu">exp</span>(<span class="fu">c</span>(<span class="fu">coef</span>(fitx1)[<span class="st">"smoking"</span>],</span>
 <span id="cb22-2"><a href="#cb22-2"></a>           <span class="fu">coef</span>(fitx2)[<span class="st">"smoking"</span>],</span>
 <span id="cb22-3"><a href="#cb22-3"></a>           <span class="fu">coef</span>(fitx3)[<span class="st">"smoking"</span>],</span>
@@ -1413,7 +1422,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb22-5"><a href="#cb22-5"></a><span class="co">#&gt; [1] 1.156387</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="partial-list-of-risk-factors-for-outcome-1-variable-1" class="level4"><h4 class="anchored" data-anchor-id="partial-list-of-risk-factors-for-outcome-1-variable-1">Partial list of risk factors for outcome (1 variable)</h4>
-<div class="cell" data-hash="confounding5_cache/html/riskpartial_5a7b7ea775128bd80f8f137395eac381">
+<div class="cell" data-hash="confounding5_cache/html/riskpartial_0d4694a14dd5f156ce633352eb2aefed">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender, </span>
 <span id="cb23-2"><a href="#cb23-2"></a>             <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb23-3"><a href="#cb23-3"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1428,7 +1437,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="strtatum-specific-1-variable-1" class="level4"><h4 class="anchored" data-anchor-id="strtatum-specific-1-variable-1">Strtatum specific (1 variable)</h4>
-<div class="cell" data-hash="confounding5_cache/html/strata11_442dd7abb7e7ee31a062281060e546c8">
+<div class="cell" data-hash="confounding5_cache/html/strata11_94d63592c0e8ae0450f3de726109e66f">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>fitx1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb24-2"><a href="#cb24-2"></a>             <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), </span>
 <span id="cb24-3"><a href="#cb24-3"></a>             <span class="at">data=</span><span class="fu">subset</span>(Obs.Data, gender <span class="sc">==</span> <span class="dv">1</span>))</span>
@@ -1457,13 +1466,13 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Unweighted mean from all strata (for simplicity, 1 variable)</p>
-<div class="cell" data-hash="confounding5_cache/html/unwgtmean3_e69ae9786d639615e3d37f508c74b7b8">
+<div class="cell" data-hash="confounding5_cache/html/unwgtmean3_5141f6097e1eddde1fae89d9b1467ad4">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">mean</span>(<span class="fu">exp</span>(<span class="fu">c</span>(<span class="fu">coef</span>(fitx1)[<span class="st">"smoking"</span>],</span>
 <span id="cb26-2"><a href="#cb26-2"></a>           <span class="fu">coef</span>(fitx2)[<span class="st">"smoking"</span>])))</span>
 <span id="cb26-3"><a href="#cb26-3"></a><span class="co">#&gt; [1] 1.077402</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="crude-in-absence-of-confounding-1" class="level4"><h4 class="anchored" data-anchor-id="crude-in-absence-of-confounding-1">Crude (in absence of confounding)</h4>
-<div class="cell" data-hash="confounding5_cache/html/crude11_453e3a86e7e09ba7815927bade2388cd">
+<div class="cell" data-hash="confounding5_cache/html/crude11_753e92d02d49348364d3a816a87be00e">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb27-2"><a href="#cb27-2"></a>             <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb27-3"><a href="#cb27-3"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1477,9 +1486,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
+<p>Since the marginal and conditional estimate are approximately the same, RD is a collapsible measure.</p>
 </section></section><section id="conditional-and-crude-or" class="level3"><h3 class="anchored" data-anchor-id="conditional-and-crude-or">Conditional and crude OR</h3>
 <section id="full-list-of-risk-factors-for-outcome-2-variables-2" class="level4"><h4 class="anchored" data-anchor-id="full-list-of-risk-factors-for-outcome-2-variables-2">Full list of risk factors for outcome (2 variables)</h4>
-<div class="cell" data-hash="confounding5_cache/html/orest_c84ddae4fe0bf8626b5631b1091f0a6b">
+<div class="cell" data-hash="confounding5_cache/html/orest_6c9d158351bce3f8690c4d239277bfc0">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender <span class="sc">+</span> age, <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb28-2"><a href="#cb28-2"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, <span class="at">pvalue.method =</span> <span class="st">"robust"</span>)<span class="sc">$</span>regressionTable[<span class="dv">1</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1492,7 +1502,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="strtatum-specific-2-variables-2" class="level4"><h4 class="anchored" data-anchor-id="strtatum-specific-2-variables-2">Strtatum specific (2 variables)</h4>
-<div class="cell" data-hash="confounding5_cache/html/strata12_5b3446810e020ade5ad38a3ece956a55">
+<div class="cell" data-hash="confounding5_cache/html/strata12_82e77083683d0816ec77250a7af86c3b">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>fitx1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb29-2"><a href="#cb29-2"></a>             <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), </span>
 <span id="cb29-3"><a href="#cb29-3"></a>             <span class="at">data=</span><span class="fu">subset</span>(Obs.Data, gender <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">2</span>))</span>
@@ -1550,7 +1560,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Unweighted mean from all strata (for simplicity, 2 variables)</p>
-<div class="cell" data-hash="confounding5_cache/html/unwgtmean4_464357743c18c2a914bcd67ca8cd1df4">
+<div class="cell" data-hash="confounding5_cache/html/unwgtmean4_6871560ef3ac5bed37ee6fed3becb4ac">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="fu">mean</span>(<span class="fu">exp</span>(<span class="fu">c</span>(<span class="fu">coef</span>(fitx1)[<span class="st">"smoking"</span>],</span>
 <span id="cb33-2"><a href="#cb33-2"></a>           <span class="fu">coef</span>(fitx2)[<span class="st">"smoking"</span>],</span>
 <span id="cb33-3"><a href="#cb33-3"></a>           <span class="fu">coef</span>(fitx3)[<span class="st">"smoking"</span>],</span>
@@ -1558,7 +1568,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb33-5"><a href="#cb33-5"></a><span class="co">#&gt; [1] 2.180804</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="partial-list-of-risk-factors-for-outcome-1-variable-2" class="level4"><h4 class="anchored" data-anchor-id="partial-list-of-risk-factors-for-outcome-1-variable-2">Partial list of risk factors for outcome (1 variable)</h4>
-<div class="cell" data-hash="confounding5_cache/html/riskpartial11_69fc6d5791ff873f5d5949abd6cb3acb">
+<div class="cell" data-hash="confounding5_cache/html/riskpartial11_70bce4a34b7aabfd917f4afd9d2171b9">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender, </span>
 <span id="cb34-2"><a href="#cb34-2"></a>             <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb34-3"><a href="#cb34-3"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1573,7 +1583,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="strtatum-specific-1-variable-2" class="level4"><h4 class="anchored" data-anchor-id="strtatum-specific-1-variable-2">Strtatum specific (1 variable)</h4>
-<div class="cell" data-hash="confounding5_cache/html/strata21_1eb76d046bf1d0d04cea80b95f2c5061">
+<div class="cell" data-hash="confounding5_cache/html/strata21_3aeba0b502322dbb95e04ad11345380b">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>fitx1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb35-2"><a href="#cb35-2"></a>             <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), </span>
 <span id="cb35-3"><a href="#cb35-3"></a>             <span class="at">data=</span><span class="fu">subset</span>(Obs.Data, gender <span class="sc">==</span> <span class="dv">1</span>))</span>
@@ -1603,13 +1613,13 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Unweighted mean from all strata (for simplicity, 1 variable)</p>
-<div class="cell" data-hash="confounding5_cache/html/wmean12_c015b310756bd3adda25c4726aef5a7a">
+<div class="cell" data-hash="confounding5_cache/html/wmean12_227bc2fa55e73f5150a9fd53c9cdf58f">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="fu">mean</span>(<span class="fu">exp</span>(<span class="fu">c</span>(<span class="fu">coef</span>(fitx1)[<span class="st">"smoking"</span>],</span>
 <span id="cb37-2"><a href="#cb37-2"></a>           <span class="fu">coef</span>(fitx2)[<span class="st">"smoking"</span>])))</span>
 <span id="cb37-3"><a href="#cb37-3"></a><span class="co">#&gt; [1] 1.290429</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="mantel-haenszel-adjusted-ors-with-1-variable" class="level4"><h4 class="anchored" data-anchor-id="mantel-haenszel-adjusted-ors-with-1-variable">Mantel-Haenszel adjusted ORs with 1 variable</h4>
-<div class="cell" data-hash="confounding5_cache/html/mhor_25f169be521027d0835bd1204e2a7c58">
+<div class="cell" data-hash="confounding5_cache/html/mhor_c9d343b3758fc2b46108f9f1fe65b7da">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>tabx <span class="ot">&lt;-</span> <span class="fu">xtabs</span>( <span class="sc">~</span> hypertension <span class="sc">+</span> smoking <span class="sc">+</span> gender, <span class="at">data =</span> Obs.Data)</span>
 <span id="cb38-2"><a href="#cb38-2"></a><span class="fu">ftable</span>(tabx)    </span>
 <span id="cb38-3"><a href="#cb38-3"></a><span class="co">#&gt;                      gender     0     1</span></span>
@@ -1633,7 +1643,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb38-21"><a href="#cb38-21"></a><span class="co"># mantelhaen.test(tabx, exact = TRUE)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="crude-in-absence-of-confounding-2" class="level4"><h4 class="anchored" data-anchor-id="crude-in-absence-of-confounding-2">Crude (in absence of confounding)</h4>
-<div class="cell" data-hash="confounding5_cache/html/crude12_ab2b2bd14322dbfaeee39a9917b946f2">
+<div class="cell" data-hash="confounding5_cache/html/crude12_ba9e8ba37f5ed6febacea10849c7cdce">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>fitx0 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb39-2"><a href="#cb39-2"></a>             <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb39-3"><a href="#cb39-3"></a><span class="fu">publish</span>(fitx0, <span class="at">print =</span> <span class="cn">FALSE</span>, <span class="at">confint.method =</span> <span class="st">"robust"</span>, </span>
@@ -1650,7 +1660,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section></section><section id="marginal-rd-rr-and-or" class="level3"><h3 class="anchored" data-anchor-id="marginal-rd-rr-and-or">Marginal RD, RR and OR</h3>
 <p>Below we show a procedure for calculating marginal probabilities <span class="math inline">\(p_1\)</span> (for treated) and <span class="math inline">\(p_0\)</span> (for untreated).</p>
 <section id="adjustment-of-2-variables" class="level4"><h4 class="anchored" data-anchor-id="adjustment-of-2-variables">Adjustment of 2 variables</h4>
-<div class="cell" data-hash="confounding5_cache/html/adj12_b019400153d8bebbc95dd084e1957e08">
+<div class="cell" data-hash="confounding5_cache/html/adj12_71080e4171e615055911fa865b7e82bd">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>fitx3 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender <span class="sc">+</span> age, </span>
 <span id="cb40-2"><a href="#cb40-2"></a>             <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb40-3"><a href="#cb40-3"></a>Obs.Data.all.tx <span class="ot">&lt;-</span> Obs.Data</span>
@@ -1679,7 +1689,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb40-26"><a href="#cb40-26"></a><span class="co">#&gt; RR (ZY)=  1.08</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="adjustment-of-1-variable" class="level4"><h4 class="anchored" data-anchor-id="adjustment-of-1-variable">Adjustment of 1 variable</h4>
-<div class="cell" data-hash="confounding5_cache/html/adj13_51884d5b1bd0d10ba9dc4d1c0dc65f23">
+<div class="cell" data-hash="confounding5_cache/html/adj13_8d6ab4793a94cb5852093c4fdb513726">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>fitx2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking <span class="sc">+</span> gender, </span>
 <span id="cb41-2"><a href="#cb41-2"></a>             <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb41-3"><a href="#cb41-3"></a>Obs.Data.all.tx <span class="ot">&lt;-</span> Obs.Data</span>
@@ -1708,7 +1718,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb41-26"><a href="#cb41-26"></a><span class="co">#&gt; RR (ZY)=  1.08</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="no-adjustment" class="level4"><h4 class="anchored" data-anchor-id="no-adjustment">No adjustment</h4>
-<div class="cell" data-hash="confounding5_cache/html/crude15_29af8735b2a45aa0dd2bba470c84e9fc">
+<div class="cell" data-hash="confounding5_cache/html/crude15_452dfb0151dda681039faa43d439e011">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a>fitx1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(hypertension <span class="sc">~</span> smoking, </span>
 <span id="cb42-2"><a href="#cb42-2"></a>             <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data=</span>Obs.Data)</span>
 <span id="cb42-3"><a href="#cb42-3"></a>Obs.Data.all.tx <span class="ot">&lt;-</span> Obs.Data</span>
@@ -1811,20 +1821,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </tr>
 </tbody>
 </table>
-<p>Let us assume we have a regression of hypertension (<span class="math inline">\(Y\)</span>), smoking (<span class="math inline">\(A\)</span>) and a risk factor for outcome, gender (<span class="math inline">\(L\)</span>). Then let us set up 2 regression models:</p>
-<ul>
-<li>1st regression model is <span class="math inline">\(Y \sim \beta \times A + \alpha \times L\)</span>. Here we are conditioning on gender (<span class="math inline">\(L\)</span>).</li>
-<li>2nd regression model is <span class="math inline">\(Y \sim \beta' \times A\)</span>
-</li>
-</ul>
-<p>Then regression is collapsible for <span class="math inline">\(\beta\)</span> over <span class="math inline">\(L\)</span> if <span class="math inline">\(\beta = \beta'\)</span> from the 2nd regression omitting <span class="math inline">\(L\)</span>. <span class="math inline">\(\beta \ne \beta'\)</span> would mean non-collapsibility. A measure of association (say, risk difference) is collapsible if the marginal measure of association is equal to a weighted average of the stratum-specific measures of association. Non-collapsibility is also knows as Simpson’s Paradox (in absence of confoinding of course): a statistical phenomenon where an association between two factors (say, hypertension and smoking) in a population (we are talking about marginal estimate here) is different than the associations of same relationship in subpopulations (conditional on some other factor, say, age; hence talking about conditional estimates).</p>
-<p>Odds ratio can be non-collapsible. It can produce different treatment effect estimate for different covariate adjustment sets (see our above example of when adjusting form age and sex vs.&nbsp;when adjusting none). This is true even in the absence of confounding. However, according to our definition here, OR is collapsible when we consider gender in the adjustment set.</p>
-<p>Note that, OR non-collapsibility is a consequence of the fact that it is estimated via a logit link function (nonlinearity of the logistic transformation).</p>
-<p>Ref:</p>
-<ul>
-<li><span class="citation" data-cites="greenland1999confounding">(<a href="#ref-greenland1999confounding" role="doc-biblioref">Greenland, Pearl, and Robins 1999</a>)</span></li>
-<li><span class="citation" data-cites="mansournia2015relation">(<a href="#ref-mansournia2015relation" role="doc-biblioref">Mansournia and Greenland 2015</a>)</span></li>
-</ul></section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
+<p>As we can see, marginal estimate = conditional estimate for RD and RR but not for OR. Hence, RD and RR are collapsible measures, while OR is a non-collapsible measure.</p>
+</section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1835,7 +1833,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.</p>
+<p>For those who prefer a video walk through, feel free to watch the video below, which offers a description of an earlier version of the above content.</p>
 </div>
 </div>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">

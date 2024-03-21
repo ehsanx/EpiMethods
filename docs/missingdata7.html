@@ -229,7 +229,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -268,7 +268,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1153,15 +1153,15 @@ Important
 <span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; 6      3       0   1    FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="model-with-interaction-and-ors" class="level3"><h3 class="anchored" data-anchor-id="model-with-interaction-and-ors">Model with interaction and ORs</h3>
-<p>We’re interested in understanding how the variable <code>wave</code> interacts with <code>sex</code> in predicting <code>drinkreg</code>. We fit two logistic regression models, one for each level of the <code>sex</code> variable, to understand this interaction. <code>wave</code> is exposure here.</p>
-<p>For effect modifier sex = 0</p>
+<p>We’re interested in understanding how the variable <code>wave</code> interacts with <code>sex</code> in predicting <code>drinkreg</code>. We fit two logistic regression models, one for each level of the <code>sex</code> variable (0 males, 1 females), to understand this interaction. <code>wave</code> is the exposure variable here.</p>
+<section id="for-effect-modifier-sex-0-males" class="level4"><h4 class="anchored" data-anchor-id="for-effect-modifier-sex-0-males">For effect modifier sex = 0 (males)</h4>
 <div class="cell" data-hash="missingdata7_cache/html/em0_b54c7092ccb2ebbd5b6ad2fc3035db24">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>models <span class="ot">&lt;-</span> <span class="fu">with</span>(smi, <span class="fu">glm</span>(drinkreg<span class="sc">~</span> wave <span class="sc">+</span> sex <span class="sc">+</span> wave<span class="sc">*</span>sex, <span class="at">family =</span> <span class="fu">binomial</span>()))</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">summary</span>(<span class="fu">pool</span>(models, <span class="at">rule =</span> <span class="st">"rubin1987"</span>), <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span>,]</span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt;   term estimate  std.error statistic       df      p.value   2.5 %   97.5 %</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; 2 wave 1.271952 0.06587423  3.651693 234.4974 0.0003212903 1.11714 1.448217</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>For effect modifier sex = 1 (just changing reference)</p>
+</section><section id="for-effect-modifier-sex-1-females-just-changing-reference" class="level4"><h4 class="anchored" data-anchor-id="for-effect-modifier-sex-1-females-just-changing-reference">For effect modifier sex = 1 (females) (just changing reference)</h4>
 <div class="cell" data-hash="missingdata7_cache/html/em1_692a6b81daf7a5659fbf0d067f7911f2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>models2<span class="ot">&lt;-</span><span class="fu">with</span>(smi, <span class="fu">glm</span>(drinkreg<span class="sc">~</span> wave <span class="sc">+</span> <span class="fu">I</span>(sex<span class="sc">==</span><span class="dv">0</span>) <span class="sc">+</span> wave<span class="sc">*</span><span class="fu">I</span>(sex<span class="sc">==</span><span class="dv">0</span>),<span class="at">family=</span><span class="fu">binomial</span>()))</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="fu">summary</span>(<span class="fu">pool</span>(models2, <span class="at">rule =</span> <span class="st">"rubin1987"</span>),<span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span>,]</span>
@@ -1171,7 +1171,7 @@ Important
 <ul>
 <li>Notice the ORs for <code>wave</code> in the above 2 analyses. These are basically our target.</li>
 <li>For proper survey data analysis, you will have to work with design and make sure you subset your subpopulation (those eligible) appropriately.</li>
-</ul></section><section id="simple-slopes-analyses" class="level3"><h3 class="anchored" data-anchor-id="simple-slopes-analyses">Simple slopes analyses</h3>
+</ul></section></section><section id="simple-slopes-analyses" class="level3"><h3 class="anchored" data-anchor-id="simple-slopes-analyses">Simple slopes analyses</h3>
 <p>We perform a simple slopes analysis for each imputed dataset. This analysis helps in understanding the relationship between the predictor and the outcome at specific levels of the moderator.</p>
 <div class="cell" data-hash="missingdata7_cache/html/em2_c0306127998dfa8fe0b90d8d11731b3e">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>a1 <span class="ot">&lt;-</span> <span class="fu">sim_slopes</span>(models[[<span class="dv">1</span>]], <span class="at">pred =</span> wave, <span class="at">modx =</span> sex)</span>

@@ -1,7 +1,7 @@
 ## Exercise (A) {.unnumbered}
 
 ::: callout-tip
-You can download all of the related files in a zip file **accessingEx.zip** from [Github folder](https://github.com/ehsanx/EpiMethods/tree/main/LabExercises/), or just by clicking this link [directly](https://github.com/ehsanx/EpiMethods/raw/main/LabExercises/accessingEx.zip).
+You cannot input any codes on this website but need to download the exercise files on your computer. You can download all of the related files in a zip file **accessingEx.zip** from [Github folder](https://github.com/ehsanx/EpiMethods/tree/main/LabExercises/), or just by clicking this link [directly](https://github.com/ehsanx/EpiMethods/raw/main/LabExercises/accessingEx.zip).
 
 -   Navigate to the GitHub folder (above link) where the ZIP file is located.
 -   Click on the file name (above zip file) to open its preview window.
@@ -15,20 +15,36 @@ We will use the article by @palis2020relationship, [DOI: 10.1080/09638237.2018.1
 -   Download the [CCHS MH topical index](https://gsg.uottawa.ca/data/teaching/escc-cchs/fmgd_pumf/2012/cchs_mh_topical_index.pdf)
 -   Download the [CCHS MH Data Dictionary](https://gsg.uottawa.ca/data/teaching/escc-cchs/fmgd_pumf/2012/cchs_mh_datadictionary.pdf)
 
-## Question I: \[60% grade\]
+## Question 1: [60\% grade]
 
 ### 1(a) Importing dataset
 
 ```{r}
 # Importing dataset
-load("Data/accessing/cchsMH.RData") 
+load("Data/accessing/cchsMH.RData")
 ```
 
 ### 1(b) Subsetting according to eligibility
 
 Subset the dataset according to the eligibility criteria / restriction specified in the paper
 
--   Identify the variable needed for eligibility criteria
+-   Identify the variable needed for eligibility criteria 
+
+**Hint**
+
+-   Read the first paragraph of **Analytic sample** (page 2) for the eligibility criteria
+-   Eligibility criteria was determined based on only **one** variable. Only work with 'YES' category.
+
+```{r}
+# your code here
+
+```
+
+### 1(c) Retaining necessary variables
+
+In the dataset, retain only the variables associated with outcome measure, explanatory variable, potential confounders and survey weight. There should be eight variables (one outcome, one exposure, five confounders, and one survey weight).
+
+Here are the steps: 
 
 -   Identify the outcome variable
 
@@ -38,40 +54,24 @@ Subset the dataset according to the eligibility criteria / restriction specified
 
 -   Identify the survey weight variable
 
+
 -   **Hint**
 
     1.  Read
 
-    -   the first paragraph of **Analytic sample** (page 2) for the eligibility criteria, and
-    -   first and second paragraphs of **Study variables** for rest of the variables,
-    -   third paragraph of the **Statistical analyses** for the survey weights variable.
+       -   first and second paragraphs of **Study variables** for the outcome, explanatory and confounding variables
+       -   third paragraph of the **Statistical analyses** for the survey weights variable.
 
-    2.  eligibility criteria was determined based on **one** variable. Only work with 'YES' category.
-    3.  Outcome variable has a category 'NOT STATED', but for our analysis, we will omit anyone associated with this category.
-    4.  For explanatory variable, we have categories such as DON'T KNOW, REFUSAL and NOT STATED. We will not use these categories (omit anyone with these categories).
-    5.  There were **five** potential confounders.
-    6.  Potentially useful functions:
+    2.  There were **five** potential confounders.
+    3.  Potentially useful functions for this exercise:
 
-    -   [%in%](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/match)
-    -   [levels](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/levels)
-    -   [recode](https://rdrr.io/cran/car/man/recode.html)
-    -   [subset](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/subset)
-    -   [as.factor](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/factor)
-    -   [relevel](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/relevel)
-
-    or [dplyr ways](https://ehsanx.github.io/intro2R/data-analysis-with-dplyr.html):
-
-    -   [filter](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/filter)
-    -   [select](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/select)
-
-```{r}
-# your code here
-
-```
-
-### 1(c) Retaining necessary variables
-
-In the dataset, retain only the variables associated with outcome measure, explanatory variable, potential confounders and survey weight
+      -   [%in%](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/match)
+      -   [levels](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/levels)
+      -   [recode](https://rdrr.io/cran/car/man/recode.html)
+      -   [subset](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/subset)
+      -   [as.factor](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/factor)
+      -   [relevel](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/relevel)
+      -   or [dplyr ways](https://ehsanx.github.io/intro2R/data-analysis-with-dplyr.html): [filter](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/filter), [select](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/select)
 
 ```{r}
 # your code here
@@ -80,8 +80,10 @@ In the dataset, retain only the variables associated with outcome measure, expla
 
 ### 1(d) Creating analytic dataset
 
+Outcome variable has a category 'NOT STATED', but for our analysis, we will omit anyone associated with this category.  Similarly, for explanatory variable, we have categories such as DON'T KNOW, REFUSAL and NOT STATED. We will omit anyone with these categories.
+
 -   Assign missing values for categories such as DON'T KNOW, REFUSAL and NOT STATED.
--   'recode' the variables as shown in Table 1 (choose any function of your choice). Here is an example (but feel free to use other functions. In R there are many other ways to do this same task):
+-   Recode the variables as shown in Table 1 in the article. You can use any function/package of your choice. Here is an example (but feel free to use other functions. In R there are many other ways to do this same task.
 
 ```{r}
 ## your code here
@@ -97,20 +99,16 @@ In the dataset, retain only the variables associated with outcome measure, expla
 
 ### 1(e) Number of columns and variable names
 
-report the number of columns in your analytic dataset, and the variable names.
+Report the number of columns in your analytic dataset, and the variable names.
 
 ```{r}
 # your code here
 
 ```
 
-## Question II: \[20% grade\]
+## Question 2: Table 1 [20\% grade]
 
-### 2(a) Table 1
-
-Reproduce Table 1 presented in the above paper (omit the 'Main source of income' variable). If necessary, drop other variables from the analytic dataset that are not presented in Table 1.
-
-The table you produce should report numbers as follows:
+Reproduce Table 1 presented in the article (or see below). Omit the 'Main source of income' variable from the table. The table you produce should report numbers as follows, with all columns as shown in the table. In other words, the numbers should match.
 
 | Self-rated Mental Health Variable | Total n(%)  | Poor or Fair n(%) | Good n(%)   | Very good or excellent n(%) |
 |------------------|-------------|-------------|-------------|---------------|
@@ -141,7 +139,7 @@ The table you produce should report numbers as follows:
 | \- Not applicable\^h              | 851 (32.4)  | 402 (40.1)        | 263 (29.7)  | 186 (25.1)                  |
 | \- Not Stated\^i                  | 245 (9.3)   | 81 (8.1)a         | 90 (10.2)a  | 74 (10.0)                   |
 
-$^a$ Coefficient of variation between 16.6 and 25.0%. $^b$ Coefficient of variation between 25.1 and 33.3%. $^c$ Coefficient of variation \> 33.3%. $^d$ Employment Income: Wages/salaries or self-employment. $^e$ Worker's compensation: Employment insurance or worker's compensation or social assistance/welfare. $^f$ Senior Benefits: Benefits from Canada or Quebec Pension Plan or job related retirement pensions, superannuation and annuities or RRSP/RRIF of Old Age Security and Guaranteed Income Supplement. $^g$ Other: Dividends/interest or child tax benefit or child support or alimony or other or no income. $^h$ Not applicable: Respondents who live in a household with only one person. The income variable "main source of personal income" is applicable only to those that live in a household of more than one person. $^i$ Not Stated: Question was not answered (don't know, refusal, not stated). - **Hint** - You can produce 1 table with total, and another table stratified by the necessary variable.
+$^a$ Coefficient of variation between 16.6 and 25.0%. $^b$ Coefficient of variation between 25.1 and 33.3%. $^c$ Coefficient of variation \> 33.3%. $^d$ Employment Income: Wages/salaries or self-employment. $^e$ Worker's compensation: Employment insurance or worker's compensation or social assistance/welfare. $^f$ Senior Benefits: Benefits from Canada or Quebec Pension Plan or job related retirement pensions, superannuation and annuities or RRSP/RRIF of Old Age Security and Guaranteed Income Supplement. $^g$ Other: Dividends/interest or child tax benefit or child support or alimony or other or no income. $^h$ Not applicable: Respondents who live in a household with only one person. The income variable "main source of personal income" is applicable only to those that live in a household of more than one person. $^i$ Not Stated: Question was not answered (don't know, refusal, not stated).
 
 ```{r,warning=FALSE,message=FALSE}
 # your code here
@@ -149,7 +147,7 @@ require(tableone)
 
 ```
 
-## Question III: \[20% grade\]
+## Question 3: [20\% grade]
 
 ### 3(a) Subset
 
@@ -171,7 +169,7 @@ Recode self-rated mental health variable and make it a binary variable: 'Good' v
 
 ### 3(c) Regression
 
-Run a logistic regression model for finding the relationship between community belonging (Reference: Very weak) and self-rated mental health (Reference: Poor) among respondents with mental or substance use disorders. Adjust the model for three confounders: sex, age, and race/ethnicity.
+Run a logistic regression model for finding the relationship between community belonging (Reference: Very weak) and self-rated mental health (Reference: Poor) among respondents with mental or substance use disorders. Adjust the model for three confounders: sex, age, and race/ethnicity. Do not need to report summary of the model. 
 
 ```{r}
 # your code here
@@ -180,10 +178,9 @@ Run a logistic regression model for finding the relationship between community b
 
 ### 3(d) Reporting odds ratio
 
-Report the odds ratios and associated confidence intervals (use Publish package).
+Report the odds ratios and associated confidence intervals. Publish or jtools package could be useful to report the odds ratios with confidence intervals.
 
 ```{r,warning=FALSE,message=FALSE}
-require(Publish)
 # your code here
 
 ```

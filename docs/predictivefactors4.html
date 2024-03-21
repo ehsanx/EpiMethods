@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1117,7 +1117,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 </header><p>The following tutorial extends the work from the previous lab and focuses on understanding overfitting, evaluating performance, and function writing in the context of linear modeling for a continuous outcome variable, cholesterol levels.</p>
-<div class="cell" data-hash="predictivefactors4_cache/html/setup_9abadbfe52120dd7659ff1a6a348b0c0">
+<div class="cell" data-hash="predictivefactors4_cache/html/setup_c9250db892c377c04ad75648ba82c2d1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(caret)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(knitr)</span>
@@ -1126,72 +1126,71 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>Load the data saved at the end of previous part of the lab.</p>
-<div class="cell" data-hash="predictivefactors4_cache/html/load_414bb884a8e550c7cee46fa7be627e1f">
+<div class="cell" data-hash="predictivefactors4_cache/html/load_ffaaff63a90eb546cdb6f49eaa0ad306">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will fit the final model that we decided at the end of previous part of the lab.</p>
-<div class="cell" data-hash="predictivefactors4_cache/html/lm_729f97fe0a22b541142d0b9dc10c749e">
+<div class="cell" data-hash="predictivefactors4_cache/html/lm_59f185b5dba7c97797b81c83747448f9">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>formula4 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born + </span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="st">             race + education + married + </span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="st">             income + diastolicBP + systolicBP + </span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="st">             bmi +</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="st">             triglycerides + uric.acid + </span></span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="st">             globulin + calcium + physical.work + physical.recreational + </span></span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="st">             diabetes"</span>)</span>
-<span id="cb3-9"><a href="#cb3-9"></a>formula4</span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt; cholesterol ~ gender + age + born + race + education + married + </span></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;     income + diastolicBP + systolicBP + bmi + triglycerides + </span></span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt;     uric.acid + protein + bilirubin + phosphorus + sodium + potassium + </span></span>
-<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt;     globulin + calcium + physical.work + physical.recreational + </span></span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt;     diabetes</span></span>
-<span id="cb3-15"><a href="#cb3-15"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula4, <span class="at">data =</span> analytic3)</span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="fu">summary</span>(fit4)</span>
-<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; </span></span>
-<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt; lm(formula = formula4, data = analytic3)</span></span>
-<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; </span></span>
-<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; Residuals:</span></span>
-<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
-<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; -115.465  -23.695   -2.598   20.017  177.264 </span></span>
-<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt; </span></span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt;                             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt; (Intercept)               136.871606  51.998527   2.632  0.00853 ** </span></span>
-<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt; genderMale                -13.064857   1.802099  -7.250 5.48e-13 ***</span></span>
-<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt; age                         0.351838   0.056116   6.270 4.22e-10 ***</span></span>
-<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt; bornOthers                  7.877420   1.947498   4.045 5.39e-05 ***</span></span>
-<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt; raceHispanic               -5.790547   2.323010  -2.493  0.01274 *  </span></span>
-<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt; raceOther                  -4.879882   2.781673  -1.754  0.07950 .  </span></span>
-<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt; raceWhite                  -0.847635   2.130149  -0.398  0.69072    </span></span>
-<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt; educationHigh.School        2.851633   1.617435   1.763  0.07801 .  </span></span>
-<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt; educationSchool            -2.446765   3.084409  -0.793  0.42769    </span></span>
-<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt; marriedNever.married       -5.739509   1.997152  -2.874  0.00409 ** </span></span>
-<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt; marriedPreviously.married   0.342206   1.968165   0.174  0.86198    </span></span>
-<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt; incomeBetween.25kto54k     -0.867063   1.990253  -0.436  0.66312    </span></span>
-<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt; incomeBetween.55kto99k      2.462130   2.169757   1.135  0.25658    </span></span>
-<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt; incomeOver100k              2.626046   2.394560   1.097  0.27289    </span></span>
-<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt; diastolicBP                 0.374971   0.062238   6.025 1.93e-09 ***</span></span>
-<span id="cb3-42"><a href="#cb3-42"></a><span class="co">#&gt; systolicBP                  0.029976   0.049515   0.605  0.54497    </span></span>
-<span id="cb3-43"><a href="#cb3-43"></a><span class="co">#&gt; bmi                        -0.309530   0.118927  -2.603  0.00930 ** </span></span>
-<span id="cb3-44"><a href="#cb3-44"></a><span class="co">#&gt; triglycerides               0.124806   0.006427  19.419  &lt; 2e-16 ***</span></span>
-<span id="cb3-45"><a href="#cb3-45"></a><span class="co">#&gt; uric.acid                   1.357242   0.609012   2.229  0.02593 *  </span></span>
-<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt; protein                     4.767008   2.931636   1.626  0.10406    </span></span>
-<span id="cb3-47"><a href="#cb3-47"></a><span class="co">#&gt; bilirubin                  -6.060791   2.593508  -2.337  0.01952 *  </span></span>
-<span id="cb3-48"><a href="#cb3-48"></a><span class="co">#&gt; phosphorus                 -0.076472   1.341957  -0.057  0.95456    </span></span>
-<span id="cb3-49"><a href="#cb3-49"></a><span class="co">#&gt; sodium                     -1.026686   0.347679  -2.953  0.00318 ** </span></span>
-<span id="cb3-50"><a href="#cb3-50"></a><span class="co">#&gt; potassium                   0.893507   2.283488   0.391  0.69561    </span></span>
-<span id="cb3-51"><a href="#cb3-51"></a><span class="co">#&gt; globulin                   -2.198037   3.036091  -0.724  0.46915    </span></span>
-<span id="cb3-52"><a href="#cb3-52"></a><span class="co">#&gt; calcium                    12.202366   2.574400   4.740 2.25e-06 ***</span></span>
-<span id="cb3-53"><a href="#cb3-53"></a><span class="co">#&gt; physical.workYes           -0.439108   1.651078  -0.266  0.79030    </span></span>
-<span id="cb3-54"><a href="#cb3-54"></a><span class="co">#&gt; physical.recreationalYes    1.238756   1.667670   0.743  0.45767    </span></span>
-<span id="cb3-55"><a href="#cb3-55"></a><span class="co">#&gt; diabetesYes               -19.032748   2.158825  -8.816  &lt; 2e-16 ***</span></span>
-<span id="cb3-56"><a href="#cb3-56"></a><span class="co">#&gt; ---</span></span>
-<span id="cb3-57"><a href="#cb3-57"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span id="cb3-58"><a href="#cb3-58"></a><span class="co">#&gt; </span></span>
-<span id="cb3-59"><a href="#cb3-59"></a><span class="co">#&gt; Residual standard error: 35.22 on 2603 degrees of freedom</span></span>
-<span id="cb3-60"><a href="#cb3-60"></a><span class="co">#&gt; Multiple R-squared:  0.2415, Adjusted R-squared:  0.2334 </span></span>
-<span id="cb3-61"><a href="#cb3-61"></a><span class="co">#&gt; F-statistic: 29.61 on 28 and 2603 DF,  p-value: &lt; 2.2e-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="st">             bmi + triglycerides + uric.acid + </span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="st">             protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="st">             globulin + calcium + physical.work + </span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="st">             physical.recreational + diabetes"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8"></a>formula4</span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; cholesterol ~ gender + age + born + race + education + married + </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;     income + diastolicBP + systolicBP + bmi + triglycerides + </span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;     uric.acid + protein + bilirubin + phosphorus + sodium + potassium + </span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt;     globulin + calcium + physical.work + physical.recreational + </span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt;     diabetes</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula4, <span class="at">data =</span> analytic3)</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="fu">summary</span>(fit4)</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; </span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; lm(formula = formula4, data = analytic3)</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt; </span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt; -115.465  -23.695   -2.598   20.017  177.264 </span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; </span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt;                             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt; (Intercept)               136.871606  51.998527   2.632  0.00853 ** </span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt; genderMale                -13.064857   1.802099  -7.250 5.48e-13 ***</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt; age                         0.351838   0.056116   6.270 4.22e-10 ***</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt; bornOthers                  7.877420   1.947498   4.045 5.39e-05 ***</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt; raceHispanic               -5.790547   2.323010  -2.493  0.01274 *  </span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt; raceOther                  -4.879882   2.781673  -1.754  0.07950 .  </span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt; raceWhite                  -0.847635   2.130149  -0.398  0.69072    </span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt; educationHigh.School        2.851633   1.617435   1.763  0.07801 .  </span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt; educationSchool            -2.446765   3.084409  -0.793  0.42769    </span></span>
+<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt; marriedNever.married       -5.739509   1.997152  -2.874  0.00409 ** </span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt; marriedPreviously.married   0.342206   1.968165   0.174  0.86198    </span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt; incomeBetween.25kto54k     -0.867063   1.990253  -0.436  0.66312    </span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt; incomeBetween.55kto99k      2.462130   2.169757   1.135  0.25658    </span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt; incomeOver100k              2.626046   2.394560   1.097  0.27289    </span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt; diastolicBP                 0.374971   0.062238   6.025 1.93e-09 ***</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt; systolicBP                  0.029976   0.049515   0.605  0.54497    </span></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="co">#&gt; bmi                        -0.309530   0.118927  -2.603  0.00930 ** </span></span>
+<span id="cb3-43"><a href="#cb3-43"></a><span class="co">#&gt; triglycerides               0.124806   0.006427  19.419  &lt; 2e-16 ***</span></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co">#&gt; uric.acid                   1.357242   0.609012   2.229  0.02593 *  </span></span>
+<span id="cb3-45"><a href="#cb3-45"></a><span class="co">#&gt; protein                     4.767008   2.931636   1.626  0.10406    </span></span>
+<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt; bilirubin                  -6.060791   2.593508  -2.337  0.01952 *  </span></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="co">#&gt; phosphorus                 -0.076472   1.341957  -0.057  0.95456    </span></span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="co">#&gt; sodium                     -1.026686   0.347679  -2.953  0.00318 ** </span></span>
+<span id="cb3-49"><a href="#cb3-49"></a><span class="co">#&gt; potassium                   0.893507   2.283488   0.391  0.69561    </span></span>
+<span id="cb3-50"><a href="#cb3-50"></a><span class="co">#&gt; globulin                   -2.198037   3.036091  -0.724  0.46915    </span></span>
+<span id="cb3-51"><a href="#cb3-51"></a><span class="co">#&gt; calcium                    12.202366   2.574400   4.740 2.25e-06 ***</span></span>
+<span id="cb3-52"><a href="#cb3-52"></a><span class="co">#&gt; physical.workYes           -0.439108   1.651078  -0.266  0.79030    </span></span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co">#&gt; physical.recreationalYes    1.238756   1.667670   0.743  0.45767    </span></span>
+<span id="cb3-54"><a href="#cb3-54"></a><span class="co">#&gt; diabetesYes               -19.032748   2.158825  -8.816  &lt; 2e-16 ***</span></span>
+<span id="cb3-55"><a href="#cb3-55"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span id="cb3-57"><a href="#cb3-57"></a><span class="co">#&gt; </span></span>
+<span id="cb3-58"><a href="#cb3-58"></a><span class="co">#&gt; Residual standard error: 35.22 on 2603 degrees of freedom</span></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="co">#&gt; Multiple R-squared:  0.2415, Adjusted R-squared:  0.2334 </span></span>
+<span id="cb3-60"><a href="#cb3-60"></a><span class="co">#&gt; F-statistic: 29.61 on 28 and 2603 DF,  p-value: &lt; 2.2e-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="design-matrix" class="level3"><h3 class="anchored" data-anchor-id="design-matrix">Design Matrix</h3>
 <p>Expands factors to a set of dummy variables.</p>
@@ -1209,7 +1208,7 @@ Tip
 </div>
 </div>
 <p>The dimensions of the model matrix are obtained, and the total number of model parameters (<code>p</code>) is calculated.</p>
-<div class="cell" data-hash="predictivefactors4_cache/html/dim_4f6d64134f3a2a6060d91fb03b922206">
+<div class="cell" data-hash="predictivefactors4_cache/html/dim_03e87078a23441f2640ea0adcd53eb02">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">head</span>(<span class="fu">model.matrix</span>(fit4))</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt;    (Intercept) genderMale age bornOthers raceHispanic raceOther raceWhite</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; 1            1          1  62          0            0         0         1</span></span>
@@ -1265,7 +1264,7 @@ Tip
 </div>
 </section><section id="check-prediction" class="level3"><h3 class="anchored" data-anchor-id="check-prediction">Check prediction</h3>
 <p>The observed and predicted cholesterol values are summarized.</p>
-<div class="cell" data-hash="predictivefactors4_cache/html/pred_e7bc0d224e0c4272bc85f7b619ee86a3">
+<div class="cell" data-hash="predictivefactors4_cache/html/pred_be917fdb520ce96b98819a3a6dcd080b">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>obs.y <span class="ot">&lt;-</span> analytic3<span class="sc">$</span>cholesterol</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="fu">summary</span>(obs.y)</span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
@@ -1335,7 +1334,7 @@ Tip
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="coefd">Wikipedia (<a href="#ref-coefd" role="doc-biblioref">2023a</a>)</span></p>
-</div></div><div class="cell" data-hash="predictivefactors4_cache/html/pe_31d84b2f7b0c6fc358d7df2830b18848">
+</div></div><div class="cell" data-hash="predictivefactors4_cache/html/pe_8a900f91136d431cae6713b6c98ebdc1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Find SSE</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>( (obs.y <span class="sc">-</span> pred.y)<span class="sc">^</span><span class="dv">2</span> )</span>
 <span id="cb7-3"><a href="#cb7-3"></a>SSE</span>
@@ -1361,7 +1360,7 @@ Tip
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="anova">Wikipedia (<a href="#ref-anova" role="doc-biblioref">2023b</a>)</span></p>
-</div></div><div class="cell" data-hash="predictivefactors4_cache/html/rmse_5c2dd8879299a1281da189f133af40a3">
+</div></div><div class="cell" data-hash="predictivefactors4_cache/html/rmse_489a6a4905e0a067edfcda08f1ad9527">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Find RMSE</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>Rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(SSE<span class="sc">/</span>(n<span class="sc">-</span>p)) </span>
 <span id="cb8-3"><a href="#cb8-3"></a>Rmse</span>
@@ -1375,7 +1374,7 @@ Tip
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p>See <span class="citation" data-cites="coefd">Wikipedia (<a href="#ref-coefd" role="doc-biblioref">2023a</a>)</span></p>
-</div></div><div class="cell" data-hash="predictivefactors4_cache/html/adjr2_112e8bc13f52da62b43d4fdf6f362494">
+</div></div><div class="cell" data-hash="predictivefactors4_cache/html/adjr2_f534ac0c7ff902f69f1aa809877dd5d4">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Find adj R2</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>adjR2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>R<span class="fl">.2</span>)<span class="sc">*</span>((n<span class="dv">-1</span>)<span class="sc">/</span>(n<span class="sc">-</span>p))</span>
 <span id="cb9-3"><a href="#cb9-3"></a>adjR2</span>
@@ -1390,7 +1389,7 @@ Tip
 <span id="cb10-4"><a href="#cb10-4"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="example-of-a-simple-function" class="level4"><h4 class="anchored" data-anchor-id="example-of-a-simple-function">Example of a simple function</h4>
-<div class="cell" data-hash="predictivefactors4_cache/html/simfunc_1e62e4fb6555cbd4f364595d1d8b34c4">
+<div class="cell" data-hash="predictivefactors4_cache/html/simfunc_3ad7f63c3c891bdcd8861e983e263ad4">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(a,b){</span>
 <span id="cb11-2"><a href="#cb11-2"></a>  result <span class="ot">&lt;-</span> a <span class="sc">+</span> b</span>
 <span id="cb11-3"><a href="#cb11-3"></a>  <span class="fu">return</span>(result)</span>
@@ -1410,7 +1409,7 @@ Tip
 <span id="cb11-17"><a href="#cb11-17"></a><span class="co">#&gt; [1] 11</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="a-bit-more-complicated" class="level4"><h4 class="anchored" data-anchor-id="a-bit-more-complicated">A bit more complicated</h4>
-<div class="cell" data-hash="predictivefactors4_cache/html/compfunc_d831403f2e78e676402262830a5ed239">
+<div class="cell" data-hash="predictivefactors4_cache/html/compfunc_7e777d6c6bf7659a9a1177e5adc02114">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># one argument</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>model.fit <span class="ot">&lt;-</span> <span class="cf">function</span>(data.for.fitting){</span>
 <span id="cb12-3"><a href="#cb12-3"></a>  formulax <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born"</span>)</span>
@@ -1425,7 +1424,7 @@ Tip
 <span id="cb12-12"><a href="#cb12-12"></a><span class="co">#&gt; (Intercept)  genderMale         age  bornOthers </span></span>
 <span id="cb12-13"><a href="#cb12-13"></a><span class="co">#&gt; 176.1286576  -4.8256829   0.3375009   7.7186190</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="predictivefactors4_cache/html/compfunc2_380d4b2ee3d480dc2e599aaf2885a794">
+<div class="cell" data-hash="predictivefactors4_cache/html/compfunc2_7cf9916cbe7766ee455d83823aad5caa">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># adding one more argument: digits</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>model.fit <span class="ot">&lt;-</span> <span class="cf">function</span>(data.for.fitting, <span class="at">digits=</span><span class="dv">2</span>){</span>
 <span id="cb13-3"><a href="#cb13-3"></a>  formulax <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"cholesterol~gender + age + born"</span>)</span>
@@ -1443,7 +1442,7 @@ Tip
 </div>
 </section><section id="function-that-gives-performance-measures" class="level4"><h4 class="anchored" data-anchor-id="function-that-gives-performance-measures">Function that gives performance measures</h4>
 <p>let us create a function that will give us the performance measures:</p>
-<div class="cell" data-hash="predictivefactors4_cache/html/perfom_73429ab358bd9ae1792420255f774200">
+<div class="cell" data-hash="predictivefactors4_cache/html/perfom_5639d49cd3e12f9e9cae8fa48f16078e">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>perform <span class="ot">&lt;-</span> <span class="cf">function</span>(new.data,</span>
 <span id="cb14-2"><a href="#cb14-2"></a>                    model.fit,<span class="at">model.formula=</span><span class="cn">NULL</span>, </span>
 <span id="cb14-3"><a href="#cb14-3"></a>                    <span class="at">y.name =</span> <span class="st">"Y"</span>,</span>

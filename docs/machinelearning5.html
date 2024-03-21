@@ -96,7 +96,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
-<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - Supervised learning">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="Images/machinelearning/enet.png">
@@ -230,7 +230,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -269,7 +269,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1075,6 +1075,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
    
   <ul>
 <li><a href="#read-previously-saved-data" id="toc-read-previously-saved-data" class="nav-link active" data-scroll-target="#read-previously-saved-data">Read previously saved data</a></li>
+  <li><a href="#ridge-lasso-and-elastic-net" id="toc-ridge-lasso-and-elastic-net" class="nav-link" data-scroll-target="#ridge-lasso-and-elastic-net">Ridge, LASSO, and Elastic net</a></li>
   <li><a href="#continuous-outcome" id="toc-continuous-outcome" class="nav-link" data-scroll-target="#continuous-outcome">Continuous outcome</a></li>
   <li><a href="#binary-outcome" id="toc-binary-outcome" class="nav-link" data-scroll-target="#binary-outcome">Binary outcome</a></li>
   <li><a href="#ensemble-methods-type-i" id="toc-ensemble-methods-type-i" class="nav-link" data-scroll-target="#ensemble-methods-type-i">Ensemble methods (Type I)</a></li>
@@ -1107,6 +1108,32 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-3"><a href="#cb1-3"></a>out.formula1 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/form1.RDS"</span>)</span>
 <span id="cb1-4"><a href="#cb1-4"></a>out.formula2 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/form2.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section><section id="ridge-lasso-and-elastic-net" class="level3"><h3 class="anchored" data-anchor-id="ridge-lasso-and-elastic-net">Ridge, LASSO, and Elastic net</h3>
+<p>The traditional regression models (e.g., linear regression, logistic regression) show poor model performance when</p>
+<ul>
+<li>predictors are highly correlated or</li>
+<li>there are many predictors</li>
+</ul>
+<p>In both cases, the variance of the estimated regression coefficients could be highly variable. Hence, the model often results in poor predictions. The general solution to this problem is to reduce the variance at the cost of introducing some bias in the coefficients. This approach is called regularization or shrinking. Since we are interested in overall prediction rather than individual regression coefficients in a prediction context, this shrinkage approach is almost always beneficial for the model’s predictive performance. Ridge, LASSO, and Elastic Net are shrinkage machine learning techniques.</p>
+<ul>
+<li><p><a href="https://en.wikipedia.org/wiki/Ridge_regression">Ridge</a>: Penalizes the sum of squared regression coefficients (the so-called <span class="math inline">\(L_2\)</span> penalty). This approach does not remove irrelevant predictors, but minimizes the impact of the irrelevant predictors. There is a hyperparameter called <span class="math inline">\(\lambda\)</span> (lambda) that determines the amount of shrinkage of the coefficients. The larger <span class="math inline">\(\lambda\)</span> indicates more penalization of the coefficients.</p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Lasso_(statistics)">LASSO</a>: The Least Absolute Shrinkage and Selection Operator (LASSO) is quite similar conceptually to the ridge regression. However, lasso penalizes the sum of the absolute values of regression coefficients (so-called <span class="math inline">\(L_1\)</span> penalty). As a result, a high <span class="math inline">\(\lambda\)</span> value forces many coefficients to be exactly zero in lasso regression, suggesting a reduced model with fewer predictors, which is never the case in ridge regression.</p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Elastic_net_regularization">Elastic Net</a>: The elastic net combines the penalties of ridge regression and lasso to get the best of both methods. Two hyperparameters in the elastic net are <span class="math inline">\(\alpha\)</span> (alpha) and <span class="math inline">\(\lambda\)</span>.</p></li>
+</ul>
+<p>We can use the <code>glmnet</code> function in R to fit these there models.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In glmnet function, <code>alpha = 1</code> for the LASSO, <code>alpha = 0</code> for the ridge, and setting alpha to some value between 0 and 1 is the elastic net model.</p>
+</div>
+</div>
 </section><section id="continuous-outcome" class="level3"><h3 class="anchored" data-anchor-id="continuous-outcome">Continuous outcome</h3>
 <section id="cross-validation-lasso" class="level4"><h4 class="anchored" data-anchor-id="cross-validation-lasso">Cross-validation LASSO</h4>
 <div class="cell">
@@ -1132,11 +1159,11 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; </span></span>
 <span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; No pre-processing</span></span>
 <span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; Summary of sample sizes: 4587, 4589, 4589, 4587, 4588 </span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; Summary of sample sizes: 4589, 4589, 4586, 4587, 4589 </span></span>
 <span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; Resampling results:</span></span>
 <span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; </span></span>
 <span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt;   RMSE      Rsquared    MAE     </span></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt;   25.11222  0.05616564  15.23327</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt;   25.12778  0.05773001  15.22013</span></span>
 <span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; </span></span>
 <span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 1</span></span>
 <span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt; Tuning</span></span>
@@ -1160,11 +1187,11 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt; </span></span>
 <span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt; No pre-processing</span></span>
 <span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; Summary of sample sizes: 4589, 4588, 4586, 4587, 4590 </span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; Summary of sample sizes: 4587, 4588, 4587, 4589, 4589 </span></span>
 <span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; Resampling results:</span></span>
 <span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; </span></span>
 <span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt;   RMSE      Rsquared    MAE     </span></span>
-<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt;   25.07807  0.05802692  15.21686</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt;   25.12456  0.05882567  15.20355</span></span>
 <span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; </span></span>
 <span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 0</span></span>
 <span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; Tuning</span></span>
@@ -1197,8 +1224,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; Summary of sample sizes: 4588, 4588, 4589, 4588, 4587 </span></span>
 <span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; Resampling results:</span></span>
 <span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; </span></span>
-<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt;   ROC        Sens       Spec     </span></span>
-<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt;   0.7563293  0.4669642  0.8559908</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt;   ROC        Sens      Spec     </span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt;   0.7559632  0.466479  0.8543891</span></span>
 <span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; </span></span>
 <span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 1</span></span>
 <span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; Tuning</span></span>
@@ -1227,11 +1254,11 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; </span></span>
 <span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; No pre-processing</span></span>
 <span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; Summary of sample sizes: 4587, 4589, 4589, 4587, 4588 </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; Summary of sample sizes: 4588, 4588, 4588, 4588, 4588 </span></span>
 <span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; Resampling results:</span></span>
 <span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; </span></span>
 <span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt;   ROC        Sens       Spec     </span></span>
-<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt;   0.7526809  0.4575213  0.8516926</span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt;   0.7525711  0.4605064  0.8533099</span></span>
 <span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; </span></span>
 <span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 0</span></span>
 <span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt; Tuning</span></span>
@@ -1262,28 +1289,28 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; </span></span>
 <span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; No pre-processing</span></span>
 <span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; Summary of sample sizes: 4588, 4588, 4589, 4588, 4587 </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; Summary of sample sizes: 4588, 4588, 4589, 4587, 4588 </span></span>
 <span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; Resampling results across tuning parameters:</span></span>
 <span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; </span></span>
 <span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt;   alpha  lambda  ROC        Sens          Spec     </span></span>
-<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt;   0.10   0.05    0.7521327  0.3696011259  0.8976402</span></span>
-<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt;   0.10   0.10    0.7487044  0.2692603978  0.9363286</span></span>
-<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt;   0.10   0.15    0.7439400  0.1723985531  0.9666854</span></span>
-<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt;   0.10   0.20    0.7385722  0.0929039665  0.9860302</span></span>
-<span id="cb6-27"><a href="#cb6-27"></a><span class="co">#&gt;   0.10   0.25    0.7319226  0.0248398207  0.9967771</span></span>
-<span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt;   0.10   0.30    0.7248655  0.0014913028  0.9994631</span></span>
-<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt;   0.15   0.05    0.7514309  0.3532054368  0.9067742</span></span>
-<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt;   0.15   0.10    0.7444457  0.2190881819  0.9519081</span></span>
-<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;   0.15   0.15    0.7357543  0.1018480797  0.9825363</span></span>
-<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt;   0.15   0.20    0.7239679  0.0183820352  0.9967767</span></span>
-<span id="cb6-33"><a href="#cb6-33"></a><span class="co">#&gt;   0.15   0.25    0.7161121  0.0000000000  1.0000000</span></span>
-<span id="cb6-34"><a href="#cb6-34"></a><span class="co">#&gt;   0.15   0.30    0.7099722  0.0000000000  1.0000000</span></span>
-<span id="cb6-35"><a href="#cb6-35"></a><span class="co">#&gt;   0.20   0.05    0.7499058  0.3313531598  0.9164455</span></span>
-<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt;   0.20   0.10    0.7391743  0.1669308544  0.9672223</span></span>
-<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt;   0.20   0.15    0.7234605  0.0422280656  0.9924778</span></span>
-<span id="cb6-38"><a href="#cb6-38"></a><span class="co">#&gt;   0.20   0.20    0.7131578  0.0009937904  0.9994631</span></span>
-<span id="cb6-39"><a href="#cb6-39"></a><span class="co">#&gt;   0.20   0.25    0.7060951  0.0000000000  1.0000000</span></span>
-<span id="cb6-40"><a href="#cb6-40"></a><span class="co">#&gt;   0.20   0.30    0.6948078  0.0000000000  1.0000000</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt;   0.10   0.05    0.7528442  0.3750700591  0.9000559</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt;   0.10   0.10    0.7496720  0.2737182573  0.9363268</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt;   0.10   0.15    0.7448441  0.1728800168  0.9685679</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt;   0.10   0.20    0.7388067  0.0879337802  0.9868352</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="co">#&gt;   0.10   0.25    0.7322999  0.0218633878  0.9959710</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt;   0.10   0.30    0.7252141  0.0004975124  1.0000000</span></span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt;   0.15   0.05    0.7522050  0.3551942521  0.9086537</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt;   0.15   0.10    0.7455831  0.2170968976  0.9513740</span></span>
+<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;   0.15   0.15    0.7359529  0.1023431231  0.9838811</span></span>
+<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt;   0.15   0.20    0.7247676  0.0198758071  0.9957025</span></span>
+<span id="cb6-33"><a href="#cb6-33"></a><span class="co">#&gt;   0.15   0.25    0.7163649  0.0000000000  1.0000000</span></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="co">#&gt;   0.15   0.30    0.7102519  0.0000000000  1.0000000</span></span>
+<span id="cb6-35"><a href="#cb6-35"></a><span class="co">#&gt;   0.20   0.05    0.7506461  0.3338259077  0.9153698</span></span>
+<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt;   0.20   0.10    0.7395549  0.1694023678  0.9691062</span></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt;   0.20   0.15    0.7243135  0.0367665395  0.9930158</span></span>
+<span id="cb6-38"><a href="#cb6-38"></a><span class="co">#&gt;   0.20   0.20    0.7136920  0.0000000000  0.9997315</span></span>
+<span id="cb6-39"><a href="#cb6-39"></a><span class="co">#&gt;   0.20   0.25    0.7065455  0.0000000000  1.0000000</span></span>
+<span id="cb6-40"><a href="#cb6-40"></a><span class="co">#&gt;   0.20   0.30    0.6970550  0.0000000000  1.0000000</span></span>
 <span id="cb6-41"><a href="#cb6-41"></a><span class="co">#&gt; </span></span>
 <span id="cb6-42"><a href="#cb6-42"></a><span class="co">#&gt; ROC was used to select the optimal model using the largest value.</span></span>
 <span id="cb6-43"><a href="#cb6-43"></a><span class="co">#&gt; The final values used for the model were alpha = 0.1 and lambda = 0.05.</span></span>
@@ -1621,7 +1648,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 </li>
 </ul></section><section id="steps" class="level4"><h4 class="anchored" data-anchor-id="steps">Steps</h4>
-<p>Refer to <a href="https://ehsanx.github.io/TMLEworkshop/g-computation-using-ml.html#g-comp-using-superlearner">this tutorial</a> for steps and examples!</p>
+<p>Refer to <a href="https://ehsanx.github.io/TMLEworkshop/g-computation-using-ml.html#g-comp-using-superlearner">this tutorial</a> for steps and examples! Refer to the <a href="machinelearningCausal.html">next chapter</a> for more details.</p>
 </section></section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

@@ -11,11 +11,16 @@ library(WeightedROC)
 
 ### Useful functions 
 
+The functions below could be helpful in 
+
+-  `svyROCw3`: calculating area under the ROC curve (AUC) value with survey data with logistic regression  
+-  `AL.gof3`: testing Archer-Lemeshow goodness of fit for survey data with logistic regression 
+
 ```{r setup1, cache=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
+
+# ROC curve for Survey Data with Logistic Regression
 svyROCw3 <- function(fit=fit7,outcome=analytic2$CVD=="event", weight = NULL,plot=FALSE){
-  # ROC curve for
-  # Survey Data with Logistic Regression
   if (is.null(weight)){ # require(ROCR)
     prob <- predict(fit, type = "response")
   pred <- prediction(as.vector(prob), outcome)
@@ -46,9 +51,10 @@ svyROCw3 <- function(fit=fit7,outcome=analytic2$CVD=="event", weight = NULL,plot
   }
   return(auc)
 }
-AL.gof3 <- function(fit=fit7, data = analytic2, weight = "weight", psu = "psu", strata= "strata"){
-  # Archer-Lemeshow Goodness of Fit Test for
-  # Survey Data with Logistic Regression
+
+# Archer-Lemeshow Goodness of Fit Test for Survey Data with Logistic Regression
+AL.gof3 <- function(fit=fit7, data = analytic2, weight = "weight", psu = "psu", 
+                    strata= "strata"){
   r <- residuals(fit, type="response") 
   f<-fitted(fit) 
   breaks.g <- c(-Inf, quantile(f,  (1:9)/10), Inf)

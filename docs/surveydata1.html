@@ -248,7 +248,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -287,7 +287,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1119,10 +1119,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </div>
   
 
-</header><p>Welcome to this tutorial where we will examine the same research question presented in the <a href="researchquestion3.html">Causal question-1</a> tutorial. Our approach will be enriched this time by working with a more comprehensive set of covariates. We will follow the guidelines from the research article by <span class="citation" data-cites="rahman2013relationship">Rahman et al. (<a href="#ref-rahman2013relationship" role="doc-biblioref">2013</a>)</span> <a href="https://bmjopen.bmj.com/content/3/5/e002624">DOI:10.1136/bmjopen-2013-002624</a>. We will also will work properly with survey feature variables (e.g., sampling weights).</p>
+</header><p>Welcome to this tutorial where we will examine the same research question presented in the <a href="researchquestion3.html">Causal question-1</a> tutorial. Our approach will be enriched this time by working with a more comprehensive set of covariates. We will follow the guidelines from the research article by <span class="citation" data-cites="rahman2013relationship">Rahman et al. (<a href="#ref-rahman2013relationship" role="doc-biblioref">2013</a>)</span> (<a href="https://bmjopen.bmj.com/content/3/5/e002624">DOI:10.1136/bmjopen-2013-002624</a>). We will also will work properly with survey feature variables (e.g., sampling weights).</p>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<p><span class="citation" data-cites="rahman2013relationship">(<a href="#ref-rahman2013relationship" role="doc-biblioref">Rahman et al. 2013</a>)</span></p>
+<p><span class="citation" data-cites="rahman2013relationship">Rahman et al. (<a href="#ref-rahman2013relationship" role="doc-biblioref">2013</a>)</span></p>
 </div></div><section id="remembering-picot" class="level3"><h3 class="anchored" data-anchor-id="remembering-picot">Remembering PICOT</h3>
 <p>Before diving into the data, let’s clarify and remember the research parameters using the PICOT framework:</p>
 <ol type="1">
@@ -1135,7 +1135,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>In addition, we’ll identify potential confounders based on literature to better understand the relationship between exposure and outcome.</p>
 </section><section id="creating-dataset" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="creating-dataset">Creating dataset</h3>
 <p>To start, we’ll load the required R packages:</p>
-<div class="cell" data-hash="surveydata1_cache/html/setup_33d0e13e1460a11b0a6d28d4a5428590">
+<div class="cell" data-hash="surveydata1_cache/html/setup_f6c32f686f11ef22f576a7520da138b3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(survey)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(knitr)</span>
@@ -1155,17 +1155,17 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-9"><a href="#cb2-9"></a></span>
 <span id="cb2-10"><a href="#cb2-10"></a><span class="co"># objects loaded</span></span>
 <span id="cb2-11"><a href="#cb2-11"></a><span class="fu">ls</span>()</span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; [1] "c1" "c2" "c3"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; [1] "c1"              "c2"              "c3"              "has_annotations"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To check the dimensions of each data set:</p>
-<div class="cell" data-hash="surveydata1_cache/html/dim_58e9db97139cd9d407f5eb893dc03df5">
+<div class="cell" data-hash="surveydata1_cache/html/dim_af63e618cadef80ed7cf43be2e764598">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Dimensions</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">dim</span>(c1)</span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; [1] 130880    614</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; [1] 130880    117</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="fu">dim</span>(c2)</span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; [1] 134072   1068</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; [1] 134072    112</span></span>
 <span id="cb3-6"><a href="#cb3-6"></a><span class="fu">dim</span>(c3)</span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; [1] 132221   1284</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; [1] 132221    112</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="subset-the-data-subset-variables" class="level3"><h3 class="anchored" data-anchor-id="subset-the-data-subset-variables">Subset the data (subset variables)</h3>
 <section id="understand-variable-coding" class="level4"><h4 class="anchored" data-anchor-id="understand-variable-coding">Understand variable coding</h4>
@@ -1399,190 +1399,122 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>We define a vector of variable names <code>var.names1</code> that are of interest for the first cycle of the Canadian Community Health Survey (CCHS 1.1). These variables cover a range of topics such as heart disease, age, sex, etc.</li>
 <li>Then we creates a new data frame <code>cc11</code> by subsetting the original data frame <code>c1</code> to include only the columns specified in <code>var.names1</code>.</li>
 </ul>
-<div class="cell" data-hash="surveydata1_cache/html/data1_061837c0212bd853027dab9413631b5e">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>var.names1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CCCA_121"</span>, </span>
-<span id="cb4-2"><a href="#cb4-2"></a>                <span class="st">"CCCA_051"</span>, </span>
-<span id="cb4-3"><a href="#cb4-3"></a>                <span class="st">"CCCA_05A"</span>, </span>
-<span id="cb4-4"><a href="#cb4-4"></a>                <span class="st">"DHHAGAGE"</span>, </span>
-<span id="cb4-5"><a href="#cb4-5"></a>                <span class="st">"DHHA_SEX"</span>, </span>
-<span id="cb4-6"><a href="#cb4-6"></a>                <span class="st">"DHHAGMS"</span>, </span>
-<span id="cb4-7"><a href="#cb4-7"></a>                <span class="st">"SDCAGRAC"</span>, </span>
-<span id="cb4-8"><a href="#cb4-8"></a>                <span class="st">"SDCAFIMM"</span>, </span>
-<span id="cb4-9"><a href="#cb4-9"></a>                <span class="st">"SDCAGRES"</span>, </span>
-<span id="cb4-10"><a href="#cb4-10"></a>                <span class="st">"EDUADR04"</span>, </span>
-<span id="cb4-11"><a href="#cb4-11"></a>                <span class="st">"INCAGHH"</span>, </span>
-<span id="cb4-12"><a href="#cb4-12"></a>                <span class="st">"HWTAGBMI"</span>, </span>
-<span id="cb4-13"><a href="#cb4-13"></a>                <span class="st">"PACADPAI"</span>, </span>
-<span id="cb4-14"><a href="#cb4-14"></a>                <span class="st">"TWDA_5"</span>, </span>
-<span id="cb4-15"><a href="#cb4-15"></a>                <span class="st">"GENA_07"</span>, </span>
-<span id="cb4-16"><a href="#cb4-16"></a>                <span class="st">"SMKADSTY"</span>, </span>
-<span id="cb4-17"><a href="#cb4-17"></a>                <span class="st">"ALCADTYP"</span>, </span>
-<span id="cb4-18"><a href="#cb4-18"></a>                <span class="st">"FVCADTOT"</span>, </span>
-<span id="cb4-19"><a href="#cb4-19"></a>                <span class="st">"CCCA_071"</span>,</span>
-<span id="cb4-20"><a href="#cb4-20"></a>                <span class="st">"CCCA_91B"</span>,</span>
-<span id="cb4-21"><a href="#cb4-21"></a>                <span class="st">"CCCA_101"</span>,</span>
-<span id="cb4-22"><a href="#cb4-22"></a>                <span class="st">"GEOAGPRV"</span>,</span>
-<span id="cb4-23"><a href="#cb4-23"></a>                <span class="st">"WTSAM"</span>)</span>
-<span id="cb4-24"><a href="#cb4-24"></a>cc11 <span class="ot">&lt;-</span> c1[var.names1]</span>
-<span id="cb4-25"><a href="#cb4-25"></a><span class="fu">dim</span>(cc11)</span>
-<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; [1] 130880     23</span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="fu">table</span>(cc11<span class="sc">$</span>CCCA_051)</span>
-<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; </span></span>
-<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
-<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;          24511         106231              0            110              3 </span></span>
-<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt;     NOT STATED </span></span>
-<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt;             25</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="surveydata1_cache/html/data1_b5d46bcac7c93c9ea182785f322cceed">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>var.names1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CCCA_121"</span>, <span class="st">"CCCA_051"</span>, <span class="st">"CCCA_05A"</span>, <span class="st">"DHHAGAGE"</span>, </span>
+<span id="cb4-2"><a href="#cb4-2"></a>                <span class="st">"DHHA_SEX"</span>, <span class="st">"DHHAGMS"</span>, <span class="st">"SDCAGRAC"</span>, <span class="st">"SDCAFIMM"</span>, </span>
+<span id="cb4-3"><a href="#cb4-3"></a>                <span class="st">"SDCAGRES"</span>, <span class="st">"EDUADR04"</span>, <span class="st">"INCAGHH"</span>, <span class="st">"HWTAGBMI"</span>, </span>
+<span id="cb4-4"><a href="#cb4-4"></a>                <span class="st">"PACADPAI"</span>, <span class="st">"TWDA_5"</span>, <span class="st">"GENA_07"</span>, <span class="st">"SMKADSTY"</span>, </span>
+<span id="cb4-5"><a href="#cb4-5"></a>                <span class="st">"ALCADTYP"</span>, <span class="st">"FVCADTOT"</span>, <span class="st">"CCCA_071"</span>, <span class="st">"CCCA_91B"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6"></a>                <span class="st">"CCCA_101"</span>, <span class="st">"GEOAGPRV"</span>, <span class="st">"WTSAM"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>cc11 <span class="ot">&lt;-</span> c1[var.names1]</span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="fu">dim</span>(cc11)</span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; [1] 130880     23</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="fu">table</span>(cc11<span class="sc">$</span>CCCA_051)</span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt;          24511         106231              0            110              3 </span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt;     NOT STATED </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt;             25</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The subsequent two code chunks do the same for CCHS 2.1 and CCHS 3.1, respectively, resulting in new data frames <code>cc21</code> and <code>cc31</code>.</p>
 </section><section id="cycle-2.1" class="level5"><h5 class="anchored" data-anchor-id="cycle-2.1">Cycle 2.1</h5>
-<div class="cell" data-hash="surveydata1_cache/html/data2_b48c63a4a10a163d2c1e1ee95092f3b1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>var.names2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CCCC_121"</span>, </span>
-<span id="cb5-2"><a href="#cb5-2"></a>                <span class="st">"CCCC_051"</span>, </span>
-<span id="cb5-3"><a href="#cb5-3"></a>                <span class="st">"CCCC_05A"</span>, </span>
-<span id="cb5-4"><a href="#cb5-4"></a>                <span class="st">"DHHCGAGE"</span>, </span>
-<span id="cb5-5"><a href="#cb5-5"></a>                <span class="st">"DHHC_SEX"</span>, </span>
-<span id="cb5-6"><a href="#cb5-6"></a>                <span class="st">"DHHCGMS"</span>, </span>
-<span id="cb5-7"><a href="#cb5-7"></a>                <span class="st">"SDCCGRAC"</span>, </span>
-<span id="cb5-8"><a href="#cb5-8"></a>                <span class="st">"SDCCFIMM"</span>, </span>
-<span id="cb5-9"><a href="#cb5-9"></a>                <span class="st">"SDCCGRES"</span>, </span>
-<span id="cb5-10"><a href="#cb5-10"></a>                <span class="st">"EDUCDR04"</span>, </span>
-<span id="cb5-11"><a href="#cb5-11"></a>                <span class="st">"INCCGHH"</span>, </span>
-<span id="cb5-12"><a href="#cb5-12"></a>                <span class="st">"HWTCGBMI"</span>, </span>
-<span id="cb5-13"><a href="#cb5-13"></a>                <span class="st">"PACCDPAI"</span>, </span>
-<span id="cb5-14"><a href="#cb5-14"></a>                <span class="st">"HCUC_1AA"</span>, </span>
-<span id="cb5-15"><a href="#cb5-15"></a>                <span class="st">"GENC_07"</span>, </span>
-<span id="cb5-16"><a href="#cb5-16"></a>                <span class="st">"SMKCDSTY"</span>, </span>
-<span id="cb5-17"><a href="#cb5-17"></a>                <span class="st">"ALCCDTYP"</span>, </span>
-<span id="cb5-18"><a href="#cb5-18"></a>                <span class="st">"FVCCDTOT"</span>, </span>
-<span id="cb5-19"><a href="#cb5-19"></a>                <span class="st">"CCCC_071"</span>,</span>
-<span id="cb5-20"><a href="#cb5-20"></a>                <span class="st">"CCCC_91B"</span>,</span>
-<span id="cb5-21"><a href="#cb5-21"></a>                <span class="st">"CCCC_101"</span>,</span>
-<span id="cb5-22"><a href="#cb5-22"></a>                <span class="st">"GEOCGPRV"</span>,</span>
-<span id="cb5-23"><a href="#cb5-23"></a>                <span class="st">"WTSC_M"</span>)</span>
-<span id="cb5-24"><a href="#cb5-24"></a>cc21 <span class="ot">&lt;-</span> c2[var.names2]</span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="fu">dim</span>(cc21)</span>
-<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; [1] 134072     23</span></span>
-<span id="cb5-27"><a href="#cb5-27"></a><span class="fu">table</span>(cc21<span class="sc">$</span>CCCC_051)</span>
-<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt; </span></span>
-<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
-<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt;          29293         104530              0            208             11 </span></span>
-<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt;     NOT STATED </span></span>
-<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt;             30</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="surveydata1_cache/html/data2_173d344dd2b5c5dae51e1f4bf1a157e5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>var.names2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CCCC_121"</span>, <span class="st">"CCCC_051"</span>, <span class="st">"CCCC_05A"</span>, <span class="st">"DHHCGAGE"</span>, </span>
+<span id="cb5-2"><a href="#cb5-2"></a>                <span class="st">"DHHC_SEX"</span>, <span class="st">"DHHCGMS"</span>, <span class="st">"SDCCGRAC"</span>, <span class="st">"SDCCFIMM"</span>, </span>
+<span id="cb5-3"><a href="#cb5-3"></a>                <span class="st">"SDCCGRES"</span>, <span class="st">"EDUCDR04"</span>, <span class="st">"INCCGHH"</span>, <span class="st">"HWTCGBMI"</span>, </span>
+<span id="cb5-4"><a href="#cb5-4"></a>                <span class="st">"PACCDPAI"</span>, <span class="st">"HCUC_1AA"</span>, <span class="st">"GENC_07"</span>, <span class="st">"SMKCDSTY"</span>, </span>
+<span id="cb5-5"><a href="#cb5-5"></a>                <span class="st">"ALCCDTYP"</span>, <span class="st">"FVCCDTOT"</span>, <span class="st">"CCCC_071"</span>, <span class="st">"CCCC_91B"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>                <span class="st">"CCCC_101"</span>, <span class="st">"GEOCGPRV"</span>, <span class="st">"WTSC_M"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7"></a>cc21 <span class="ot">&lt;-</span> c2[var.names2]</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">dim</span>(cc21)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; [1] 134072     23</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="fu">table</span>(cc21<span class="sc">$</span>CCCC_051)</span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;          29293         104530              0            208             11 </span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;     NOT STATED </span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;             30</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="cycle-3.1" class="level5"><h5 class="anchored" data-anchor-id="cycle-3.1">Cycle 3.1</h5>
-<div class="cell" data-hash="surveydata1_cache/html/data3_5a383e6ffe8067436b363cc541faf486">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>var.names3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CCCE_121"</span>, </span>
-<span id="cb6-2"><a href="#cb6-2"></a>                <span class="st">"CCCE_051"</span>, </span>
-<span id="cb6-3"><a href="#cb6-3"></a>                <span class="st">"CCCE_05A"</span>, </span>
-<span id="cb6-4"><a href="#cb6-4"></a>                <span class="st">"DHHEGAGE"</span>, </span>
-<span id="cb6-5"><a href="#cb6-5"></a>                <span class="st">"DHHE_SEX"</span>, </span>
-<span id="cb6-6"><a href="#cb6-6"></a>                <span class="st">"DHHEGMS"</span>, </span>
-<span id="cb6-7"><a href="#cb6-7"></a>                <span class="st">"SDCEGCGT"</span>, </span>
-<span id="cb6-8"><a href="#cb6-8"></a>                <span class="st">"SDCEFIMM"</span>, </span>
-<span id="cb6-9"><a href="#cb6-9"></a>                <span class="st">"SDCEGRES"</span>, </span>
-<span id="cb6-10"><a href="#cb6-10"></a>                <span class="st">"EDUEDR04"</span>, </span>
-<span id="cb6-11"><a href="#cb6-11"></a>                <span class="st">"INCEGHH"</span>, </span>
-<span id="cb6-12"><a href="#cb6-12"></a>                <span class="st">"HWTEGBMI"</span>, </span>
-<span id="cb6-13"><a href="#cb6-13"></a>                <span class="st">"PACEDPAI"</span>, </span>
-<span id="cb6-14"><a href="#cb6-14"></a>                <span class="st">"HCUE_1AA"</span>, </span>
-<span id="cb6-15"><a href="#cb6-15"></a>                <span class="st">"GENE_07"</span>, </span>
-<span id="cb6-16"><a href="#cb6-16"></a>                <span class="st">"SMKEDSTY"</span>, </span>
-<span id="cb6-17"><a href="#cb6-17"></a>                <span class="st">"ALCEDTYP"</span>, </span>
-<span id="cb6-18"><a href="#cb6-18"></a>                <span class="st">"FVCEDTOT"</span>, </span>
-<span id="cb6-19"><a href="#cb6-19"></a>                <span class="st">"CCCE_071"</span>, </span>
-<span id="cb6-20"><a href="#cb6-20"></a>                <span class="st">"CCCE_91F"</span>, </span>
-<span id="cb6-21"><a href="#cb6-21"></a>                <span class="st">"CCCE_101"</span>, </span>
-<span id="cb6-22"><a href="#cb6-22"></a>                <span class="st">"GEOEGPRV"</span>, </span>
-<span id="cb6-23"><a href="#cb6-23"></a>                <span class="st">"WTSE_M"</span>)</span>
-<span id="cb6-24"><a href="#cb6-24"></a>cc31 <span class="ot">&lt;-</span> c3[var.names3]</span>
-<span id="cb6-25"><a href="#cb6-25"></a><span class="fu">dim</span>(cc31)</span>
-<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt; [1] 132221     23</span></span>
-<span id="cb6-27"><a href="#cb6-27"></a><span class="fu">table</span>(cc31<span class="sc">$</span>CCCE_051)</span>
-<span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt; </span></span>
-<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
-<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt;          28221         103781              0            191              4 </span></span>
-<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;     NOT STATED </span></span>
-<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt;             24</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="surveydata1_cache/html/data3_ad51cc16e35d51f4d9b1612fc7d08828">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>var.names3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CCCE_121"</span>, <span class="st">"CCCE_051"</span>, <span class="st">"CCCE_05A"</span>, <span class="st">"DHHEGAGE"</span>, </span>
+<span id="cb6-2"><a href="#cb6-2"></a>                <span class="st">"DHHE_SEX"</span>, <span class="st">"DHHEGMS"</span>, <span class="st">"SDCEGCGT"</span>, <span class="st">"SDCEFIMM"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3"></a>                <span class="st">"SDCEGRES"</span>, <span class="st">"EDUEDR04"</span>, <span class="st">"INCEGHH"</span>, <span class="st">"HWTEGBMI"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4"></a>                <span class="st">"PACEDPAI"</span>, <span class="st">"HCUE_1AA"</span>, <span class="st">"GENE_07"</span>, <span class="st">"SMKEDSTY"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5"></a>                <span class="st">"ALCEDTYP"</span>, <span class="st">"FVCEDTOT"</span>,<span class="st">"CCCE_071"</span>, <span class="st">"CCCE_91F"</span>, </span>
+<span id="cb6-6"><a href="#cb6-6"></a>                <span class="st">"CCCE_101"</span>, <span class="st">"GEOEGPRV"</span>, <span class="st">"WTSE_M"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7"></a>cc31 <span class="ot">&lt;-</span> c3[var.names3]</span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="fu">dim</span>(cc31)</span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; [1] 132221     23</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="fu">table</span>(cc31<span class="sc">$</span>CCCE_051)</span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;          28221         103781              0            191              4 </span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;     NOT STATED </span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;             24</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section></section><section id="making-variable-names-the-same" class="level3"><h3 class="anchored" data-anchor-id="making-variable-names-the-same">Making variable names the same</h3>
 <p>We now create a new set of more readable and consistent variable names.</p>
-<div class="cell" data-hash="surveydata1_cache/html/data4_02f090769eb35d07542448c9f5e5c1cc">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>new.var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CVD"</span>, </span>
-<span id="cb7-2"><a href="#cb7-2"></a>                   <span class="st">"arthritis"</span>, </span>
-<span id="cb7-3"><a href="#cb7-3"></a>                   <span class="st">"arthritis.kind"</span>, </span>
-<span id="cb7-4"><a href="#cb7-4"></a>                   <span class="st">"age"</span>, </span>
-<span id="cb7-5"><a href="#cb7-5"></a>                   <span class="st">"sex"</span>, </span>
-<span id="cb7-6"><a href="#cb7-6"></a>                   <span class="st">"married"</span>, </span>
-<span id="cb7-7"><a href="#cb7-7"></a>                   <span class="st">"race"</span>, </span>
-<span id="cb7-8"><a href="#cb7-8"></a>                   <span class="st">"immigration"</span>, </span>
-<span id="cb7-9"><a href="#cb7-9"></a>                   <span class="st">"recent.immigrant"</span>, </span>
-<span id="cb7-10"><a href="#cb7-10"></a>                   <span class="st">"edu"</span>, </span>
-<span id="cb7-11"><a href="#cb7-11"></a>                   <span class="st">"income"</span>, </span>
-<span id="cb7-12"><a href="#cb7-12"></a>                   <span class="st">"bmi"</span>, </span>
-<span id="cb7-13"><a href="#cb7-13"></a>                   <span class="st">"phyact"</span>, </span>
-<span id="cb7-14"><a href="#cb7-14"></a>                   <span class="st">"doctor"</span>, </span>
-<span id="cb7-15"><a href="#cb7-15"></a>                   <span class="st">"stress"</span>, </span>
-<span id="cb7-16"><a href="#cb7-16"></a>                   <span class="st">"smoke"</span>, </span>
-<span id="cb7-17"><a href="#cb7-17"></a>                   <span class="st">"drink"</span>, </span>
-<span id="cb7-18"><a href="#cb7-18"></a>                   <span class="st">"fruit"</span>, </span>
-<span id="cb7-19"><a href="#cb7-19"></a>                   <span class="st">"bp"</span>, </span>
-<span id="cb7-20"><a href="#cb7-20"></a>                   <span class="st">"copd"</span>, </span>
-<span id="cb7-21"><a href="#cb7-21"></a>                   <span class="st">"diab"</span>,  </span>
-<span id="cb7-22"><a href="#cb7-22"></a>                   <span class="st">"province"</span>, </span>
-<span id="cb7-23"><a href="#cb7-23"></a>                   <span class="st">"weight"</span>)</span>
-<span id="cb7-24"><a href="#cb7-24"></a><span class="fu">cbind</span>(new.var.names, var.names1, var.names2, var.names3)</span>
-<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt;       new.var.names      var.names1 var.names2 var.names3</span></span>
-<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt;  [1,] "CVD"              "CCCA_121" "CCCC_121" "CCCE_121"</span></span>
-<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt;  [2,] "arthritis"        "CCCA_051" "CCCC_051" "CCCE_051"</span></span>
-<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt;  [3,] "arthritis.kind"   "CCCA_05A" "CCCC_05A" "CCCE_05A"</span></span>
-<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt;  [4,] "age"              "DHHAGAGE" "DHHCGAGE" "DHHEGAGE"</span></span>
-<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt;  [5,] "sex"              "DHHA_SEX" "DHHC_SEX" "DHHE_SEX"</span></span>
-<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt;  [6,] "married"          "DHHAGMS"  "DHHCGMS"  "DHHEGMS" </span></span>
-<span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt;  [7,] "race"             "SDCAGRAC" "SDCCGRAC" "SDCEGCGT"</span></span>
-<span id="cb7-33"><a href="#cb7-33"></a><span class="co">#&gt;  [8,] "immigration"      "SDCAFIMM" "SDCCFIMM" "SDCEFIMM"</span></span>
-<span id="cb7-34"><a href="#cb7-34"></a><span class="co">#&gt;  [9,] "recent.immigrant" "SDCAGRES" "SDCCGRES" "SDCEGRES"</span></span>
-<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt; [10,] "edu"              "EDUADR04" "EDUCDR04" "EDUEDR04"</span></span>
-<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt; [11,] "income"           "INCAGHH"  "INCCGHH"  "INCEGHH" </span></span>
-<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt; [12,] "bmi"              "HWTAGBMI" "HWTCGBMI" "HWTEGBMI"</span></span>
-<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt; [13,] "phyact"           "PACADPAI" "PACCDPAI" "PACEDPAI"</span></span>
-<span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt; [14,] "doctor"           "TWDA_5"   "HCUC_1AA" "HCUE_1AA"</span></span>
-<span id="cb7-40"><a href="#cb7-40"></a><span class="co">#&gt; [15,] "stress"           "GENA_07"  "GENC_07"  "GENE_07" </span></span>
-<span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt; [16,] "smoke"            "SMKADSTY" "SMKCDSTY" "SMKEDSTY"</span></span>
-<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt; [17,] "drink"            "ALCADTYP" "ALCCDTYP" "ALCEDTYP"</span></span>
-<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt; [18,] "fruit"            "FVCADTOT" "FVCCDTOT" "FVCEDTOT"</span></span>
-<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt; [19,] "bp"               "CCCA_071" "CCCC_071" "CCCE_071"</span></span>
-<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt; [20,] "copd"             "CCCA_91B" "CCCC_91B" "CCCE_91F"</span></span>
-<span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt; [21,] "diab"             "CCCA_101" "CCCC_101" "CCCE_101"</span></span>
-<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt; [22,] "province"         "GEOAGPRV" "GEOCGPRV" "GEOEGPRV"</span></span>
-<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt; [23,] "weight"           "WTSAM"    "WTSC_M"   "WTSE_M"</span></span>
-<span id="cb7-49"><a href="#cb7-49"></a><span class="fu">names</span>(cc11) <span class="ot">&lt;-</span> <span class="fu">names</span>(cc21) <span class="ot">&lt;-</span> <span class="fu">names</span>(cc31) <span class="ot">&lt;-</span> new.var.names</span>
-<span id="cb7-50"><a href="#cb7-50"></a></span>
-<span id="cb7-51"><a href="#cb7-51"></a><span class="fu">table</span>(cc11<span class="sc">$</span>arthritis)</span>
-<span id="cb7-52"><a href="#cb7-52"></a><span class="co">#&gt; </span></span>
-<span id="cb7-53"><a href="#cb7-53"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
-<span id="cb7-54"><a href="#cb7-54"></a><span class="co">#&gt;          24511         106231              0            110              3 </span></span>
-<span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt;     NOT STATED </span></span>
-<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt;             25</span></span>
-<span id="cb7-57"><a href="#cb7-57"></a><span class="fu">table</span>(cc21<span class="sc">$</span>arthritis)</span>
-<span id="cb7-58"><a href="#cb7-58"></a><span class="co">#&gt; </span></span>
-<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
-<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt;          29293         104530              0            208             11 </span></span>
-<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt;     NOT STATED </span></span>
-<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt;             30</span></span>
-<span id="cb7-63"><a href="#cb7-63"></a><span class="fu">table</span>(cc31<span class="sc">$</span>arthritis)</span>
-<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt; </span></span>
-<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
-<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt;          28221         103781              0            191              4 </span></span>
-<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt;     NOT STATED </span></span>
-<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt;             24</span></span>
-<span id="cb7-69"><a href="#cb7-69"></a></span>
-<span id="cb7-70"><a href="#cb7-70"></a>cc11<span class="sc">$</span>cycle <span class="ot">&lt;-</span> <span class="dv">11</span></span>
-<span id="cb7-71"><a href="#cb7-71"></a>cc21<span class="sc">$</span>cycle <span class="ot">&lt;-</span> <span class="dv">21</span></span>
-<span id="cb7-72"><a href="#cb7-72"></a>cc31<span class="sc">$</span>cycle <span class="ot">&lt;-</span> <span class="dv">31</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="surveydata1_cache/html/data4_15a901384a07874a79d7a8452d76e857">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>new.var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CVD"</span>, <span class="st">"arthritis"</span>, <span class="st">"arthritis.kind"</span>, <span class="st">"age"</span>, </span>
+<span id="cb7-2"><a href="#cb7-2"></a>                   <span class="st">"sex"</span>, <span class="st">"married"</span>, <span class="st">"race"</span>, <span class="st">"immigration"</span>, </span>
+<span id="cb7-3"><a href="#cb7-3"></a>                   <span class="st">"recent.immigrant"</span>, <span class="st">"edu"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>, </span>
+<span id="cb7-4"><a href="#cb7-4"></a>                   <span class="st">"phyact"</span>, <span class="st">"doctor"</span>, <span class="st">"stress"</span>, <span class="st">"smoke"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5"></a>                   <span class="st">"drink"</span>, <span class="st">"fruit"</span>, <span class="st">"bp"</span>, <span class="st">"copd"</span>, </span>
+<span id="cb7-6"><a href="#cb7-6"></a>                   <span class="st">"diab"</span>,  <span class="st">"province"</span>, <span class="st">"weight"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="fu">cbind</span>(new.var.names, var.names1, var.names2, var.names3)</span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt;       new.var.names      var.names1 var.names2 var.names3</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt;  [1,] "CVD"              "CCCA_121" "CCCC_121" "CCCE_121"</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;  [2,] "arthritis"        "CCCA_051" "CCCC_051" "CCCE_051"</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt;  [3,] "arthritis.kind"   "CCCA_05A" "CCCC_05A" "CCCE_05A"</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt;  [4,] "age"              "DHHAGAGE" "DHHCGAGE" "DHHEGAGE"</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt;  [5,] "sex"              "DHHA_SEX" "DHHC_SEX" "DHHE_SEX"</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt;  [6,] "married"          "DHHAGMS"  "DHHCGMS"  "DHHEGMS" </span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt;  [7,] "race"             "SDCAGRAC" "SDCCGRAC" "SDCEGCGT"</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt;  [8,] "immigration"      "SDCAFIMM" "SDCCFIMM" "SDCEFIMM"</span></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt;  [9,] "recent.immigrant" "SDCAGRES" "SDCCGRES" "SDCEGRES"</span></span>
+<span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt; [10,] "edu"              "EDUADR04" "EDUCDR04" "EDUEDR04"</span></span>
+<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt; [11,] "income"           "INCAGHH"  "INCCGHH"  "INCEGHH" </span></span>
+<span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt; [12,] "bmi"              "HWTAGBMI" "HWTCGBMI" "HWTEGBMI"</span></span>
+<span id="cb7-21"><a href="#cb7-21"></a><span class="co">#&gt; [13,] "phyact"           "PACADPAI" "PACCDPAI" "PACEDPAI"</span></span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt; [14,] "doctor"           "TWDA_5"   "HCUC_1AA" "HCUE_1AA"</span></span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt; [15,] "stress"           "GENA_07"  "GENC_07"  "GENE_07" </span></span>
+<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt; [16,] "smoke"            "SMKADSTY" "SMKCDSTY" "SMKEDSTY"</span></span>
+<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt; [17,] "drink"            "ALCADTYP" "ALCCDTYP" "ALCEDTYP"</span></span>
+<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt; [18,] "fruit"            "FVCADTOT" "FVCCDTOT" "FVCEDTOT"</span></span>
+<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt; [19,] "bp"               "CCCA_071" "CCCC_071" "CCCE_071"</span></span>
+<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt; [20,] "copd"             "CCCA_91B" "CCCC_91B" "CCCE_91F"</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt; [21,] "diab"             "CCCA_101" "CCCC_101" "CCCE_101"</span></span>
+<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt; [22,] "province"         "GEOAGPRV" "GEOCGPRV" "GEOEGPRV"</span></span>
+<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt; [23,] "weight"           "WTSAM"    "WTSC_M"   "WTSE_M"</span></span>
+<span id="cb7-32"><a href="#cb7-32"></a><span class="fu">names</span>(cc11) <span class="ot">&lt;-</span> <span class="fu">names</span>(cc21) <span class="ot">&lt;-</span> <span class="fu">names</span>(cc31) <span class="ot">&lt;-</span> new.var.names</span>
+<span id="cb7-33"><a href="#cb7-33"></a></span>
+<span id="cb7-34"><a href="#cb7-34"></a><span class="fu">table</span>(cc11<span class="sc">$</span>arthritis)</span>
+<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt; </span></span>
+<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
+<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt;          24511         106231              0            110              3 </span></span>
+<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt;     NOT STATED </span></span>
+<span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt;             25</span></span>
+<span id="cb7-40"><a href="#cb7-40"></a><span class="fu">table</span>(cc21<span class="sc">$</span>arthritis)</span>
+<span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt; </span></span>
+<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
+<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt;          29293         104530              0            208             11 </span></span>
+<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt;     NOT STATED </span></span>
+<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt;             30</span></span>
+<span id="cb7-46"><a href="#cb7-46"></a><span class="fu">table</span>(cc31<span class="sc">$</span>arthritis)</span>
+<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt; </span></span>
+<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
+<span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt;          28221         103781              0            191              4 </span></span>
+<span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt;     NOT STATED </span></span>
+<span id="cb7-51"><a href="#cb7-51"></a><span class="co">#&gt;             24</span></span>
+<span id="cb7-52"><a href="#cb7-52"></a></span>
+<span id="cb7-53"><a href="#cb7-53"></a>cc11<span class="sc">$</span>cycle <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb7-54"><a href="#cb7-54"></a>cc21<span class="sc">$</span>cycle <span class="ot">&lt;-</span> <span class="dv">21</span></span>
+<span id="cb7-55"><a href="#cb7-55"></a>cc31<span class="sc">$</span>cycle <span class="ot">&lt;-</span> <span class="dv">31</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="appending" class="level3"><h3 class="anchored" data-anchor-id="appending">Appending</h3>
 <p>We now combine the data frames <code>cc11</code>, <code>cc21</code>, and <code>cc31</code> by stacking them on top of each other.</p>
-<div class="cell" data-hash="surveydata1_cache/html/append_5457a603a03c224c6903a51c7890cd48">
+<div class="cell" data-hash="surveydata1_cache/html/append_56570de2cf30ab676ad48eac5481c656">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>cc123a <span class="ot">&lt;-</span> <span class="fu">rbind</span>(cc11,cc21,cc31)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="fu">dim</span>(cc123a)</span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; [1] 397173     24</span></span>
@@ -1598,14 +1530,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section><section id="variables" class="level3"><h3 class="anchored" data-anchor-id="variables">Variables</h3>
 <section id="sampling-weight" class="level4"><h4 class="anchored" data-anchor-id="sampling-weight">Sampling weight</h4>
 <p>We use the <code>summary</code> function to provide basic statistics (like mean, median, min, max, etc.) for the <code>weight</code> column in the data frame <code>cc123a</code>.</p>
-<div class="cell" data-hash="surveydata1_cache/html/summ_0cdc39b3e39ef2410ce6813fae47eaf2">
+<div class="cell" data-hash="surveydata1_cache/html/summ_970a088b946ee77e657cb2cf8adf11d7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">summary</span>(cc123a<span class="sc">$</span>weight)</span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt;    1.17   65.28  126.63  200.09  243.21 7154.95</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="exposure" class="level4"><h4 class="anchored" data-anchor-id="exposure">Exposure</h4>
 <p>This following chunk creates frequency tables for the ‘arthritis’ and ‘arthritis.kind’ columns.</p>
-<div class="cell" data-hash="surveydata1_cache/html/tab0_cffcfaae6098a962199d81a6ccefbbed">
+<div class="cell" data-hash="surveydata1_cache/html/tab0_6f8eb35768bc2e5a0ea2e61a13286ecf">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">table</span>(cc123a<span class="sc">$</span>arthritis)</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt; </span></span>
 <span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
@@ -1624,7 +1556,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-16"><a href="#cb10-16"></a><span class="co">#&gt; [1] 314542</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We create the exposure variable with exposure status vs controls.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recodeOA_9ef5f14f7ba13cfb7a9c2068d7fa6605">
+<div class="cell" data-hash="surveydata1_cache/html/recodeOA_d99b441a0ca2a8c6f410f1c2eb13ed68">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>c123sub1 <span class="ot">&lt;-</span> cc123a</span>
 <span id="cb11-2"><a href="#cb11-2"></a>c123sub1<span class="sc">$</span>arthritis.kind <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub1<span class="sc">$</span>arthritis.kind, </span>
 <span id="cb11-3"><a href="#cb11-3"></a>                            <span class="st">"'OSTEOARTHRITIS'='OSTEOARTHRITIS';</span></span>
@@ -1636,7 +1568,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt; NOT APPLICABLE OSTEOARTHRITIS           &lt;NA&gt; </span></span>
 <span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt;         314542          40943          41688</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="surveydata1_cache/html/recode1_3c858f4096f605a3ea8125e1a464ae0b">
+<div class="cell" data-hash="surveydata1_cache/html/recode1_c899314cc583ae8efd7847acb2bb521c">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># c123sub1 &lt;- subset(cc123a, arthritis.kind == "OSTEOARTHRITIS" | </span></span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="co">#                      arthritis.kind == "NOT APPLICABLE" )</span></span>
 <span id="cb12-3"><a href="#cb12-3"></a><span class="co"># dim(c123sub1)</span></span>
@@ -1669,7 +1601,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="outcome" class="level4"><h4 class="anchored" data-anchor-id="outcome">Outcome</h4>
 <p>We create the outcome variable.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recodecvd_b716d1c43ad6a98aaf0ef2d00ab9a234">
+<div class="cell" data-hash="surveydata1_cache/html/recodecvd_6ade4eb6b8e6beab852b91f8e76aa586">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>c123sub2 <span class="ot">&lt;-</span> c123sub1</span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="fu">table</span>(c123sub2<span class="sc">$</span>CVD)</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; </span></span>
@@ -1683,7 +1615,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb13-11"><a href="#cb13-11"></a><span class="st">                            else = NA"</span>,  </span>
 <span id="cb13-12"><a href="#cb13-12"></a>                            <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="surveydata1_cache/html/recodecvd3_f31fb892b0444da15efb781cb7383f36">
+<div class="cell" data-hash="surveydata1_cache/html/recodecvd3_0c1f20c384a369d174c2e181ef0497d9">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># table(c123sub1$CVD)</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co"># c123sub2 &lt;- subset(c123sub1, CVD == "YES" | CVD == "NO")</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co"># table(c123sub2$CVD)</span></span>
@@ -1704,32 +1636,36 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb14-18"><a href="#cb14-18"></a><span class="co">#&gt; [1] 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="covariates" class="level4"><h4 class="anchored" data-anchor-id="covariates">Covariates</h4>
-<section id="age" class="level5"><h5 class="anchored" data-anchor-id="age">age</h5>
+<section id="age" class="level5"><h5 class="anchored" data-anchor-id="age">Age</h5>
 <p>Recodes the ‘age’ column into broader age categories.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode4_5bcfa6b94e0162f5390f1a603c8796ab">
+<div class="cell" data-hash="surveydata1_cache/html/recode4_e8b6e9be1ad4695c4087addd7ac1d8a6">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>c123sub2<span class="sc">$</span>age <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub2<span class="sc">$</span>age, </span>
-<span id="cb15-2"><a href="#cb15-2"></a>                       <span class="st">"c('12 TO 14 YEARS','15 TO 19 YEARS',</span></span>
-<span id="cb15-3"><a href="#cb15-3"></a><span class="st">                       '15 TO 17 YEARS', '18 TO 19 YEARS')='teen';</span></span>
-<span id="cb15-4"><a href="#cb15-4"></a><span class="st">                       c('20 TO 24 YEARS','25 TO 29 YEARS')='20-29 years';</span></span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="st">                       c('30 TO 34 YEARS','35 TO 39 YEARS')='30-39 years';</span></span>
-<span id="cb15-6"><a href="#cb15-6"></a><span class="st">                       c('40 TO 44 YEARS','45 TO 49 YEARS')='40-49 years';</span></span>
-<span id="cb15-7"><a href="#cb15-7"></a><span class="st">                       c('50 TO 54 YEARS','55 TO 59 YEARS')='50-59 years';</span></span>
-<span id="cb15-8"><a href="#cb15-8"></a><span class="st">                       c('60 TO 64 YEARS')='60-64 years';   </span></span>
-<span id="cb15-9"><a href="#cb15-9"></a><span class="st">                       else='65 years and over'"</span>,</span>
-<span id="cb15-10"><a href="#cb15-10"></a>                       <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb15-11"><a href="#cb15-11"></a><span class="fu">table</span>(c123sub2<span class="sc">$</span>age)</span>
-<span id="cb15-12"><a href="#cb15-12"></a><span class="co">#&gt; </span></span>
-<span id="cb15-13"><a href="#cb15-13"></a><span class="co">#&gt;       20-29 years       30-39 years       40-49 years       50-59 years </span></span>
-<span id="cb15-14"><a href="#cb15-14"></a><span class="co">#&gt;             48652             63810             65111             61035 </span></span>
-<span id="cb15-15"><a href="#cb15-15"></a><span class="co">#&gt;       60-64 years 65 years and over              teen </span></span>
-<span id="cb15-16"><a href="#cb15-16"></a><span class="co">#&gt;             25265             80913             52387</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-2"><a href="#cb15-2"></a>                            <span class="st">"c('12 TO 14 YEARS','15 TO 19 YEARS', </span></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="st">                            '15 TO 17 YEARS', '18 TO 19 YEARS')='teen';</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="st">                            c('20 TO 24 YEARS','25 TO 29 YEARS')=</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="st">                            '20-29 years'; </span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="st">                            c('30 TO 34 YEARS','35 TO 39 YEARS')=</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="st">                            '30-39 years';</span></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="st">                            c('40 TO 44 YEARS','45 TO 49 YEARS')=</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="st">                            '40-49 years';</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="st">                            c('50 TO 54 YEARS','55 TO 59 YEARS')=</span></span>
+<span id="cb15-11"><a href="#cb15-11"></a><span class="st">                            '50-59 years';</span></span>
+<span id="cb15-12"><a href="#cb15-12"></a><span class="st">                            c('60 TO 64 YEARS')='60-64 years';</span></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="st">                            else='65 years and over'"</span>,  </span>
+<span id="cb15-14"><a href="#cb15-14"></a>                            <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb15-15"><a href="#cb15-15"></a><span class="fu">table</span>(c123sub2<span class="sc">$</span>age)</span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">#&gt; </span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="co">#&gt;       20-29 years       30-39 years       40-49 years       50-59 years </span></span>
+<span id="cb15-18"><a href="#cb15-18"></a><span class="co">#&gt;             48652             63810             65111             61035 </span></span>
+<span id="cb15-19"><a href="#cb15-19"></a><span class="co">#&gt;       60-64 years 65 years and over              teen </span></span>
+<span id="cb15-20"><a href="#cb15-20"></a><span class="co">#&gt;             25265             80913             52387</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="surveydata1_cache/html/recode5_6fdb0d53af6d5272eef0ac2b146f5825">
+<div class="cell" data-hash="surveydata1_cache/html/recode5_8e15000f0435f2915454113f387b845c">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>c123sub3 <span class="ot">&lt;-</span> c123sub2</span>
 <span id="cb16-2"><a href="#cb16-2"></a><span class="co"># c123sub3$age[c123sub3$age == 'teen'] &lt;- NA</span></span>
 <span id="cb16-3"><a href="#cb16-3"></a><span class="co"># c123sub3$age[c123sub3$age == '65 years and over'] &lt;- NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="surveydata1_cache/html/tabage_0203ac66fb500b1c485ba67eff700c36">
+<div class="cell" data-hash="surveydata1_cache/html/tabage_2dcfd2cea1638d1b3b5baf3ecc24d982">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># dim(c123sub2)</span></span>
 <span id="cb17-2"><a href="#cb17-2"></a><span class="co"># c123sub3 &lt;- subset(c123sub2, age != 'teen' &amp; age != '65 years and over')</span></span>
 <span id="cb17-3"><a href="#cb17-3"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>age, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
@@ -1741,9 +1677,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb17-9"><a href="#cb17-9"></a><span class="fu">dim</span>(c123sub3)</span>
 <span id="cb17-10"><a href="#cb17-10"></a><span class="co">#&gt; [1] 397173     24</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="sex" class="level5"><h5 class="anchored" data-anchor-id="sex">sex</h5>
+</section><section id="sex" class="level5"><h5 class="anchored" data-anchor-id="sex">Sex</h5>
 <p>Recodes ‘sex’ to ‘Male’ or ‘Female’.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode6_09d32e087b077a7d4062ef874dfb4146">
+<div class="cell" data-hash="surveydata1_cache/html/recode6_54dbe4da58add7f67712a75df7a62e6f">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>sex)</span>
 <span id="cb18-2"><a href="#cb18-2"></a><span class="co">#&gt; </span></span>
 <span id="cb18-3"><a href="#cb18-3"></a><span class="co">#&gt;           MALE         FEMALE NOT APPLICABLE     NOT STATED     DON'T KNOW </span></span>
@@ -1760,9 +1696,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb18-14"><a href="#cb18-14"></a><span class="co">#&gt; Female   Male   &lt;NA&gt; </span></span>
 <span id="cb18-15"><a href="#cb18-15"></a><span class="co">#&gt; 214650 182523      0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="marital-status" class="level5"><h5 class="anchored" data-anchor-id="marital-status">marital status</h5>
+</section><section id="marital-status" class="level5"><h5 class="anchored" data-anchor-id="marital-status">Marital status</h5>
 <p>Recodes the ‘married’ column into two categories: ‘not single’ and ‘single’.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode7_2d00a1b1611bf9e850cfac5566073bb2">
+<div class="cell" data-hash="surveydata1_cache/html/recode7_b264e829b6b752903eb2bdaf4dc10f9f">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>married)</span>
 <span id="cb19-2"><a href="#cb19-2"></a><span class="co">#&gt; </span></span>
 <span id="cb19-3"><a href="#cb19-3"></a><span class="co">#&gt;          MARRIED       COMMON-LAW    WIDOW/SEP/DIV           SINGLE </span></span>
@@ -1773,17 +1709,18 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb19-8"><a href="#cb19-8"></a><span class="co">#&gt;            40153</span></span>
 <span id="cb19-9"><a href="#cb19-9"></a>c123sub3<span class="sc">$</span>married <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub3<span class="sc">$</span>married, </span>
 <span id="cb19-10"><a href="#cb19-10"></a>                             <span class="st">"c('MARRIED', 'COMMON-LAW')='not single';</span></span>
-<span id="cb19-11"><a href="#cb19-11"></a><span class="st">                             c('WIDOW/SEP/DIV', 'SINGLE', 'SINGLE/NEVER MAR') = 'single';</span></span>
-<span id="cb19-12"><a href="#cb19-12"></a><span class="st">                             else = NA"</span>,  </span>
-<span id="cb19-13"><a href="#cb19-13"></a>                             <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb19-14"><a href="#cb19-14"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>married, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb19-15"><a href="#cb19-15"></a><span class="co">#&gt; </span></span>
-<span id="cb19-16"><a href="#cb19-16"></a><span class="co">#&gt; not single     single       &lt;NA&gt; </span></span>
-<span id="cb19-17"><a href="#cb19-17"></a><span class="co">#&gt;     202213     194299        661</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-11"><a href="#cb19-11"></a><span class="st">                             c('WIDOW/SEP/DIV', 'SINGLE', </span></span>
+<span id="cb19-12"><a href="#cb19-12"></a><span class="st">                             'SINGLE/NEVER MAR') = 'single';</span></span>
+<span id="cb19-13"><a href="#cb19-13"></a><span class="st">                             else = NA"</span>,  </span>
+<span id="cb19-14"><a href="#cb19-14"></a>                             <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb19-15"><a href="#cb19-15"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>married, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb19-16"><a href="#cb19-16"></a><span class="co">#&gt; </span></span>
+<span id="cb19-17"><a href="#cb19-17"></a><span class="co">#&gt; not single     single       &lt;NA&gt; </span></span>
+<span id="cb19-18"><a href="#cb19-18"></a><span class="co">#&gt;     202213     194299        661</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="race" class="level5"><h5 class="anchored" data-anchor-id="race">race</h5>
+</section><section id="raceethnicity" class="level5"><h5 class="anchored" data-anchor-id="raceethnicity">Race/ethnicity</h5>
 <p>Recodes ‘race’ into ‘White’ and ‘Non-white’.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode8_6045c427daa704b57fa78c2e989ca2cd">
+<div class="cell" data-hash="surveydata1_cache/html/recode8_d31364ee8aebec69ebb59c3d2234383f">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>race)</span>
 <span id="cb20-2"><a href="#cb20-2"></a><span class="co">#&gt; </span></span>
 <span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt;            WHITE VISIBLE MINORITY   NOT APPLICABLE       NOT STATED </span></span>
@@ -1800,9 +1737,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb20-14"><a href="#cb20-14"></a><span class="co">#&gt; Non-white     White      &lt;NA&gt; </span></span>
 <span id="cb20-15"><a href="#cb20-15"></a><span class="co">#&gt;     38641    349222      9310</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="immigration" class="level5"><h5 class="anchored" data-anchor-id="immigration">immigration</h5>
+</section><section id="immigration" class="level5"><h5 class="anchored" data-anchor-id="immigration">Immigration</h5>
 <p>Creates a new column for immigration status based on the ‘recent.immigrant’ column, then removes the original column.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode9_f4da1ff174b84ea7c48840933243c128">
+<div class="cell" data-hash="surveydata1_cache/html/recode9_306c9d8e461a485347054186ad4397bc">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>recent.immigrant)</span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="co">#&gt; </span></span>
 <span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt;     0 TO 9 YEARS 10 YEARS OR MORE   NOT APPLICABLE       NOT STATED </span></span>
@@ -1822,9 +1759,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb21-17"><a href="#cb21-17"></a>c123sub3<span class="sc">$</span>recent.immigrant <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb21-18"><a href="#cb21-18"></a>c123sub3<span class="sc">$</span>immigration <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="education" class="level5"><h5 class="anchored" data-anchor-id="education">education</h5>
-<p>Recodes educational status into specified categories.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode10_0f631b05eb9941daed55965da6c5885d">
+</section><section id="education" class="level5"><h5 class="anchored" data-anchor-id="education">Education</h5>
+<p>Recode educational status into specified categories.</p>
+<div class="cell" data-hash="surveydata1_cache/html/recode10_fa0bd12ec66feb8ee7e9463e5a6b9b04">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>edu)</span>
 <span id="cb22-2"><a href="#cb22-2"></a><span class="co">#&gt; </span></span>
 <span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt; &lt; THAN SECONDARY  SECONDARY GRAD.  OTHER POST-SEC.  POST-SEC. GRAD. </span></span>
@@ -1843,9 +1780,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb22-16"><a href="#cb22-16"></a><span class="co">#&gt;        &lt; 2ndary       2nd grad. Other 2nd grad.  Post-2nd grad.            &lt;NA&gt; </span></span>
 <span id="cb22-17"><a href="#cb22-17"></a><span class="co">#&gt;          124425           64753           29000          171972            7023</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="income" class="level5"><h5 class="anchored" data-anchor-id="income">income</h5>
+</section><section id="income" class="level5"><h5 class="anchored" data-anchor-id="income">Income</h5>
 <p>Recodes income levels into broader categories.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode11_88d1dc1ceadc8ae0db8e0beb2e6588ab">
+<div class="cell" data-hash="surveydata1_cache/html/recode11_a5f09ceb6a0b9af808335e51d7996ac0">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>income)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="co">#&gt; </span></span>
 <span id="cb23-3"><a href="#cb23-3"></a><span class="co">#&gt;        NO INCOME LESS THAN 15,000  $15,000-$29,999  $30,000-$49,999 </span></span>
@@ -1857,22 +1794,23 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb23-9"><a href="#cb23-9"></a><span class="co"># cycle 1.1 has: 'NO INCOME','LESS THAN 15,000'</span></span>
 <span id="cb23-10"><a href="#cb23-10"></a><span class="co"># Other cycles have: 'NO OR &lt;$15,000'</span></span>
 <span id="cb23-11"><a href="#cb23-11"></a>c123sub3<span class="sc">$</span>income <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub3<span class="sc">$</span>income, </span>
-<span id="cb23-12"><a href="#cb23-12"></a>                               <span class="st">"c('NO OR &lt;$15,000', 'NO INCOME','LESS THAN 15,000',</span></span>
-<span id="cb23-13"><a href="#cb23-13"></a><span class="st">                               '$15,000-$29,999')='$29,999 or less';</span></span>
-<span id="cb23-14"><a href="#cb23-14"></a><span class="st">                               '$30,000-$49,999' = '$30,000-$49,999';</span></span>
-<span id="cb23-15"><a href="#cb23-15"></a><span class="st">                               '$50,000-$79,999' = '$50,000-$79,999';</span></span>
-<span id="cb23-16"><a href="#cb23-16"></a><span class="st">                               '$80,000 OR MORE' = '$80,000 or more';</span></span>
-<span id="cb23-17"><a href="#cb23-17"></a><span class="st">                               else = NA"</span>,  </span>
-<span id="cb23-18"><a href="#cb23-18"></a>                               <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb23-19"><a href="#cb23-19"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>income, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb23-20"><a href="#cb23-20"></a><span class="co">#&gt; </span></span>
-<span id="cb23-21"><a href="#cb23-21"></a><span class="co">#&gt; $29,999 or less $30,000-$49,999 $50,000-$79,999 $80,000 or more            &lt;NA&gt; </span></span>
-<span id="cb23-22"><a href="#cb23-22"></a><span class="co">#&gt;          101331           77940           85108           75715           57079</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-12"><a href="#cb23-12"></a>                               <span class="st">"c('NO OR &lt;$15,000', 'NO INCOME',</span></span>
+<span id="cb23-13"><a href="#cb23-13"></a><span class="st">                               'LESS THAN 15,000',</span></span>
+<span id="cb23-14"><a href="#cb23-14"></a><span class="st">                               '$15,000-$29,999')='$29,999 or less';</span></span>
+<span id="cb23-15"><a href="#cb23-15"></a><span class="st">                               '$30,000-$49,999' = '$30,000-$49,999';</span></span>
+<span id="cb23-16"><a href="#cb23-16"></a><span class="st">                               '$50,000-$79,999' = '$50,000-$79,999';</span></span>
+<span id="cb23-17"><a href="#cb23-17"></a><span class="st">                               '$80,000 OR MORE' = '$80,000 or more';</span></span>
+<span id="cb23-18"><a href="#cb23-18"></a><span class="st">                               else = NA"</span>,  </span>
+<span id="cb23-19"><a href="#cb23-19"></a>                               <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb23-20"><a href="#cb23-20"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>income, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb23-21"><a href="#cb23-21"></a><span class="co">#&gt; </span></span>
+<span id="cb23-22"><a href="#cb23-22"></a><span class="co">#&gt; $29,999 or less $30,000-$49,999 $50,000-$79,999 $80,000 or more            &lt;NA&gt; </span></span>
+<span id="cb23-23"><a href="#cb23-23"></a><span class="co">#&gt;          101331           77940           85108           75715           57079</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="bmi" class="level5"><h5 class="anchored" data-anchor-id="bmi">BMI</h5>
 <p>Converts ‘bmi’ column values to numerical data and also categorizes it based on the BMI value.</p>
 <p>If you want to reuse the continuous variable later (usually a good idea in statistical sense), keep a second copy of the variable.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode12_0d3aee27950066744aa4c175d89a1501">
+<div class="cell" data-hash="surveydata1_cache/html/recode12_a37a6749662eb6dde77f11d645fc8ad9">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># table(c123sub3$bmi)</span></span>
 <span id="cb24-2"><a href="#cb24-2"></a><span class="fu">sum</span>(c123sub3<span class="sc">$</span>bmi<span class="sc">==</span><span class="st">"NOT APPLICABLE"</span>)<span class="sc">+</span></span>
 <span id="cb24-3"><a href="#cb24-3"></a>  <span class="fu">sum</span>(c123sub3<span class="sc">$</span>bmi<span class="sc">==</span><span class="st">"REFUSAL"</span>)<span class="sc">+</span></span>
@@ -1880,29 +1818,30 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb24-5"><a href="#cb24-5"></a>  <span class="fu">sum</span>(c123sub3<span class="sc">$</span>bmi<span class="sc">==</span><span class="st">"DON'T KNOW"</span>)</span>
 <span id="cb24-6"><a href="#cb24-6"></a><span class="co">#&gt; [1] 72303</span></span>
 <span id="cb24-7"><a href="#cb24-7"></a>c123sub3<span class="sc">$</span>bmi <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub3<span class="sc">$</span>bmi, </span>
-<span id="cb24-8"><a href="#cb24-8"></a>                               <span class="st">'c("NOT APPLICABLE", "REFUSAL", "NOT STATED", "DON</span><span class="sc">\'</span><span class="st">T KNOW")=NA'</span>,</span>
-<span id="cb24-9"><a href="#cb24-9"></a>                               <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb24-10"><a href="#cb24-10"></a><span class="co">#table(c123sub3$bmi, useNA = "always")</span></span>
-<span id="cb24-11"><a href="#cb24-11"></a>c123sub3<span class="sc">$</span>bmi <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(c123sub3<span class="sc">$</span>bmi))</span>
-<span id="cb24-12"><a href="#cb24-12"></a><span class="fu">summary</span>(c123sub3<span class="sc">$</span>bmi)</span>
-<span id="cb24-13"><a href="#cb24-13"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
-<span id="cb24-14"><a href="#cb24-14"></a><span class="co">#&gt;   11.91   22.47   25.30   25.86   28.50   57.90   72303</span></span>
-<span id="cb24-15"><a href="#cb24-15"></a>c123sub3<span class="sc">$</span>bmi2 <span class="ot">&lt;-</span> <span class="fu">cut</span>(c123sub3<span class="sc">$</span>bmi,</span>
-<span id="cb24-16"><a href="#cb24-16"></a>                       <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">18.5</span>,<span class="dv">25</span>,<span class="cn">Inf</span>),</span>
-<span id="cb24-17"><a href="#cb24-17"></a>                       <span class="at">right =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb24-18"><a href="#cb24-18"></a>                       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Underweight"</span>, </span>
-<span id="cb24-19"><a href="#cb24-19"></a>                                  <span class="st">"healthy weight"</span>, </span>
-<span id="cb24-20"><a href="#cb24-20"></a>                                  <span class="st">"Overweight"</span>))</span>
-<span id="cb24-21"><a href="#cb24-21"></a>c123sub3<span class="sc">$</span>bmi <span class="ot">&lt;-</span> c123sub3<span class="sc">$</span>bmi2</span>
-<span id="cb24-22"><a href="#cb24-22"></a>c123sub3<span class="sc">$</span>bmi2 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb24-23"><a href="#cb24-23"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>bmi, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb24-24"><a href="#cb24-24"></a><span class="co">#&gt; </span></span>
-<span id="cb24-25"><a href="#cb24-25"></a><span class="co">#&gt;    Underweight healthy weight     Overweight           &lt;NA&gt; </span></span>
-<span id="cb24-26"><a href="#cb24-26"></a><span class="co">#&gt;          10116         148533         166221          72303</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-8"><a href="#cb24-8"></a>                               <span class="st">'c("NOT APPLICABLE", "REFUSAL", </span></span>
+<span id="cb24-9"><a href="#cb24-9"></a><span class="st">                               "NOT STATED", "DON</span><span class="sc">\'</span><span class="st">T KNOW")=NA'</span>,</span>
+<span id="cb24-10"><a href="#cb24-10"></a>                               <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb24-11"><a href="#cb24-11"></a><span class="co">#table(c123sub3$bmi, useNA = "always")</span></span>
+<span id="cb24-12"><a href="#cb24-12"></a>c123sub3<span class="sc">$</span>bmi <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(c123sub3<span class="sc">$</span>bmi))</span>
+<span id="cb24-13"><a href="#cb24-13"></a><span class="fu">summary</span>(c123sub3<span class="sc">$</span>bmi)</span>
+<span id="cb24-14"><a href="#cb24-14"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
+<span id="cb24-15"><a href="#cb24-15"></a><span class="co">#&gt;   11.91   22.47   25.30   25.86   28.50   57.90   72303</span></span>
+<span id="cb24-16"><a href="#cb24-16"></a>c123sub3<span class="sc">$</span>bmi2 <span class="ot">&lt;-</span> <span class="fu">cut</span>(c123sub3<span class="sc">$</span>bmi,</span>
+<span id="cb24-17"><a href="#cb24-17"></a>                       <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">18.5</span>,<span class="dv">25</span>,<span class="cn">Inf</span>),</span>
+<span id="cb24-18"><a href="#cb24-18"></a>                       <span class="at">right =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb24-19"><a href="#cb24-19"></a>                       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Underweight"</span>, </span>
+<span id="cb24-20"><a href="#cb24-20"></a>                                  <span class="st">"healthy weight"</span>, </span>
+<span id="cb24-21"><a href="#cb24-21"></a>                                  <span class="st">"Overweight"</span>))</span>
+<span id="cb24-22"><a href="#cb24-22"></a>c123sub3<span class="sc">$</span>bmi <span class="ot">&lt;-</span> c123sub3<span class="sc">$</span>bmi2</span>
+<span id="cb24-23"><a href="#cb24-23"></a>c123sub3<span class="sc">$</span>bmi2 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb24-24"><a href="#cb24-24"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>bmi, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb24-25"><a href="#cb24-25"></a><span class="co">#&gt; </span></span>
+<span id="cb24-26"><a href="#cb24-26"></a><span class="co">#&gt;    Underweight healthy weight     Overweight           &lt;NA&gt; </span></span>
+<span id="cb24-27"><a href="#cb24-27"></a><span class="co">#&gt;          10116         148533         166221          72303</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="physical-activity" class="level5"><h5 class="anchored" data-anchor-id="physical-activity">physical activity</h5>
+</section><section id="physical-activity" class="level5"><h5 class="anchored" data-anchor-id="physical-activity">Physical activity</h5>
 <p>Recodes physical activity levels.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode13_3fbc6c883240d9e719f238c131954e9e">
+<div class="cell" data-hash="surveydata1_cache/html/recode13_23f505c3b1a25fc090e603d5d8ce1499">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>phyact)</span>
 <span id="cb25-2"><a href="#cb25-2"></a><span class="co">#&gt; </span></span>
 <span id="cb25-3"><a href="#cb25-3"></a><span class="co">#&gt;         ACTIVE       MODERATE       INACTIVE NOT APPLICABLE     NOT STATED </span></span>
@@ -1920,9 +1859,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb25-15"><a href="#cb25-15"></a><span class="co">#&gt;   Active Inactive Moderate     &lt;NA&gt; </span></span>
 <span id="cb25-16"><a href="#cb25-16"></a><span class="co">#&gt;    98571   190739    93507    14356</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="doctor" class="level5"><h5 class="anchored" data-anchor-id="doctor">doctor</h5>
+</section><section id="doctor" class="level5"><h5 class="anchored" data-anchor-id="doctor">Doctor</h5>
 <p>Recodes whether someone has access to a doctor into ‘Yes’ or ‘No’.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode14_a88dde1cfab008e03be38be782d26e45">
+<div class="cell" data-hash="surveydata1_cache/html/recode14_d7e46bc7142cc219e004ae8528c32bae">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>doctor)</span>
 <span id="cb26-2"><a href="#cb26-2"></a><span class="co">#&gt; </span></span>
 <span id="cb26-3"><a href="#cb26-3"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
@@ -1939,9 +1878,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb26-14"><a href="#cb26-14"></a><span class="co">#&gt;     No    Yes   &lt;NA&gt; </span></span>
 <span id="cb26-15"><a href="#cb26-15"></a><span class="co">#&gt;  58623 338105    445</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="stress" class="level5"><h5 class="anchored" data-anchor-id="stress">stress</h5>
+</section><section id="stress" class="level5"><h5 class="anchored" data-anchor-id="stress">Stress</h5>
 <p>Recodes stress levels into ‘Not too stressed’ or ‘stressed’.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode16_e6ce7914aa8aa533c425afa3a065357a">
+<div class="cell" data-hash="surveydata1_cache/html/recode16_0eee369377c4ef0b13177f84ba8e39a6">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>stress)</span>
 <span id="cb27-2"><a href="#cb27-2"></a><span class="co">#&gt; </span></span>
 <span id="cb27-3"><a href="#cb27-3"></a><span class="co">#&gt;     NOT AT ALL       NOT VERY          A BIT    QUITE A BIT      EXTREMELY </span></span>
@@ -1949,18 +1888,20 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb27-5"><a href="#cb27-5"></a><span class="co">#&gt; NOT APPLICABLE     DON'T KNOW        REFUSAL     NOT STATED </span></span>
 <span id="cb27-6"><a href="#cb27-6"></a><span class="co">#&gt;          26737           1244            145              6</span></span>
 <span id="cb27-7"><a href="#cb27-7"></a>c123sub3<span class="sc">$</span>stress <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub3<span class="sc">$</span>stress,</span>
-<span id="cb27-8"><a href="#cb27-8"></a>                              <span class="st">"c('NOT AT ALL','NOT VERY','A BIT')='Not too stressed';</span></span>
-<span id="cb27-9"><a href="#cb27-9"></a><span class="st">                              c('QUITE A BIT','EXTREMELY') = 'stressed';</span></span>
-<span id="cb27-10"><a href="#cb27-10"></a><span class="st">                              else = NA"</span>,</span>
-<span id="cb27-11"><a href="#cb27-11"></a>                              <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb27-12"><a href="#cb27-12"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>stress, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb27-13"><a href="#cb27-13"></a><span class="co">#&gt; </span></span>
-<span id="cb27-14"><a href="#cb27-14"></a><span class="co">#&gt; Not too stressed         stressed             &lt;NA&gt; </span></span>
-<span id="cb27-15"><a href="#cb27-15"></a><span class="co">#&gt;           286744            82297            28132</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-8"><a href="#cb27-8"></a>                              <span class="st">"c('NOT AT ALL','NOT VERY','A BIT')=</span></span>
+<span id="cb27-9"><a href="#cb27-9"></a><span class="st">                              'Not too stressed';</span></span>
+<span id="cb27-10"><a href="#cb27-10"></a><span class="st">                              c('QUITE A BIT','EXTREMELY') = </span></span>
+<span id="cb27-11"><a href="#cb27-11"></a><span class="st">                              'stressed';</span></span>
+<span id="cb27-12"><a href="#cb27-12"></a><span class="st">                              else = NA"</span>,</span>
+<span id="cb27-13"><a href="#cb27-13"></a>                              <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb27-14"><a href="#cb27-14"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>stress, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb27-15"><a href="#cb27-15"></a><span class="co">#&gt; </span></span>
+<span id="cb27-16"><a href="#cb27-16"></a><span class="co">#&gt; Not too stressed         stressed             &lt;NA&gt; </span></span>
+<span id="cb27-17"><a href="#cb27-17"></a><span class="co">#&gt;           286744            82297            28132</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="smoking" class="level5"><h5 class="anchored" data-anchor-id="smoking">smoking</h5>
+</section><section id="smoking" class="level5"><h5 class="anchored" data-anchor-id="smoking">Smoking</h5>
 <p>Recodes smoking status into ‘Current smoker’, ‘Former smoker’, or ‘Never smoker’.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode17_caee86b349a8e51e79009e42a7d10058">
+<div class="cell" data-hash="surveydata1_cache/html/recode17_4ad7e88a65990814692609b89a8f0452">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>smoke)</span>
 <span id="cb28-2"><a href="#cb28-2"></a><span class="co">#&gt; </span></span>
 <span id="cb28-3"><a href="#cb28-3"></a><span class="co">#&gt;            DAILY       OCCASIONAL ALWAYS OCCASION.     FORMER DAILY </span></span>
@@ -1982,9 +1923,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb28-19"><a href="#cb28-19"></a><span class="co">#&gt; Current smoker  Former smoker   Never smoker           &lt;NA&gt; </span></span>
 <span id="cb28-20"><a href="#cb28-20"></a><span class="co">#&gt;          97852         157570         140017           1734</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="alcohol" class="level5"><h5 class="anchored" data-anchor-id="alcohol">alcohol</h5>
+</section><section id="alcohol" class="level5"><h5 class="anchored" data-anchor-id="alcohol">Alcohol</h5>
 <p>Recodes drinking habits into ‘Current drinker’, ‘Former driker’, or ‘Never drank’.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode18_74f668507de9f9578b133a0d8bd34b31">
+<div class="cell" data-hash="surveydata1_cache/html/recode18_fefdf4e52a4cd223394c589e294e0e5c">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>drink)</span>
 <span id="cb29-2"><a href="#cb29-2"></a><span class="co">#&gt; </span></span>
 <span id="cb29-3"><a href="#cb29-3"></a><span class="co">#&gt; REGULAR DRINKER    OCC. DRINKER  FORMER DRINKER     NEVER DRANK  NOT APPLICABLE </span></span>
@@ -2003,10 +1944,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb29-16"><a href="#cb29-16"></a><span class="co">#&gt; Current drinker   Former driker     Never drank            &lt;NA&gt; </span></span>
 <span id="cb29-17"><a href="#cb29-17"></a><span class="co">#&gt;          295733           55299           40670            5471</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="fruit-and-vegetable-consumption" class="level5"><h5 class="anchored" data-anchor-id="fruit-and-vegetable-consumption">fruit and vegetable consumption</h5>
+</section><section id="fruit-and-vegetable-consumption" class="level5"><h5 class="anchored" data-anchor-id="fruit-and-vegetable-consumption">Fruit and vegetable consumption</h5>
 <p>Converts fruit and vegetable consumption to numerical values and then categorizes it.</p>
 <p>If you want to reuse the continuous variable later (usually a good idea in statistical sense), keep a second copy of the variable.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode19_187a3ceb1325d6f531ac1b5661ad64ed">
+<div class="cell" data-hash="surveydata1_cache/html/recode19_70cab8febd522f25d4113ed51029d5ad">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="fu">str</span>(c123sub3<span class="sc">$</span>fruit)</span>
 <span id="cb30-2"><a href="#cb30-2"></a><span class="co">#&gt;  Factor w/ 303 levels "0","0.1","0.2",..: 57 48 42 72 67 120 39 54 61 51 ...</span></span>
 <span id="cb30-3"><a href="#cb30-3"></a><span class="co">#c123sub3$fruit.cont &lt;- c123sub3$fruit</span></span>
@@ -2028,9 +1969,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb30-19"><a href="#cb30-19"></a>c123sub3<span class="sc">$</span>fruit <span class="ot">&lt;-</span> c123sub3<span class="sc">$</span>fruit2</span>
 <span id="cb30-20"><a href="#cb30-20"></a>c123sub3<span class="sc">$</span>fruit2 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="hypertension" class="level5"><h5 class="anchored" data-anchor-id="hypertension">hypertension</h5>
+</section><section id="hypertension" class="level5"><h5 class="anchored" data-anchor-id="hypertension">Hypertension</h5>
 <p>The following chunk of code is concerned with recoding the blood pressure column. The code also shows the distribution of the values before and after recoding.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode20_2b2b8874d69c9eb225125292209242e6">
+<div class="cell" data-hash="surveydata1_cache/html/recode20_0a2725dff2dee254b8fd1b75030dc07f">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>bp)</span>
 <span id="cb31-2"><a href="#cb31-2"></a><span class="co">#&gt; </span></span>
 <span id="cb31-3"><a href="#cb31-3"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
@@ -2049,7 +1990,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="copd" class="level5"><h5 class="anchored" data-anchor-id="copd">COPD</h5>
 <p>The following chunk of code is concerned with recoding the COPD column.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode21_329684efe0151cdc970ce332f37e1eea">
+<div class="cell" data-hash="surveydata1_cache/html/recode21_b14bccbd739eb26e6e77241fe4a04f4e">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>copd)</span>
 <span id="cb32-2"><a href="#cb32-2"></a><span class="co">#&gt; </span></span>
 <span id="cb32-3"><a href="#cb32-3"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
@@ -2068,7 +2009,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="diabetes" class="level5"><h5 class="anchored" data-anchor-id="diabetes">Diabetes</h5>
 <p>The following chunk of code is concerned with recoding the diabetes column.</p>
-<div class="cell" data-hash="surveydata1_cache/html/recode22_25e0c31135bde488b69c8f59a63f3312">
+<div class="cell" data-hash="surveydata1_cache/html/recode22_0b2ce18b38335f709631601b829b03fc">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>diab)</span>
 <span id="cb33-2"><a href="#cb33-2"></a><span class="co">#&gt; </span></span>
 <span id="cb33-3"><a href="#cb33-3"></a><span class="co">#&gt;            YES             NO NOT APPLICABLE     DON'T KNOW        REFUSAL </span></span>
@@ -2105,7 +2046,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 </li>
 </ul>
-<div class="cell" data-hash="surveydata1_cache/html/recode23_601ece390fb8f49b556219ac0940469d">
+<div class="cell" data-hash="surveydata1_cache/html/recode23_c5d867f92c66a7187d00fd9476e69f57">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>c123sub3<span class="sc">$</span>province.check <span class="ot">&lt;-</span> c123sub3<span class="sc">$</span>province</span>
 <span id="cb34-2"><a href="#cb34-2"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>province)</span>
 <span id="cb34-3"><a href="#cb34-3"></a><span class="co">#&gt; </span></span>
@@ -2119,25 +2060,18 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb34-11"><a href="#cb34-11"></a><span class="co">#&gt;                0                0                0            56764 </span></span>
 <span id="cb34-12"><a href="#cb34-12"></a><span class="co">#&gt;      NFLD &amp; LAB.  YUKON/NWT/NUNA. </span></span>
 <span id="cb34-13"><a href="#cb34-13"></a><span class="co">#&gt;             4111             2658</span></span>
-<span id="cb34-14"><a href="#cb34-14"></a><span class="co"># c123sub3$province &lt;- car::recode(c123sub3$province,</span></span>
-<span id="cb34-15"><a href="#cb34-15"></a><span class="co">#                               "c('YUKON/NWT/NUNAVT','YUKON/NWT/NUNA.')='North';</span></span>
-<span id="cb34-16"><a href="#cb34-16"></a><span class="co">#                               c('NEWFOUNDLAND', 'PEI', 'NOVA SCOTIA', 'NEW BRUNSWICK', </span></span>
-<span id="cb34-17"><a href="#cb34-17"></a><span class="co"># 'QU?BEC', 'ONTARIO', 'MANITOBA', 'SASKATCHEWAN', 'ALBERTA', </span></span>
-<span id="cb34-18"><a href="#cb34-18"></a><span class="co"># 'BRITISH COLUMBIA', 'QUEBEC', 'NFLD &amp; LAB.') = 'South';</span></span>
-<span id="cb34-19"><a href="#cb34-19"></a><span class="co">#                               else = NA",</span></span>
-<span id="cb34-20"><a href="#cb34-20"></a><span class="co">#                               as.factor = FALSE)</span></span>
-<span id="cb34-21"><a href="#cb34-21"></a>c123sub3<span class="sc">$</span>province <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub3<span class="sc">$</span>province,</span>
-<span id="cb34-22"><a href="#cb34-22"></a>                              <span class="st">"c('YUKON/NWT/NUNAVT','YUKON/NWT/NUNA.')='North';</span></span>
-<span id="cb34-23"><a href="#cb34-23"></a><span class="st">                              else = 'South'"</span>,</span>
-<span id="cb34-24"><a href="#cb34-24"></a>                              <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb34-25"><a href="#cb34-25"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>province, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb34-26"><a href="#cb34-26"></a><span class="co">#&gt; </span></span>
-<span id="cb34-27"><a href="#cb34-27"></a><span class="co">#&gt;  North  South   &lt;NA&gt; </span></span>
-<span id="cb34-28"><a href="#cb34-28"></a><span class="co">#&gt;   7722 389451      0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-14"><a href="#cb34-14"></a>c123sub3<span class="sc">$</span>province <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(c123sub3<span class="sc">$</span>province,</span>
+<span id="cb34-15"><a href="#cb34-15"></a>                              <span class="st">"c('YUKON/NWT/NUNAVT','YUKON/NWT/NUNA.')=</span></span>
+<span id="cb34-16"><a href="#cb34-16"></a><span class="st">                              'North'; else = 'South'"</span>,</span>
+<span id="cb34-17"><a href="#cb34-17"></a>                              <span class="at">as.factor =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb34-18"><a href="#cb34-18"></a><span class="fu">table</span>(c123sub3<span class="sc">$</span>province, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb34-19"><a href="#cb34-19"></a><span class="co">#&gt; </span></span>
+<span id="cb34-20"><a href="#cb34-20"></a><span class="co">#&gt;  North  South   &lt;NA&gt; </span></span>
+<span id="cb34-21"><a href="#cb34-21"></a><span class="co">#&gt;   7722 389451      0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="dimension-testing" class="level5"><h5 class="anchored" data-anchor-id="dimension-testing">Dimension testing</h5>
 <p>This chunk verifies the dimensions of the modified data frames and performs some other operations like setting factors.</p>
-<div class="cell" data-hash="surveydata1_cache/html/dims2_206b377c0d8e0ecda8d165590750e14e">
+<div class="cell" data-hash="surveydata1_cache/html/dims2_f004aeb5013463344ba629dc071df03b">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>save.c123sub3 <span class="ot">&lt;-</span> c123sub3</span>
 <span id="cb35-2"><a href="#cb35-2"></a><span class="fu">names</span>(c123sub3)</span>
 <span id="cb35-3"><a href="#cb35-3"></a><span class="co">#&gt;  [1] "CVD"            "age"            "sex"            "married"       </span></span>
@@ -2169,7 +2103,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section></section><section id="saving-data" class="level3"><h3 class="anchored" data-anchor-id="saving-data">Saving data</h3>
 <p>We save the data for future use:</p>
-<div class="cell" data-hash="surveydata1_cache/html/save_5e109b974b97a8e392e9b40197fe09d7">
+<div class="cell" data-hash="surveydata1_cache/html/save_3eb34b8eeb9c8b6dbe6ca6460e9bac87">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a><span class="fu">save</span>(cc123a, analytic, <span class="at">file =</span> <span class="st">"Data/surveydata/cchs123.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>

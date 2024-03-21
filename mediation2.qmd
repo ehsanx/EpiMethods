@@ -1,5 +1,7 @@
 ## Justification {.unnumbered}
 
+We must show enough justification to do a mediation analysis. A causal diagram would be the first step to conceptualize the mediation analysis problem hypothetically. Then, we can empirically verify where doing the mediation analysis makes sense in that particular context. 
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 require(survey)
@@ -27,14 +29,14 @@ analytic.miss$exposure <- ifelse(analytic.miss$OA == "OA", 1, 0)
 analytic.miss$outcome <- ifelse(analytic.miss$CVD == "event", 1, 0)
 ```
 
-### Analysis
+### Notation
 
--   Outcome ($Y$): CVD
--   Exposure ($A$): OA
+-   Outcome ($Y$): Cardiovascular disease (CVD)
+-   Exposure ($A$): Osteoarthritis (OA)
 -   Mediator ($M$): Pain medication
 -   Adjustment covariates ($C$)
 
-#### Hypothesis
+### Hypothesis
 
 1.  For total effect (TE): Is OA ($A$) associated with CVD ($Y$)?
 
@@ -68,7 +70,7 @@ sampling0 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("images/mediat
 knitr::include_graphics("images/mediation/H00relation.png")
 ```
 
-2.  For mediation analysis: Does pain-medication ($M$) play a mediating role in the causal payway between OA ($A$) and CVD ($Y$)? Here, we will decompose total effect (TE) to a natural direct effect (NDE) and a natural indirect effect (NIE).
+2.  For mediation analysis: Does pain-medication ($M$) play a mediating role in the causal pathway between OA ($A$) and CVD ($Y$)? Here, we will decompose total effect (TE) to a natural direct effect (NDE) and a natural indirect effect (NIE).
 
 ```{r h01, echo=FALSE,cache=TRUE}
 sampling0 <- grViz("
@@ -119,6 +121,8 @@ Adjustment variables ($C$):
     -   COPD
     -   diabetes
 
+### Analysis/empirical exploration 
+
 #### Total effect
 
 Outcome model (weighted) is
@@ -130,21 +134,22 @@ $logit [P(Y_{a}=1 | C = c] = \theta_0 + \theta_1 a + \theta_3 c$
 ```{r design, cache=TRUE}
 require(survey)
 summary(analytic.miss$weight)
-w.design0 <- svydesign(id=~1, weights=~weight, 
-                      data=analytic.miss)
+
+# Survey design
+w.design0 <- svydesign(id=~1, weights=~weight, data=analytic.miss)
 summary(weights(w.design0))
 sd(weights(w.design0))
+
+# Subset the design
 w.design <- subset(w.design0, miss == 0)
 summary(weights(w.design))
 sd(weights(w.design))
 ```
 
 ```{r te, eval=TRUE, cache=TRUE}
-TE <- svyglm(outcome ~ exposure + 
-               age + sex + income + race + bmi + edu +
-               phyact + smoke + fruit + diab, 
-                    design = w.design, 
-                    family = quasibinomial("logit"))
+# Model
+TE <- svyglm(outcome ~ exposure + age + sex + income + race + bmi + edu + phyact + 
+               smoke + fruit + diab, design = w.design, family = quasibinomial("logit"))
 # painmed is mediator; not included here.
 TE.save <- exp(c(summary(TE)$coef["exposure",1], 
                 confint(TE)["exposure",]))
@@ -156,17 +161,14 @@ Exposure to OA has a detrimental effect on CVD risk (significant!).
 #### Effect on the mediators
 
 ```{r mediator, eval=TRUE, cache=TRUE}
-fit.m = svyglm(mediator ~ exposure + 
-                 age + sex + income + race + bmi + edu +
-                 phyact + smoke + fruit + diab,
-                design = w.design, 
-                family = binomial("logit"))
-med.save <- exp(c(summary(fit.m)$coef["exposure",1], 
-                confint(fit.m)["exposure",]))
+fit.m = svyglm(mediator ~ exposure + age + sex + income + race + bmi + edu +
+                 phyact + smoke + fruit + diab, design = w.design,
+               family = binomial("logit"))
+med.save <- exp(c(summary(fit.m)$coef["exposure",1], confint(fit.m)["exposure",]))
 med.save
 ```
 
-Exposure to OA has a substantial effect on the mediator (Pain medication) as well (significant!). It will be interesting to explore a mediation analysis to assess the mediating role.
+Exposure to OA has a substantial effect on the mediator (Pain medication) as well (significant!). Hence, it would be interesting to explore a mediation analysis to assess the mediating role.
 
 ### Save data
 

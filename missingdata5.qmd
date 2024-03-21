@@ -90,7 +90,8 @@ dat.with.miss <- subset(dat.full, age >= 20)
 table(dat.with.miss$cvd, useNA = "always") # 6 missing
 table(dat.with.miss$rheumatoid, useNA = "always") # 1375 missing
 
-# Drop missing in outcome and exposure - dataset with missing values only in covariates
+# Drop missing in outcome and exposure 
+# i.e., dataset with missing values only in covariates
 dat.analytic <- dat.with.miss[complete.cases(dat.with.miss$cvd),]
 dat.analytic <- dat.analytic[complete.cases(dat.analytic$rheumatoid),]
 nrow(dat.analytic)
@@ -117,19 +118,24 @@ Let us see the summary statistics, i.e., create Table 1 stratified by outcome (c
 
 ```{r analytic2, cache=TRUE}
 # Categorical age
-dat.analytic$age.cat <- with(dat.analytic, ifelse(age >= 20 & age < 50, "20-49", 
-                                  ifelse(age >= 50 & age < 65, "50-64", "65+")))
-dat.analytic$age.cat <- factor(dat.analytic$age.cat, levels = c("20-49", "50-64", "65+"))
+dat.analytic$age.cat <- 
+  with(dat.analytic, ifelse(age >= 20 & age < 50, "20-49", 
+                            ifelse(age >= 50 & age < 65, 
+                                   "50-64", "65+")))
+dat.analytic$age.cat <- factor(dat.analytic$age.cat, 
+                               levels = c("20-49", "50-64", "65+"))
 table(dat.analytic$age.cat, useNA = "always")
 
 # Recode rheumatoid to arthritis
-dat.analytic$arthritis <- car::recode(dat.analytic$rheumatoid, " 'No' = 'No arthritis';
-                                      'Yes' = 'Rheumatoid arthritis' ", as.factor = T)
+dat.analytic$arthritis <- 
+car::recode(dat.analytic$rheumatoid, " 'No' = 'No arthritis';
+            'Yes' = 'Rheumatoid arthritis' ", as.factor = T)
 table(dat.analytic$arthritis, useNA = "always")
 
 # Keep only relevant variables
-vars <-  c("studyid", "survey.weight", "psu", "strata", "cvd", "arthritis", "age.cat", 
-           "sex", "education", "race", "income", "bmi", "smoking", "htn", "diabetes")
+vars <-  c("studyid", "survey.weight", "psu", "strata", "cvd",
+           "arthritis", "age.cat", "sex", "education", "race",
+           "income", "bmi", "smoking", "htn", "diabetes")
 dat.analytic2 <- dat.analytic[, vars]
 ```
 
@@ -137,7 +143,8 @@ dat.analytic2 <- dat.analytic[, vars]
 # Create Table 1
 vars <- c("arthritis", "age.cat", "sex", "education", "race", "income", "bmi", "smoking",
           "htn", "diabetes")
-tab1 <- CreateTableOne(vars = vars, strata = "cvd", data = dat.analytic2, includeNA = F,
+tab1 <- CreateTableOne(vars = vars, strata = "cvd", 
+                       data = dat.analytic2, includeNA = F,
                        addOverall = T, test = F)
 print(tab1, format = "f", showAllLevels = T)
 ```
@@ -184,7 +191,7 @@ meth
 
 -   There is no missing for studyid, survey.weight, psu, strata, cvd, arthritis, age, sex, race, smoking. Hence, no method is assigned for these variables.
 -   For education, `polyreg` (Polytomous logistic regression) will be used.
--   Similarly, we will use `pmm` (Predictive mean matching) for bmi, income and used `logreg` (Logistic regression) for htn, diabetes.
+-   Similarly, we will use `pmm` (Predictive mean matching) for bmi, income and used `logreg` (Logistic regression) for htn, diabetes. See the [Imputation](missingdata1.html) chapter to see how the PMM method works. 
 
 #### Step 1: Imputing missing values using mice
 
@@ -284,12 +291,14 @@ As we can see, the variable names are different in the two datasets. Particularl
 ```{r step1k, cache=TRUE}
 # Categorical age
 summary(dat.ineligible.stacked$age)
-dat.ineligible.stacked$age.cat <- with(dat.ineligible.stacked, 
-                                       ifelse(age >= 20 & age < 50, "20-49", 
-                                              ifelse(age >= 50 & age < 65, "50-64", 
-                                                    ifelse(age >= 65, "65+", NA))))
-dat.ineligible.stacked$age.cat <- factor(dat.ineligible.stacked$age.cat, 
-                                         levels = c("20-49", "50-64", "65+"))
+dat.ineligible.stacked$age.cat <- 
+  with(dat.ineligible.stacked, 
+       ifelse(age >= 20 & age < 50, "20-49", 
+              ifelse(age >= 50 & age < 65, "50-64", 
+                     ifelse(age >= 65, "65+", NA))))
+dat.ineligible.stacked$age.cat <- 
+  factor(dat.ineligible.stacked$age.cat, 
+         levels = c("20-49", "50-64", "65+"))
 ```
 
 Note that, we are assigning anyone with less than 20 age as missing.
@@ -297,9 +306,10 @@ Note that, we are assigning anyone with less than 20 age as missing.
 ```{r step1l, cache=TRUE}
 table(dat.ineligible.stacked$age.cat, useNA = "always")
 # Recode arthritis
-dat.ineligible.stacked$arthritis <- car::recode(dat.ineligible.stacked$rheumatoid, 
-                                                " 'No' = 'No arthritis'; 'Yes' = 
-                                                'Rheumatoid arthritis' ", as.factor = T)
+dat.ineligible.stacked$arthritis <- 
+  car::recode(dat.ineligible.stacked$rheumatoid, 
+  " 'No' = 'No arthritis'; 'Yes' = 'Rheumatoid arthritis' ", 
+  as.factor = T)
 ```
 
 Note: In the above step, we could also create two variables with missing values rather than recoding. The reason is that we will subset the design; no matter whether we recode or create missing values for ineligible, the only information we need from ineligible subjects is their survey features when creating the design.
@@ -328,7 +338,8 @@ The next step is to create the design on full dataset \[with eligible (imputed) 
 
 ```{r step1o, cache=TRUE}
 m <- 5
-allImputations <- imputationList(lapply(1:m, function(n) subset(impdata2, subset=.imp==n)))
+allImputations <- imputationList(lapply(1:m, function(n) 
+  subset(impdata2, subset=.imp==n)))
 
 # Step 2: Survey data analysis
 w.design0 <- svydesign(ids = ~psu, 
@@ -351,9 +362,11 @@ The subsetted design contains 4,191 subjects with 17 variables and 5 imputed dat
 
 ```{r step2, cache=TRUE}
 # Design-adjusted logistic regression
-fit <- with(w.design, svyglm(I(cvd == "Yes") ~ arthritis + age.cat + sex + education + 
-                               race + income + bmi + smoking + htn + diabetes, 
-                             family = quasibinomial))
+fit <- with(w.design, 
+            svyglm(I(cvd == "Yes") ~ arthritis + age.cat + 
+                     sex + education + race + income + bmi + 
+                     smoking + htn + diabetes, 
+                   family = quasibinomial))
 res <- exp(as.data.frame(cbind(coef(fit[[1]]),
       coef(fit[[2]]),
       coef(fit[[3]]),

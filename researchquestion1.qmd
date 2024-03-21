@@ -11,7 +11,7 @@ require(ggplot2)
 
 ### Working with a Predictive question using RHC
 
-This tutorial delves into processing and understanding the RHC dataset, which pertains to patients in the intensive care unit. The dataset is particularly centered around the implications of using right heart catheterization (RHC) in the early phases of care, with a focus on comparing two patient groups: those who received the RHC procedure and those who did not. The key outcome being analyzed is the 30-day survival rate. We will use this as an example to explain how to work with a predictive research question to build the analytic data.
+This tutorial delves into processing and understanding the right heart catheterization (RHC) dataset, which pertains to patients in the intensive care unit. The dataset is particularly centered around the implications of using RHC in the early phases of care, with a focus on comparing two patient groups: those who received the RHC procedure and those who did not. The key outcome being analyzed is the 30-day survival rate. We will use this as an example to explain how to work with a predictive research question to build the analytic data.
 
 ::: column-margin
 [Link for the RHC dataset](https://search.r-project.org/CRAN/refmans/ATbounds/html/RHC.html)
@@ -58,23 +58,24 @@ Let us download the dataset and save it for later use.
 
 ```{r download, cache=TRUE}
 # Load the dataset
-ObsData <- read.csv("https://hbiostat.org/data/repo/rhc.csv", header = TRUE)
+ObsData <- read.csv("https://hbiostat.org/data/repo/rhc.csv", 
+                    header = TRUE)
 
 # Save the dataset
 saveRDS(ObsData, file = "Data/researchquestion/rhc.RDS")
 ```
 
-### Creating analytic data
+### Creating analytic dataset
 
-Now, we show the process of preparing analytic data, so that the variables generally match with the way the authors were coded in the original article. Below we show the process of creating the analytic data.
+Now, we show the process of preparing our analytic dataset (i.e., ready to use dataset for our analysis), so that the variables generally match with the way the authors were coded in the original article. Below we show the process of creating the analytic dataset.
 
 #### Add column for outcome: length of stay
 
 ```{r addcol, cache=TRUE}
-# Length.of.Stay = date of discharge - study admission date
+# Length of Stay = date of discharge - study admission date
 ObsData$Length.of.Stay <- ObsData$dschdte - ObsData$sadmdte
 
-# Length.of.Stay = date of death - study admission date if date of discharge not available
+# Length of Stay = date of death - study admission date if date of discharge not available
 ObsData$Length.of.Stay[is.na(ObsData$Length.of.Stay)] <- 
   ObsData$dthdte[is.na(ObsData$Length.of.Stay)] - 
   ObsData$sadmdte[is.na(ObsData$Length.of.Stay)]
@@ -110,7 +111,8 @@ ObsData <- dplyr::select(ObsData, !c(dthdte, lstctdte, dschdte,
 Now we will drop unnecessary and problematic variables:
 
 ```{r remove2, cache=TRUE}
-ObsData <- dplyr::select(ObsData, !c(sadmdte, ptid, X, adld3p, urin1, cat2))
+ObsData <- dplyr::select(ObsData, !c(sadmdte, ptid, X, adld3p, 
+                                     urin1, cat2))
 ```
 
 #### Basic data cleanup
@@ -139,7 +141,8 @@ ObsData <- dplyr::select(ObsData, !swang1)
 # Categorize the variables to match with the original paper
 ObsData$age <- cut(ObsData$age, breaks=c(-Inf, 50, 60, 70, 80, Inf),
                    right=FALSE)
-ObsData$race <- factor(ObsData$race, levels=c("white","black","other"))
+ObsData$race <- factor(ObsData$race, 
+                       levels=c("white","black","other"))
 ObsData$sex <- as.factor(ObsData$sex)
 ObsData$sex <- relevel(ObsData$sex, ref = "Male")
 ObsData$cat1 <- as.factor(ObsData$cat1)
@@ -155,19 +158,25 @@ ObsData$ca <- factor(ObsData$ca, levels=c("None", "Localized (Yes)",
 
 ```{r rename2, cache=TRUE}
 # Rename the variables
-names(ObsData) <- c("Disease.category", "Cancer", "Death", "Cardiovascular", 
-                    "Congestive.HF", "Dementia", "Psychiatric", "Pulmonary", 
+names(ObsData) <- c("Disease.category", "Cancer", "Death", 
+                    "Cardiovascular", "Congestive.HF", 
+                    "Dementia", "Psychiatric", "Pulmonary", 
                     "Renal", "Hepatic", "GI.Bleed", "Tumor", 
-                    "Immunosupperssion", "Transfer.hx", "MI", "age", "sex", 
-                    "edu", "DASIndex", "APACHE.score", "Glasgow.Coma.Score", 
-                    "blood.pressure", "WBC", "Heart.rate", "Respiratory.rate", 
-                    "Temperature", "PaO2vs.FIO2", "Albumin", "Hematocrit", 
-                    "Bilirubin", "Creatinine", "Sodium", "Potassium", "PaCo2", 
-                    "PH", "Weight", "DNR.status", "Medical.insurance", 
+                    "Immunosupperssion", "Transfer.hx", "MI", 
+                    "age", "sex", "edu", "DASIndex", 
+                    "APACHE.score", "Glasgow.Coma.Score", 
+                    "blood.pressure", "WBC", "Heart.rate",
+                    "Respiratory.rate",  "Temperature",
+                    "PaO2vs.FIO2", "Albumin", "Hematocrit", 
+                    "Bilirubin", "Creatinine", "Sodium", 
+                    "Potassium", "PaCo2",  "PH", "Weight", 
+                    "DNR.status", "Medical.insurance", 
                     "Respiratory.Diag", "Cardiovascular.Diag", 
-                    "Neurological.Diag", "Gastrointestinal.Diag", "Renal.Diag",
-                    "Metabolic.Diag", "Hematologic.Diag", "Sepsis.Diag", 
-                    "Trauma.Diag", "Orthopedic.Diag", "race", "income", 
+                    "Neurological.Diag", "Gastrointestinal.Diag",
+                    "Renal.Diag", "Metabolic.Diag", 
+                    "Hematologic.Diag", "Sepsis.Diag", 
+                    "Trauma.Diag", "Orthopedic.Diag", 
+                    "race", "income", 
                     "Length.of.Stay", "RHC.use")
 
 # Save the dataset

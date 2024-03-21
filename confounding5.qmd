@@ -1,6 +1,21 @@
 ## Collapsibility {.unnumbered}
 
-Explanation of collapsibility property of an estimate (RD, RR and OR: conditional or marginal) in absence of confounding
+Let us assume we have a regression of hypertension ($Y$), smoking ($A$) and a risk factor for outcome, gender ($L$). Then let us set up 2 regression models:
+
+-   1st regression model is $Y \sim \beta \times A + \alpha \times L$. Here we are conditioning on gender ($L$).
+-   2nd regression model is $Y \sim \beta' \times A$
+
+Then regression is collapsible for $\beta$ over $L$ if $\beta = \beta'$ from the 2nd regression omitting $L$. $\beta \ne \beta'$ would mean non-collapsibility. A measure of association (say, risk difference) is collapsible if the marginal measure of association is equal to a weighted average of the stratum-specific measures of association. Non-collapsibility is also knows as Simpson's Paradox (in absence of confounding of course): a statistical phenomenon where an association between two factors (say, hypertension and smoking) in a population (we are talking about marginal estimate here) is different than the associations of same relationship in subpopulations (conditional on some other factor, say, age; hence talking about conditional estimates). Risk ratio and risk difference are collapsible.
+
+Odds ratio can be non-collapsible. It can produce different treatment effect estimate for different covariate adjustment sets (see example below of when adjusting form age and sex vs. when adjusting none). This is true even in the absence of confounding. However, according to our definition here, OR is collapsible when we consider gender in the adjustment set.
+
+Note that, OR non-collapsibility is a consequence of the fact that it is estimated via a logit link function (nonlinearity of the logistic transformation).
+
+Ref:
+
+-   [@greenland1999confounding]
+-   [@mansournia2015relation]
+
 
 ```{r setup, warning=FALSE, message=FALSE,cache=TRUE}
 # Load required packages
@@ -12,20 +27,17 @@ library(lawstat)
 
 ### Data generating process
 
+Let us generate the data with smoking being the exposure and hypertension being the outcome. 
+
 ```{r dgm5, warning=FALSE, message=FALSE, cache = TRUE}
 require(simcausal)
 D <- DAG.empty()
 D <- D + 
-  node("gender", distr = "rbern", 
-       prob = 0.7) +
-  node("age", distr = "rnorm", 
-       mean = 2, sd = 4) +
-  node("smoking", distr = "rbern", 
-       prob = plogis(.1)) +
+  node("gender", distr = "rbern", prob = 0.7) +
+  node("age", distr = "rnorm", mean = 2, sd = 4) +
+  node("smoking", distr = "rbern", prob = plogis(.1)) +
   node("hypertension", distr = "rbern", 
-       prob = plogis(1 + log(3.5) * smoking 
-                     + log(.1) * gender  
-                       + log(7) * age))
+       prob = plogis(1 + log(3.5) * smoking + log(.1) * gender + log(7) * age))
 Dset <- set.DAG(D)
 ```
 
@@ -35,7 +47,6 @@ Dset <- set.DAG(D)
 plotDAG(Dset, xjitter = 0.1, yjitter = .9,
         edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
         vertex_attrs = list(size = 12, label.cex = 0.8))
-
 ```
 
 #### Generate Data
@@ -49,12 +60,12 @@ head(Obs.Data)
 
 ```{r balance5, warning=FALSE, message=FALSE, cache = TRUE}
 require(tableone)
-CreateTableOne(data = Obs.Data, 
-               strata = "smoking", 
-               vars = c("gender", "age"))
+CreateTableOne(data = Obs.Data, strata = "smoking", vars = c("gender", "age"))
 ```
 
-### Conditional and crude RD
+### Conditional and crude risk difference (RD)
+
+Since RD is a collapsible measure, the marginal and conditional estimate should be approximately the same.
 
 #### Full list of risk factors for outcome (2 variables)
 
@@ -127,7 +138,7 @@ publish(fitx2, print = FALSE, confint.method = "robust",
         pvalue.method = "robust")$regressionTable[2,]
 ```
 
-Unweighted mean from all strata (for simplicity, 1 variables)
+Unweighted mean from all strata (for simplicity, 1 variable)
 
 ```{r wmean, warning=FALSE, message=FALSE, cache = TRUE}
 round(mean(c(coef(fitx1)["smoking"],
@@ -143,7 +154,7 @@ publish(fitx0, print = FALSE, confint.method = "robust",
         pvalue.method = "robust")$regressionTable[2,]
 ```
 
-### Conditional and crude RR
+### Conditional and crude risk ratio (RR)
 
 Ref:
 
@@ -157,6 +168,8 @@ fitx0 <- glm(hypertension ~ smoking + gender + age,
 publish(fitx0, print = FALSE, confint.method = "robust", 
         pvalue.method = "robust")$regressionTable[1,]
 ```
+
+The estimate we see as a `hazard ratio` is basically a `risk ratio`. 
 
 #### Strtatum specific (2 variables)
 
@@ -234,6 +247,8 @@ fitx0 <- glm(hypertension ~ smoking,
 publish(fitx0, print = FALSE, confint.method = "robust", 
         pvalue.method = "robust")$regressionTable[1,]
 ```
+
+Since the marginal and conditional estimate are approximately the same, RD is a collapsible measure. 
 
 ### Conditional and crude OR
 
@@ -442,26 +457,12 @@ Here are the summary of the results based on a scenario where confounding was ab
 | crude                                                      | 0.05 \[0.05;0.06\]        | 1.08 \[1.07;1.09\]          | 1.29 \[1.25;1.32\]                          |
 | Based on marginal probabilities (any variable combination) | 0.05                      | 1.08                        | 1.29                                        |
 
-Let us assume we have a regression of hypertension ($Y$), smoking ($A$) and a risk factor for outcome, gender ($L$). Then let us set up 2 regression models:
-
--   1st regression model is $Y \sim \beta \times A + \alpha \times L$. Here we are conditioning on gender ($L$).
--   2nd regression model is $Y \sim \beta' \times A$
-
-Then regression is collapsible for $\beta$ over $L$ if $\beta = \beta'$ from the 2nd regression omitting $L$. $\beta \ne \beta'$ would mean non-collapsibility. A measure of association (say, risk difference) is collapsible if the marginal measure of association is equal to a weighted average of the stratum-specific measures of association. Non-collapsibility is also knows as Simpson's Paradox (in absence of confoinding of course): a statistical phenomenon where an association between two factors (say, hypertension and smoking) in a population (we are talking about marginal estimate here) is different than the associations of same relationship in subpopulations (conditional on some other factor, say, age; hence talking about conditional estimates).
-
-Odds ratio can be non-collapsible. It can produce different treatment effect estimate for different covariate adjustment sets (see our above example of when adjusting form age and sex vs. when adjusting none). This is true even in the absence of confounding. However, according to our definition here, OR is collapsible when we consider gender in the adjustment set.
-
-Note that, OR non-collapsibility is a consequence of the fact that it is estimated via a logit link function (nonlinearity of the logistic transformation).
-
-Ref:
-
--   [@greenland1999confounding]
--   [@mansournia2015relation]
+As we can see, marginal estimate = conditional estimate for RD and RR but not for OR. Hence, RD and RR are collapsible measures, while OR is a non-collapsible measure.
 
 ### Video content (optional)
 
 ::: callout-tip
-For those who prefer a video walkthrough, feel free to watch the video below, which offers a description of an earlier version of the above content.
+For those who prefer a video walk through, feel free to watch the video below, which offers a description of an earlier version of the above content.
 :::
 
 ::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}

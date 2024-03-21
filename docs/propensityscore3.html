@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1117,66 +1117,55 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><section id="pre-processing" class="level3"><h3 class="anchored" data-anchor-id="pre-processing">Pre-processing</h3>
 <section id="load-data" class="level4"><h4 class="anchored" data-anchor-id="load-data">Load data</h4>
 <p>Load the dataset and inspect its structure and variables.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/data_7e58789066707b26fc1e641fb70e9a8c">
+<div class="cell" data-hash="propensityscore3_cache/html/data_540eeaa74f54af6d9caa48b0380f3a6e">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/NHANES17.RData"</span>) </span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">ls</span>()</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; [1] "analytic"           "analytic.with.miss"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; [1] "analytic"           "analytic.with.miss" "has_annotations"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Visualize missing data patterns.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/mplot_8e900758279d361d0107dca0d7be977b">
+<div class="cell" data-hash="propensityscore3_cache/html/mplot_6e872d24465de6dc7ed94f22b6aee554">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt; </span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; The following objects are masked from 'package:data.table':</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; </span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;     between, first, last</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; </span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt;     filter, lag</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; </span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a>analytic.with.miss <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(analytic.with.miss, </span>
-<span id="cb2-14"><a href="#cb2-14"></a>                  cholesterol, <span class="co">#outcome</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a>                  gender, age, born, race, education, </span>
-<span id="cb2-16"><a href="#cb2-16"></a>                  married, income, bmi, diabetes, <span class="co">#predictors</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a>                  weight, psu, strata) <span class="co">#survey features</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="fu">dim</span>(analytic.with.miss)</span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; [1] 9254   13</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="fu">str</span>(analytic.with.miss)</span>
-<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt; 'data.frame':    9254 obs. of  13 variables:</span></span>
-<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt;  $ cholesterol: 'labelled' int  NA NA 157 148 189 209 176 NA 238 182 ...</span></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Total Cholesterol (mg/dL)"</span></span>
-<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt;  $ gender     : chr  "Female" "Male" "Female" "Male" ...</span></span>
-<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt;  $ age        : 'labelled' int  NA NA 66 NA NA 66 75 NA 56 NA ...</span></span>
-<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Age in years at screening"</span></span>
-<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt;  $ born       : chr  "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
-<span id="cb2-29"><a href="#cb2-29"></a><span class="co">#&gt;  $ race       : chr  "Other" "White" "Black" "Other" ...</span></span>
-<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#&gt;  $ education  : chr  NA NA "High.School" NA ...</span></span>
-<span id="cb2-31"><a href="#cb2-31"></a><span class="co">#&gt;  $ married    : chr  NA NA "Previously.married" NA ...</span></span>
-<span id="cb2-32"><a href="#cb2-32"></a><span class="co">#&gt;  $ income     : chr  "Over100k" "Over100k" "&lt;25k" NA ...</span></span>
-<span id="cb2-33"><a href="#cb2-33"></a><span class="co">#&gt;  $ bmi        : 'labelled' num  17.5 15.7 31.7 21.5 18.1 23.7 38.9 NA 21.3 19.7 ...</span></span>
-<span id="cb2-34"><a href="#cb2-34"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Body Mass Index (kg/m**2)"</span></span>
-<span id="cb2-35"><a href="#cb2-35"></a><span class="co">#&gt;  $ diabetes   : chr  "No" "No" "No" "No" ...</span></span>
-<span id="cb2-36"><a href="#cb2-36"></a><span class="co">#&gt;  $ weight     : 'labelled' num  8540 42567 8338 8723 7065 ...</span></span>
-<span id="cb2-37"><a href="#cb2-37"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Full sample 2 year MEC exam weight"</span></span>
-<span id="cb2-38"><a href="#cb2-38"></a><span class="co">#&gt;  $ psu        : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
-<span id="cb2-39"><a href="#cb2-39"></a><span class="co">#&gt;  $ strata     : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
-<span id="cb2-40"><a href="#cb2-40"></a><span class="fu">names</span>(analytic.with.miss)</span>
-<span id="cb2-41"><a href="#cb2-41"></a><span class="co">#&gt;  [1] "cholesterol" "gender"      "age"         "born"        "race"       </span></span>
-<span id="cb2-42"><a href="#cb2-42"></a><span class="co">#&gt;  [6] "education"   "married"     "income"      "bmi"         "diabetes"   </span></span>
-<span id="cb2-43"><a href="#cb2-43"></a><span class="co">#&gt; [11] "weight"      "psu"         "strata"</span></span>
-<span id="cb2-44"><a href="#cb2-44"></a></span>
-<span id="cb2-45"><a href="#cb2-45"></a><span class="fu">library</span>(DataExplorer)</span>
-<span id="cb2-46"><a href="#cb2-46"></a><span class="fu">plot_missing</span>(analytic.with.miss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2"></a>analytic.with.miss <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(analytic.with.miss, </span>
+<span id="cb2-3"><a href="#cb2-3"></a>                  cholesterol, <span class="co">#outcome</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>                  gender, age, born, race, education, </span>
+<span id="cb2-5"><a href="#cb2-5"></a>                  married, income, bmi, diabetes, <span class="co">#predictors</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>                  weight, psu, strata) <span class="co">#survey features</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">dim</span>(analytic.with.miss)</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; [1] 9254   13</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="fu">str</span>(analytic.with.miss)</span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 'data.frame':    9254 obs. of  13 variables:</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt;  $ cholesterol: 'labelled' int  NA NA 157 148 189 209 176 NA 238 182 ...</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Total Cholesterol (mg/dL)"</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt;  $ gender     : chr  "Female" "Male" "Female" "Male" ...</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt;  $ age        : 'labelled' int  NA NA 66 NA NA 66 75 NA 56 NA ...</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Age in years at screening"</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt;  $ born       : chr  "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" "Born in 50 US states or Washingt" ...</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt;  $ race       : chr  "Other" "White" "Black" "Other" ...</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt;  $ education  : chr  NA NA "High.School" NA ...</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt;  $ married    : chr  NA NA "Previously.married" NA ...</span></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt;  $ income     : chr  "Over100k" "Over100k" "&lt;25k" NA ...</span></span>
+<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt;  $ bmi        : 'labelled' num  17.5 15.7 31.7 21.5 18.1 23.7 38.9 NA 21.3 19.7 ...</span></span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Body Mass Index (kg/m**2)"</span></span>
+<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt;  $ diabetes   : chr  "No" "No" "No" "No" ...</span></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt;  $ weight     : 'labelled' num  8540 42567 8338 8723 7065 ...</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt;   ..- attr(*, "label")= chr "Full sample 2 year MEC exam weight"</span></span>
+<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt;  $ psu        : Factor w/ 2 levels "1","2": 2 1 2 2 1 2 1 1 2 2 ...</span></span>
+<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt;  $ strata     : Factor w/ 15 levels "134","135","136",..: 12 10 12 1 5 5 3 1 1 14 ...</span></span>
+<span id="cb2-29"><a href="#cb2-29"></a><span class="fu">names</span>(analytic.with.miss)</span>
+<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#&gt;  [1] "cholesterol" "gender"      "age"         "born"        "race"       </span></span>
+<span id="cb2-31"><a href="#cb2-31"></a><span class="co">#&gt;  [6] "education"   "married"     "income"      "bmi"         "diabetes"   </span></span>
+<span id="cb2-32"><a href="#cb2-32"></a><span class="co">#&gt; [11] "weight"      "psu"         "strata"</span></span>
+<span id="cb2-33"><a href="#cb2-33"></a></span>
+<span id="cb2-34"><a href="#cb2-34"></a><span class="fu">library</span>(DataExplorer)</span>
+<span id="cb2-35"><a href="#cb2-35"></a><span class="fu">plot_missing</span>(analytic.with.miss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propensityscore3_files/figure-html/mplot-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="formatting-variables" class="level4"><h4 class="anchored" data-anchor-id="formatting-variables">Formatting variables</h4>
 <p>Rename variables to avoid conflicts. Recode variables into binary or categorical as needed. Ensure variable types (factor, numeric) are appropriate.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/format_664c3a4af7ce9ab4058d9ceca138e3a8">
+<div class="cell" data-hash="propensityscore3_cache/html/format_c4725de7c7395b61c67b9cf8d2f40855">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># to avaoid any confusion later</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co"># rename weight variable as weights </span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co"># is reserved for matching weights</span></span>
@@ -1255,7 +1244,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="complete-case-data" class="level4"><h4 class="anchored" data-anchor-id="complete-case-data">Complete case data</h4>
 <p>Create a dataset (<code>analytic.data</code>) without <code>NA</code> values for analysis. This is done for simplified analysis, but this approach has it’s own challenges. In a next tutorial, we will appropriately deal with missing observations in a propensity score modelling.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/ccdata_e555aa0a61032bdd96f8995b89a4884d">
+<div class="cell" data-hash="propensityscore3_cache/html/ccdata_e39012164b3e410455f1b7f1c32b3f6f">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">dim</span>(analytic.with.miss)</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; [1] 9254   15</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a>analytic.data <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">na.omit</span>(analytic.with.miss))</span>
@@ -1264,7 +1253,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="zanutto-2006" class="level3"><h3 class="anchored" data-anchor-id="zanutto-2006">Zanutto (2006)</h3>
 <ul>
-<li>Ref: <span class="citation" data-cites="zanutto2006comparison">(<a href="#ref-zanutto2006comparison" role="doc-biblioref">Zanutto 2006</a>)</span>
+<li>Ref: <span class="citation" data-cites="zanutto2006comparison">Zanutto (<a href="#ref-zanutto2006comparison" role="doc-biblioref">2006</a>)</span>
 </li>
 </ul>
 <section id="video-content-optional" class="level4"><h4 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h4>
@@ -1286,22 +1275,27 @@ Tip
 </iframe>
 </div>
 </section><section id="set-seed" class="level4"><h4 class="anchored" data-anchor-id="set-seed">Set seed</h4>
-<div class="cell" data-hash="propensityscore3_cache/html/seed_fabf10c2fdb6d21cb8d8dd18d2b5240e">
+<div class="cell" data-hash="propensityscore3_cache/html/seed_13287f65648ed92f1559b6e741363d78">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>“it is not necessary to use survey-weighted estimation for the propensity score model”</li>
 </ul>
 <p>Propensity score analysis in 4 steps:</p>
-</section><section id="step-1" class="level4"><h4 class="anchored" data-anchor-id="step-1">Step 1</h4>
+<ul>
+<li>Step 1: PS model specification</li>
+<li>Step 2: Matching based on the estimated propensity scores</li>
+<li>Step 3: Balance checking</li>
+<li>Step 4: Outcome modelling</li>
+</ul></section><section id="step-1" class="level4"><h4 class="anchored" data-anchor-id="step-1">Step 1</h4>
 <p>Specify the propensity score model to estimate propensity scores</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Zanstep1_2e5e582634f5eb5534df4ffe8de350b4">
+<div class="cell" data-hash="propensityscore3_cache/html/Zanstep1_2051ab8d579822ce26d4536c705f9123">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(diabetes <span class="sc">~</span> gender <span class="sc">+</span> born <span class="sc">+</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>                         race <span class="sc">+</span> education <span class="sc">+</span> married <span class="sc">+</span> income <span class="sc">+</span> bmi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2" class="level4"><h4 class="anchored" data-anchor-id="step-2">Step 2</h4>
-<p>Match treated and untreated subjects on the estimated propensity scores. Perform nearest-neighbor matching using the propensity scores. Visualize the distribution of propensity scores before and after matching.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Zanstep2_4b34170d53dad92f247d00e9f3035c33">
+<p>Match treated and untreated subjects based on the estimated propensity scores. Perform nearest-neighbor matching using the propensity scores. Visualize the distribution of propensity scores before and after matching.</p>
+<div class="cell" data-hash="propensityscore3_cache/html/Zanstep2_fbfd7367e42bc956b0400dd672ad2b46">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">require</span>(MatchIt)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co"># This function fits propensity score model (using logistic </span></span>
@@ -1327,7 +1321,8 @@ Tip
 <div class="cell-output-display">
 <p><img src="propensityscore3_files/figure-html/Zanstep2-1.png" class="img-fluid" width="672"></p>
 </div>
-<pre><code>#&gt; To identify the units, use first mouse button; to stop, use second.
+<pre><code>#&gt; [1] "To identify the units, use first mouse button; to stop, use second."
+#&gt; integer(0)
 plot(match.obj, type = "hist")</code></pre>
 <div class="cell-output-display">
 <p><img src="propensityscore3_files/figure-html/Zanstep2-2.png" class="img-fluid" width="672"></p>
@@ -1354,8 +1349,8 @@ plot(match.obj, type = "hist")</code></pre>
 <span id="cb9-20"><a href="#cb9-20"></a>matched.data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3" class="level4"><h4 class="anchored" data-anchor-id="step-3">Step 3</h4>
-<p>compare the similarity of baseline characteristics between treated and untreated subjects in a the propensity score-matched sample. In this case, we will compare SMD &lt; 0.2 or not.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Zanstep3_778ebd5d4bcaa6920dde8ecd4057d40a">
+<p>Compare the similarity of baseline characteristics between treated and untreated subjects in a the propensity score-matched sample. In this case, we will compare SMD &lt; 0.2 or not.</p>
+<div class="cell" data-hash="propensityscore3_cache/html/Zanstep3_73cdc992f883aa798ddf830d6d0fd153">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">require</span>(tableone)</span>
 <span id="cb10-2"><a href="#cb10-2"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, </span>
 <span id="cb10-3"><a href="#cb10-3"></a>                  <span class="st">"married"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>)</span>
@@ -1387,7 +1382,7 @@ plot(match.obj, type = "hist")</code></pre>
 <span id="cb10-29"><a href="#cb10-29"></a><span class="co">#&gt;      Over100k             704 (20.9)    149 (18.8)        </span></span>
 <span id="cb10-30"><a href="#cb10-30"></a><span class="co">#&gt;   bmi (mean (SD))       29.29 (7.11)  32.31 (8.03)   0.399</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore3_cache/html/Zanstep3b_c0a8dbc7eeeb7b671506ceb7cee09fe5">
+<div class="cell" data-hash="propensityscore3_cache/html/Zanstep3b_dcc12b8541222c4ad1072249bb8da5d1">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>tab1m <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"diabetes"</span>, <span class="at">vars =</span> baselinevars, </span>
 <span id="cb11-2"><a href="#cb11-2"></a>                        <span class="at">data =</span> matched.data, <span class="at">test =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="fu">print</span>(tab1m, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
@@ -1419,7 +1414,7 @@ plot(match.obj, type = "hist")</code></pre>
 </section><section id="step-4" class="level4"><h4 class="anchored" data-anchor-id="step-4">Step 4</h4>
 <p>Estimate the effect of treatment on outcomes using propensity score-matched sample. Use the matched sample to estimate the treatment effect, considering survey design.</p>
 <p>Incorporating the survey design into both linear regression and propensity score analysis is crucial. Neglecting the survey weights can significantly impact the estimates, altering the representation of population-level effects.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Zanstep4_9ad85200cd2e0dac991e44259734a610">
+<div class="cell" data-hash="propensityscore3_cache/html/Zanstep4_48f6418a443c0ba52e3feaf9d796788b">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="co"># setup the design with survey features</span></span>
 <span id="cb12-3"><a href="#cb12-3"></a>analytic.with.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -1438,7 +1433,7 @@ plot(match.obj, type = "hist")</code></pre>
 <span id="cb12-16"><a href="#cb12-16"></a>                      <span class="at">data=</span>analytic.with.miss, <span class="at">nest=</span><span class="cn">TRUE</span>)</span>
 <span id="cb12-17"><a href="#cb12-17"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore3_cache/html/Zanstep4b_8861f519f6527f2b58389ecbc6681030">
+<div class="cell" data-hash="propensityscore3_cache/html/Zanstep4b_bdbd47f0b098f707b5c2a3531cc0f3f4">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(cholesterol.bin <span class="sc">~</span> diabetes)</span>
 <span id="cb13-2"><a href="#cb13-2"></a>sfit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(out.formula,<span class="at">family=</span><span class="fu">binomial</span>(logit), <span class="at">design =</span> w.design.m)</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
@@ -1481,7 +1476,7 @@ plot(match.obj, type = "hist")</code></pre>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">AIC</td>
-<td style="text-align: right;">1925.24</td>
+<td style="text-align: right;">1924.27</td>
 </tr>
 </tbody></table>
 </div>
@@ -1498,17 +1493,17 @@ plot(match.obj, type = "hist")</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">(Intercept)</td>
-<td style="text-align: right;">1.33</td>
-<td style="text-align: right;">0.97</td>
-<td style="text-align: right;">1.80</td>
-<td style="text-align: right;">1.79</td>
+<td style="text-align: right;">1.34</td>
+<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">1.83</td>
+<td style="text-align: right;">1.84</td>
 <td style="text-align: right;">0.09</td>
 </tr>
 <tr class="even">
 <td style="text-align: left; font-weight: bold;">diabetes</td>
-<td style="text-align: right;">1.68</td>
+<td style="text-align: right;">1.67</td>
 <td style="text-align: right;">1.17</td>
-<td style="text-align: right;">2.41</td>
+<td style="text-align: right;">2.37</td>
 <td style="text-align: right;">2.84</td>
 <td style="text-align: right;">0.01</td>
 </tr>
@@ -1528,7 +1523,7 @@ plot(match.obj, type = "hist")</code></pre>
 </div>
 </section></section><section id="dugoff-et-al.-2014" class="level3"><h3 class="anchored" data-anchor-id="dugoff-et-al.-2014">DuGoff et al.&nbsp;(2014)</h3>
 <ul>
-<li>Ref: <span class="citation" data-cites="dugoff2014generalizing">(<a href="#ref-dugoff2014generalizing" role="doc-biblioref">DuGoff, Schuler, and Stuart 2014</a>)</span>
+<li>Ref: <span class="citation" data-cites="dugoff2014generalizing">DuGoff, Schuler, and Stuart (<a href="#ref-dugoff2014generalizing" role="doc-biblioref">2014</a>)</span>
 </li>
 </ul>
 <p>Propensity score analysis in 4 steps (PATT)</p>
@@ -1552,7 +1547,7 @@ Tip
 </div>
 </section><section id="step-1-1" class="level4"><h4 class="anchored" data-anchor-id="step-1-1">Step 1</h4>
 <p>Specify the propensity score model to estimate propensity scores. Similar to Zanutto but includes additional covariates in the model.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Dugstep1_d8f867a7f153236f9f6a91f6baf95cfa">
+<div class="cell" data-hash="propensityscore3_cache/html/Dugstep1_90488f58f4289c43f1e34d626501f961">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># response = exposure variable</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co"># independent variables = baseline covariates</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(diabetes <span class="sc">~</span> gender <span class="sc">+</span> born <span class="sc">+</span> race <span class="sc">+</span> education <span class="sc">+</span> </span>
@@ -1561,7 +1556,7 @@ Tip
 </div>
 </section><section id="step-2-1" class="level4"><h4 class="anchored" data-anchor-id="step-2-1">Step 2</h4>
 <p>Match treated and untreated subjects on the estimated propensity scores</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Dugstep2_1fe72972d3b0ccdfc5de9f96d52a413e">
+<div class="cell" data-hash="propensityscore3_cache/html/Dugstep2_48dec33e11d01e1590f25e78f23c0def">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">require</span>(MatchIt)</span>
 <span id="cb15-2"><a href="#cb15-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb15-3"><a href="#cb15-3"></a>match.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula, <span class="at">data =</span> analytic.data,</span>
@@ -1578,7 +1573,8 @@ Tip
 <div class="cell-output-display">
 <p><img src="propensityscore3_files/figure-html/Dugstep2-1.png" class="img-fluid" width="672"></p>
 </div>
-<pre><code>#&gt; To identify the units, use first mouse button; to stop, use second.
+<pre><code>#&gt; [1] "To identify the units, use first mouse button; to stop, use second."
+#&gt; integer(0)
 plot(match.obj, type = "hist")</code></pre>
 <div class="cell-output-display">
 <p><img src="propensityscore3_files/figure-html/Dugstep2-2.png" class="img-fluid" width="672"></p>
@@ -1606,7 +1602,7 @@ plot(match.obj, type = "hist")</code></pre>
 </div>
 </section><section id="step-3-1" class="level4"><h4 class="anchored" data-anchor-id="step-3-1">Step 3</h4>
 <p>Compare the similarity of baseline characteristics between treated and untreated subjects in a the propensity score-matched sample. In this case, we will compare SMD &lt; 0.2 or not.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Dugstep3_771f2d6f80c51cc5cdc1973aec205f0f">
+<div class="cell" data-hash="propensityscore3_cache/html/Dugstep3_98459d41bc8a4e061bfd28cd4ab2ce82">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">require</span>(tableone)</span>
 <span id="cb18-2"><a href="#cb18-2"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, </span>
 <span id="cb18-3"><a href="#cb18-3"></a>                  <span class="st">"married"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>, </span>
@@ -1646,7 +1642,7 @@ plot(match.obj, type = "hist")</code></pre>
 </div>
 </section><section id="step-4-1" class="level4"><h4 class="anchored" data-anchor-id="step-4-1">Step 4</h4>
 <p>Estimate the effect of treatment on outcomes using propensity score-matched sample</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Dugstep4_89b2dd9d23c83287fa03691c1e844532">
+<div class="cell" data-hash="propensityscore3_cache/html/Dugstep4_6174c9e6dbcd32afcf9076748cd8222b">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># setup the design with survey features</span></span>
 <span id="cb19-2"><a href="#cb19-2"></a>analytic.with.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb19-3"><a href="#cb19-3"></a><span class="fu">length</span>(analytic.with.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
@@ -1664,7 +1660,7 @@ plot(match.obj, type = "hist")</code></pre>
 <span id="cb19-15"><a href="#cb19-15"></a>                      <span class="at">data=</span>analytic.with.miss, <span class="at">nest=</span><span class="cn">TRUE</span>)</span>
 <span id="cb19-16"><a href="#cb19-16"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore3_cache/html/Dugstep4b_922d6dc0583746c64628ec82ce5c19f8">
+<div class="cell" data-hash="propensityscore3_cache/html/Dugstep4b_790d88c023259be1c3f1b09809c0f4ec">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(cholesterol.bin <span class="sc">~</span> diabetes)</span>
 <span id="cb20-2"><a href="#cb20-2"></a>sfit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(out.formula,<span class="at">family=</span>binomial, <span class="at">design =</span> w.design.m)</span>
 <span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
@@ -1754,7 +1750,7 @@ plot(match.obj, type = "hist")</code></pre>
 </div>
 </section></section><section id="austin-et-al.-2018" class="level3"><h3 class="anchored" data-anchor-id="austin-et-al.-2018">Austin et al.&nbsp;(2018)</h3>
 <ul>
-<li>Ref: <span class="citation" data-cites="austin2018propensity">(<a href="#ref-austin2018propensity" role="doc-biblioref">Austin, Jembere, and Chiu 2018</a>)</span>
+<li>Ref: <span class="citation" data-cites="austin2018propensity">Austin, Jembere, and Chiu (<a href="#ref-austin2018propensity" role="doc-biblioref">2018</a>)</span>
 </li>
 </ul>
 <p>Propensity score analysis in 4 steps (PATT)</p>
@@ -1778,7 +1774,7 @@ Tip
 </div>
 </section><section id="step-1-2" class="level4"><h4 class="anchored" data-anchor-id="step-1-2">Step 1</h4>
 <p>Specify the propensity score model to estimate propensity scores. Use survey logistic regression to account for survey design in propensity score estimation.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Ausstep1_150ed0bddbb367c4707faaa9f0c725c6">
+<div class="cell" data-hash="propensityscore3_cache/html/Ausstep1_c4369f72ece1a85db6f57650fdc8f270">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># response = exposure variable</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="co"># independent variables = baseline covariates</span></span>
 <span id="cb21-3"><a href="#cb21-3"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(diabetes <span class="sc">~</span> gender <span class="sc">+</span> born <span class="sc">+</span> race <span class="sc">+</span> education <span class="sc">+</span> </span>
@@ -1795,51 +1791,35 @@ Tip
 </div>
 </section><section id="step-2-2" class="level4"><h4 class="anchored" data-anchor-id="step-2-2">Step 2</h4>
 <p>Match treated and untreated subjects on the estimated propensity scores. Two methods are explored: using the <code>Matching</code> package and the <code>MatchIt</code> package.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Ausstep2a_3f479e113344d967ed32aa51376d5033">
+<div class="cell" data-hash="propensityscore3_cache/html/Ausstep2a_ff6da2376244ae10116c808efa3a428d">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">require</span>(Matching)</span>
-<span id="cb22-2"><a href="#cb22-2"></a><span class="co">#&gt; Loading required package: Matching</span></span>
-<span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt; Warning: package 'Matching' was built under R version 4.3.1</span></span>
-<span id="cb22-4"><a href="#cb22-4"></a><span class="co">#&gt; Loading required package: MASS</span></span>
-<span id="cb22-5"><a href="#cb22-5"></a><span class="co">#&gt; </span></span>
-<span id="cb22-6"><a href="#cb22-6"></a><span class="co">#&gt; Attaching package: 'MASS'</span></span>
-<span id="cb22-7"><a href="#cb22-7"></a><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
-<span id="cb22-8"><a href="#cb22-8"></a><span class="co">#&gt; </span></span>
-<span id="cb22-9"><a href="#cb22-9"></a><span class="co">#&gt;     select</span></span>
-<span id="cb22-10"><a href="#cb22-10"></a><span class="co">#&gt; ## </span></span>
-<span id="cb22-11"><a href="#cb22-11"></a><span class="co">#&gt; ##  Matching (Version 4.10-14, Build Date: 2023-09-13)</span></span>
-<span id="cb22-12"><a href="#cb22-12"></a><span class="co">#&gt; ##  See https://www.jsekhon.com for additional documentation.</span></span>
-<span id="cb22-13"><a href="#cb22-13"></a><span class="co">#&gt; ##  Please cite software as:</span></span>
-<span id="cb22-14"><a href="#cb22-14"></a><span class="co">#&gt; ##   Jasjeet S. Sekhon. 2011. ``Multivariate and Propensity Score Matching</span></span>
-<span id="cb22-15"><a href="#cb22-15"></a><span class="co">#&gt; ##   Software with Automated Balance Optimization: The Matching package for R.''</span></span>
-<span id="cb22-16"><a href="#cb22-16"></a><span class="co">#&gt; ##   Journal of Statistical Software, 42(7): 1-52. </span></span>
-<span id="cb22-17"><a href="#cb22-17"></a><span class="co">#&gt; ##</span></span>
-<span id="cb22-18"><a href="#cb22-18"></a>match.obj2 <span class="ot">&lt;-</span> <span class="fu">Match</span>(<span class="at">Y=</span>analytic.data<span class="sc">$</span>cholesterol, </span>
-<span id="cb22-19"><a href="#cb22-19"></a>                    <span class="at">Tr=</span>analytic.data<span class="sc">$</span>diabetes, </span>
-<span id="cb22-20"><a href="#cb22-20"></a>                    <span class="at">X=</span>analytic.data<span class="sc">$</span>PS, </span>
-<span id="cb22-21"><a href="#cb22-21"></a>                    <span class="at">M=</span><span class="dv">1</span>, </span>
-<span id="cb22-22"><a href="#cb22-22"></a>                    <span class="at">estimand =</span> <span class="st">"ATT"</span>,</span>
-<span id="cb22-23"><a href="#cb22-23"></a>                    <span class="at">replace=</span><span class="cn">FALSE</span>, </span>
-<span id="cb22-24"><a href="#cb22-24"></a>                    <span class="at">caliper =</span> <span class="fl">0.2</span>)</span>
-<span id="cb22-25"><a href="#cb22-25"></a><span class="fu">summary</span>(match.obj2)</span>
-<span id="cb22-26"><a href="#cb22-26"></a><span class="co">#&gt; </span></span>
-<span id="cb22-27"><a href="#cb22-27"></a><span class="co">#&gt; Estimate...  -15.287 </span></span>
-<span id="cb22-28"><a href="#cb22-28"></a><span class="co">#&gt; SE.........  2.118 </span></span>
-<span id="cb22-29"><a href="#cb22-29"></a><span class="co">#&gt; T-stat.....  -7.2175 </span></span>
-<span id="cb22-30"><a href="#cb22-30"></a><span class="co">#&gt; p.val......  5.2958e-13 </span></span>
-<span id="cb22-31"><a href="#cb22-31"></a><span class="co">#&gt; </span></span>
-<span id="cb22-32"><a href="#cb22-32"></a><span class="co">#&gt; Original number of observations..............  4167 </span></span>
-<span id="cb22-33"><a href="#cb22-33"></a><span class="co">#&gt; Original number of treated obs...............  791 </span></span>
-<span id="cb22-34"><a href="#cb22-34"></a><span class="co">#&gt; Matched number of observations...............  781 </span></span>
-<span id="cb22-35"><a href="#cb22-35"></a><span class="co">#&gt; Matched number of observations  (unweighted).  781 </span></span>
-<span id="cb22-36"><a href="#cb22-36"></a><span class="co">#&gt; </span></span>
-<span id="cb22-37"><a href="#cb22-37"></a><span class="co">#&gt; Caliper (SDs)........................................   0.2 </span></span>
-<span id="cb22-38"><a href="#cb22-38"></a><span class="co">#&gt; Number of obs dropped by 'exact' or 'caliper'  10</span></span>
-<span id="cb22-39"><a href="#cb22-39"></a>matched.data2 <span class="ot">&lt;-</span> analytic.data[<span class="fu">c</span>(match.obj2<span class="sc">$</span>index.treated, </span>
-<span id="cb22-40"><a href="#cb22-40"></a>                                 match.obj2<span class="sc">$</span>index.control),]</span>
-<span id="cb22-41"><a href="#cb22-41"></a><span class="fu">dim</span>(matched.data2)</span>
-<span id="cb22-42"><a href="#cb22-42"></a><span class="co">#&gt; [1] 1562   16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-2"><a href="#cb22-2"></a>match.obj2 <span class="ot">&lt;-</span> <span class="fu">Match</span>(<span class="at">Y=</span>analytic.data<span class="sc">$</span>cholesterol, </span>
+<span id="cb22-3"><a href="#cb22-3"></a>                    <span class="at">Tr=</span>analytic.data<span class="sc">$</span>diabetes, </span>
+<span id="cb22-4"><a href="#cb22-4"></a>                    <span class="at">X=</span>analytic.data<span class="sc">$</span>PS, </span>
+<span id="cb22-5"><a href="#cb22-5"></a>                    <span class="at">M=</span><span class="dv">1</span>, </span>
+<span id="cb22-6"><a href="#cb22-6"></a>                    <span class="at">estimand =</span> <span class="st">"ATT"</span>,</span>
+<span id="cb22-7"><a href="#cb22-7"></a>                    <span class="at">replace=</span><span class="cn">FALSE</span>, </span>
+<span id="cb22-8"><a href="#cb22-8"></a>                    <span class="at">caliper =</span> <span class="fl">0.2</span>)</span>
+<span id="cb22-9"><a href="#cb22-9"></a><span class="fu">summary</span>(match.obj2)</span>
+<span id="cb22-10"><a href="#cb22-10"></a><span class="co">#&gt; </span></span>
+<span id="cb22-11"><a href="#cb22-11"></a><span class="co">#&gt; Estimate...  -15.287 </span></span>
+<span id="cb22-12"><a href="#cb22-12"></a><span class="co">#&gt; SE.........  2.118 </span></span>
+<span id="cb22-13"><a href="#cb22-13"></a><span class="co">#&gt; T-stat.....  -7.2175 </span></span>
+<span id="cb22-14"><a href="#cb22-14"></a><span class="co">#&gt; p.val......  5.2958e-13 </span></span>
+<span id="cb22-15"><a href="#cb22-15"></a><span class="co">#&gt; </span></span>
+<span id="cb22-16"><a href="#cb22-16"></a><span class="co">#&gt; Original number of observations..............  4167 </span></span>
+<span id="cb22-17"><a href="#cb22-17"></a><span class="co">#&gt; Original number of treated obs...............  791 </span></span>
+<span id="cb22-18"><a href="#cb22-18"></a><span class="co">#&gt; Matched number of observations...............  781 </span></span>
+<span id="cb22-19"><a href="#cb22-19"></a><span class="co">#&gt; Matched number of observations  (unweighted).  781 </span></span>
+<span id="cb22-20"><a href="#cb22-20"></a><span class="co">#&gt; </span></span>
+<span id="cb22-21"><a href="#cb22-21"></a><span class="co">#&gt; Caliper (SDs)........................................   0.2 </span></span>
+<span id="cb22-22"><a href="#cb22-22"></a><span class="co">#&gt; Number of obs dropped by 'exact' or 'caliper'  10</span></span>
+<span id="cb22-23"><a href="#cb22-23"></a>matched.data2 <span class="ot">&lt;-</span> analytic.data[<span class="fu">c</span>(match.obj2<span class="sc">$</span>index.treated, </span>
+<span id="cb22-24"><a href="#cb22-24"></a>                                 match.obj2<span class="sc">$</span>index.control),]</span>
+<span id="cb22-25"><a href="#cb22-25"></a><span class="fu">dim</span>(matched.data2)</span>
+<span id="cb22-26"><a href="#cb22-26"></a><span class="co">#&gt; [1] 1562   16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore3_cache/html/Ausstep2b_a29f52a83c9b2724c1ccf3b683a13e7a">
+<div class="cell" data-hash="propensityscore3_cache/html/Ausstep2b_840623c1f5c6c507aeeef208a309bc8c">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">require</span>(MatchIt)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb23-3"><a href="#cb23-3"></a>match.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula, <span class="at">data =</span> analytic.data,</span>
@@ -1856,7 +1836,8 @@ Tip
 <div class="cell-output-display">
 <p><img src="propensityscore3_files/figure-html/Ausstep2b-1.png" class="img-fluid" width="672"></p>
 </div>
-<pre><code>#&gt; To identify the units, use first mouse button; to stop, use second.
+<pre><code>#&gt; [1] "To identify the units, use first mouse button; to stop, use second."
+#&gt; integer(0)
 plot(match.obj, type = "hist")</code></pre>
 <div class="cell-output-display">
 <p><img src="propensityscore3_files/figure-html/Ausstep2b-2.png" class="img-fluid" width="672"></p>
@@ -1885,7 +1866,7 @@ plot(match.obj, type = "hist")</code></pre>
 </div>
 </section><section id="step-3-2" class="level4"><h4 class="anchored" data-anchor-id="step-3-2">Step 3</h4>
 <p>Compare the similarity of baseline characteristics between treated and untreated subjects in a the propensity score-matched sample. In this case, we will compare SMD &lt; 0.2 or not.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Ausstep3_4dc6e9b93f383bf3b93df2b302c33306">
+<div class="cell" data-hash="propensityscore3_cache/html/Ausstep3_8bf55021486804af2ff7066b92c4cc09">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"born"</span>, <span class="st">"race"</span>, <span class="st">"education"</span>, </span>
 <span id="cb26-2"><a href="#cb26-2"></a>                  <span class="st">"married"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>)</span>
 <span id="cb26-3"><a href="#cb26-3"></a>tab1m <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"diabetes"</span>, </span>
@@ -1919,7 +1900,7 @@ plot(match.obj, type = "hist")</code></pre>
 </div>
 </section><section id="step-4-2" class="level4"><h4 class="anchored" data-anchor-id="step-4-2">Step 4</h4>
 <p>Estimate the effect of treatment on outcomes using propensity score-matched sample.</p>
-<div class="cell" data-hash="propensityscore3_cache/html/Ausstep4_6188c9783742701996be4436b2d3a4a0">
+<div class="cell" data-hash="propensityscore3_cache/html/Ausstep4_ed49a8b2f9162de010050363235140fe">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># setup the design with survey features</span></span>
 <span id="cb27-2"><a href="#cb27-2"></a>analytic.with.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb27-3"><a href="#cb27-3"></a><span class="fu">length</span>(analytic.with.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
@@ -1937,7 +1918,7 @@ plot(match.obj, type = "hist")</code></pre>
 <span id="cb27-15"><a href="#cb27-15"></a>                      <span class="at">data=</span>analytic.with.miss, <span class="at">nest=</span><span class="cn">TRUE</span>)</span>
 <span id="cb27-16"><a href="#cb27-16"></a>w.design.m2 <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore3_cache/html/Ausstep4b_dafb4990bf522c2efe935e987d77abee">
+<div class="cell" data-hash="propensityscore3_cache/html/Ausstep4b_f9a0f58db1b5c0b91dda49ecf3f8f097">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(cholesterol.bin <span class="sc">~</span> diabetes)</span>
 <span id="cb28-2"><a href="#cb28-2"></a>sfit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(out.formula,<span class="at">family=</span>binomial, <span class="at">design =</span> w.design.m2)</span>
 <span id="cb28-3"><a href="#cb28-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
@@ -1981,7 +1962,7 @@ plot(match.obj, type = "hist")</code></pre>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">AIC</td>
-<td style="text-align: right;">1919.53</td>
+<td style="text-align: right;">1918.99</td>
 </tr>
 </tbody></table>
 </div>
@@ -1998,18 +1979,18 @@ plot(match.obj, type = "hist")</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">(Intercept)</td>
-<td style="text-align: right;">1.46</td>
-<td style="text-align: right;">1.15</td>
-<td style="text-align: right;">1.86</td>
-<td style="text-align: right;">3.11</td>
+<td style="text-align: right;">1.47</td>
+<td style="text-align: right;">1.13</td>
+<td style="text-align: right;">1.91</td>
+<td style="text-align: right;">2.88</td>
 <td style="text-align: right;">0.01</td>
 </tr>
 <tr class="even">
 <td style="text-align: left; font-weight: bold;">diabetes</td>
-<td style="text-align: right;">1.52</td>
-<td style="text-align: right;">1.21</td>
-<td style="text-align: right;">1.90</td>
-<td style="text-align: right;">3.65</td>
+<td style="text-align: right;">1.51</td>
+<td style="text-align: right;">1.20</td>
+<td style="text-align: right;">1.89</td>
+<td style="text-align: right;">3.58</td>
 <td style="text-align: right;">0.00</td>
 </tr>
 </tbody>

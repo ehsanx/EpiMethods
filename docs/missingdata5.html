@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1129,7 +1129,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>keep count of the ineligible subjects from the full data who are not included in the analytic data</li>
 <li>adding those ineligible subjects back in the imputed datasets, so that we can utilize the survey features and subset the design.</li>
 </ul>
-<div class="cell" data-hash="missingdata5_cache/html/setup_bb0962d9120c70b7834cf3bf8087a9de">
+<div class="cell" data-hash="missingdata5_cache/html/setup_42797e97e7265e4ac5182b98ba8c0147">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(kableExtra)</span>
@@ -1141,12 +1141,12 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-9"><a href="#cb1-9"></a><span class="fu">library</span>(mitools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let us import the dataset:</p>
-<div class="cell" data-hash="missingdata5_cache/html/load_0ce6bf6d7607f7b2c718cf9b762b6ca7">
+<div class="cell" data-hash="missingdata5_cache/html/load_ba74cf765d6bee3d0d3fc1afa4673f12">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/missingdata/MIexample.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "dat.full"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "dat.full"        "has_annotations"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="missingdata5_cache/html/data_16e22ad2063d63d514d89ebe28066a2c">
+<div class="cell" data-hash="missingdata5_cache/html/data_c75aef60a37fe2cc92080ac80c1dda5b">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">dim</span>(dat.full)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co">#&gt; [1] 9254   15</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="fu">head</span>(dat.full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1207,7 +1207,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>adults aged 20 years or more</li>
 <li>without missing values in outcome (cvd) or exposure (rheumatoid arthritis).</li>
 </ul>
-<div class="cell" data-hash="missingdata5_cache/html/analytic0_565a0105ad29867be662dab0ee3f5d06">
+<div class="cell" data-hash="missingdata5_cache/html/analytic0_6b2a3e0020294586755b261fa4f70093">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Drop &lt; 20 years</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>dat.with.miss <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full, age <span class="sc">&gt;=</span> <span class="dv">20</span>)</span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
@@ -1221,14 +1221,15 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;   No  Yes &lt;NA&gt; </span></span>
 <span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; 3857  337 1375</span></span>
 <span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co"># Drop missing in outcome and exposure - dataset with missing values only in covariates</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a>dat.analytic <span class="ot">&lt;-</span> dat.with.miss[<span class="fu">complete.cases</span>(dat.with.miss<span class="sc">$</span>cvd),]</span>
-<span id="cb4-16"><a href="#cb4-16"></a>dat.analytic <span class="ot">&lt;-</span> dat.analytic[<span class="fu">complete.cases</span>(dat.analytic<span class="sc">$</span>rheumatoid),]</span>
-<span id="cb4-17"><a href="#cb4-17"></a><span class="fu">nrow</span>(dat.analytic)</span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; [1] 4191</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co"># Drop missing in outcome and exposure </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co"># i.e., dataset with missing values only in covariates</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a>dat.analytic <span class="ot">&lt;-</span> dat.with.miss[<span class="fu">complete.cases</span>(dat.with.miss<span class="sc">$</span>cvd),]</span>
+<span id="cb4-17"><a href="#cb4-17"></a>dat.analytic <span class="ot">&lt;-</span> dat.analytic[<span class="fu">complete.cases</span>(dat.analytic<span class="sc">$</span>rheumatoid),]</span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="fu">nrow</span>(dat.analytic)</span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; [1] 4191</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>As we can see, we have 4,191 participants aged 20 years or more without missing values in outcome or exposure. Let us count the ineligible subjects from the full data and create an indicator variable.</p>
-<div class="cell" data-hash="missingdata5_cache/html/analytic1_47681e2c202ac6f1af0a24de78e5230b">
+<div class="cell" data-hash="missingdata5_cache/html/analytic1_a868dca770c8020cd9fb2389ff95aa31">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dat.full<span class="sc">$</span>ineligible <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>dat.full<span class="sc">$</span>ineligible[dat.full<span class="sc">$</span>studyid <span class="sc">%in%</span> dat.analytic<span class="sc">$</span>studyid] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="fu">table</span>(dat.full<span class="sc">$</span>ineligible, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
@@ -1243,92 +1244,98 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>later we will include 5,063 ineligible subjects in the data so that we can utilize survey features.</li>
 </ul></section><section id="table-1" class="level4"><h4 class="anchored" data-anchor-id="table-1">Table 1</h4>
 <p>Let us see the summary statistics, i.e., create Table 1 stratified by outcome (cvd). Before that, we will categorize <code>age</code> and recode <code>rheumatoid</code>:</p>
-<div class="cell" data-hash="missingdata5_cache/html/analytic2_1b6de3338a023c09054aac33bcfac8e2">
+<div class="cell" data-hash="missingdata5_cache/html/analytic2_19116ac6876e6b0897995a28fd8c98b7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Categorical age</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>dat.analytic<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> <span class="fu">with</span>(dat.analytic, <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">50</span>, <span class="st">"20-49"</span>, </span>
-<span id="cb6-3"><a href="#cb6-3"></a>                                  <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">65</span>, <span class="st">"50-64"</span>, <span class="st">"65+"</span>)))</span>
-<span id="cb6-4"><a href="#cb6-4"></a>dat.analytic<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> <span class="fu">factor</span>(dat.analytic<span class="sc">$</span>age.cat, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"20-49"</span>, <span class="st">"50-64"</span>, <span class="st">"65+"</span>))</span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="fu">table</span>(dat.analytic<span class="sc">$</span>age.cat, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; </span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; 20-49 50-64   65+  &lt;NA&gt; </span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;  2280  1097   814     0</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a></span>
-<span id="cb6-10"><a href="#cb6-10"></a><span class="co"># Recode rheumatoid to arthritis</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a>dat.analytic<span class="sc">$</span>arthritis <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat.analytic<span class="sc">$</span>rheumatoid, <span class="st">" 'No' = 'No arthritis';</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="st">                                      'Yes' = 'Rheumatoid arthritis' "</span>, <span class="at">as.factor =</span> T)</span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="fu">table</span>(dat.analytic<span class="sc">$</span>arthritis, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; </span></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;         No arthritis Rheumatoid arthritis                 &lt;NA&gt; </span></span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;                 3854                  337                    0</span></span>
-<span id="cb6-17"><a href="#cb6-17"></a></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co"># Keep only relevant variables</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a>vars <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">"studyid"</span>, <span class="st">"survey.weight"</span>, <span class="st">"psu"</span>, <span class="st">"strata"</span>, <span class="st">"cvd"</span>, <span class="st">"arthritis"</span>, <span class="st">"age.cat"</span>, </span>
-<span id="cb6-20"><a href="#cb6-20"></a>           <span class="st">"sex"</span>, <span class="st">"education"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, <span class="st">"htn"</span>, <span class="st">"diabetes"</span>)</span>
-<span id="cb6-21"><a href="#cb6-21"></a>dat.analytic2 <span class="ot">&lt;-</span> dat.analytic[, vars]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-2"><a href="#cb6-2"></a>dat.analytic<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> </span>
+<span id="cb6-3"><a href="#cb6-3"></a>  <span class="fu">with</span>(dat.analytic, <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">50</span>, <span class="st">"20-49"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4"></a>                            <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">65</span>, </span>
+<span id="cb6-5"><a href="#cb6-5"></a>                                   <span class="st">"50-64"</span>, <span class="st">"65+"</span>)))</span>
+<span id="cb6-6"><a href="#cb6-6"></a>dat.analytic<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> <span class="fu">factor</span>(dat.analytic<span class="sc">$</span>age.cat, </span>
+<span id="cb6-7"><a href="#cb6-7"></a>                               <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"20-49"</span>, <span class="st">"50-64"</span>, <span class="st">"65+"</span>))</span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="fu">table</span>(dat.analytic<span class="sc">$</span>age.cat, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; </span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; 20-49 50-64   65+  &lt;NA&gt; </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;  2280  1097   814     0</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co"># Recode rheumatoid to arthritis</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>dat.analytic<span class="sc">$</span>arthritis <span class="ot">&lt;-</span> </span>
+<span id="cb6-15"><a href="#cb6-15"></a>car<span class="sc">::</span><span class="fu">recode</span>(dat.analytic<span class="sc">$</span>rheumatoid, <span class="st">" 'No' = 'No arthritis';</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="st">            'Yes' = 'Rheumatoid arthritis' "</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="fu">table</span>(dat.analytic<span class="sc">$</span>arthritis, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt;         No arthritis Rheumatoid arthritis                 &lt;NA&gt; </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt;                 3854                  337                    0</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co"># Keep only relevant variables</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a>vars <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">"studyid"</span>, <span class="st">"survey.weight"</span>, <span class="st">"psu"</span>, <span class="st">"strata"</span>, <span class="st">"cvd"</span>,</span>
+<span id="cb6-24"><a href="#cb6-24"></a>           <span class="st">"arthritis"</span>, <span class="st">"age.cat"</span>, <span class="st">"sex"</span>, <span class="st">"education"</span>, <span class="st">"race"</span>,</span>
+<span id="cb6-25"><a href="#cb6-25"></a>           <span class="st">"income"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, <span class="st">"htn"</span>, <span class="st">"diabetes"</span>)</span>
+<span id="cb6-26"><a href="#cb6-26"></a>dat.analytic2 <span class="ot">&lt;-</span> dat.analytic[, vars]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="missingdata5_cache/html/tab1_d986d087ebbb8c0b9c18c7a6c577885f">
+<div class="cell" data-hash="missingdata5_cache/html/tab1_661a11f9bb6f2dad51bce2b02365b2f7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Create Table 1</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"arthritis"</span>, <span class="st">"age.cat"</span>, <span class="st">"sex"</span>, <span class="st">"education"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>,</span>
 <span id="cb7-3"><a href="#cb7-3"></a>          <span class="st">"htn"</span>, <span class="st">"diabetes"</span>)</span>
-<span id="cb7-4"><a href="#cb7-4"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> vars, <span class="at">strata =</span> <span class="st">"cvd"</span>, <span class="at">data =</span> dat.analytic2, <span class="at">includeNA =</span> F,</span>
-<span id="cb7-5"><a href="#cb7-5"></a>                       <span class="at">addOverall =</span> T, <span class="at">test =</span> F)</span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="fu">print</span>(tab1, <span class="at">format =</span> <span class="st">"f"</span>, <span class="at">showAllLevels =</span> T)</span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt;                  Stratified by cvd</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt;                   level                     Overall      No          </span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt;   n                                          4191         3823       </span></span>
-<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;   arthritis       No arthritis               3854         3580       </span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt;                   Rheumatoid arthritis        337          243       </span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt;   age.cat         20-49                      2280         2240       </span></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt;                   50-64                      1097          979       </span></span>
-<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt;                   65+                         814          604       </span></span>
-<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt;   sex             Male                       2126         1884       </span></span>
-<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt;                   Female                     2065         1939       </span></span>
-<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt;   education       Less than high school       828          728       </span></span>
-<span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt;                   High school                2292         2094       </span></span>
-<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt;                   College graduate or above  1063          993       </span></span>
-<span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt;   race            White                      1275         1113       </span></span>
-<span id="cb7-21"><a href="#cb7-21"></a><span class="co">#&gt;                   Black                       998          898       </span></span>
-<span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt;                   Hispanic                   1015          958       </span></span>
-<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt;                   Others                      903          854       </span></span>
-<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt;   income          less than $20,000           659          557       </span></span>
-<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt;                   $20,000 to $74,999         1967         1796       </span></span>
-<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt;                   $75,000 and Over           1143         1079       </span></span>
-<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt;   bmi (mean (SD))                           29.28 (7.19) 29.20 (7.18)</span></span>
-<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt;   smoking         Never smoker               2570         2427       </span></span>
-<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt;                   Previous smoker             882          726       </span></span>
-<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt;                   Current smoker              739          670       </span></span>
-<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt;   htn             No                         1424         1380       </span></span>
-<span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt;                   Yes                        2415         2107       </span></span>
-<span id="cb7-33"><a href="#cb7-33"></a><span class="co">#&gt;   diabetes        No                         3622         3396       </span></span>
-<span id="cb7-34"><a href="#cb7-34"></a><span class="co">#&gt;                   Yes                         566          424       </span></span>
-<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt;                  Stratified by cvd</span></span>
-<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt;                   Yes         </span></span>
-<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt;   n                 368       </span></span>
-<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt;   arthritis         274       </span></span>
-<span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt;                      94       </span></span>
-<span id="cb7-40"><a href="#cb7-40"></a><span class="co">#&gt;   age.cat            40       </span></span>
-<span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt;                     118       </span></span>
-<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt;                     210       </span></span>
-<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt;   sex               242       </span></span>
-<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt;                     126       </span></span>
-<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt;   education         100       </span></span>
-<span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt;                     198       </span></span>
-<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt;                      70       </span></span>
-<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt;   race              162       </span></span>
-<span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt;                     100       </span></span>
-<span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt;                      57       </span></span>
-<span id="cb7-51"><a href="#cb7-51"></a><span class="co">#&gt;                      49       </span></span>
-<span id="cb7-52"><a href="#cb7-52"></a><span class="co">#&gt;   income            102       </span></span>
-<span id="cb7-53"><a href="#cb7-53"></a><span class="co">#&gt;                     171       </span></span>
-<span id="cb7-54"><a href="#cb7-54"></a><span class="co">#&gt;                      64       </span></span>
-<span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt;   bmi (mean (SD)) 30.09 (7.29)</span></span>
-<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt;   smoking           143       </span></span>
-<span id="cb7-57"><a href="#cb7-57"></a><span class="co">#&gt;                     156       </span></span>
-<span id="cb7-58"><a href="#cb7-58"></a><span class="co">#&gt;                      69       </span></span>
-<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt;   htn                44       </span></span>
-<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt;                     308       </span></span>
-<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt;   diabetes          226       </span></span>
-<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt;                     142</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-4"><a href="#cb7-4"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> vars, <span class="at">strata =</span> <span class="st">"cvd"</span>, </span>
+<span id="cb7-5"><a href="#cb7-5"></a>                       <span class="at">data =</span> dat.analytic2, <span class="at">includeNA =</span> F,</span>
+<span id="cb7-6"><a href="#cb7-6"></a>                       <span class="at">addOverall =</span> T, <span class="at">test =</span> F)</span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="fu">print</span>(tab1, <span class="at">format =</span> <span class="st">"f"</span>, <span class="at">showAllLevels =</span> T)</span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt;                  Stratified by cvd</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt;                   level                     Overall      No          </span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;   n                                          4191         3823       </span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt;   arthritis       No arthritis               3854         3580       </span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt;                   Rheumatoid arthritis        337          243       </span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt;   age.cat         20-49                      2280         2240       </span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt;                   50-64                      1097          979       </span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt;                   65+                         814          604       </span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt;   sex             Male                       2126         1884       </span></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt;                   Female                     2065         1939       </span></span>
+<span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt;   education       Less than high school       828          728       </span></span>
+<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt;                   High school                2292         2094       </span></span>
+<span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt;                   College graduate or above  1063          993       </span></span>
+<span id="cb7-21"><a href="#cb7-21"></a><span class="co">#&gt;   race            White                      1275         1113       </span></span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt;                   Black                       998          898       </span></span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt;                   Hispanic                   1015          958       </span></span>
+<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt;                   Others                      903          854       </span></span>
+<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt;   income          less than $20,000           659          557       </span></span>
+<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt;                   $20,000 to $74,999         1967         1796       </span></span>
+<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt;                   $75,000 and Over           1143         1079       </span></span>
+<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt;   bmi (mean (SD))                           29.28 (7.19) 29.20 (7.18)</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt;   smoking         Never smoker               2570         2427       </span></span>
+<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt;                   Previous smoker             882          726       </span></span>
+<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt;                   Current smoker              739          670       </span></span>
+<span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt;   htn             No                         1424         1380       </span></span>
+<span id="cb7-33"><a href="#cb7-33"></a><span class="co">#&gt;                   Yes                        2415         2107       </span></span>
+<span id="cb7-34"><a href="#cb7-34"></a><span class="co">#&gt;   diabetes        No                         3622         3396       </span></span>
+<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt;                   Yes                         566          424       </span></span>
+<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt;                  Stratified by cvd</span></span>
+<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt;                   Yes         </span></span>
+<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt;   n                 368       </span></span>
+<span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt;   arthritis         274       </span></span>
+<span id="cb7-40"><a href="#cb7-40"></a><span class="co">#&gt;                      94       </span></span>
+<span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt;   age.cat            40       </span></span>
+<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt;                     118       </span></span>
+<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt;                     210       </span></span>
+<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt;   sex               242       </span></span>
+<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt;                     126       </span></span>
+<span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt;   education         100       </span></span>
+<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt;                     198       </span></span>
+<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt;                      70       </span></span>
+<span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt;   race              162       </span></span>
+<span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt;                     100       </span></span>
+<span id="cb7-51"><a href="#cb7-51"></a><span class="co">#&gt;                      57       </span></span>
+<span id="cb7-52"><a href="#cb7-52"></a><span class="co">#&gt;                      49       </span></span>
+<span id="cb7-53"><a href="#cb7-53"></a><span class="co">#&gt;   income            102       </span></span>
+<span id="cb7-54"><a href="#cb7-54"></a><span class="co">#&gt;                     171       </span></span>
+<span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt;                      64       </span></span>
+<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt;   bmi (mean (SD)) 30.09 (7.29)</span></span>
+<span id="cb7-57"><a href="#cb7-57"></a><span class="co">#&gt;   smoking           143       </span></span>
+<span id="cb7-58"><a href="#cb7-58"></a><span class="co">#&gt;                     156       </span></span>
+<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt;                      69       </span></span>
+<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt;   htn                44       </span></span>
+<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt;                     308       </span></span>
+<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt;   diabetes          226       </span></span>
+<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt;                     142</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="check-missingness-using-a-plot" class="level4"><h4 class="anchored" data-anchor-id="check-missingness-using-a-plot">Check missingness using a plot</h4>
 <p>Now we will see the percentage of missing values in the variables.</p>
@@ -1351,7 +1358,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
 </ul>
 <section id="step-0-set-up-the-imputation-model" class="level4"><h4 class="anchored" data-anchor-id="step-0-set-up-the-imputation-model">Step 0: Set up the imputation model</h4>
-<div class="cell" data-hash="missingdata5_cache/html/step0_9b65e23409b845633ed9a4a399f96a17">
+<div class="cell" data-hash="missingdata5_cache/html/step0_80dcd4a3a88106837ab2c4888957c013">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Step 0: Set imputation model</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>ini <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.analytic2, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb9-3"><a href="#cb9-3"></a>pred <span class="ot">&lt;-</span> ini<span class="sc">$</span>pred</span>
@@ -1379,10 +1386,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <ul>
 <li>There is no missing for studyid, survey.weight, psu, strata, cvd, arthritis, age, sex, race, smoking. Hence, no method is assigned for these variables.</li>
 <li>For education, <code>polyreg</code> (Polytomous logistic regression) will be used.</li>
-<li>Similarly, we will use <code>pmm</code> (Predictive mean matching) for bmi, income and used <code>logreg</code> (Logistic regression) for htn, diabetes.</li>
+<li>Similarly, we will use <code>pmm</code> (Predictive mean matching) for bmi, income and used <code>logreg</code> (Logistic regression) for htn, diabetes. See the <a href="missingdata1.html">Imputation</a> chapter to see how the PMM method works.</li>
 </ul></section><section id="step-1-imputing-missing-values-using-mice" class="level4"><h4 class="anchored" data-anchor-id="step-1-imputing-missing-values-using-mice">Step 1: Imputing missing values using mice</h4>
 <section id="imputing-dataset-for-eligible-subjects" class="level5"><h5 class="anchored" data-anchor-id="imputing-dataset-for-eligible-subjects">1.1 Imputing dataset for eligible subjects</h5>
-<div class="cell" data-hash="missingdata5_cache/html/step1a_9176b5e23d40a897f045d5a9812db51c">
+<div class="cell" data-hash="missingdata5_cache/html/step1a_343025e8907ecc9b42fdaf9f3ccf3897">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Step 1: impute the incomplete data</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.analytic2,</span>
 <span id="cb10-3"><a href="#cb10-3"></a>                   <span class="at">seed =</span> <span class="dv">123</span>,</span>
@@ -1393,7 +1400,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-8"><a href="#cb10-8"></a>                   <span class="at">print =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will combine m = 5 datasets and create a stacked dataset. This dataset should contain 5*4,191 = 20,955 rows.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1b_4da9e3754664c00bfa66eab39ba7ce56">
+<div class="cell" data-hash="missingdata5_cache/html/step1b_371bbf00355780283d1b7f4725c9933d">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>impdata <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imputation, <span class="at">action=</span><span class="st">"long"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2"></a></span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="fu">table</span>(impdata<span class="sc">$</span>age.cat)</span>
@@ -1402,7 +1409,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; 11400  5485  4070</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note that age has no missing values, and everyone is above 20.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1c_35f45cd2abe41d7c74295dc031cc74cb">
+<div class="cell" data-hash="missingdata5_cache/html/step1c_df3d8aa12bebe7b4c4d3cba774f7342a">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#Remove .id variable from the model as it was created in an intermediate step</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>impdata<span class="sc">$</span>.id <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb12-3"><a href="#cb12-3"></a></span>
@@ -1414,7 +1421,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt; [1] 20955</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s see whether there is any missing value after imputation:</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1d_a498efd8c83a71debee70ba875fadf75">
+<div class="cell" data-hash="missingdata5_cache/html/step1d_339d22a2e246262fc8ba4797b82b3345">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>DataExplorer<span class="sc">::</span><span class="fu">plot_missing</span>(impdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="missingdata5_files/figure-html/step1d-1.png" class="img-fluid" width="672"></p>
@@ -1425,7 +1432,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>As we can see, there is an additional variable (<code>.imp</code>) in the imputed dataset. This <code>.imp</code> goes from 1 to m = 5, indicating the first to the fifth imputed datasets.</li>
 </ul></section><section id="preparing-dataset-for-ineligible-subjects" class="level5"><h5 class="anchored" data-anchor-id="preparing-dataset-for-ineligible-subjects">1.2 Preparing dataset for ineligible subjects</h5>
 <p>The next task is adding the <strong>ineligible subjects</strong> in the imputed datasets, so that we can set up the survey design on the full dataset and then subset the design.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1e_1c69183f123ad25d30c5d3eb82c93786">
+<div class="cell" data-hash="missingdata5_cache/html/step1e_f89f3c3d5399e11b4eb0c9cc493c69ad">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Number of ineligible subjects</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co">#dat.full$ineligible &lt;- 1</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co">#dat.full$ineligible[dat.full$studyid %in% dat.analytic$studyid] &lt;- 0</span></span>
@@ -1435,7 +1442,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; 4191 5063    0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will subset the data for ineligible subjects and create <code>m = 5</code> copies.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1f_2cd0ea2befbfe8ebca12b39735bccf51">
+<div class="cell" data-hash="missingdata5_cache/html/step1f_83d34d75c94e80736bf0e3ca4bcdbfd6">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Subset for ineligible</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a>dat.ineligible <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full, ineligible <span class="sc">==</span> <span class="dv">1</span>)</span>
 <span id="cb15-3"><a href="#cb15-3"></a></span>
@@ -1447,19 +1454,19 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb15-9"><a href="#cb15-9"></a>dat35 <span class="ot">&lt;-</span> dat.ineligible; dat35<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The next step is combining ineligible datasets. Before merging the <code>stacked dataset for ineligible subjects</code> to the <code>imputed stacked dataset for eligible subjects,</code> we must ensure the variable names are the same.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1g_936f2daee6bb53799ea4aa58f96bbd44">
+<div class="cell" data-hash="missingdata5_cache/html/step1g_e8c52cc5cbe8a10e86f8914464c423fe">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Stacked data for ineligible subjects</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a>dat.ineligible.stacked <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dat31, dat32, dat33, dat34, dat35)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We should have missing value in this ineligible part of the data:</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1h_40cffa6bde9125478a95951805eacce9">
+<div class="cell" data-hash="missingdata5_cache/html/step1h_ab595b1094e2f32b43c2990fd012212c">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>DataExplorer<span class="sc">::</span><span class="fu">plot_missing</span>(dat.ineligible.stacked)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="missingdata5_files/figure-html/step1h-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section><section id="combining-eligible-imputed-and-ineligible-unimputed-subjects" class="level5"><h5 class="anchored" data-anchor-id="combining-eligible-imputed-and-ineligible-unimputed-subjects">1.3 Combining eligible (imputed) and ineligible (unimputed) subjects</h5>
-<div class="cell" data-hash="missingdata5_cache/html/step1i_bb4c244a487083215b6b815110b96fd0">
+<div class="cell" data-hash="missingdata5_cache/html/step1i_e13df16d249ba291cca6ccb72af3a18f">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">names</span>(impdata)</span>
 <span id="cb18-2"><a href="#cb18-2"></a><span class="co">#&gt;  [1] ".imp"          "studyid"       "survey.weight" "psu"          </span></span>
 <span id="cb18-3"><a href="#cb18-3"></a><span class="co">#&gt;  [5] "strata"        "cvd"           "arthritis"     "age.cat"      </span></span>
@@ -1467,7 +1474,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt; [13] "bmi"           "smoking"       "htn"           "diabetes"     </span></span>
 <span id="cb18-6"><a href="#cb18-6"></a><span class="co">#&gt; [17] "ineligible"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="missingdata5_cache/html/step1j_8ae0883e6fa89802043bc34e4a851745">
+<div class="cell" data-hash="missingdata5_cache/html/step1j_23fb9e35a454d0c789587c2d3b6857f3">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">names</span>(dat.ineligible.stacked)</span>
 <span id="cb19-2"><a href="#cb19-2"></a><span class="co">#&gt;  [1] "studyid"       "survey.weight" "psu"           "strata"       </span></span>
 <span id="cb19-3"><a href="#cb19-3"></a><span class="co">#&gt;  [5] "cvd"           "rheumatoid"    "age"           "sex"          </span></span>
@@ -1476,32 +1483,35 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb19-6"><a href="#cb19-6"></a><span class="co">#&gt; [17] ".imp"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>As we can see, the variable names are different in the two datasets. Particularly, <code>arthritis</code> and <code>age.cat</code> variables are not available in the <code>dat.ineligible.stacked</code> dataset. Now we will recode these variables in the same format as done for <code>impdata</code>:</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1k_e586f3b1760281df439c22cc02b37f76">
+<div class="cell" data-hash="missingdata5_cache/html/step1k_74821416eaa42505fd511a627109fec3">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Categorical age</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a><span class="fu">summary</span>(dat.ineligible.stacked<span class="sc">$</span>age)</span>
 <span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt;    0.00    5.00   12.00   23.25   41.00   80.00</span></span>
-<span id="cb20-5"><a href="#cb20-5"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> <span class="fu">with</span>(dat.ineligible.stacked, </span>
-<span id="cb20-6"><a href="#cb20-6"></a>                                       <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">50</span>, <span class="st">"20-49"</span>, </span>
-<span id="cb20-7"><a href="#cb20-7"></a>                                              <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">65</span>, <span class="st">"50-64"</span>, </span>
-<span id="cb20-8"><a href="#cb20-8"></a>                                                    <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">65</span>, <span class="st">"65+"</span>, <span class="cn">NA</span>))))</span>
-<span id="cb20-9"><a href="#cb20-9"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> <span class="fu">factor</span>(dat.ineligible.stacked<span class="sc">$</span>age.cat, </span>
-<span id="cb20-10"><a href="#cb20-10"></a>                                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"20-49"</span>, <span class="st">"50-64"</span>, <span class="st">"65+"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-5"><a href="#cb20-5"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> </span>
+<span id="cb20-6"><a href="#cb20-6"></a>  <span class="fu">with</span>(dat.ineligible.stacked, </span>
+<span id="cb20-7"><a href="#cb20-7"></a>       <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">50</span>, <span class="st">"20-49"</span>, </span>
+<span id="cb20-8"><a href="#cb20-8"></a>              <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">65</span>, <span class="st">"50-64"</span>, </span>
+<span id="cb20-9"><a href="#cb20-9"></a>                     <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">65</span>, <span class="st">"65+"</span>, <span class="cn">NA</span>))))</span>
+<span id="cb20-10"><a href="#cb20-10"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> </span>
+<span id="cb20-11"><a href="#cb20-11"></a>  <span class="fu">factor</span>(dat.ineligible.stacked<span class="sc">$</span>age.cat, </span>
+<span id="cb20-12"><a href="#cb20-12"></a>         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"20-49"</span>, <span class="st">"50-64"</span>, <span class="st">"65+"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note that, we are assigning anyone with less than 20 age as missing.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1l_93fd8e063ecba20fcb32c89aed0eac61">
+<div class="cell" data-hash="missingdata5_cache/html/step1l_b82eb689e31c9ef9ec127e958044ea26">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">table</span>(dat.ineligible.stacked<span class="sc">$</span>age.cat, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="co">#&gt; </span></span>
 <span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; 20-49 50-64   65+  &lt;NA&gt; </span></span>
 <span id="cb21-4"><a href="#cb21-4"></a><span class="co">#&gt;  1100  2360  3430 18425</span></span>
 <span id="cb21-5"><a href="#cb21-5"></a><span class="co"># Recode arthritis</span></span>
-<span id="cb21-6"><a href="#cb21-6"></a>dat.ineligible.stacked<span class="sc">$</span>arthritis <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat.ineligible.stacked<span class="sc">$</span>rheumatoid, </span>
-<span id="cb21-7"><a href="#cb21-7"></a>                                                <span class="st">" 'No' = 'No arthritis'; 'Yes' = </span></span>
-<span id="cb21-8"><a href="#cb21-8"></a><span class="st">                                                'Rheumatoid arthritis' "</span>, <span class="at">as.factor =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-6"><a href="#cb21-6"></a>dat.ineligible.stacked<span class="sc">$</span>arthritis <span class="ot">&lt;-</span> </span>
+<span id="cb21-7"><a href="#cb21-7"></a>  car<span class="sc">::</span><span class="fu">recode</span>(dat.ineligible.stacked<span class="sc">$</span>rheumatoid, </span>
+<span id="cb21-8"><a href="#cb21-8"></a>  <span class="st">" 'No' = 'No arthritis'; 'Yes' = 'Rheumatoid arthritis' "</span>, </span>
+<span id="cb21-9"><a href="#cb21-9"></a>  <span class="at">as.factor =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note: In the above step, we could also create two variables with missing values rather than recoding. The reason is that we will subset the design; no matter whether we recode or create missing values for ineligible, the only information we need from ineligible subjects is their survey features when creating the design.</p>
 <p>The next step is to combine these two datasets (<code>impdata</code> and <code>dat.ineligible.stacked</code>).</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1m_67cadbef938a94a370e332f5268d6194">
+<div class="cell" data-hash="missingdata5_cache/html/step1m_210fefb2b508542d51d189e00d2e64ae">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="co"># Variable names in the imputed dataset</span></span>
 <span id="cb22-2"><a href="#cb22-2"></a>vars <span class="ot">&lt;-</span> <span class="fu">names</span>(impdata) </span>
 <span id="cb22-3"><a href="#cb22-3"></a></span>
@@ -1509,7 +1519,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb22-5"><a href="#cb22-5"></a>dat.ineligible.stacked <span class="ot">&lt;-</span> dat.ineligible.stacked[, vars]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will merge ineligible and eligible subjects to make the full dataset of 5 <span class="math inline">\(\times\)</span> 9,254 = 46,270 subjects.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1n_18e00570daf1882625e6f27c09ddcb4d">
+<div class="cell" data-hash="missingdata5_cache/html/step1n_b589ea0bf47686da8f767929e0d197b0">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>impdata2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(impdata, dat.ineligible.stacked)</span>
 <span id="cb23-2"><a href="#cb23-2"></a>impdata2 <span class="ot">&lt;-</span> impdata2[<span class="fu">order</span>(impdata2<span class="sc">$</span>.imp, impdata2<span class="sc">$</span>studyid),]</span>
 <span id="cb23-3"><a href="#cb23-3"></a><span class="fu">dim</span>(impdata2)</span>
@@ -1517,70 +1527,73 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="prepating-survey-design-and-subpopulation-of-eligible" class="level5"><h5 class="anchored" data-anchor-id="prepating-survey-design-and-subpopulation-of-eligible">1.4 Prepating Survey design and subpopulation of eligible</h5>
 <p>The next step is to create the design on full dataset [with eligible (imputed) and ineligible (unimputed) subjects] of 5 <span class="math inline">\(\times\)</span> 9,254 = 46,270 subjects and subset the design for 5 <span class="math inline">\(\times\)</span> 4,716 = 23,580 subjects.</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1o_82391f5c17f8c09e9ab399306c8c3cdb">
+<div class="cell" data-hash="missingdata5_cache/html/step1o_c898035f72f04854ccefd69fca4622e1">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>m <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb24-2"><a href="#cb24-2"></a>allImputations <span class="ot">&lt;-</span> <span class="fu">imputationList</span>(<span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>m, <span class="cf">function</span>(n) <span class="fu">subset</span>(impdata2, <span class="at">subset=</span>.imp<span class="sc">==</span>n)))</span>
-<span id="cb24-3"><a href="#cb24-3"></a></span>
-<span id="cb24-4"><a href="#cb24-4"></a><span class="co"># Step 2: Survey data analysis</span></span>
-<span id="cb24-5"><a href="#cb24-5"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, </span>
-<span id="cb24-6"><a href="#cb24-6"></a>                       <span class="at">weights =</span> <span class="sc">~</span>survey.weight, </span>
-<span id="cb24-7"><a href="#cb24-7"></a>                       <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
-<span id="cb24-8"><a href="#cb24-8"></a>                      <span class="at">data =</span> allImputations, </span>
-<span id="cb24-9"><a href="#cb24-9"></a>                      <span class="at">nest =</span> <span class="cn">TRUE</span>) <span class="co"># Design on full data</span></span>
-<span id="cb24-10"><a href="#cb24-10"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, ineligible <span class="sc">==</span> <span class="dv">0</span>) <span class="co"># Subset the design</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-2"><a href="#cb24-2"></a>allImputations <span class="ot">&lt;-</span> <span class="fu">imputationList</span>(<span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>m, <span class="cf">function</span>(n) </span>
+<span id="cb24-3"><a href="#cb24-3"></a>  <span class="fu">subset</span>(impdata2, <span class="at">subset=</span>.imp<span class="sc">==</span>n)))</span>
+<span id="cb24-4"><a href="#cb24-4"></a></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="co"># Step 2: Survey data analysis</span></span>
+<span id="cb24-6"><a href="#cb24-6"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, </span>
+<span id="cb24-7"><a href="#cb24-7"></a>                       <span class="at">weights =</span> <span class="sc">~</span>survey.weight, </span>
+<span id="cb24-8"><a href="#cb24-8"></a>                       <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
+<span id="cb24-9"><a href="#cb24-9"></a>                      <span class="at">data =</span> allImputations, </span>
+<span id="cb24-10"><a href="#cb24-10"></a>                      <span class="at">nest =</span> <span class="cn">TRUE</span>) <span class="co"># Design on full data</span></span>
+<span id="cb24-11"><a href="#cb24-11"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, ineligible <span class="sc">==</span> <span class="dv">0</span>) <span class="co"># Subset the design</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can see the length of the subsetted design:</p>
-<div class="cell" data-hash="missingdata5_cache/html/step1p_9920916a70ee27a5b64e253910397412">
+<div class="cell" data-hash="missingdata5_cache/html/step1p_c57c3708aa230dfc6503959dcdddda28">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">dim</span>(w.design)</span>
 <span id="cb25-2"><a href="#cb25-2"></a><span class="co">#&gt; [1] 4191   17    5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The subsetted design contains 4,191 subjects with 17 variables and 5 imputed datasets. Now we will run the design-adjusted logistic regression on and pool the estimate using Rubin’s rule:</p>
 </section></section><section id="step-2-design-adjusted-regression-analysis" class="level4"><h4 class="anchored" data-anchor-id="step-2-design-adjusted-regression-analysis">Step 2: Design adjusted regression analysis</h4>
-<div class="cell" data-hash="missingdata5_cache/html/step2_db1d26787ccf6fe5b0c36ef48b82b138">
+<div class="cell" data-hash="missingdata5_cache/html/step2_43baae94aa971a685538fb5252bb5d85">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># Design-adjusted logistic regression</span></span>
-<span id="cb26-2"><a href="#cb26-2"></a>fit <span class="ot">&lt;-</span> <span class="fu">with</span>(w.design, <span class="fu">svyglm</span>(<span class="fu">I</span>(cvd <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> arthritis <span class="sc">+</span> age.cat <span class="sc">+</span> sex <span class="sc">+</span> education <span class="sc">+</span> </span>
-<span id="cb26-3"><a href="#cb26-3"></a>                               race <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> smoking <span class="sc">+</span> htn <span class="sc">+</span> diabetes, </span>
-<span id="cb26-4"><a href="#cb26-4"></a>                             <span class="at">family =</span> quasibinomial))</span>
-<span id="cb26-5"><a href="#cb26-5"></a>res <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">as.data.frame</span>(<span class="fu">cbind</span>(<span class="fu">coef</span>(fit[[<span class="dv">1</span>]]),</span>
-<span id="cb26-6"><a href="#cb26-6"></a>      <span class="fu">coef</span>(fit[[<span class="dv">2</span>]]),</span>
-<span id="cb26-7"><a href="#cb26-7"></a>      <span class="fu">coef</span>(fit[[<span class="dv">3</span>]]),</span>
-<span id="cb26-8"><a href="#cb26-8"></a>      <span class="fu">coef</span>(fit[[<span class="dv">4</span>]]),</span>
-<span id="cb26-9"><a href="#cb26-9"></a>      <span class="fu">coef</span>(fit[[<span class="dv">5</span>]]))))</span>
-<span id="cb26-10"><a href="#cb26-10"></a><span class="fu">names</span>(res) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"OR from m ="</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
-<span id="cb26-11"><a href="#cb26-11"></a><span class="fu">round</span>(<span class="fu">t</span>(res),<span class="dv">2</span>)</span>
-<span id="cb26-12"><a href="#cb26-12"></a><span class="co">#&gt;               (Intercept) arthritisRheumatoid arthritis age.cat50-64 age.cat65+</span></span>
-<span id="cb26-13"><a href="#cb26-13"></a><span class="co">#&gt; OR from m = 1        0.02                          2.03         4.71      13.08</span></span>
-<span id="cb26-14"><a href="#cb26-14"></a><span class="co">#&gt; OR from m = 2        0.02                          2.04         4.74      13.21</span></span>
-<span id="cb26-15"><a href="#cb26-15"></a><span class="co">#&gt; OR from m = 3        0.02                          2.12         4.58      11.88</span></span>
-<span id="cb26-16"><a href="#cb26-16"></a><span class="co">#&gt; OR from m = 4        0.02                          2.10         4.59      12.45</span></span>
-<span id="cb26-17"><a href="#cb26-17"></a><span class="co">#&gt; OR from m = 5        0.02                          2.07         4.47      12.25</span></span>
-<span id="cb26-18"><a href="#cb26-18"></a><span class="co">#&gt;               sexFemale educationHigh school educationCollege graduate or above</span></span>
-<span id="cb26-19"><a href="#cb26-19"></a><span class="co">#&gt; OR from m = 1      0.46                 0.75                               0.75</span></span>
-<span id="cb26-20"><a href="#cb26-20"></a><span class="co">#&gt; OR from m = 2      0.45                 0.76                               0.79</span></span>
-<span id="cb26-21"><a href="#cb26-21"></a><span class="co">#&gt; OR from m = 3      0.47                 0.71                               0.70</span></span>
-<span id="cb26-22"><a href="#cb26-22"></a><span class="co">#&gt; OR from m = 4      0.46                 0.70                               0.71</span></span>
-<span id="cb26-23"><a href="#cb26-23"></a><span class="co">#&gt; OR from m = 5      0.45                 0.75                               0.77</span></span>
-<span id="cb26-24"><a href="#cb26-24"></a><span class="co">#&gt;               raceBlack raceHispanic raceOthers income$20,000 to $74,999</span></span>
-<span id="cb26-25"><a href="#cb26-25"></a><span class="co">#&gt; OR from m = 1      0.96         0.54       0.86                     0.48</span></span>
-<span id="cb26-26"><a href="#cb26-26"></a><span class="co">#&gt; OR from m = 2      0.97         0.54       0.88                     0.48</span></span>
-<span id="cb26-27"><a href="#cb26-27"></a><span class="co">#&gt; OR from m = 3      0.98         0.54       0.85                     0.54</span></span>
-<span id="cb26-28"><a href="#cb26-28"></a><span class="co">#&gt; OR from m = 4      0.96         0.53       0.86                     0.51</span></span>
-<span id="cb26-29"><a href="#cb26-29"></a><span class="co">#&gt; OR from m = 5      0.99         0.55       0.87                     0.53</span></span>
-<span id="cb26-30"><a href="#cb26-30"></a><span class="co">#&gt;               income$75,000 and Over  bmi smokingPrevious smoker</span></span>
-<span id="cb26-31"><a href="#cb26-31"></a><span class="co">#&gt; OR from m = 1                   0.33 1.02                   1.55</span></span>
-<span id="cb26-32"><a href="#cb26-32"></a><span class="co">#&gt; OR from m = 2                   0.32 1.03                   1.55</span></span>
-<span id="cb26-33"><a href="#cb26-33"></a><span class="co">#&gt; OR from m = 3                   0.36 1.01                   1.59</span></span>
-<span id="cb26-34"><a href="#cb26-34"></a><span class="co">#&gt; OR from m = 4                   0.34 1.02                   1.56</span></span>
-<span id="cb26-35"><a href="#cb26-35"></a><span class="co">#&gt; OR from m = 5                   0.34 1.02                   1.55</span></span>
-<span id="cb26-36"><a href="#cb26-36"></a><span class="co">#&gt;               smokingCurrent smoker htnYes diabetesYes</span></span>
-<span id="cb26-37"><a href="#cb26-37"></a><span class="co">#&gt; OR from m = 1                  1.43   1.35        3.01</span></span>
-<span id="cb26-38"><a href="#cb26-38"></a><span class="co">#&gt; OR from m = 2                  1.47   1.30        3.01</span></span>
-<span id="cb26-39"><a href="#cb26-39"></a><span class="co">#&gt; OR from m = 3                  1.45   1.48        3.13</span></span>
-<span id="cb26-40"><a href="#cb26-40"></a><span class="co">#&gt; OR from m = 4                  1.44   1.46        3.03</span></span>
-<span id="cb26-41"><a href="#cb26-41"></a><span class="co">#&gt; OR from m = 5                  1.45   1.47        3.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-2"><a href="#cb26-2"></a>fit <span class="ot">&lt;-</span> <span class="fu">with</span>(w.design, </span>
+<span id="cb26-3"><a href="#cb26-3"></a>            <span class="fu">svyglm</span>(<span class="fu">I</span>(cvd <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> arthritis <span class="sc">+</span> age.cat <span class="sc">+</span> </span>
+<span id="cb26-4"><a href="#cb26-4"></a>                     sex <span class="sc">+</span> education <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> </span>
+<span id="cb26-5"><a href="#cb26-5"></a>                     smoking <span class="sc">+</span> htn <span class="sc">+</span> diabetes, </span>
+<span id="cb26-6"><a href="#cb26-6"></a>                   <span class="at">family =</span> quasibinomial))</span>
+<span id="cb26-7"><a href="#cb26-7"></a>res <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">as.data.frame</span>(<span class="fu">cbind</span>(<span class="fu">coef</span>(fit[[<span class="dv">1</span>]]),</span>
+<span id="cb26-8"><a href="#cb26-8"></a>      <span class="fu">coef</span>(fit[[<span class="dv">2</span>]]),</span>
+<span id="cb26-9"><a href="#cb26-9"></a>      <span class="fu">coef</span>(fit[[<span class="dv">3</span>]]),</span>
+<span id="cb26-10"><a href="#cb26-10"></a>      <span class="fu">coef</span>(fit[[<span class="dv">4</span>]]),</span>
+<span id="cb26-11"><a href="#cb26-11"></a>      <span class="fu">coef</span>(fit[[<span class="dv">5</span>]]))))</span>
+<span id="cb26-12"><a href="#cb26-12"></a><span class="fu">names</span>(res) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"OR from m ="</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb26-13"><a href="#cb26-13"></a><span class="fu">round</span>(<span class="fu">t</span>(res),<span class="dv">2</span>)</span>
+<span id="cb26-14"><a href="#cb26-14"></a><span class="co">#&gt;               (Intercept) arthritisRheumatoid arthritis age.cat50-64 age.cat65+</span></span>
+<span id="cb26-15"><a href="#cb26-15"></a><span class="co">#&gt; OR from m = 1        0.02                          2.03         4.71      13.08</span></span>
+<span id="cb26-16"><a href="#cb26-16"></a><span class="co">#&gt; OR from m = 2        0.02                          2.04         4.74      13.21</span></span>
+<span id="cb26-17"><a href="#cb26-17"></a><span class="co">#&gt; OR from m = 3        0.02                          2.12         4.58      11.88</span></span>
+<span id="cb26-18"><a href="#cb26-18"></a><span class="co">#&gt; OR from m = 4        0.02                          2.10         4.59      12.45</span></span>
+<span id="cb26-19"><a href="#cb26-19"></a><span class="co">#&gt; OR from m = 5        0.02                          2.07         4.47      12.25</span></span>
+<span id="cb26-20"><a href="#cb26-20"></a><span class="co">#&gt;               sexFemale educationHigh school educationCollege graduate or above</span></span>
+<span id="cb26-21"><a href="#cb26-21"></a><span class="co">#&gt; OR from m = 1      0.46                 0.75                               0.75</span></span>
+<span id="cb26-22"><a href="#cb26-22"></a><span class="co">#&gt; OR from m = 2      0.45                 0.76                               0.79</span></span>
+<span id="cb26-23"><a href="#cb26-23"></a><span class="co">#&gt; OR from m = 3      0.47                 0.71                               0.70</span></span>
+<span id="cb26-24"><a href="#cb26-24"></a><span class="co">#&gt; OR from m = 4      0.46                 0.70                               0.71</span></span>
+<span id="cb26-25"><a href="#cb26-25"></a><span class="co">#&gt; OR from m = 5      0.45                 0.75                               0.77</span></span>
+<span id="cb26-26"><a href="#cb26-26"></a><span class="co">#&gt;               raceBlack raceHispanic raceOthers income$20,000 to $74,999</span></span>
+<span id="cb26-27"><a href="#cb26-27"></a><span class="co">#&gt; OR from m = 1      0.96         0.54       0.86                     0.48</span></span>
+<span id="cb26-28"><a href="#cb26-28"></a><span class="co">#&gt; OR from m = 2      0.97         0.54       0.88                     0.48</span></span>
+<span id="cb26-29"><a href="#cb26-29"></a><span class="co">#&gt; OR from m = 3      0.98         0.54       0.85                     0.54</span></span>
+<span id="cb26-30"><a href="#cb26-30"></a><span class="co">#&gt; OR from m = 4      0.96         0.53       0.86                     0.51</span></span>
+<span id="cb26-31"><a href="#cb26-31"></a><span class="co">#&gt; OR from m = 5      0.99         0.55       0.87                     0.53</span></span>
+<span id="cb26-32"><a href="#cb26-32"></a><span class="co">#&gt;               income$75,000 and Over  bmi smokingPrevious smoker</span></span>
+<span id="cb26-33"><a href="#cb26-33"></a><span class="co">#&gt; OR from m = 1                   0.33 1.02                   1.55</span></span>
+<span id="cb26-34"><a href="#cb26-34"></a><span class="co">#&gt; OR from m = 2                   0.32 1.03                   1.55</span></span>
+<span id="cb26-35"><a href="#cb26-35"></a><span class="co">#&gt; OR from m = 3                   0.36 1.01                   1.59</span></span>
+<span id="cb26-36"><a href="#cb26-36"></a><span class="co">#&gt; OR from m = 4                   0.34 1.02                   1.56</span></span>
+<span id="cb26-37"><a href="#cb26-37"></a><span class="co">#&gt; OR from m = 5                   0.34 1.02                   1.55</span></span>
+<span id="cb26-38"><a href="#cb26-38"></a><span class="co">#&gt;               smokingCurrent smoker htnYes diabetesYes</span></span>
+<span id="cb26-39"><a href="#cb26-39"></a><span class="co">#&gt; OR from m = 1                  1.43   1.35        3.01</span></span>
+<span id="cb26-40"><a href="#cb26-40"></a><span class="co">#&gt; OR from m = 2                  1.47   1.30        3.01</span></span>
+<span id="cb26-41"><a href="#cb26-41"></a><span class="co">#&gt; OR from m = 3                  1.45   1.48        3.13</span></span>
+<span id="cb26-42"><a href="#cb26-42"></a><span class="co">#&gt; OR from m = 4                  1.44   1.46        3.03</span></span>
+<span id="cb26-43"><a href="#cb26-43"></a><span class="co">#&gt; OR from m = 5                  1.45   1.47        3.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3-pooling-estimates" class="level4"><h4 class="anchored" data-anchor-id="step-3-pooling-estimates">Step 3: Pooling estimates</h4>
-<div class="cell" data-hash="missingdata5_cache/html/step3_05e72718f5d6aeed75c10fd11e0704f9">
+<div class="cell" data-hash="missingdata5_cache/html/step3_0c20e9870be956f1013daecdec82b9de">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># Step 3: Pooled estimates</span></span>
 <span id="cb27-2"><a href="#cb27-2"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit)</span>
 <span id="cb27-3"><a href="#cb27-3"></a>OR <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(pooled.estimates<span class="sc">$</span>coefficients), <span class="dv">2</span>)</span>

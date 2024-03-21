@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1123,7 +1123,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </header><p>This tutorial is a comprehensive guide on implementing Propensity Score Matching (PSM) using R, particularly focusing on a OA - CVD health study from the Canadian Community Health Survey (CCHS). This PSM method is used to reduce bias due to confounding variables in observational studies by matching treated and control units with similar propensity scores. The tutorial illustrates that PSM is an iterative process, where researchers may need to refine their matching strategy to achieve satisfactory balance in the matched sample. Different strategies for estimating the treatment effect in the matched sample are explored, each with its own assumptions and implications.</p>
 <section id="load-packages" class="level3"><h3 class="anchored" data-anchor-id="load-packages">Load packages</h3>
 <p>At first, various R packages are loaded to utilize their functions for data manipulation, statistical analysis, and visualization.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/setup_41fc00b48777f01a707bb5d0e5747c10">
+<div class="cell" data-hash="propensityscore2_cache/html/setup_78e69958c3b650f17a1d01fd64072433">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(MatchIt)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(tableone)</span>
@@ -1134,7 +1134,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>The dataset is loaded into the R environment. Variables are renamed to avoid conflicts in subsequent analyses.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/data_77164924df979c43b937ca8d40f2710c">
+<div class="cell" data-hash="propensityscore2_cache/html/data_da13ad48a85630840a9306527c028fa0">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/cchs123c.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">head</span>(analytic11n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1158,7 +1158,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section><section id="step-1" class="level3"><h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
 <section id="specify-ps" class="level4"><h4 class="anchored" data-anchor-id="specify-ps">Specify PS</h4>
 <p>A logistic regression model formula is specified to calculate the propensity scores (PS), which is the probability of receiving the treatment given the observed covariates.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step1_bd33865d210bb860a3bf87a9d4d60fd0">
+<div class="cell" data-hash="propensityscore2_cache/html/step1_825e1a95c18df6b1abbf7e559f78b549">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age + sex + stress + married + </span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="st">                         income + race + bmi + phyact + smoke +</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="st">                        doctor + drink + bp + </span></span>
@@ -1207,7 +1207,7 @@ Tip
 <p>In the context of PSM, a caliper is a predefined maximum allowable difference between the propensity scores of matched units. Essentially, it sets a threshold for how dissimilar matched units can be in terms of their propensity scores. When a caliper is used, a treated unit is only matched with a control unit if the absolute difference in their propensity scores is less than or equal to the specified caliper width. The caliper is used to avoid bad matches and thereby minimize bias in the estimated treatment effect. The size of the caliper is crucial. Too wide a caliper may allow poor matches, while too narrow a caliper may result in many units going unmatched. Implementing a caliper involves a trade-off between bias and efficiency. Using a caliper reduces bias by avoiding poor matches but may increase variance by reducing the number of matched pairs available for analysis. Therefore, the use of a caliper in PSM is a strategic decision to enhance the quality of matches and thereby improve the validity of causal inferences drawn from observational data. It is a practical tool to ensure that matched units are sufficiently similar in terms of their propensity scores, reducing the likelihood of bias due to poor matches.</p>
 </div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/step2_a38ac165127c1bef7c99cb15b7d7bfc6">
+<div class="cell" data-hash="propensityscore2_cache/html/step2_85121a023dd35d299383b3349c2f6444">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># set seed</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co"># match</span></span>
@@ -1234,7 +1234,7 @@ Tip
 </div>
 <p>Let’s try to understand how this is working.</p>
 </section><section id="extract-matched-ids" class="level4"><h4 class="anchored" data-anchor-id="extract-matched-ids">Extract matched IDs</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/matchitstrata2_acc3f982d008eba89095ec0d4538fc93">
+<div class="cell" data-hash="propensityscore2_cache/html/matchitstrata2_21b60af3150d7a4efa97f2249f122e20">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>m.mat<span class="ot">&lt;-</span>matching.obj<span class="sc">$</span>match.matrix</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">head</span>(m.mat)</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;       [,1]    </span></span>
@@ -1246,7 +1246,7 @@ Tip
 <span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; 18383 "108197"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="extract-the-matched-treated-ids" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-treated-ids">Extract the matched treated IDs</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step2b_59ed09bd750b88161146a794acc8c5db">
+<div class="cell" data-hash="propensityscore2_cache/html/step2b_6032f5a051ff8c20c1ba97f275cf977d">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>treated.id<span class="ot">&lt;-</span><span class="fu">as.numeric</span>(<span class="fu">row.names</span>(m.mat))</span>
 <span id="cb8-2"><a href="#cb8-2"></a>treated.id <span class="co"># basically row names</span></span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt;  [1]  17864  17921  18191  18256  18264  18383  18389  18475  39105  96344</span></span>
@@ -1258,19 +1258,19 @@ Tip
 <span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt; [61] 112289 112290 112300 112325 112375 126477 126522</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="extract-the-matched-untreated-ids" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-untreated-ids">Extract the matched untreated IDs</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step2c_566083270d85bdd554067a769d40d57c">
+<div class="cell" data-hash="propensityscore2_cache/html/step2c_7d895c21fff176a3b99a14b8b43fe3c3">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>untreated.id <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(m.mat)</span>
 <span id="cb9-2"><a href="#cb9-2"></a>untreated.id <span class="co"># basically row names</span></span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt;  [1]  96719  17846  97168 111999  17989 108197 112384  17909 126561 111880</span></span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; [11] 112184  18117  96865  18120  97023 112379  97017 126562  96356 126470</span></span>
 <span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt; [21] 126385  96374  18203  18262  96972 111924  96354  96983  18235  96882</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#&gt; [31] 112054  18321 112349  18426  38996 126516 111814 112087  96569 111932</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#&gt; [31] 112054  18321  18426 112349  38996 126516 111814 112087  96569 111932</span></span>
 <span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; [41] 126539  18315  96665  18225 112052 112324 112165  18329  96609 126376</span></span>
 <span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; [51]  96474 126570 126547 126343  96680  96558 111931  96718  96533 111823</span></span>
 <span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt; [61] 112177  17953  17904 111908 111962  96644  96576</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="extract-the-matched-treated-data" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-treated-data">Extract the matched treated data</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step2d_606e2043348ec4e6eadadc6600734af5">
+<div class="cell" data-hash="propensityscore2_cache/html/step2d_2025044e9a20f66eeb70f1081d245813">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>tx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> treated.id,]</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">head</span>(tx[<span class="fu">c</span>(<span class="st">"OA"</span>, <span class="st">"CVD"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1283,7 +1283,7 @@ Tip
 </div>
 </div>
 </section><section id="extract-the-matched-untreated-data" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-untreated-data">Extract the matched untreated data</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step2e_8f53b110824b1fa36f2ecde24978966c">
+<div class="cell" data-hash="propensityscore2_cache/html/step2e_a6468aa10098c44e84b8ec23361601e9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>utx <span class="ot">&lt;-</span> analytic11n[<span class="fu">rownames</span>(analytic11n) <span class="sc">%in%</span> untreated.id,]</span>
 <span id="cb11-2"><a href="#cb11-2"></a><span class="fu">head</span>(utx[<span class="fu">c</span>(<span class="st">"OA"</span>, <span class="st">"CVD"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"edu"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1297,11 +1297,11 @@ Tip
 </div>
 </section><section id="extract-the-matched-data-altogether" class="level4"><h4 class="anchored" data-anchor-id="extract-the-matched-data-altogether">Extract the matched data altogether</h4>
 <p>Simply using <code>match.data</code> is enough (as done earlier).</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step2f_bf97749361e21174c16b0348f6faa25f">
+<div class="cell" data-hash="propensityscore2_cache/html/step2f_e3890cdcc045feaed8986895f0272adb">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="assign-match-id" class="level4"><h4 class="anchored" data-anchor-id="assign-match-id">Assign match ID</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step2g_ac9c99a3cb09a34774ce3f7d7348bb99">
+<div class="cell" data-hash="propensityscore2_cache/html/step2g_5118c1b2c27cdec72e165beab6af163d">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>OACVD.match<span class="sc">$</span>match.ID <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>OACVD.match<span class="sc">$</span>match.ID[<span class="fu">rownames</span>(OACVD.match) <span class="sc">%in%</span> treated.id] <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(treated.id)</span>
 <span id="cb13-3"><a href="#cb13-3"></a>OACVD.match<span class="sc">$</span>match.ID[<span class="fu">rownames</span>(OACVD.match) <span class="sc">%in%</span> untreated.id] <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(untreated.id)</span>
@@ -1315,7 +1315,7 @@ Tip
 <span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt;  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Take a look at individual matches for the first match</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step2h_387b628a12476e0af902753a25f43631">
+<div class="cell" data-hash="propensityscore2_cache/html/step2h_b6fdd7bc4070060585cc2d70a5fef72f">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">1</span>,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
@@ -1327,7 +1327,7 @@ Tip
 </div>
 </div>
 <p>Take a look at individual matches for the second match</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step2i_fbfbad05b3c5660ff100df497f9704f2">
+<div class="cell" data-hash="propensityscore2_cache/html/step2i_a7d91fc8aa57c30f501bda6195c7c96a">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">na.omit</span>(OACVD.match[OACVD.match<span class="sc">$</span>match.ID <span class="sc">==</span> <span class="dv">2</span>,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
@@ -1343,13 +1343,14 @@ Tip
 <section id="examining-ps-graphically" class="level4"><h4 class="anchored" data-anchor-id="examining-ps-graphically">Examining PS graphically</h4>
 <p>Visually inspect the PS and assess the balance of covariates in the matched sample. Various plots are generated to visualize the distribution of PS across treatment groups and to check the balance of covariates before and after matching.</p>
 </section><section id="matchit-package" class="level4"><h4 class="anchored" data-anchor-id="matchit-package">matchit package</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step3_eaebbead8a9ff44754817e38a7fb0d5c">
+<div class="cell" data-hash="propensityscore2_cache/html/step3_8788e70f297154a41dcdd9fbab2e2766">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># plot(matching.obj) # covariate balance</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a><span class="fu">plot</span>(matching.obj, <span class="at">type =</span> <span class="st">"jitter"</span>) <span class="co"># propensity score locations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3-1.png" class="img-fluid" width="672"></p>
 </div>
-<pre><code>#&gt; To identify the units, use first mouse button; to stop, use second.
+<pre><code>#&gt; [1] "To identify the units, use first mouse button; to stop, use second."
+#&gt; integer(0)
 plot(matching.obj, type = "hist") #check matched treated vs matched control</code></pre>
 <div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3-2.png" class="img-fluid" width="672"></p>
@@ -1361,7 +1362,7 @@ plot(matching.obj, type = "hist") #check matched treated vs matched control</cod
 </div>
 </div>
 </section><section id="overalp-check" class="level4"><h4 class="anchored" data-anchor-id="overalp-check">Overalp check</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step3b_a04c8692aa9cca9244ea4bd5744c0328">
+<div class="cell" data-hash="propensityscore2_cache/html/step3b_83bc5de14b1c4f741ac123815ae92adf">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># plot propensity scores by exposure group</span></span>
 <span id="cb19-2"><a href="#cb19-2"></a><span class="fu">plot</span>(<span class="fu">density</span>(OACVD.match<span class="sc">$</span>distance[OACVD.match<span class="sc">$</span>OA<span class="sc">==</span><span class="dv">1</span>]), </span>
 <span id="cb19-3"><a href="#cb19-3"></a>     <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">main =</span> <span class="st">""</span>)</span>
@@ -1375,7 +1376,7 @@ plot(matching.obj, type = "hist") #check matched treated vs matched control</cod
 </div>
 </section><section id="cobalt-package" class="level4"><h4 class="anchored" data-anchor-id="cobalt-package">cobalt package</h4>
 <p>Overlap check in a more convenient way</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step3c_bb6c1fc10e90ea17d67ad6946fef1591">
+<div class="cell" data-hash="propensityscore2_cache/html/step3c_2dc417201e7aa21709ff469277596597">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># different badwidth</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"distance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1383,7 +1384,7 @@ plot(matching.obj, type = "hist") #check matched treated vs matched control</cod
 </div>
 </div>
 </section><section id="look-at-the-data" class="level4"><h4 class="anchored" data-anchor-id="look-at-the-data">Look at the data</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step3d_6010a159df2ab6e9342a198e69daddc3">
+<div class="cell" data-hash="propensityscore2_cache/html/step3d_43e4f5689321a30bd619dd7c23a23013">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># what is distance variable here?</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1396,7 +1397,7 @@ plot(matching.obj, type = "hist") #check matched treated vs matched control</cod
 </div>
 </div>
 </section><section id="numerical-values-of-ps" class="level4"><h4 class="anchored" data-anchor-id="numerical-values-of-ps">Numerical values of PS</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step3e_d8803c9224dca3d6d0d92a10c67db4ac">
+<div class="cell" data-hash="propensityscore2_cache/html/step3e_88a762c80d2bec31db8d9f4ca1db40c9">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">summary</span>(OACVD.match<span class="sc">$</span>distance)</span>
 <span id="cb22-2"><a href="#cb22-2"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt; 0.004671 0.044834 0.099094 0.138969 0.200576 0.611166</span></span>
@@ -1432,7 +1433,7 @@ Tip
 </ul>
 </div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/step3f_b3e0aad2d6204b6704142d05de21d8a0">
+<div class="cell" data-hash="propensityscore2_cache/html/step3f_a7e36855789cd31b61f76c13fc73e787">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> OACVD.match, </span>
 <span id="cb23-2"><a href="#cb23-2"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
 <span id="cb23-3"><a href="#cb23-3"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
@@ -1495,60 +1496,64 @@ Tip
 </ul></section><section id="other-balance-measures" class="level4"><h4 class="anchored" data-anchor-id="other-balance-measures">Other balance measures</h4>
 <section id="individual-categories" class="level5"><h5 class="anchored" data-anchor-id="individual-categories">Individual categories</h5>
 <p>If you want to check balance at each category (not very useful in general situations). We are generally interested if the variables are balanced or not (not categories).</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step3g_efa8b3a85a452eed2c2bdbb3c06ba8b1">
+<div class="cell" data-hash="propensityscore2_cache/html/step3g_b1fb4747d63cbc03c92cbe77c267c054">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>baltab <span class="ot">&lt;-</span> <span class="fu">bal.tab</span>(matching.obj)</span>
 <span id="cb24-2"><a href="#cb24-2"></a>baltab</span>
-<span id="cb24-3"><a href="#cb24-3"></a><span class="co">#&gt; Balance Measures</span></span>
-<span id="cb24-4"><a href="#cb24-4"></a><span class="co">#&gt;                             Type Diff.Adj</span></span>
-<span id="cb24-5"><a href="#cb24-5"></a><span class="co">#&gt; distance                Distance   0.0597</span></span>
-<span id="cb24-6"><a href="#cb24-6"></a><span class="co">#&gt; age_20-29 years           Binary   0.0000</span></span>
-<span id="cb24-7"><a href="#cb24-7"></a><span class="co">#&gt; age_30-39 years           Binary  -0.0746</span></span>
-<span id="cb24-8"><a href="#cb24-8"></a><span class="co">#&gt; age_40-49 years           Binary   0.0299</span></span>
-<span id="cb24-9"><a href="#cb24-9"></a><span class="co">#&gt; age_50-59 years           Binary   0.0448</span></span>
-<span id="cb24-10"><a href="#cb24-10"></a><span class="co">#&gt; age_60-64 years           Binary   0.0000</span></span>
-<span id="cb24-11"><a href="#cb24-11"></a><span class="co">#&gt; sex_Male                  Binary   0.0597</span></span>
-<span id="cb24-12"><a href="#cb24-12"></a><span class="co">#&gt; stress_stressed           Binary   0.0149</span></span>
-<span id="cb24-13"><a href="#cb24-13"></a><span class="co">#&gt; married_single            Binary   0.0149</span></span>
-<span id="cb24-14"><a href="#cb24-14"></a><span class="co">#&gt; income_$29,999 or less    Binary   0.0299</span></span>
-<span id="cb24-15"><a href="#cb24-15"></a><span class="co">#&gt; income_$30,000-$49,999    Binary  -0.0597</span></span>
-<span id="cb24-16"><a href="#cb24-16"></a><span class="co">#&gt; income_$50,000-$79,999    Binary  -0.0299</span></span>
-<span id="cb24-17"><a href="#cb24-17"></a><span class="co">#&gt; income_$80,000 or more    Binary   0.0597</span></span>
-<span id="cb24-18"><a href="#cb24-18"></a><span class="co">#&gt; race_White                Binary   0.0149</span></span>
-<span id="cb24-19"><a href="#cb24-19"></a><span class="co">#&gt; bmi_Underweight           Binary   0.0000</span></span>
-<span id="cb24-20"><a href="#cb24-20"></a><span class="co">#&gt; bmi_healthy weight        Binary   0.0000</span></span>
-<span id="cb24-21"><a href="#cb24-21"></a><span class="co">#&gt; bmi_Overweight            Binary   0.0000</span></span>
-<span id="cb24-22"><a href="#cb24-22"></a><span class="co">#&gt; phyact_Active             Binary   0.0000</span></span>
-<span id="cb24-23"><a href="#cb24-23"></a><span class="co">#&gt; phyact_Inactive           Binary  -0.0149</span></span>
-<span id="cb24-24"><a href="#cb24-24"></a><span class="co">#&gt; phyact_Moderate           Binary   0.0149</span></span>
-<span id="cb24-25"><a href="#cb24-25"></a><span class="co">#&gt; smoke_Never smoker        Binary  -0.0746</span></span>
-<span id="cb24-26"><a href="#cb24-26"></a><span class="co">#&gt; smoke_Current smoker      Binary   0.1045</span></span>
-<span id="cb24-27"><a href="#cb24-27"></a><span class="co">#&gt; smoke_Former smoker       Binary  -0.0299</span></span>
-<span id="cb24-28"><a href="#cb24-28"></a><span class="co">#&gt; doctor_Yes                Binary  -0.0597</span></span>
-<span id="cb24-29"><a href="#cb24-29"></a><span class="co">#&gt; drink_Never drank         Binary   0.0000</span></span>
-<span id="cb24-30"><a href="#cb24-30"></a><span class="co">#&gt; drink_Current drinker     Binary  -0.0448</span></span>
-<span id="cb24-31"><a href="#cb24-31"></a><span class="co">#&gt; drink_Former driker       Binary   0.0448</span></span>
-<span id="cb24-32"><a href="#cb24-32"></a><span class="co">#&gt; bp_Yes                    Binary  -0.0299</span></span>
-<span id="cb24-33"><a href="#cb24-33"></a><span class="co">#&gt; immigrate_not immigrant   Binary  -0.0448</span></span>
-<span id="cb24-34"><a href="#cb24-34"></a><span class="co">#&gt; immigrate_&gt; 10 years      Binary   0.0448</span></span>
-<span id="cb24-35"><a href="#cb24-35"></a><span class="co">#&gt; immigrate_recent          Binary   0.0000</span></span>
-<span id="cb24-36"><a href="#cb24-36"></a><span class="co">#&gt; fruit_0-3 daily serving   Binary   0.0000</span></span>
-<span id="cb24-37"><a href="#cb24-37"></a><span class="co">#&gt; fruit_4-6 daily serving   Binary   0.0597</span></span>
-<span id="cb24-38"><a href="#cb24-38"></a><span class="co">#&gt; fruit_6+ daily serving    Binary  -0.0597</span></span>
-<span id="cb24-39"><a href="#cb24-39"></a><span class="co">#&gt; diab_Yes                  Binary   0.0448</span></span>
-<span id="cb24-40"><a href="#cb24-40"></a><span class="co">#&gt; edu_&lt; 2ndary              Binary  -0.0149</span></span>
-<span id="cb24-41"><a href="#cb24-41"></a><span class="co">#&gt; edu_2nd grad.             Binary   0.0149</span></span>
-<span id="cb24-42"><a href="#cb24-42"></a><span class="co">#&gt; edu_Other 2nd grad.       Binary   0.0000</span></span>
-<span id="cb24-43"><a href="#cb24-43"></a><span class="co">#&gt; edu_Post-2nd grad.        Binary   0.0000</span></span>
-<span id="cb24-44"><a href="#cb24-44"></a><span class="co">#&gt; </span></span>
-<span id="cb24-45"><a href="#cb24-45"></a><span class="co">#&gt; Sample sizes</span></span>
-<span id="cb24-46"><a href="#cb24-46"></a><span class="co">#&gt;           Control Treated</span></span>
-<span id="cb24-47"><a href="#cb24-47"></a><span class="co">#&gt; All          1357      67</span></span>
-<span id="cb24-48"><a href="#cb24-48"></a><span class="co">#&gt; Matched        67      67</span></span>
-<span id="cb24-49"><a href="#cb24-49"></a><span class="co">#&gt; Unmatched    1290       0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="co">#&gt; Call</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="co">#&gt;  matchit(formula = ps.formula, data = analytic11n, method = "nearest", </span></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="co">#&gt;     ratio = 1)</span></span>
+<span id="cb24-6"><a href="#cb24-6"></a><span class="co">#&gt; </span></span>
+<span id="cb24-7"><a href="#cb24-7"></a><span class="co">#&gt; Balance Measures</span></span>
+<span id="cb24-8"><a href="#cb24-8"></a><span class="co">#&gt;                             Type Diff.Adj</span></span>
+<span id="cb24-9"><a href="#cb24-9"></a><span class="co">#&gt; distance                Distance   0.0597</span></span>
+<span id="cb24-10"><a href="#cb24-10"></a><span class="co">#&gt; age_20-29 years           Binary   0.0000</span></span>
+<span id="cb24-11"><a href="#cb24-11"></a><span class="co">#&gt; age_30-39 years           Binary  -0.0746</span></span>
+<span id="cb24-12"><a href="#cb24-12"></a><span class="co">#&gt; age_40-49 years           Binary   0.0299</span></span>
+<span id="cb24-13"><a href="#cb24-13"></a><span class="co">#&gt; age_50-59 years           Binary   0.0448</span></span>
+<span id="cb24-14"><a href="#cb24-14"></a><span class="co">#&gt; age_60-64 years           Binary   0.0000</span></span>
+<span id="cb24-15"><a href="#cb24-15"></a><span class="co">#&gt; sex_Male                  Binary   0.0597</span></span>
+<span id="cb24-16"><a href="#cb24-16"></a><span class="co">#&gt; stress_stressed           Binary   0.0149</span></span>
+<span id="cb24-17"><a href="#cb24-17"></a><span class="co">#&gt; married_single            Binary   0.0149</span></span>
+<span id="cb24-18"><a href="#cb24-18"></a><span class="co">#&gt; income_$29,999 or less    Binary   0.0299</span></span>
+<span id="cb24-19"><a href="#cb24-19"></a><span class="co">#&gt; income_$30,000-$49,999    Binary  -0.0597</span></span>
+<span id="cb24-20"><a href="#cb24-20"></a><span class="co">#&gt; income_$50,000-$79,999    Binary  -0.0299</span></span>
+<span id="cb24-21"><a href="#cb24-21"></a><span class="co">#&gt; income_$80,000 or more    Binary   0.0597</span></span>
+<span id="cb24-22"><a href="#cb24-22"></a><span class="co">#&gt; race_White                Binary   0.0149</span></span>
+<span id="cb24-23"><a href="#cb24-23"></a><span class="co">#&gt; bmi_Underweight           Binary   0.0000</span></span>
+<span id="cb24-24"><a href="#cb24-24"></a><span class="co">#&gt; bmi_healthy weight        Binary   0.0000</span></span>
+<span id="cb24-25"><a href="#cb24-25"></a><span class="co">#&gt; bmi_Overweight            Binary   0.0000</span></span>
+<span id="cb24-26"><a href="#cb24-26"></a><span class="co">#&gt; phyact_Active             Binary   0.0000</span></span>
+<span id="cb24-27"><a href="#cb24-27"></a><span class="co">#&gt; phyact_Inactive           Binary  -0.0149</span></span>
+<span id="cb24-28"><a href="#cb24-28"></a><span class="co">#&gt; phyact_Moderate           Binary   0.0149</span></span>
+<span id="cb24-29"><a href="#cb24-29"></a><span class="co">#&gt; smoke_Never smoker        Binary  -0.0746</span></span>
+<span id="cb24-30"><a href="#cb24-30"></a><span class="co">#&gt; smoke_Current smoker      Binary   0.1045</span></span>
+<span id="cb24-31"><a href="#cb24-31"></a><span class="co">#&gt; smoke_Former smoker       Binary  -0.0299</span></span>
+<span id="cb24-32"><a href="#cb24-32"></a><span class="co">#&gt; doctor_Yes                Binary  -0.0597</span></span>
+<span id="cb24-33"><a href="#cb24-33"></a><span class="co">#&gt; drink_Never drank         Binary   0.0000</span></span>
+<span id="cb24-34"><a href="#cb24-34"></a><span class="co">#&gt; drink_Current drinker     Binary  -0.0448</span></span>
+<span id="cb24-35"><a href="#cb24-35"></a><span class="co">#&gt; drink_Former driker       Binary   0.0448</span></span>
+<span id="cb24-36"><a href="#cb24-36"></a><span class="co">#&gt; bp_Yes                    Binary  -0.0299</span></span>
+<span id="cb24-37"><a href="#cb24-37"></a><span class="co">#&gt; immigrate_not immigrant   Binary  -0.0448</span></span>
+<span id="cb24-38"><a href="#cb24-38"></a><span class="co">#&gt; immigrate_&gt; 10 years      Binary   0.0448</span></span>
+<span id="cb24-39"><a href="#cb24-39"></a><span class="co">#&gt; immigrate_recent          Binary   0.0000</span></span>
+<span id="cb24-40"><a href="#cb24-40"></a><span class="co">#&gt; fruit_0-3 daily serving   Binary   0.0000</span></span>
+<span id="cb24-41"><a href="#cb24-41"></a><span class="co">#&gt; fruit_4-6 daily serving   Binary   0.0597</span></span>
+<span id="cb24-42"><a href="#cb24-42"></a><span class="co">#&gt; fruit_6+ daily serving    Binary  -0.0597</span></span>
+<span id="cb24-43"><a href="#cb24-43"></a><span class="co">#&gt; diab_Yes                  Binary   0.0448</span></span>
+<span id="cb24-44"><a href="#cb24-44"></a><span class="co">#&gt; edu_&lt; 2ndary              Binary  -0.0149</span></span>
+<span id="cb24-45"><a href="#cb24-45"></a><span class="co">#&gt; edu_2nd grad.             Binary   0.0149</span></span>
+<span id="cb24-46"><a href="#cb24-46"></a><span class="co">#&gt; edu_Other 2nd grad.       Binary   0.0000</span></span>
+<span id="cb24-47"><a href="#cb24-47"></a><span class="co">#&gt; edu_Post-2nd grad.        Binary   0.0000</span></span>
+<span id="cb24-48"><a href="#cb24-48"></a><span class="co">#&gt; </span></span>
+<span id="cb24-49"><a href="#cb24-49"></a><span class="co">#&gt; Sample sizes</span></span>
+<span id="cb24-50"><a href="#cb24-50"></a><span class="co">#&gt;           Control Treated</span></span>
+<span id="cb24-51"><a href="#cb24-51"></a><span class="co">#&gt; All          1357      67</span></span>
+<span id="cb24-52"><a href="#cb24-52"></a><span class="co">#&gt; Matched        67      67</span></span>
+<span id="cb24-53"><a href="#cb24-53"></a><span class="co">#&gt; Unmatched    1290       0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="individual-plots" class="level5"><h5 class="anchored" data-anchor-id="individual-plots">Individual plots</h5>
 <p>You could plot each variables individually</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step3h_2d0d2774a69b9c76e9d218722ccfeeb6">
+<div class="cell" data-hash="propensityscore2_cache/html/step3h_a737e427ce53ffce428e68670af91e6f">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">bal.plot</span>(matching.obj, <span class="at">var.name =</span> <span class="st">"income"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/step3h-1.png" class="img-fluid" width="672"></p>
@@ -1571,13 +1576,13 @@ Tip
 </div>
 </div>
 </section><section id="love-plot" class="level5"><h5 class="anchored" data-anchor-id="love-plot">Love plot</h5>
-<div class="cell" data-hash="propensityscore2_cache/html/loveplot_0a47658a80b3082fdb25de43e4f2fa80">
+<div class="cell" data-hash="propensityscore2_cache/html/loveplot_a88c895c3f7aad31cc22911a5e23faa2">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co"># Individual categories again</span></span>
 <span id="cb30-2"><a href="#cb30-2"></a><span class="fu">love.plot</span>(baltab, <span class="at">threshold =</span> .<span class="dv">2</span>)</span>
-<span id="cb30-3"><a href="#cb30-3"></a><span class="co">#&gt; Warning: Unadjusted values are missing. This can occur when `un = FALSE` and</span></span>
-<span id="cb30-4"><a href="#cb30-4"></a><span class="co">#&gt; `quick = TRUE` in the original call to `bal.tab()`.</span></span>
+<span id="cb30-3"><a href="#cb30-3"></a><span class="co">#&gt; Warning: Unadjusted values are missing. This can occur when un = FALSE and</span></span>
+<span id="cb30-4"><a href="#cb30-4"></a><span class="co">#&gt; quick = TRUE in the original call to bal.tab().</span></span>
 <span id="cb30-5"><a href="#cb30-5"></a><span class="co">#&gt; Warning: Standardized mean differences and raw mean differences are present in the same plot. </span></span>
-<span id="cb30-6"><a href="#cb30-6"></a><span class="co">#&gt; Use the `stars` argument to distinguish between them and appropriately label the x-axis.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb30-6"><a href="#cb30-6"></a><span class="co">#&gt; Use the 'stars' argument to distinguish between them and appropriately label the x-axis.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propensityscore2_files/figure-html/loveplot-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1586,7 +1591,7 @@ Tip
 <p>Covariate balance is reassessed in each step to ensure the quality of the match.</p>
 <section id="add-caliper" class="level4"><h4 class="anchored" data-anchor-id="add-caliper">Add caliper</h4>
 <p>The matching process is repeated, this time introducing a caliper to ensure that matches are only made within a specified range of PS.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step3i_8d227fbf633ac580edc4e8952ddd0e1d">
+<div class="cell" data-hash="propensityscore2_cache/html/step3i_75ef8e9566e211c6776020acf960c395">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>logitPS <span class="ot">&lt;-</span>  <span class="sc">-</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">/</span>OACVD.match<span class="sc">$</span>distance <span class="sc">-</span> <span class="dv">1</span>) </span>
 <span id="cb31-2"><a href="#cb31-2"></a><span class="co"># logit of the propensity score</span></span>
 <span id="cb31-3"><a href="#cb31-3"></a>.<span class="dv">2</span><span class="sc">*</span><span class="fu">sd</span>(logitPS) <span class="co"># suggested in the literature</span></span>
@@ -1611,7 +1616,7 @@ Tip
 <span id="cb31-22"><a href="#cb31-22"></a><span class="co">#&gt;  - covariates: age, sex, stress, married, income, race, bmi, phyact, smoke, doctor, drink, bp, immigrate, fruit, diab, edu</span></span>
 <span id="cb31-23"><a href="#cb31-23"></a>OACVD.match <span class="ot">&lt;-</span> <span class="fu">match.data</span>(matching.obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/step3j_4df312b8b00d1c451d4572156071c5ef">
+<div class="cell" data-hash="propensityscore2_cache/html/step3j_8ded6f1fe7c4e49a925a4fe693a985bb">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># Step 3</span></span>
 <span id="cb32-2"><a href="#cb32-2"></a><span class="fu">by</span>(OACVD.match<span class="sc">$</span>distance, OACVD.match<span class="sc">$</span>OA, summary)</span>
 <span id="cb32-3"><a href="#cb32-3"></a><span class="co">#&gt; OACVD.match$OA: 0</span></span>
@@ -1681,7 +1686,7 @@ Tip
 <ul>
 <li>Did all of the SMDs decrease?</li>
 </ul></section><section id="look-at-the-data-1" class="level4"><h4 class="anchored" data-anchor-id="look-at-the-data-1">Look at the data</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step3k_722e2d8c4e1d3c189500dbd2e2f6f80d">
+<div class="cell" data-hash="propensityscore2_cache/html/step3k_e4329eb304962dda392f862a4184dd5d">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># what is weights variable for pair matching?</span></span>
 <span id="cb33-2"><a href="#cb33-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1700,7 +1705,7 @@ Tip
 <section id="estimate-treatment-effect-for-matched-data" class="level4"><h4 class="anchored" data-anchor-id="estimate-treatment-effect-for-matched-data">Estimate treatment effect for matched data</h4>
 <p>Different models (e.g., unconditional logistic regression, survey design) are fitted to estimate the treatment effect in the matched sample.</p>
 </section><section id="unconditional-logistic" class="level4"><h4 class="anchored" data-anchor-id="unconditional-logistic">Unconditional logistic</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/step4_a5241f6f63352a012705249257394c92">
+<div class="cell" data-hash="propensityscore2_cache/html/step4_41cd7ff153dbaa6608f5c2e0c73635fc">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># Wrong model for population!!</span></span>
 <span id="cb35-2"><a href="#cb35-2"></a>outcome.model <span class="ot">&lt;-</span> <span class="fu">glm</span>(CVD <span class="sc">~</span> OA, <span class="at">data =</span> OACVD.match, <span class="at">family =</span> <span class="fu">binomial</span>())</span>
 <span id="cb35-3"><a href="#cb35-3"></a><span class="fu">publish</span>(outcome.model)</span>
@@ -1710,7 +1715,7 @@ Tip
 </section><section id="survey-design" class="level4"><h4 class="anchored" data-anchor-id="survey-design">Survey design</h4>
 <section id="convert-data-to-design" class="level5"><h5 class="anchored" data-anchor-id="convert-data-to-design">Convert data to design</h5>
 <p>The matched data is converted to a survey design object to account for the matched pairs in the analysis.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/step4b_19891cf6266acf9e360b30359ff0fd20">
+<div class="cell" data-hash="propensityscore2_cache/html/step4b_6ddd27f2e098eeaef8848218b86d4fcf">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb36-2"><a href="#cb36-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb36-3"><a href="#cb36-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -1728,7 +1733,7 @@ Tip
 <span id="cb36-15"><a href="#cb36-15"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="balance-in-matched-population" class="level5"><h5 class="anchored" data-anchor-id="balance-in-matched-population">Balance in matched population?</h5>
-<div class="cell" data-hash="propensityscore2_cache/html/step4c_209be743b31bba1ac8514610d8b3d6ca">
+<div class="cell" data-hash="propensityscore2_cache/html/step4c_4466a5cdb410e54732862791fb633923">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">svyCreateTableOne</span>(<span class="at">strata =</span> <span class="st">"OA"</span>, <span class="at">data =</span> w.design.m, </span>
 <span id="cb37-2"><a href="#cb37-2"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>, <span class="at">vars =</span> var.names)</span>
 <span id="cb37-3"><a href="#cb37-3"></a><span class="fu">print</span>(tab1, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
@@ -1786,7 +1791,7 @@ Tip
 <span id="cb37-55"><a href="#cb37-55"></a><span class="co">#&gt;      Post-2nd grad.     1424.7 (79.9)  1559.4 (77.9)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="outcome-analysis" class="level5"><h5 class="anchored" data-anchor-id="outcome-analysis">Outcome analysis</h5>
-<div class="cell" data-hash="propensityscore2_cache/html/step4d_a070e67d36187dab8e9f06d991c7933c">
+<div class="cell" data-hash="propensityscore2_cache/html/step4d_d186559f5014119c73ef96d2ae921be0">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb38-2"><a href="#cb38-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb38-3"><a href="#cb38-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
@@ -1796,7 +1801,7 @@ Tip
 </div>
 </section></section></section><section id="matched-data-with-increase-ratio" class="level3"><h3 class="anchored" data-anchor-id="matched-data-with-increase-ratio">Matched data with increase ratio</h3>
 <p>The matching process is repeated with a different ratio (e.g., 1:5) to explore how changing the ratio affects the covariate balance and treatment effect estimation.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio_7e9a7035395a25a5f32e875635e03a46">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio_cf7be5e15ab074fcbb60cbdcba2f9f07">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="co"># Step 1 and 2</span></span>
 <span id="cb39-2"><a href="#cb39-2"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
 <span id="cb39-3"><a href="#cb39-3"></a>                        <span class="at">data =</span> analytic11n,</span>
@@ -1883,7 +1888,7 @@ Tip
 <ul>
 <li>Did all of the SMDs decrease?</li>
 </ul></section><section id="look-at-the-data-2" class="level5"><h5 class="anchored" data-anchor-id="look-at-the-data-2">Look at the data</h5>
-<div class="cell" data-hash="propensityscore2_cache/html/summdata_a83fddff664a38be2a71add01d451a45">
+<div class="cell" data-hash="propensityscore2_cache/html/summdata_afb2241bedc06c4ad45195384d9f5684">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
 <span id="cb40-2"><a href="#cb40-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1901,7 +1906,7 @@ Tip
 </section><section id="combining-matching-weights" class="level4"><h4 class="anchored" data-anchor-id="combining-matching-weights">Combining matching weights</h4>
 <p>Different approaches to incorporating weights (e.g., matching weights, survey weights) are explored.</p>
 </section><section id="not-incorporating-matching-weights" class="level4"><h4 class="anchored" data-anchor-id="not-incorporating-matching-weights">Not incorporating matching weights</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio1_b771797a4aa55606c6004bea2cbf5223">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio1_ea6715171e072cc6ea1cf0fb5d36542c">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb42-2"><a href="#cb42-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb42-3"><a href="#cb42-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -1918,16 +1923,16 @@ Tip
 <span id="cb42-14"><a href="#cb42-14"></a>                      <span class="at">data=</span>analytic.miss)</span>
 <span id="cb42-15"><a href="#cb42-15"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio2_a59f0948c31866ba55ea66b33d02be0d">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio2_e8030f199a292269d82d1c113e2ddff8">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(CVD <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb43-2"><a href="#cb43-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb43-3"><a href="#cb43-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb43-4"><a href="#cb43-4"></a><span class="fu">publish</span>(fit.design)</span>
 <span id="cb43-5"><a href="#cb43-5"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95 p-value </span></span>
-<span id="cb43-6"><a href="#cb43-6"></a><span class="co">#&gt;        OA            0.80 [0.23;2.80]   0.722</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb43-6"><a href="#cb43-6"></a><span class="co">#&gt;        OA            0.79 [0.23;2.80]   0.721</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="incorporating-matching-weights" class="level5"><h5 class="anchored" data-anchor-id="incorporating-matching-weights">Incorporating matching weights</h5>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio3_6dd5224418323a88792ee30434b73c06">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio3_3eddef4f7b4477a3de7bcc7217ab4b2e">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb44-2"><a href="#cb44-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb44-3"><a href="#cb44-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -1941,7 +1946,7 @@ Tip
 <span id="cb44-11"><a href="#cb44-11"></a><span class="co">#&gt;      0      1 </span></span>
 <span id="cb44-12"><a href="#cb44-12"></a><span class="co">#&gt; 396824    349</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio4_ca8cfa47adb7021c072aa3a48fdc22bf">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio4_facea327ec448a0576658b0164855235">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
 <span id="cb45-2"><a href="#cb45-2"></a>analytic.miss<span class="sc">$</span>combined.weight <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb45-3"><a href="#cb45-3"></a>analytic.miss<span class="sc">$</span>combined.weight[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span></span>
@@ -1950,17 +1955,17 @@ Tip
 <span id="cb45-6"><a href="#cb45-6"></a>                      <span class="at">data=</span>analytic.miss)</span>
 <span id="cb45-7"><a href="#cb45-7"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio5_a99c3807a6f13722e241cfbd53c86c10">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio5_b4ac35b15334b3b98908af15eec90b22">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb46-2"><a href="#cb46-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb46-3"><a href="#cb46-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb46-4"><a href="#cb46-4"></a><span class="fu">publish</span>(fit.design)</span>
 <span id="cb46-5"><a href="#cb46-5"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95  p-value </span></span>
-<span id="cb46-6"><a href="#cb46-6"></a><span class="co">#&gt;        OA            1.14 [0.32;4.07]   0.8419</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb46-6"><a href="#cb46-6"></a><span class="co">#&gt;        OA            1.14 [0.32;4.07]   0.8409</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="matched-with-replacement" class="level4"><h4 class="anchored" data-anchor-id="matched-with-replacement">Matched with replacement</h4>
 <p>Matching is performed with replacement, allowing control units to be used in more than one match.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio6_caf0beb0922ab310c70fc303ba94c977">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio6_9ee61eb048681d73f0326a517ea73959">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a><span class="co"># Step 1 and 2</span></span>
 <span id="cb47-2"><a href="#cb47-2"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula,</span>
 <span id="cb47-3"><a href="#cb47-3"></a>                        <span class="at">data =</span> analytic11n,</span>
@@ -2048,7 +2053,7 @@ Tip
 <ul>
 <li>Did all of the SMDs decrease?</li>
 </ul></section><section id="look-at-the-data-3" class="level4"><h4 class="anchored" data-anchor-id="look-at-the-data-3">Look at the data</h4>
-<div class="cell" data-hash="propensityscore2_cache/html/ratio7_20987e94438fcd53ecd4716ae49030fa">
+<div class="cell" data-hash="propensityscore2_cache/html/ratio7_f975ecc06e768472da8459f3b4aa063c">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># what is weights variable now for 1:5 ratio?</span></span>
 <span id="cb48-2"><a href="#cb48-2"></a><span class="fu">head</span>(OACVD.match)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2065,7 +2070,7 @@ Tip
 </div>
 </section><section id="survey-design-1" class="level4"><h4 class="anchored" data-anchor-id="survey-design-1">Survey design</h4>
 <p>The matched data is converted into a survey design object, and the treatment effect is estimated while accounting for the complex survey design.</p>
-<div class="cell" data-hash="propensityscore2_cache/html/new0_206cb2cf18113b2f1171cee4c262b55b">
+<div class="cell" data-hash="propensityscore2_cache/html/new0_0b90c496b8cd99a607a3516a287c00c3">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb50-2"><a href="#cb50-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb50-3"><a href="#cb50-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -2079,7 +2084,7 @@ Tip
 <span id="cb50-11"><a href="#cb50-11"></a><span class="co">#&gt;      0      1 </span></span>
 <span id="cb50-12"><a href="#cb50-12"></a><span class="co">#&gt; 396865    308</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/new1_6533f78fe40fa73018fec802b1178dbf">
+<div class="cell" data-hash="propensityscore2_cache/html/new1_76028790418d404059c37892c1389dc6">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="co"># multiply with matching (ratio) weights with survey weights</span></span>
 <span id="cb51-2"><a href="#cb51-2"></a>analytic.miss<span class="sc">$</span>combined.weight <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb51-3"><a href="#cb51-3"></a>analytic.miss<span class="sc">$</span>combined.weight[analytic.miss<span class="sc">$</span>ID <span class="sc">%in%</span> OACVD.match<span class="sc">$</span>ID] <span class="ot">&lt;-</span></span>
@@ -2088,13 +2093,13 @@ Tip
 <span id="cb51-6"><a href="#cb51-6"></a>                      <span class="at">data=</span>analytic.miss)</span>
 <span id="cb51-7"><a href="#cb51-7"></a>w.design.m <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="propensityscore2_cache/html/new2_256137433b5defd12c19fa0f9efe4816">
+<div class="cell" data-hash="propensityscore2_cache/html/new2_4c22467151b1c03ef2cddce1c6ed0de3">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>fit.design <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA, <span class="at">design =</span> w.design.m, </span>
 <span id="cb52-2"><a href="#cb52-2"></a>       <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
 <span id="cb52-3"><a href="#cb52-3"></a><span class="co">#&gt; Warning in eval(family$initialize): non-integer #successes in a binomial glm!</span></span>
 <span id="cb52-4"><a href="#cb52-4"></a><span class="fu">publish</span>(fit.design)</span>
 <span id="cb52-5"><a href="#cb52-5"></a><span class="co">#&gt;  Variable Units OddsRatio       CI.95  p-value </span></span>
-<span id="cb52-6"><a href="#cb52-6"></a><span class="co">#&gt;        OA            0.99 [0.26;3.72]   0.9909</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb52-6"><a href="#cb52-6"></a><span class="co">#&gt;        OA            0.99 [0.26;3.73]   0.9932</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
 <div class="callout callout-style-default callout-tip callout-titled">

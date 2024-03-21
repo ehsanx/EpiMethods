@@ -117,6 +117,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - PSM in BMI-diabetes">
+<meta name="twitter:description" content="">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked">
@@ -247,7 +248,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -286,7 +287,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1118,12 +1119,20 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <ul>
 <li>Perform a <strong>propensity score matching</strong> (pair matching, without replacement, using SMD cut-point 0.2, may adjust for imbalanced and/or all covariates in the outcome model, if any) analysis as per the following recommendations
 <ul>
-<li><span class="citation" data-cites="zanutto2006comparison">(<a href="#ref-zanutto2006comparison" role="doc-biblioref">Zanutto 2006</a>)</span></li>
-<li><span class="citation" data-cites="dugoff2014generalizing">(<a href="#ref-dugoff2014generalizing" role="doc-biblioref">DuGoff, Schuler, and Stuart 2014</a>)</span></li>
-<li><span class="citation" data-cites="austin2018propensity">(<a href="#ref-austin2018propensity" role="doc-biblioref">Austin, Jembere, and Chiu 2018</a>)</span></li>
+<li><span class="citation" data-cites="zanutto2006comparison">Zanutto (<a href="#ref-zanutto2006comparison" role="doc-biblioref">2006</a>)</span></li>
+<li><span class="citation" data-cites="dugoff2014generalizing">DuGoff, Schuler, and Stuart (<a href="#ref-dugoff2014generalizing" role="doc-biblioref">2014</a>)</span></li>
+<li><span class="citation" data-cites="austin2018propensity">Austin, Jembere, and Chiu (<a href="#ref-austin2018propensity" role="doc-biblioref">2018</a>)</span></li>
 </ul>
 </li>
 </ul>
+<p>See explained in the previous chapter on <a href="propensityscore3.html">PSM in OA-CVD (US)</a>, there are four steps of the propensity score matching:</p>
+<ul>
+<li>Step 1: PS model specification</li>
+<li>Step 2: Matching based on the estimated propensity scores</li>
+<li>Step 3: Balance checking</li>
+<li>Step 4: Outcome modelling</li>
+</ul>
+<p>Only Step 1 is different for Zanutto (2006), DuGoff et al.&nbsp;(2014), and Austin et al.&nbsp;(2018) approaches.</p>
 <section id="dataset" class="level4"><h4 class="anchored" data-anchor-id="dataset">Dataset</h4>
 <ul>
 <li>The following modified NHANES dataset
@@ -1184,11 +1193,11 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
 </ul></section></section><section id="pre-processing" class="level3"><h3 class="anchored" data-anchor-id="pre-processing">Pre-processing</h3>
 <section id="load-data" class="level4"><h4 class="anchored" data-anchor-id="load-data">Load data</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/data_02a6504b70cf10bc0e383a04461e6399">
+<div class="cell" data-hash="propensityscore4_cache/html/data_f8531c065e3b63c0572cb81818f3488a">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/NHANES15lab5.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="variable-summary" class="level4"><h4 class="anchored" data-anchor-id="variable-summary">Variable summary</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/varsum_a384fa46a9c05b4e4cc38d410a1799da">
+<div class="cell" data-hash="propensityscore4_cache/html/varsum_f2f2bf9d04f1301125b5add0d1dc84c0">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Exposure</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>analytic.with.miss<span class="sc">$</span>bmi <span class="ot">&lt;-</span> <span class="fu">with</span>(analytic.with.miss, </span>
 <span id="cb2-3"><a href="#cb2-3"></a>                                   <span class="fu">ifelse</span>(bmi<span class="sc">&gt;</span><span class="dv">25</span>, <span class="st">"Overweight"</span>, </span>
@@ -1204,18 +1213,18 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-13"><a href="#cb2-13"></a><span class="fu">names</span>(analytic.with.miss)[<span class="fu">names</span>(analytic.with.miss) <span class="sc">==</span> <span class="st">"weight"</span>] <span class="ot">&lt;-</span> <span class="st">"interview.weight"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="reproducibility" class="level4"><h4 class="anchored" data-anchor-id="reproducibility">Reproducibility</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/seed_b7f7990878adb0b7b3b3a1b128f7cdec">
+<div class="cell" data-hash="propensityscore4_cache/html/seed_3186bfe213e6c33d35ace6aaf26a91f0">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">set.seed</span>(<span class="dv">504</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="approach-by-zanutto-2006" class="level3"><h3 class="anchored" data-anchor-id="approach-by-zanutto-2006">Approach by Zanutto (2006)</h3>
 <section id="step-1" class="level4"><h4 class="anchored" data-anchor-id="step-1">Step 1</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep1_a0d2e24df2fe88c7f0d8821b52a32fd4">
+<div class="cell" data-hash="propensityscore4_cache/html/Zanstep1_6d32070cc8624361f83a27472f949565">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Specify the PS model to estimate propensity scores</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(bmi<span class="sc">==</span><span class="st">"Not overweight"</span>) <span class="sc">~</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> education <span class="sc">+</span> </span>
 <span id="cb4-3"><a href="#cb4-3"></a>                           married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2" class="level4"><h4 class="anchored" data-anchor-id="step-2">Step 2</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep2_84a51562541b3934c1ddbae37a037c6a">
+<div class="cell" data-hash="propensityscore4_cache/html/Zanstep2_b1c258265c3cb2df0654315e7322b6a4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">require</span>(MatchIt)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co"># Complete data for matching</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a>analytic.data <span class="ot">&lt;-</span> analytic.with.miss[<span class="fu">complete.cases</span>(analytic.with.miss),]</span>
@@ -1244,7 +1253,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb5-26"><a href="#cb5-26"></a>matched.data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3" class="level4"><h4 class="anchored" data-anchor-id="step-3">Step 3</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep3_2f5f2714b807b944e41f39731527f60d">
+<div class="cell" data-hash="propensityscore4_cache/html/Zanstep3_174b24e0834e9bfc1908f2b6cce1338b">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Balance checking</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>cov <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
 <span id="cb6-3"><a href="#cb6-3"></a>         <span class="st">"education"</span>, <span class="st">"married"</span>, <span class="st">"cholesterol"</span>, </span>
@@ -1281,7 +1290,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <p>All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.</p>
 </section><section id="step-4" class="level4"><h4 class="anchored" data-anchor-id="step-4">Step 4</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep4_fd4d6b711747aa84cf40913823c12188">
+<div class="cell" data-hash="propensityscore4_cache/html/Zanstep4_84cfa718c70e07ee688628cd9f0ff295">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co"># Setup the design with survey features</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a>analytic.with.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -1382,7 +1391,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="double-adjustment" class="level4"><h4 class="anchored" data-anchor-id="double-adjustment">Double adjustment</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zandoubleadj_9a19073890b98f37422adba7c9267da4">
+<div class="cell" data-hash="propensityscore4_cache/html/Zandoubleadj_b9bc97b8b0ece5dac4ab4d47558467a2">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">library</span>(survey)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="co"># Outcome model with covariates adjustment</span></span>
 <span id="cb8-3"><a href="#cb8-3"></a>fit.DA <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> bmi <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> </span>
@@ -1593,14 +1602,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="approach-by-dugoff-et-al.-2014" class="level3"><h3 class="anchored" data-anchor-id="approach-by-dugoff-et-al.-2014">Approach by DuGoff et al.&nbsp;(2014)</h3>
 <section id="step-1-1" class="level4"><h4 class="anchored" data-anchor-id="step-1-1">Step 1</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep1_515ebbf82ead5bd7f7ac0d520237b0c8">
+<div class="cell" data-hash="propensityscore4_cache/html/duGstep1_46746072ec34226e7b2714adf29dcd6e">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Specify the PS model to estimate propensity scores</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>ps.formula2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(bmi <span class="sc">==</span> <span class="st">"Not overweight"</span>) <span class="sc">~</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> education <span class="sc">+</span> </span>
 <span id="cb9-3"><a href="#cb9-3"></a>                           married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP <span class="sc">+</span> </span>
 <span id="cb9-4"><a href="#cb9-4"></a>                           psu <span class="sc">+</span> strata <span class="sc">+</span> interview.weight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2-1" class="level4"><h4 class="anchored" data-anchor-id="step-2-1">Step 2</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep2_1d71f9b080981856ee5830fc7f67efa5">
+<div class="cell" data-hash="propensityscore4_cache/html/duGstep2_3ba1569244665c5ec1f4d52f45ee0cd6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Propensity scores</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>ps.fit2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(ps.formula2, <span class="at">data =</span> analytic.data, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb10-3"><a href="#cb10-3"></a>analytic.data<span class="sc">$</span>PS2 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(ps.fit2)</span>
@@ -1622,7 +1631,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-19"><a href="#cb10-19"></a>matched.data2 <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj2) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3-1" class="level4"><h4 class="anchored" data-anchor-id="step-3-1">Step 3</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep3_6c1a88693e4523353bed8df09ebc5e82">
+<div class="cell" data-hash="propensityscore4_cache/html/duGstep3_6e9f5b2913f50f369c980489d5c1d30f">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Balance checking</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>cov2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
 <span id="cb11-3"><a href="#cb11-3"></a>          <span class="st">"education"</span>, <span class="st">"married"</span>, <span class="st">"cholesterol"</span>, </span>
@@ -1663,7 +1672,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <p>All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.</p>
 </section><section id="step-4-1" class="level4"><h4 class="anchored" data-anchor-id="step-4-1">Step 4</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep4_2f02f2534f144b9225db0c122856798a">
+<div class="cell" data-hash="propensityscore4_cache/html/duGstep4_313748d87fc6969bd110e4ca289a6b4b">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Setup the design with survey features</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>analytic.with.miss<span class="sc">$</span>matched2 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb12-3"><a href="#cb12-3"></a>analytic.with.miss<span class="sc">$</span>matched2[analytic.with.miss<span class="sc">$</span>ID <span class="sc">%in%</span> matched.data2<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
@@ -1762,7 +1771,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="double-adjustment-1" class="level4"><h4 class="anchored" data-anchor-id="double-adjustment-1">Double adjustment</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGdoubleadj2_9246b5edc25a225f5c80f50aa68053bc">
+<div class="cell" data-hash="propensityscore4_cache/html/duGdoubleadj2_321ba9f4fe609e5d6f035b310885c19c">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Outcome model with covariates adjustment</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>fit2.DA <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> bmi <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> </span>
 <span id="cb13-3"><a href="#cb13-3"></a>                 education <span class="sc">+</span> married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP, </span>
@@ -1987,7 +1996,7 @@ Tip
 </div>
 </section></section><section id="approach-by-austin-et-al.-2018" class="level3"><h3 class="anchored" data-anchor-id="approach-by-austin-et-al.-2018">Approach by Austin et al.&nbsp;(2018)</h3>
 <section id="step-1-2" class="level4"><h4 class="anchored" data-anchor-id="step-1-2">Step 1</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep1_ecee2740d2ed24483d68f90eae11d38e">
+<div class="cell" data-hash="propensityscore4_cache/html/Ausstep1_7a68261d087257fb5a0690e4b6188def">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Specify the PS model to estimate propensity scores</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a>ps.formula3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(bmi <span class="sc">==</span> <span class="st">"Not overweight"</span>) <span class="sc">~</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> education <span class="sc">+</span> </span>
 <span id="cb14-3"><a href="#cb14-3"></a>                           married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP)</span>
@@ -1998,7 +2007,7 @@ Tip
 <span id="cb14-8"><a href="#cb14-8"></a>                             <span class="at">data =</span> analytic.data, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2-2" class="level4"><h4 class="anchored" data-anchor-id="step-2-2">Step 2</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep2_589003a176ba5626d06ec566c6f795b3">
+<div class="cell" data-hash="propensityscore4_cache/html/Ausstep2_2aadf986822e071f7a93f1bf13d5f3af">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Propensity scores</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a>ps.fit3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(ps.formula3, <span class="at">design =</span> analytic.design, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb15-3"><a href="#cb15-3"></a>analytic.data<span class="sc">$</span>PS3 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(ps.fit3)</span>
@@ -2020,7 +2029,7 @@ Tip
 <span id="cb15-19"><a href="#cb15-19"></a>matched.data3 <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj3) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3-2" class="level4"><h4 class="anchored" data-anchor-id="step-3-2">Step 3</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep_2850f7b3ae3de851bffa5bb817fa5d05">
+<div class="cell" data-hash="propensityscore4_cache/html/Ausstep_ffec308e8054ac98d13825e8224f799f">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Balance checking</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a>cov <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
 <span id="cb16-3"><a href="#cb16-3"></a>         <span class="st">"education"</span>, <span class="st">"married"</span>, <span class="st">"cholesterol"</span>, </span>
@@ -2057,7 +2066,7 @@ Tip
 </div>
 <p>All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.</p>
 </section><section id="step-4-2" class="level4"><h4 class="anchored" data-anchor-id="step-4-2">Step 4</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep4_06f8ff31d5535110c1a2ca23233c5283">
+<div class="cell" data-hash="propensityscore4_cache/html/Ausstep4_b2835e50f11b87dc43de96a154f7eb8f">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Setup the design with survey features</span></span>
 <span id="cb17-2"><a href="#cb17-2"></a>analytic.with.miss<span class="sc">$</span>matched3 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb17-3"><a href="#cb17-3"></a>analytic.with.miss<span class="sc">$</span>matched3[analytic.with.miss<span class="sc">$</span>ID <span class="sc">%in%</span> matched.data3<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
@@ -2156,7 +2165,7 @@ Tip
 </div>
 </div>
 </section><section id="double-adjustment-2" class="level4"><h4 class="anchored" data-anchor-id="double-adjustment-2">Double adjustment</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausdoubleadj_cf629a628de6ad3d708b1a7ea8ce12d5">
+<div class="cell" data-hash="propensityscore4_cache/html/Ausdoubleadj_6fd64edad05a872658c93fe40c7d983a">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Outcome model with covariates adjustment</span></span>
 <span id="cb18-2"><a href="#cb18-2"></a>fit3.DA <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> bmi <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> </span>
 <span id="cb18-3"><a href="#cb18-3"></a>                 education <span class="sc">+</span> married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP, </span>

@@ -24,6 +24,28 @@ out.formula1 <- readRDS(file = "Data/machinelearning/form1.RDS")
 out.formula2 <- readRDS(file = "Data/machinelearning/form2.RDS")
 ```
 
+### Ridge, LASSO, and Elastic net
+
+The traditional regression models (e.g., linear regression, logistic regression) show poor model performance when
+
+-   predictors are highly correlated or
+-   there are many predictors
+
+In both cases, the variance of the estimated regression coefficients could be highly variable. Hence, the model often results in poor predictions. The general solution to this problem is to reduce the variance at the cost of introducing some bias in the coefficients. This approach is called regularization or shrinking. Since we are interested in overall prediction rather than individual regression coefficients in a prediction context, this shrinkage approach is almost always beneficial for the model's predictive performance. Ridge, LASSO, and Elastic Net are shrinkage machine learning techniques.
+
+-   [Ridge](https://en.wikipedia.org/wiki/Ridge_regression): Penalizes the sum of squared regression coefficients (the so-called $L_2$ penalty). This approach does not remove irrelevant predictors, but minimizes the impact of the irrelevant predictors. There is a hyperparameter called $\lambda$ (lambda) that determines the amount of shrinkage of the coefficients. The larger $\lambda$ indicates more penalization of the coefficients. 
+
+-   [LASSO](https://en.wikipedia.org/wiki/Lasso_(statistics)): The Least Absolute Shrinkage and Selection Operator (LASSO) is quite similar conceptually to the ridge regression. However, lasso penalizes the sum of the absolute values of regression coefficients (so-called $L_1$ penalty). As a result, a high $\lambda$ value forces many coefficients to be exactly zero in lasso regression, suggesting a reduced model with fewer predictors, which is never the case in ridge regression.
+
+-   [Elastic Net](https://en.wikipedia.org/wiki/Elastic_net_regularization): The elastic net combines the penalties of ridge regression and lasso to get the best of both methods. Two hyperparameters in the elastic net are $\alpha$ (alpha) and $\lambda$.
+
+We can use the `glmnet` function in R to fit these there models.
+
+::: callout-note
+In glmnet function, `alpha = 1` for the LASSO, `alpha = 0` for the ridge, and setting alpha to some value between 0 and 1 is the elastic net model.
+:::
+
+
 ### Continuous outcome
 
 #### Cross-validation LASSO

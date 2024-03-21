@@ -248,7 +248,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -287,7 +287,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1112,10 +1112,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </div>
   
 
-</header><p>This tutorial is focused on a crucial aspect of model building: splitting your data into training and test sets to avoid overfitting. Overfitting occurs when your model learns the noise in the data, rather than the underlying trend. As a result, the model performs well on the training data but poorly on new, unseen data. To mitigate this, you often split your data.</p>
+</header><p>This tutorial is focused on a crucial aspect of model building: splitting your data into training and test sets to avoid overfitting. Overfitting occurs when your model learns the noise in the data rather than the underlying trend. As a result, the model performs well on the training data but poorly on new, unseen data. To mitigate this, you often split your data.</p>
 <section id="load-data-anf-files" class="level3"><h3 class="anchored" data-anchor-id="load-data-anf-files">Load data anf files</h3>
 <p>Initially, several libraries are loaded to facilitate data manipulation and analysis.</p>
-<div class="cell" data-hash="predictivefactors5_cache/html/setup_06712d1ec447ea46ea85ad8a99e57376">
+<div class="cell" data-hash="predictivefactors5_cache/html/setup_83589bad94ac057364672a9e2149ff26">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(caret)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(knitr)</span>
@@ -1123,8 +1123,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(car)</span>
 <span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(DescTools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Then, previously saved data related to cholesterol and other factors is loaded for further use.</p>
-<div class="cell" data-hash="predictivefactors5_cache/html/load_4818a058c8fa46d36f5f1acaff474bb1">
+<p>Then, previously saved dataset related to cholesterol and other factors is loaded for further use.</p>
+<div class="cell" data-hash="predictivefactors5_cache/html/load_70fb1ca23a5ea72473ff811c311851e2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/predictivefactors/cholesterolNHANES15part2.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="data-spliting-to-avoid-model-overfitting" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="data-spliting-to-avoid-model-overfitting">Data spliting to avoid model overfitting</h3>
@@ -1148,7 +1148,7 @@ Tip
 <p>We can use the <code>createDataPartition</code> function to split a dataset into training and testing datasets. The function will return the row indices that should go into the training set. These indices are stored in a variable, and its dimensions are displayed to provide an understanding of the size of the training set that will be created. Additionally, you can calculate what 70% of your entire dataset would look like to verify the approximation of the training data size, as well as what the remaining 30% (for the test set) would look like.</p>
 </div>
 </div>
-<div class="cell" data-hash="predictivefactors5_cache/html/split0_a0a863012ffce3cc1cd02cd77ae9441e">
+<div class="cell" data-hash="predictivefactors5_cache/html/split0_c93c7d7b6baa5f2db359927675108823">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Using a seed to randomize in a reproducible way </span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb3-3"><a href="#cb3-3"></a>split <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(<span class="at">y =</span> analytic3<span class="sc">$</span>cholesterol, <span class="at">p =</span> <span class="fl">0.7</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
@@ -1169,8 +1169,8 @@ Tip
 <span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; [1] 789.6  10.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="split-the-data" class="level4"><h4 class="anchored" data-anchor-id="split-the-data">Split the data</h4>
-<p>After determining how to partition the data, the next step is to actually create the training and test datasets. The indices are used to subset the original dataset into these two new datasets. The dimensions of each dataset are displayed to confirm their sizes.</p>
-<div class="cell" data-hash="predictivefactors5_cache/html/split1_003555c25f95cde25fee0520e52eaf63">
+<p>After determining how to partition the data, the next step is actually creating the training and test datasets. The indices are used to subset the original dataset into these two new datasets. The dimensions of each dataset are displayed to confirm their sizes.</p>
+<div class="cell" data-hash="predictivefactors5_cache/html/split1_7be5f4572edb01badc2038d5a89bf386">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Create train data</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>train.data <span class="ot">&lt;-</span> analytic3[split,]</span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="fu">dim</span>(train.data)</span>
@@ -1184,7 +1184,7 @@ Tip
 <p>Our next task is to fit the model (e.g., linear regression) on the training set and evaluate the performance on the test set.</p>
 </section><section id="train-the-model" class="level4"><h4 class="anchored" data-anchor-id="train-the-model">Train the model</h4>
 <p>Once the training dataset is created, you can proceed to train the model using the training data. A previously defined formula containing the predictor variables is used in a linear regression model. After fitting the model, a summary is generated to display key statistics that help in evaluating the model’s performance.</p>
-<div class="cell" data-hash="predictivefactors5_cache/html/split2_fdc34d0fa3130aa7382df06f24390322">
+<div class="cell" data-hash="predictivefactors5_cache/html/split2_3ca388d0a5a062ecc06ce9e1ffedeb82">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>formula4</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; cholesterol ~ gender + age + born + race + education + married + </span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;     income + diastolicBP + systolicBP + bmi + triglycerides + </span></span>
@@ -1240,7 +1240,7 @@ Tip
 <span id="cb5-53"><a href="#cb5-53"></a><span class="co">#&gt; F-statistic: 20.84 on 28 and 1815 DF,  p-value: &lt; 2.2e-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="extract-performance-measures" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="extract-performance-measures">Extract performance measures</h4>
-<p>You can use a saved function to measure the performance of the trained model. The function will return performance metrics like R-squared, RMSE, etc. This function is applied not just on the training data but also on the test data, the full dataset, and a separate, fictitious dataset.</p>
+<p>You can use a saved function to measure the performance of the trained model. The function will return performance metrics like R-squared, RMSE, etc. This function is applied not just to the training data but also to the test data, the full dataset, and a separate, fictitious dataset.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1254,7 +1254,7 @@ Tip
 <p>Below we use the <code>perform</code> function that we saved to evaluate the model performances</p>
 </div>
 </div>
-<div class="cell" data-hash="predictivefactors5_cache/html/perf_9dfd5547063b7394d6952390c5237252">
+<div class="cell" data-hash="predictivefactors5_cache/html/perf_501e21480c392a04ce09b02749e47fcc">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">perform</span>(<span class="at">new.data =</span> train.data,<span class="at">y.name =</span> <span class="st">"cholesterol"</span>, <span class="at">model.fit =</span> fit4.train1)</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt;         n  p df.residual     SSE     SST    R2 adjR2  sigma   logLik      AIC</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; [1,] 1844 29        1815 2182509 2884109 0.243 0.232 34.677 -9140.98 18341.96</span></span>

@@ -1,11 +1,37 @@
 ## Baron and Kenny {.unnumbered}
 
+### Baron and Kenny (1986) approach 1
+
+In Baron and Kenny approach 1 [@baron1986moderator], two regression models are fitted to estimate the total effect, direct effect, and indirect effect. 
+
+$$ Y = \alpha_{0} + \beta_0 A + \gamma_0 M, $$
+$$ Y = \alpha_{1} + \beta_1 A, $$
+where $Y$ is the outcome, $A$ is the exposure, $M$ is the mediator, and $\alpha, \beta, \gamma$ are regression coefficients. The effects are then calculated as:
+
+-   Total effect of A on Y: $\hat{\beta}_1$
+-   Direct effect of A on Y: $\hat{\beta}_0$
+-   Indirect effect of A on Y through M: $\hat{\beta}_1 - \hat{\beta}_0$, 
+
+where $\hat{\beta}$ is estimated regression coefficient of $\beta$.
+
+### Baron and Kenny (1986) approach 2
+In the second approach, three models are fitted: 
+
+$$ Y = \alpha_{0} + \beta_0 A + \gamma_0 M, $$
+$$ Y = \alpha_{1} + \beta_1 A, $$
+$$ M = \alpha_{2} + \beta_2 A, $$
+
+The indirect effect of A on Y through M can be calculated as: $\hat{\beta}_2 \times \hat{\beta}_0$, where $\hat{\beta}$ is estimated regression coefficient of $\beta$. 
+
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 require(simcausal)
 ```
 
 Big data: **What if we had 1,000,000 (1 million) observations?**
+
+Let us explore the mediation analysis using Baron and Kenny (1986) approaches. We first simulate a big dataset and then show the results from the mediation analysis.
 
 ### Continuous outcome, continuous mediator
 
@@ -29,7 +55,6 @@ Dset <- set.DAG(D)
 plotDAG(Dset, xjitter = 0.1, yjitter = .9,
         edge_attrs = list(width = 0.5, arrow.width = 0.4, arrow.size = 0.7),
         vertex_attrs = list(size = 12, label.cex = 0.8))
-
 ```
 
 #### Generate Data
@@ -200,6 +225,7 @@ fit.m <- glm(M ~ A, family=binomial(link = "logit"), data=Obs.Data)
 round(coef(fit.m),2)
 ```
 
+
 ```{r m29, cache= TRUE}
 # from 1st model
 a.coef <- round(coef(fit),2)[2]
@@ -231,6 +257,8 @@ a.coef - am.coef
 # Indirect effect
 m.coef * ma.coef
 ```
+
+As we can see, the estimated indirect effects are different from the two approaches. That means Baron and Kenny's (1986) approach doesn't work for a non-collapsible effect measure such as the odds ratio.  
 
 
 ### Video content (optional)

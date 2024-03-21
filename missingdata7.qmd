@@ -40,16 +40,16 @@ head(smi[[1]][[1]])
 
 ### Model with interaction and ORs
 
-We're interested in understanding how the variable `wave` interacts with `sex` in predicting `drinkreg`. We fit two logistic regression models, one for each level of the `sex` variable, to understand this interaction. `wave` is exposure here.
+We're interested in understanding how the variable `wave` interacts with `sex` in predicting `drinkreg`. We fit two logistic regression models, one for each level of the `sex` variable (0 males, 1 females), to understand this interaction. `wave` is the exposure variable here.
 
-For effect modifier sex = 0
+#### For effect modifier sex = 0 (males)
 
 ```{r em0, cache=TRUE}
 models <- with(smi, glm(drinkreg~ wave + sex + wave*sex, family = binomial()))
 summary(pool(models, rule = "rubin1987"), conf.int = TRUE, exponentiate = TRUE)[2,]
 ```
 
-For effect modifier sex = 1 (just changing reference)
+#### For effect modifier sex = 1 (females) (just changing reference)
 
 ```{r em1, cache=TRUE}
 models2<-with(smi, glm(drinkreg~ wave + I(sex==0) + wave*I(sex==0),family=binomial()))

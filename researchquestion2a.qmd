@@ -37,14 +37,13 @@ For those who prefer a video walkthrough, feel free to watch the video below, wh
 
 Building a predictive model for `Diastolic blood pressure` from 2013-14 NHANES data. Here we are only interested about explaining the outcome (`Diastolic blood pressure`).
 
-| PICOT element | Description              |
-|---------------|--------------------------|
-| P             | US                       |
-| I             | \-                       |
-| C             | \-                       |
-| O             | Diastolic blood pressure |
-| T             | 2013-14                  |
-| \-            | \-                       |
+| PICOT element     | Description                                                    |
+|-------------------|----------------------------------------------------------------|
+| P                 | US                                                             |
+| I                 | Not applicable, as we are dealing with a prediction model here |
+| C                 | Not applicable, as we are dealing with a prediction model here |
+| O                 | Diastolic blood pressure                                       |
+| T                 | 2013-14                                                        |
 
 Covariates under consideration (that are known to influence this outcome) based on the literature (e.g., try [this paper](https://www.nature.com/articles/s41371-019-0224-9.pdf); see Table 1):
 
@@ -114,8 +113,10 @@ NHANES [Variable Keyword Search](https://wwwn.cdc.gov/nchs/nhanes/search/default
 
 ```{r, cache=TRUE}
 # ?nhanesTableVars
-nhanesTableVars(data_group='DEMO', nh_table='DEMO_H', namesonly = TRUE)
-kable(nhanesTableVars(data_group='DEMO', nh_table='DEMO_H', namesonly = FALSE))
+nhanesTableVars(data_group='DEMO', nh_table='DEMO_H', 
+                namesonly = TRUE)
+kable(nhanesTableVars(data_group='DEMO', nh_table='DEMO_H', 
+                      namesonly = FALSE))
 # https://wwwn.cdc.gov/nchs/nhanes/2013-2014/DEMO_H.htm
 ```
 
@@ -219,13 +220,12 @@ Finally, we will import data about alcohol consumption.
 
 [NHANES 2013-2014 Alcohol Use (ALQ_H)](https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/ALQ_H.htm)
 
-`ALQ130` - Avg no alcoholic drinks/day - past 12 mos - Target:Both males and females 18 YEARS - 150 YEARS - Missing 2328
+`ALQ130` - Avg no alcoholic drinks/day - past 12 mos - Target: Both males and females 18 YEARS - 150 YEARS - Missing 2328
 
 ```{r download2013al, cache=TRUE}
 alq <- nhanes('ALQ_H')
 alq1 <- alq[c("SEQN", # Respondent sequence number
-              "ALQ130")] # Avg # alcoholic drinks/day - past 12 mos 
-              # 18 YEARS - 150 YEARS
+              "ALQ130")] # Avg # alcoholic drinks/day 
 alq_vars <- names(alq1)
 alq2 <- nhanesTranslate('ALQ_H', alq_vars, data=alq1)
 head(alq2)
@@ -241,10 +241,12 @@ Now, we need to combine all these individual datasets into one for our analysis.
 analytic.data0 <- merge(demo2, bpx2, by = c("SEQN"), all=TRUE)
 head(analytic.data0)
 dim(analytic.data0)
-analytic.data1 <- merge(analytic.data0, smq2, by = c("SEQN"), all=TRUE)
+analytic.data1 <- merge(analytic.data0, smq2, by = c("SEQN"), 
+                        all=TRUE)
 head(analytic.data1)
 dim(analytic.data1)
-analytic.data2 <- merge(analytic.data1, alq2, by = c("SEQN"), all=TRUE)
+analytic.data2 <- merge(analytic.data1, alq2, by = c("SEQN"), 
+                        all=TRUE)
 head(analytic.data2)
 dim(analytic.data2)
 ```
@@ -255,7 +257,8 @@ Alternatively, you can merge all datasets at once.
 
 ```{r, cache=TRUE}
 require(plyr)
-analytic.data <- join_all(list(demo2, bpx2, smq2, alq2), by = "SEQN", type='full')
+analytic.data <- join_all(list(demo2, bpx2, smq2, alq2), 
+                          by = "SEQN", type='full')
 head(analytic.data)
 dim(analytic.data)
 ```

@@ -42,7 +42,8 @@ We are going to use the `BtheB` dataset from the `HSAUR2` package to explain the
 library(HSAUR2)
 data("BtheB")
 kable(head(BtheB))%>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+  kable_styling(bootstrap_options = "striped", full_width = F, 
+                position = "left")
 ```
 
 -   A typical form of repeated measurement data from a clinical trial data.
@@ -55,10 +56,12 @@ data("BtheB", package = "HSAUR2")
 layout(matrix(1:2, nrow = 1))
 ylim <- range(BtheB[,grep("bdi", names(BtheB))],na.rm = TRUE)
 tau <- subset(BtheB, treatment == "TAU")[, grep("bdi", names(BtheB))]
-boxplot(tau, main = "Treated as Usual", ylab = "BDI",xlab = "Time (in months)", 
+boxplot(tau, main = "Treated as Usual", ylab = "BDI",
+        xlab = "Time (in months)", 
         names = c(0, 2, 3, 5, 8),ylim = ylim)
 btheb <- subset(BtheB, treatment == "BtheB")[, grep("bdi", names(BtheB))]
-boxplot(btheb, main = "Beat the Blues", ylab = "BDI",xlab = "Time (in months)", 
+boxplot(btheb, main = "Beat the Blues", ylab = "BDI",
+        xlab = "Time (in months)", 
         names = c(0, 2, 3, 5, 8),ylim = ylim)
 
 ```
@@ -75,20 +78,25 @@ To compare, we start with fixed effect linear model, i.e., a regular linear mode
 ## To analyze the data, we first need to convert the dataset to a analysis-ready form
 BtheB$subject <- factor(rownames(BtheB))
 nobs <- nrow(BtheB)
-BtheB_long <- reshape(BtheB, idvar = "subject", varying = c("bdi.2m", "bdi.3m", "bdi.5m", "bdi.8m"), 
+BtheB_long <- reshape(BtheB, idvar = "subject", 
+                      varying = c("bdi.2m", "bdi.3m", "bdi.5m", 
+                                  "bdi.8m"), 
                       direction = "long")
 BtheB_long$time <- rep(c(2, 3, 5, 8), rep(nobs, 4))
 kable(head(BtheB_long))%>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+  kable_styling(bootstrap_options = "striped", full_width = F, 
+                position = "left")
 unique(BtheB_long$subject)
 kable(subset(BtheB_long,  subject == 2))%>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+  kable_styling(bootstrap_options = "striped", full_width = F, 
+                position = "left")
 kable(subset(BtheB_long,  subject == 99))%>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+  kable_styling(bootstrap_options = "striped", full_width = F, 
+                position = "left")
 
 
-lmfit <- lm(bdi ~ bdi.pre + time + treatment + drug +length, data = BtheB_long,
-                    na.action = na.omit)
+lmfit <- lm(bdi ~ bdi.pre + time + treatment + drug +length, 
+            data = BtheB_long, na.action = na.omit)
 require(jtools)
 summ(lmfit)
 ```
@@ -101,8 +109,8 @@ Let us start with a model with a random intercept but fixed slope. In this case,
 ## Fit a random intercept model with lme4 package
 library("lme4")
 BtheB_lmer1 <- lmer(bdi ~ bdi.pre + time + treatment + drug +length 
-                    + (1 | subject), data = BtheB_long, REML = FALSE, 
-                    na.action = na.omit)
+                    + (1 | subject), data = BtheB_long, 
+                    REML = FALSE, na.action = na.omit)
 
 summary(BtheB_lmer1)
 summ(BtheB_lmer1)
@@ -119,8 +127,10 @@ summ(BtheB_lmer1)
 ```{r random2, cache=TRUE}
 library(ggplot2)
 BtheB_longna <- na.omit(BtheB_long)
-dat <- data.frame(time=BtheB_longna$time,pred=fitted(BtheB_lmer1),Subject= BtheB_longna$subject)
-ggplot(data=dat,aes(x=time, y=pred, group=Subject, color=Subject)) + theme_classic() +
+dat <- data.frame(time=BtheB_longna$time,pred=fitted(BtheB_lmer1),
+                  Subject= BtheB_longna$subject)
+ggplot(data=dat,aes(x=time, y=pred, group=Subject, 
+                    color=Subject)) + theme_classic() +
     geom_line() 
 ```
 
@@ -145,8 +155,10 @@ The interpretation of the model outputs will be similar to the model with only r
 ```{r random5, cache=TRUE}
 library(ggplot2)
 BtheB_longna <- na.omit(BtheB_long)
-dat <- data.frame(time=BtheB_longna$time,pred=fitted(BtheB_lmer2),Subject= BtheB_longna$subject)
-ggplot(data=dat,aes(x=time, y=pred, group=Subject, color=Subject)) + theme_classic() +
+dat <- data.frame(time=BtheB_longna$time,pred=fitted(BtheB_lmer2),
+                  Subject= BtheB_longna$subject)
+ggplot(data=dat,aes(x=time, y=pred, group=Subject, color=Subject)) + 
+  theme_classic() +
     geom_line() 
 ```
 
@@ -201,13 +213,15 @@ We have predict the values of random effect and we could extract residuals from 
 ```{r assumption, cache=TRUE}
 # Assumption 1
 qres <- residuals(BtheB_lmer1)
-qqnorm(qres, xlim = c(-3, 3), ylim = c(-20, 20), ylab = "Estimated residuals",
+qqnorm(qres, xlim = c(-3, 3), ylim = c(-20, 20), 
+       ylab = "Estimated residuals",
        main = "Residuals")
 qqline(qres)
 
 # Assumption 2
 qint <- ranef(BtheB_lmer1)$subject[["(Intercept)"]]
-qqnorm(qint, ylab = "Estimated random intercepts", xlim = c(-3, 3), ylim = c(-20, 20),
+qqnorm(qint, ylab = "Estimated random intercepts", 
+       xlim = c(-3, 3), ylim = c(-20, 20),
        main = "Random intercepts")
 qqline(qint)
 ```

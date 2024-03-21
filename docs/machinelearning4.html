@@ -230,7 +230,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -269,7 +269,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1114,7 +1114,7 @@ Important
 </div>
 <p>In this chapter, we will talk about Regression that deals with prediction of binary outcomes. We will use logistic regression to build the first prediction model.</p>
 <section id="read-previously-saved-data" class="level3"><h3 class="anchored" data-anchor-id="read-previously-saved-data">Read previously saved data</h3>
-<div class="cell" data-hash="machinelearning4_cache/html/load_9dfab3911ccc854d13bc898b3726d36f">
+<div class="cell" data-hash="machinelearning4_cache/html/load_c801af57292dfb810fcf63361351b770">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">"Data/machinelearning/rhcAnalytic.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="outcome-levels-factor" class="level3"><h3 class="anchored" data-anchor-id="outcome-levels-factor">Outcome levels (factor)</h3>
@@ -1125,7 +1125,7 @@ Important
 </ul>
 </li>
 </ul>
-<div class="cell" data-hash="machinelearning4_cache/html/levels_73d532f55028b663a09d76379c8f4cac">
+<div class="cell" data-hash="machinelearning4_cache/html/levels_fa3cc8c93c8067f96df9cf45222e2794">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">levels</span>(ObsData<span class="sc">$</span>Death)<span class="ot">=</span><span class="fu">c</span>(<span class="st">"No"</span>,<span class="st">"Yes"</span>) <span class="co"># this is useful for caret</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="co"># ref: https://tinyurl.com/caretbin</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="fu">class</span>(ObsData<span class="sc">$</span>Death)</span>
@@ -1137,7 +1137,8 @@ Important
 </div>
 </section><section id="measuring-prediction-error" class="level3"><h3 class="anchored" data-anchor-id="measuring-prediction-error">Measuring prediction error</h3>
 <ul>
-<li>Brier score
+<li>
+<a href="predictivefactors7.html">Brier score</a>
 <ul>
 <li>Brier score 0 means perfect prediction, and</li>
 <li>close to zero means better prediction,</li>
@@ -1145,7 +1146,8 @@ Important
 <li>Less accurate forecasts get higher score in Brier score.</li>
 </ul>
 </li>
-<li>AUC
+<li>
+<a href="predictivefactors7.html">AUC</a>
 <ul>
 <li>The area under a ROC curve is called as a c statistics.</li>
 <li>c being 0.5 means random prediction and</li>
@@ -1155,7 +1157,7 @@ Important
 </ul></section><section id="prediction-for-death" class="level3"><h3 class="anchored" data-anchor-id="prediction-for-death">Prediction for death</h3>
 <p>In this section, we show the regression fitting when outcome is binary (death).</p>
 <section id="variables" class="level4"><h4 class="anchored" data-anchor-id="variables">Variables</h4>
-<div class="cell" data-hash="machinelearning4_cache/html/vars_a684d775df81947f3823e4e30a75b722">
+<div class="cell" data-hash="machinelearning4_cache/html/vars_8859ff31f7e1b9c94f3671463d081e7f">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
 <span id="cb3-2"><a href="#cb3-2"></a>                         <span class="sc">!</span><span class="fu">c</span>(Length.of.Stay,Death)))</span>
 <span id="cb3-3"><a href="#cb3-3"></a>baselinevars</span>
@@ -1178,7 +1180,7 @@ Important
 <span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; [49] "income"                "RHC.use"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="model" class="level4"><h4 class="anchored" data-anchor-id="model">Model</h4>
-<div class="cell" data-hash="machinelearning4_cache/html/reg3_fed1d24784de0ed085379a6aa448c0a5">
+<div class="cell" data-hash="machinelearning4_cache/html/reg3_c8c3eef5582008ac5395c3e15a4039b7">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># adjust covariates</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>out.formula2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">"Death~ "</span>, <span class="fu">paste</span>(baselinevars, <span class="at">collapse =</span> <span class="st">"+"</span>)))</span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="fu">saveRDS</span>(out.formula2, <span class="at">file =</span> <span class="st">"Data/machinelearning/form2.RDS"</span>)</span>
@@ -1187,7 +1189,7 @@ Important
 <span id="cb4-6"><a href="#cb4-6"></a><span class="fu">require</span>(Publish)</span>
 <span id="cb4-7"><a href="#cb4-7"></a>adj.fit2 <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit2, <span class="at">digits=</span><span class="dv">1</span>)<span class="sc">$</span>regressionTable</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="machinelearning4_cache/html/reg3a_7450ddd0000175ede3c19d228c59ae74">
+<div class="cell" data-hash="machinelearning4_cache/html/reg3a_ef8b3b1c985e4fb3f58c8ac1bf6e09c5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>out.formula2</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; Death ~ Disease.category + Cancer + Cardiovascular + Congestive.HF + </span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;     Dementia + Psychiatric + Pulmonary + Renal + Hepatic + GI.Bleed + </span></span>
@@ -1212,28 +1214,21 @@ Important
 </div>
 </section><section id="measuring-prediction-error-1" class="level4"><h4 class="anchored" data-anchor-id="measuring-prediction-error-1">Measuring prediction error</h4>
 <section id="auc" class="level5"><h5 class="anchored" data-anchor-id="auc">AUC</h5>
-<div class="cell" data-hash="machinelearning4_cache/html/auc1_5ef976fadb892005bb0a82da6cdf62b6">
+<div class="cell" data-hash="machinelearning4_cache/html/auc1_4277100ad17937a17be1075eaf7d0559">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">require</span>(pROC)</span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt; Loading required package: pROC</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; Type 'citation("pROC")' for a citation.</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; </span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; Attaching package: 'pROC'</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; </span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;     cov, smooth, var</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a>obs.y2<span class="ot">&lt;-</span>ObsData<span class="sc">$</span>Death</span>
-<span id="cb6-10"><a href="#cb6-10"></a>pred.y2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit2, <span class="at">type =</span> <span class="st">"response"</span>)</span>
-<span id="cb6-11"><a href="#cb6-11"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(obs.y2, pred.y2)</span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt; Setting levels: control = No, case = Yes</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; Setting direction: controls &lt; cases</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a>rocobj</span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; </span></span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; roc.default(response = obs.y2, predictor = pred.y2)</span></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; </span></span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; Data: pred.y2 in 2013 controls (obs.y2 No) &lt; 3722 cases (obs.y2 Yes).</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; Area under the curve: 0.7682</span></span>
-<span id="cb6-21"><a href="#cb6-21"></a><span class="fu">plot</span>(rocobj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-2"><a href="#cb6-2"></a>obs.y2<span class="ot">&lt;-</span>ObsData<span class="sc">$</span>Death</span>
+<span id="cb6-3"><a href="#cb6-3"></a>pred.y2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit2, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>rocobj <span class="ot">&lt;-</span> <span class="fu">roc</span>(obs.y2, pred.y2)</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; Setting levels: control = No, case = Yes</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; Setting direction: controls &lt; cases</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>rocobj</span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; </span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; roc.default(response = obs.y2, predictor = pred.y2)</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt; Data: pred.y2 in 2013 controls (obs.y2 No) &lt; 3722 cases (obs.y2 Yes).</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; Area under the curve: 0.7682</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="fu">plot</span>(rocobj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="machinelearning4_files/figure-html/auc1-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1241,55 +1236,46 @@ Important
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt; Area under the curve: 0.7682</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="brier-score" class="level5"><h5 class="anchored" data-anchor-id="brier-score">Brier Score</h5>
-<div class="cell" data-hash="machinelearning4_cache/html/brier_0d9b9f9b989bad8190a64f4536c323f8">
+<div class="cell" data-hash="machinelearning4_cache/html/brier_4cd55640b8fef9a8bf12c591319be3d3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">require</span>(DescTools)</span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt; Loading required package: DescTools</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="fu">BrierScore</span>(fit2)</span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; [1] 0.1812502</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">BrierScore</span>(fit2)</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; [1] 0.1812502</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section></section><section id="cross-validation-using-caret" class="level3"><h3 class="anchored" data-anchor-id="cross-validation-using-caret">Cross-validation using caret</h3>
 </section><section id="basic-setup" class="level3"><h3 class="anchored" data-anchor-id="basic-setup">Basic setup</h3>
-<div class="cell" data-hash="machinelearning4_cache/html/cvbin_222d748140c18105c168b4cffc16c711">
+<div class="cell" data-hash="machinelearning4_cache/html/cvbin_8e65880f83c36f7324a64bc3ab01a7af">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Using Caret package</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="fu">set.seed</span>(<span class="dv">504</span>)</span>
 <span id="cb9-3"><a href="#cb9-3"></a></span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co"># make a 5-fold CV</span></span>
 <span id="cb9-5"><a href="#cb9-5"></a><span class="fu">require</span>(caret)</span>
-<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#&gt; Loading required package: caret</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; Loading required package: lattice</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt; </span></span>
-<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt; Attaching package: 'caret'</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt; The following objects are masked from 'package:DescTools':</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; </span></span>
-<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt;     MAE, RMSE</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a>ctrl<span class="ot">&lt;-</span><span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>, </span>
-<span id="cb9-15"><a href="#cb9-15"></a>                   <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-16"><a href="#cb9-16"></a>                   <span class="at">summaryFunction =</span> twoClassSummary)</span>
-<span id="cb9-17"><a href="#cb9-17"></a></span>
-<span id="cb9-18"><a href="#cb9-18"></a><span class="co"># fit the model with formula = out.formula2</span></span>
-<span id="cb9-19"><a href="#cb9-19"></a><span class="co"># use training method glm (have to specify family)</span></span>
-<span id="cb9-20"><a href="#cb9-20"></a>fit.cv.bin<span class="ot">&lt;-</span><span class="fu">train</span>(out.formula2, <span class="at">trControl =</span> ctrl,</span>
-<span id="cb9-21"><a href="#cb9-21"></a>               <span class="at">data =</span> ObsData, <span class="at">method =</span> <span class="st">"glm"</span>,</span>
-<span id="cb9-22"><a href="#cb9-22"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(),</span>
-<span id="cb9-23"><a href="#cb9-23"></a>              <span class="at">metric=</span><span class="st">"ROC"</span>)</span>
-<span id="cb9-24"><a href="#cb9-24"></a>fit.cv.bin</span>
-<span id="cb9-25"><a href="#cb9-25"></a><span class="co">#&gt; Generalized Linear Model </span></span>
-<span id="cb9-26"><a href="#cb9-26"></a><span class="co">#&gt; </span></span>
-<span id="cb9-27"><a href="#cb9-27"></a><span class="co">#&gt; 5735 samples</span></span>
-<span id="cb9-28"><a href="#cb9-28"></a><span class="co">#&gt;   50 predictor</span></span>
-<span id="cb9-29"><a href="#cb9-29"></a><span class="co">#&gt;    2 classes: 'No', 'Yes' </span></span>
-<span id="cb9-30"><a href="#cb9-30"></a><span class="co">#&gt; </span></span>
-<span id="cb9-31"><a href="#cb9-31"></a><span class="co">#&gt; No pre-processing</span></span>
-<span id="cb9-32"><a href="#cb9-32"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb9-33"><a href="#cb9-33"></a><span class="co">#&gt; Summary of sample sizes: 4587, 4589, 4587, 4589, 4588 </span></span>
-<span id="cb9-34"><a href="#cb9-34"></a><span class="co">#&gt; Resampling results:</span></span>
-<span id="cb9-35"><a href="#cb9-35"></a><span class="co">#&gt; </span></span>
-<span id="cb9-36"><a href="#cb9-36"></a><span class="co">#&gt;   ROC        Sens       Spec     </span></span>
-<span id="cb9-37"><a href="#cb9-37"></a><span class="co">#&gt;   0.7545115  0.4659618  0.8535653</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-6"><a href="#cb9-6"></a>ctrl<span class="ot">&lt;-</span><span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>, </span>
+<span id="cb9-7"><a href="#cb9-7"></a>                   <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-8"><a href="#cb9-8"></a>                   <span class="at">summaryFunction =</span> twoClassSummary)</span>
+<span id="cb9-9"><a href="#cb9-9"></a></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co"># fit the model with formula = out.formula2</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co"># use training method glm (have to specify family)</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a>fit.cv.bin<span class="ot">&lt;-</span><span class="fu">train</span>(out.formula2, <span class="at">trControl =</span> ctrl,</span>
+<span id="cb9-13"><a href="#cb9-13"></a>               <span class="at">data =</span> ObsData, <span class="at">method =</span> <span class="st">"glm"</span>,</span>
+<span id="cb9-14"><a href="#cb9-14"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(),</span>
+<span id="cb9-15"><a href="#cb9-15"></a>              <span class="at">metric=</span><span class="st">"ROC"</span>)</span>
+<span id="cb9-16"><a href="#cb9-16"></a>fit.cv.bin</span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="co">#&gt; Generalized Linear Model </span></span>
+<span id="cb9-18"><a href="#cb9-18"></a><span class="co">#&gt; </span></span>
+<span id="cb9-19"><a href="#cb9-19"></a><span class="co">#&gt; 5735 samples</span></span>
+<span id="cb9-20"><a href="#cb9-20"></a><span class="co">#&gt;   50 predictor</span></span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="co">#&gt;    2 classes: 'No', 'Yes' </span></span>
+<span id="cb9-22"><a href="#cb9-22"></a><span class="co">#&gt; </span></span>
+<span id="cb9-23"><a href="#cb9-23"></a><span class="co">#&gt; No pre-processing</span></span>
+<span id="cb9-24"><a href="#cb9-24"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
+<span id="cb9-25"><a href="#cb9-25"></a><span class="co">#&gt; Summary of sample sizes: 4587, 4589, 4587, 4589, 4588 </span></span>
+<span id="cb9-26"><a href="#cb9-26"></a><span class="co">#&gt; Resampling results:</span></span>
+<span id="cb9-27"><a href="#cb9-27"></a><span class="co">#&gt; </span></span>
+<span id="cb9-28"><a href="#cb9-28"></a><span class="co">#&gt;   ROC        Sens       Spec     </span></span>
+<span id="cb9-29"><a href="#cb9-29"></a><span class="co">#&gt;   0.7545115  0.4659618  0.8535653</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="extract-results-from-each-test-data" class="level4"><h4 class="anchored" data-anchor-id="extract-results-from-each-test-data">Extract results from each test data</h4>
-<div class="cell" data-hash="machinelearning4_cache/html/cvbin2_32a067d96b45d1e8e0cd918db4a39f7c">
+<div class="cell" data-hash="machinelearning4_cache/html/cvbin2_9ad2721c20fb361eefd61a2bc4d3c3ff">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>summary.res <span class="ot">&lt;-</span> fit.cv.bin<span class="sc">$</span>resample</span>
 <span id="cb10-2"><a href="#cb10-2"></a>summary.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1306,7 +1292,7 @@ Important
 <span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt; [1] 0.01651437</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="more-options" class="level4"><h4 class="anchored" data-anchor-id="more-options">More options</h4>
-<div class="cell" data-hash="machinelearning4_cache/html/cvbincs_1f6b157d1c6c3ee16d4dd1b5715dd27b">
+<div class="cell" data-hash="machinelearning4_cache/html/cvbincs_31e92d0d54033405d68310d4434dbd67">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>ctrl<span class="ot">&lt;-</span><span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>, </span>
 <span id="cb12-2"><a href="#cb12-2"></a>                   <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb12-3"><a href="#cb12-3"></a>                   <span class="at">summaryFunction =</span> twoClassSummary)</span>
@@ -1332,7 +1318,7 @@ Important
 </div>
 </section></section><section id="variable-selection" class="level3"><h3 class="anchored" data-anchor-id="variable-selection">Variable selection</h3>
 <p>We can also use stepwise regression that uses AIC as a criterion.</p>
-<div class="cell" data-hash="machinelearning4_cache/html/cvbinaic_93a4be23b1d1410cd82b924a824fc1ad">
+<div class="cell" data-hash="machinelearning4_cache/html/cvbinaic_ed9ebbd98c28796dc789b7f0fd0eac12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">set.seed</span>(<span class="dv">504</span>)</span>
 <span id="cb13-2"><a href="#cb13-2"></a>ctrl<span class="ot">&lt;-</span><span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>, </span>
 <span id="cb13-3"><a href="#cb13-3"></a>                   <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
@@ -1343,7 +1329,7 @@ Important
 <span id="cb13-8"><a href="#cb13-8"></a>              <span class="at">family =</span> <span class="fu">binomial</span>(),</span>
 <span id="cb13-9"><a href="#cb13-9"></a>              <span class="at">metric=</span><span class="st">"ROC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="machinelearning4_cache/html/cvbinaic2_3874489426ec0ef8581967ad8c35e3bf">
+<div class="cell" data-hash="machinelearning4_cache/html/cvbinaic2_7eb91bbc607be6c02735b911763cba69">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>fit.cv.bin.aic</span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co">#&gt; Generalized Linear Model with Stepwise Feature Selection </span></span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; </span></span>

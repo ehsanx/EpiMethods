@@ -27,7 +27,7 @@ Sometimes, only part of the variables will be used in your analysis. Therefore, 
 ::: callout-tip
 **Option 1: No package needed**
 
-dataset.name\[, c(the columns you want to KEEP)\]
+dataset.name\[, c(columns_names_you_want_to_KEEP)\]
 :::
 
 Say, we want to keep only three variables in the mpg dataset: manufacturer, model and cyl. For Option 1 (without package), we can use the following R codes to keep these three variables:
@@ -42,7 +42,7 @@ Here `mpg1` is a new dataset containing only three variables (manufacturer, mode
 ::: callout-tip
 **Option 2: use select in dplyr**
 
-select(dataset.name, ...(columns names you want to KEEP))
+select(dataset.name, c(columns_names_you_want_to_KEEP))
 :::
 
 For Option 2, the `dplyr` package offers the `select` function, which provides a more intuitive way to subset data.
@@ -68,20 +68,22 @@ It often happens that we only want to investigate a subset of a population which
 ::: callout-tip
 **Option 1: No package needed**
 
-dataset.name\[the rows you want to KEEP, \]
+dataset.name\[rows_you_want_to_KEEP, \]
 :::
 
 ::: callout-tip
 **Option 2: No package needed**
 
-subset(dataset.name, ...(logical tests))
+subset(dataset.name, rows_you_want_to_KEEP)
 :::
 
 ::: callout-tip
 **Option 3: use select in dplyr**
 
-filter(dataset.name, ...(logical tests))
+filter(dataset.name, rows_you_want_to_KEEP)
 :::
+
+We can use the logical tests for the rows you want to keep or drop.
 
 ::: callout-tip
 Common logical tests are:
@@ -101,19 +103,22 @@ kable(df, "html", align = c("l", "l")) %>%
 Say, we want to keep the observations for which cars are manufactured in 2008. We can use the following R codes to do it:
 
 ```{r keep1, cache=TRUE}
-mpg4 <- mpg[mpg$year == "2008",] # Option 1
+# Option 1
+mpg4 <- mpg[mpg$year == "2008",]
 head(mpg4)
 ```
 
 The following codes with the `subset` and `filter` function will do the same:
 
 ```{r keep2, cache=TRUE}
-mpg5 <- subset(mpg, year == "2008") # Option 1
+# Option 2
+mpg5 <- subset(mpg, year == "2008")
 head(mpg5)
 ```
 
 ```{r keep3, cache=TRUE}
-mpg6 <- filter(mpg, year == "2008") # Option 3
+# Option 3
+mpg6 <- filter(mpg, year == "2008") 
 head(mpg6)
 ```
 
@@ -213,6 +218,16 @@ levels(mpg$trans)
 ::: {.column-margin}
 In R, the use of factors with multiple levels is primarily a memory optimization strategy. While users may not directly see this, R assigns internal numerical identifiers to each level, which is a more memory-efficient way of handling such data. Unlike some other software packages that generate multiple dummy variables to represent a single variable, R's approach is generally more resource-efficient.
 :::
+
+3.  Converting back from Factors Characters
+
+You can also convert factor back to character using the **as.character** function. 
+
+```{r convertback, cache=TRUE}
+# Convert factor back to character
+mpg$trans <- as.character(mpg$trans)
+levels(mpg$trans) # no levels for character
+```
 
 #### Convert continuous variables to categorical variables
 

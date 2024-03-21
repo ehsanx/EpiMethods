@@ -229,7 +229,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -268,7 +268,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1108,7 +1108,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul>
 <section id="data" class="level3"><h3 class="anchored" data-anchor-id="data">Data</h3>
 <p>In the initial chunk, we load several packages that provide functions and tools necessary for the subsequent analysis. These packages facilitate multiple imputation, data visualization, and statistical modeling among other tasks.</p>
-<div class="cell" data-hash="missingdata3_cache/html/setup_08227ac9e9caef05eceb71c00b267c49">
+<div class="cell" data-hash="missingdata3_cache/html/setup_4c38ddae20e8526bb74bfb12dda091e3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(mice)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(DataExplorer)</span>
@@ -1118,11 +1118,11 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb1-7"><a href="#cb1-7"></a><span class="fu">library</span>(mitools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We load the necessary data:</p>
-<div class="cell" data-hash="missingdata3_cache/html/load_5bb85f1ec1fffb3034338072cc99ed19">
+<div class="cell" data-hash="missingdata3_cache/html/load_db58b6e4730442173e31c7ab6ff05ae5">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/missingdata/NHANES17.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The data is briefly inspected to understand its structure. An identifier column is added to uniquely identify each row or observation in the dataset.</p>
-<div class="cell" data-hash="missingdata3_cache/html/data1_5d62dfd9ad6e4bc02895a27cee0e07b9">
+<div class="cell" data-hash="missingdata3_cache/html/data1_d15bcd31b06e01772227fe231b975618">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">require</span>(mice)</span>
 <span id="cb3-2"><a href="#cb3-2"></a>nhanes2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1146,7 +1146,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="outcome-and-exposure-has-missing" class="level3"><h3 class="anchored" data-anchor-id="outcome-and-exposure-has-missing">Outcome and exposure has missing</h3>
 <p>This chunk focuses on identifying which rows have missing values in both the outcome and exposure variables. The outcome and exposure variables are crucial for the analysis, so understanding where they are missing is essential.</p>
-<div class="cell" data-hash="missingdata3_cache/html/miss0_49197055dc4e7e8643ea92fdf3c79987">
+<div class="cell" data-hash="missingdata3_cache/html/miss0_872b4234265f68fda49c9bd08c22aa97">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># assume outcome = bmi and exposure = chl </span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>nhanes2.excludingYA <span class="ot">&lt;-</span> <span class="fu">subset</span>(nhanes2, <span class="sc">!</span><span class="fu">is.na</span>(bmi) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(chl) )</span>
 <span id="cb5-3"><a href="#cb5-3"></a>nhanes2.excludingYA <span class="co"># data without missing A and Y</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1164,7 +1164,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="impute-as-usual" class="level3"><h3 class="anchored" data-anchor-id="impute-as-usual">Impute as usual</h3>
 <p>Using the entire dataset, missing values are imputed. This is done by first initializing an imputation model and then performing the imputation to create multiple datasets where missing values are filled in. The result is a list of datasets with imputed values. That means, we impute Y and A for now, as well as other covariates with missing values.</p>
-<div class="cell" data-hash="missingdata3_cache/html/imp0_a3a306d4c82f322b52356c15e284d832">
+<div class="cell" data-hash="missingdata3_cache/html/imp0_ef610f00a75400ee9e3ca0add554b5d9">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># use full data to impute </span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>ini <span class="ot">&lt;-</span> <span class="fu">mice</span>(nhanes2, <span class="at">pri =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb7-3"><a href="#cb7-3"></a>ini<span class="sc">$</span>method</span>
@@ -1346,7 +1346,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="include-a-missing-indicator-y-a" class="level3"><h3 class="anchored" data-anchor-id="include-a-missing-indicator-y-a">Include a missing indicator (Y &amp; A)</h3>
 <p>For each imputed dataset, a new column is added to indicate whether the outcome and exposure variables were originally missing. This “missing indicator” column will be used later to subset the data.</p>
-<div class="cell" data-hash="missingdata3_cache/html/imp1_afc1700e5506d36b9a424b599cce728e">
+<div class="cell" data-hash="missingdata3_cache/html/imp1_4824c02b10599504802a556f600b6649">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Define formula (making binary Y)</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"I(bmi&gt;25) ~ chl + hyp"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3"></a>data.list <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, m)</span>
@@ -1502,7 +1502,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="design-subset-and-fit" class="level3"><h3 class="anchored" data-anchor-id="design-subset-and-fit">Design, subset and fit</h3>
 <p>For each imputed dataset, a statistical model is fitted. Before fitting, the data is structured to account for survey design features. Only rows without originally missing outcome and exposure values are used for model fitting. The results of the model fitting for each dataset are stored for later analysis.</p>
-<div class="cell" data-hash="missingdata3_cache/html/imp2_cf9d2dc3e2e58af451bec9c3fde2cb2f">
+<div class="cell" data-hash="missingdata3_cache/html/imp2_9f54875e6e508123d99afab3514062aa">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb9-2"><a href="#cb9-2"></a>fit.list <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, <span class="dv">5</span>)</span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m) {</span>
@@ -1517,7 +1517,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="pooled-results" class="level3"><h3 class="anchored" data-anchor-id="pooled-results">Pooled results</h3>
 <p>After fitting models to each imputed dataset, the results are combined or “pooled”. This pooled result provides a more robust estimate by considering the variability across the imputed datasets.</p>
-<div class="cell" data-hash="missingdata3_cache/html/imp3_b425475ecdc5ba3380b95b058d6de9d0">
+<div class="cell" data-hash="missingdata3_cache/html/imp3_3459f8481ec4e54fe047574893142929">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">require</span>(mitools)</span>
 <span id="cb10-2"><a href="#cb10-2"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit.list)</span>
 <span id="cb10-3"><a href="#cb10-3"></a>pooled.estimates</span>
@@ -1559,7 +1559,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="report-or" class="level3"><h3 class="anchored" data-anchor-id="report-or">Report OR</h3>
 <p>The pooled results are further processed to calculate and report odds ratios, which provide insights into the relationships between variables in the context of logistic regression.</p>
-<div class="cell" data-hash="missingdata3_cache/html/imp4_257fa3400e3e6b461af84a167f52f080">
+<div class="cell" data-hash="missingdata3_cache/html/imp4_755b91b0a9579fa268d6cf783d462fde">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>sum.pooled.OR <span class="ot">&lt;-</span> <span class="fu">summary</span>(pooled.estimates, <span class="at">logeffect=</span><span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">2</span>)</span>
 <span id="cb11-2"><a href="#cb11-2"></a><span class="co">#&gt; Multiple imputation results:</span></span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt;       MIcombine.default(fit.list)</span></span>

@@ -249,7 +249,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data accessing</span></a>
+ <span class="menu-text">Accessing data</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -288,7 +288,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing results</span></a>
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1117,16 +1117,20 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 </header><p>For this example we will be looking at the binary outcome variable <code>death</code>.</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/tab1bin_bf01318569961c1c03f79c56f0b9efed">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"Death"</span>),</span>
-<span id="cb1-2"><a href="#cb1-2"></a>                       <span class="at">data =</span> ObsData, </span>
-<span id="cb1-3"><a href="#cb1-3"></a>                       <span class="at">strata =</span> <span class="st">"RHC.use"</span>, </span>
-<span id="cb1-4"><a href="#cb1-4"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">print</span>(tab1, <span class="at">showAllLevels =</span> <span class="cn">FALSE</span>, )</span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&gt;                    Stratified by RHC.use</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="co">#&gt;                     0           1          </span></span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="co">#&gt;   n                 3551        2184       </span></span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="co">#&gt;   Death (mean (SD)) 0.63 (0.48) 0.68 (0.47)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="machinelearningCausal3_cache/html/tab1bin_ea81a55c2f92be4aa2162b55400aa1cb">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Data</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/machinelearningCausal/cl2.RData"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Table 1</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"Death"</span>),</span>
+<span id="cb1-6"><a href="#cb1-6"></a>                       <span class="at">data =</span> ObsData, </span>
+<span id="cb1-7"><a href="#cb1-7"></a>                       <span class="at">strata =</span> <span class="st">"RHC.use"</span>, </span>
+<span id="cb1-8"><a href="#cb1-8"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="fu">print</span>(tab1, <span class="at">showAllLevels =</span> <span class="cn">FALSE</span>, )</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">#&gt;                    Stratified by RHC.use</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="co">#&gt;                     0           1          </span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co">#&gt;   n                 3551        2184       </span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt;   Death (mean (SD)) 0.63 (0.48) 0.68 (0.47)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="tmle" class="level3 unnumbered page-columns page-full"><h3 class="unnumbered anchored" data-anchor-id="tmle">TMLE</h3>
 <p>TMLE works by first constructing an initial outcome and extracting a crude estimate of the treatment effect. Then, TMLE aims to refine the initial estimate in the direction of the true value of the parameter of interest through use of the exposure model.</p>
@@ -1185,7 +1189,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="number-of-folds" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="number-of-folds">Number of folds</h4>
 <p>First, we need to define the number of cross-validation folds to use for each model. This depends on our effective sample size <span class="citation" data-cites="phillips2023ConsiderationsSL">(<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">Phillips et al. 2023</a>)</span>.</p>
 <p>Our effective sample size for the outcome model is:</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-3_cf84f3d2de8d5938feca993378cdbe21">
+<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-3_395a735e7bfe8156581a440a27eb1250">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData) </span>
 <span id="cb2-2"><a href="#cb2-2"></a>p <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>Death <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n </span>
 <span id="cb2-3"><a href="#cb2-3"></a>n_eff <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p, <span class="dv">1</span><span class="sc">-</span>p))) </span>
@@ -1193,7 +1197,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; [1] 5735</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Our effective sample size for the exposure model is:</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-4_d1ea1af3fe24110d45b130a2b104a6a5">
+<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-4_5278f6d7f3ae20bbdae8cd06076a0baf">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>p_exp <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>RHC.use <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n </span>
 <span id="cb3-2"><a href="#cb3-2"></a>n_eff_exp <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p, <span class="dv">1</span><span class="sc">-</span>p))) </span>
 <span id="cb3-3"><a href="#cb3-3"></a>n_eff_exp</span>
@@ -1205,7 +1209,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>The second step is to define the library of learners we will feed in to SuperLearner as potential options for each model (exposure and outcome). In this example, some of our covariates are continuous variables, such as temperature and blood pressure, so we need to include learners that allow non-linear/monotonic relationships.</p>
 <p>Since <span class="math inline">\(n\)</span> is large (<span class="math inline">\(&gt;500\)</span>), we should include as many learners as is computationally feasible in our libraries.</p>
 <p>Furthermore, we have 50 covariates:</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-5_731b7d40d6cc9d41e1ec937b80a7c1de">
+<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-5_761ba531574b010a0930994338c54836">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">length</span>(<span class="fu">c</span>(baselinevars, <span class="st">"Length.of.Stay"</span>))</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; [1] 50</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1222,27 +1226,27 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>
 <p>Parametric</p>
 <ul>
-<li><p><code>SL.mean</code></p></li>
-<li><p><code>SL.glm</code></p></li>
+<li><p><code>SL.mean</code>: only mean</p></li>
+<li><p><code>SL.glm</code>: generalized linear model</p></li>
 </ul>
 </li>
 <li>
 <p>Highly data-adaptive</p>
 <ul>
-<li><p><code>SL.glmnet</code></p></li>
-<li><p><code>SL.xgboost</code></p></li>
+<li><p><code>SL.glmnet</code>: penalized regression such as lasso</p></li>
+<li><p><code>SL.xgboost</code>: extreme gradient boosting</p></li>
 </ul>
 </li>
 <li>
 <p>Allowing non-linear/monotonic relationships</p>
 <ul>
-<li><p><code>SL.randomForest</code></p></li>
-<li><p><code>tmle.SL.dbarts2</code></p></li>
-<li><p><code>SL.svm</code></p></li>
+<li><p><code>SL.randomForest</code>: random forest</p></li>
+<li><p><code>tmle.SL.dbarts2</code>: bayesian additive regression tree</p></li>
+<li><p><code>SL.svm</code>: support vector machine</p></li>
 </ul>
 </li>
 </ul>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-6_435267bee8244003c59f42489dd5e116">
+<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-6_213727d0c7fb854e528080a71adcfc6a">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Construct the SuperLearner library</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>SL.library <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.mean"</span>, </span>
 <span id="cb5-3"><a href="#cb5-3"></a>                <span class="st">"SL.glm"</span>, </span>
@@ -1253,9 +1257,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb5-8"><a href="#cb5-8"></a>                <span class="st">"SL.svm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="tmle-with-superlearner" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="tmle-with-superlearner">TMLE with SuperLearner</h3>
-<p>To run TMLE, first install the tmle package:</p>
+<p>To run TMLE, we need to install the tmle package and load it on the R environment.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">'tmle'</span>, <span class="st">'xgboost'</span>))</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">#install.packages(c('tmle', 'xgboost'))</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">require</span>(tmle)</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="fu">require</span>(xgboost)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1271,18 +1275,19 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb8-2"><a href="#cb8-2"></a>                   <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
 <span id="cb8-3"><a href="#cb8-3"></a>                   <span class="at">W =</span> ObsData.noYA, </span>
 <span id="cb8-4"><a href="#cb8-4"></a>                   <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb8-5"><a href="#cb8-5"></a>                   <span class="at">V =</span> <span class="dv">10</span>,</span>
-<span id="cb8-6"><a href="#cb8-6"></a>                   <span class="at">Q.SL.library =</span> SL.library, </span>
-<span id="cb8-7"><a href="#cb8-7"></a>                   <span class="at">g.SL.library =</span> SL.library)</span>
-<span id="cb8-8"><a href="#cb8-8"></a></span>
-<span id="cb8-9"><a href="#cb8-9"></a>tmle.est.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
-<span id="cb8-10"><a href="#cb8-10"></a>tmle.ci.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-5"><a href="#cb8-5"></a>                   <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
+<span id="cb8-6"><a href="#cb8-6"></a>                   <span class="at">V.g =</span> <span class="dv">10</span>,</span>
+<span id="cb8-7"><a href="#cb8-7"></a>                   <span class="at">Q.SL.library =</span> SL.library, </span>
+<span id="cb8-8"><a href="#cb8-8"></a>                   <span class="at">g.SL.library =</span> SL.library)</span>
+<span id="cb8-9"><a href="#cb8-9"></a></span>
+<span id="cb8-10"><a href="#cb8-10"></a>tmle.est.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
+<span id="cb8-11"><a href="#cb8-11"></a>tmle.ci.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>ATE for binary outcome using user-specified library: 1.28 and 95% CI is 1.1992981, 1.3761869</p>
 <p>These results show those who received RHC had odds of death that were 1.28 times as high as the odds of death in those who did not receive RHC.</p>
 </section><section id="understanding-defaults" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="understanding-defaults">Understanding defaults</h3>
 <p>We can compare the results using our specified SuperLearner library to the results we would get when using the <code>tmle</code> package’s default SuperLearner libraries. To do this we simply do not specify libraries for the <code>Q.SL.library</code> and <code>g.SL.library</code> arguments.</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-12_3fe14c9918a45bed1a281519beaa4cfa">
+<div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-12_588b5471761774cb5f863b2931bc525a">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># small test library </span></span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="co"># with only glm just </span></span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="co"># for sake of making this work</span></span>
@@ -1293,18 +1298,19 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-2"><a href="#cb10-2"></a>                           <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
 <span id="cb10-3"><a href="#cb10-3"></a>                           <span class="at">W =</span> ObsData.noYA, </span>
 <span id="cb10-4"><a href="#cb10-4"></a>                           <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb10-5"><a href="#cb10-5"></a>                           <span class="at">V =</span> <span class="dv">10</span>)</span>
-<span id="cb10-6"><a href="#cb10-6"></a><span class="co"># Q.SL.library = SL.library.test,  ## removed this line</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="co"># g.SL.library = SL.library.test)  ## removed this line</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a></span>
-<span id="cb10-9"><a href="#cb10-9"></a>tmle.est.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
-<span id="cb10-10"><a href="#cb10-10"></a>tmle.ci.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-5"><a href="#cb10-5"></a>                           <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
+<span id="cb10-6"><a href="#cb10-6"></a>                           <span class="at">V.g =</span> <span class="dv">10</span>)</span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co"># Q.SL.library = SL.library.test,  ## removed this line</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co"># g.SL.library = SL.library.test)  ## removed this line</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a></span>
+<span id="cb10-10"><a href="#cb10-10"></a>tmle.est.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
+<span id="cb10-11"><a href="#cb10-11"></a>tmle.ci.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>ATE for binary outcome using default library: 1.32 with 95% CI 1.1466162, 1.5219877.</p>
 <p>These ATE when using the default SuperLearner library (1.31) is very close to the ATE when using our user-specified SuperLearner library (1.29). However, the confidence interval from TMLE using the default SuperLearner library (1.17, 1.46) is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library (1.20, 1.39).</p>
 </section><section id="comparison-of-results" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="comparison-of-results">Comparison of results</h3>
 <p>We can also compare these results to those from a basic regression and from the literature.</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/reg2bin_b3aa6cf916f359920e3001eef51b71f2">
+<div class="cell" data-hash="machinelearningCausal3_cache/html/reg2bin_70846281d0c66e5ae664153dbd6ab6de">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># adjust the exposure variable </span></span>
 <span id="cb11-2"><a href="#cb11-2"></a><span class="co"># (primary interest) + covariates</span></span>
 <span id="cb11-3"><a href="#cb11-3"></a>baselineVars.Death <span class="ot">&lt;-</span> <span class="fu">c</span>(baselinevars, <span class="st">"Length.of.Stay"</span>)</span>
@@ -1315,7 +1321,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb11-8"><a href="#cb11-8"></a>fit1.bin <span class="ot">&lt;-</span> <span class="fu">lm</span>(out.formula.bin, <span class="at">data =</span> ObsData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><span class="citation" data-cites="connors1996effectiveness">Connors et al. (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> conducted a propensity score matching analysis. Table 4 showed that, after propensity score pair (1-to-1) matching, the odds of in-hospital mortality were 39% higher in those who received RHC (OR: 1.39 (1.15, 1.67)).</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/summarytablebin_5d89c71a54c4df4dba07825dcce34daf">
+<div class="cell" data-hash="machinelearningCausal3_cache/html/summarytablebin_7ebdac933ca5a680738bae7e8c1dfc98">
 <div class="cell-output-display">
 <table data-quarto-postprocess="true" class="table table-sm table-striped small">
 <thead><tr class="header">

@@ -25,19 +25,36 @@ dim(analytic2)
 
 Three different logistic regression models are fitted to the data:
 
+-   Simple model: Model with only OA as a predictor
+-   Basic model: Model with OA, age and sex
+-   Complex model: Model with many predictors and some interaction terms
+
+```{r models, cache=TRUE}
+# Formula for Simple model
+simple.model <- as.formula(I(CVD=="event") ~ OA)
+simple.model
+
+# Formula for Basic model
+basic.model
+
+# Formula for the Complex model with interactions
+aic.int.model
+```
+
 ```{r fit0, cache=TRUE}
 library(survey)
-simple.model <- as.formula(I(CVD=="event") ~ OA)
+
+# Simple model
 fit0 <- svyglm(simple.model,
               design = w.design,
               family = binomial(logit))
 
-basic.model
+# Basic model
 fit5 <- svyglm(basic.model,
               design = w.design,
               family = binomial(logit))
 
-aic.int.model
+# Complex model with interactions
 fit9 <- svyglm(aic.int.model,
               design = w.design,
               family = binomial(logit))

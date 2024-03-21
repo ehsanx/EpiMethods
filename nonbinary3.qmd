@@ -1,5 +1,7 @@
 ## Poisson {.unnumbered}
 
+In this tutorial, we will see how to use Poisson and negative binomial regression. In practice, we use Poisson regression to model a count outcome. Note that we assume the mean is equal to the variance in Poisson. When the variance is greater than what's assumed by the model, overdispersion occurs. Poisson regression of overdispersed data leads to under-estimated or deflated standard errors, which leads to inflated test statistics and p-values. We can use negative binomial regression to model overdispersed data.  
+
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
 knitr::opts_chunk$set(echo = TRUE)
@@ -10,21 +12,32 @@ require(survey)
 ### Data
 
 ```{r load, cache=TRUE}
+# Load
 load("Data/nonbinary/OAcvd.RData")
+
+# Survey weight
 analytic2$weight <- analytic2$weight/3
+
+# Make fruit.cont as a numeric variable
 analytic2$fruit.cont <- as.numeric(as.character(analytic2$fruit.cont))
+
+# Make fruit.cont as a integer/count variable
+analytic2$fruit.cont <- floor(analytic2$fruit.cont) # round
+
+# Factor variables using lapply
 var.names <- c("age", "sex", "income", "race", "bmicat", "phyact", "smoke",
                "fruit", "painmed", "ht", "copd", "diab", "edu", "CVD", "OA")
 analytic2[var.names] <- lapply(analytic2[var.names] , factor)
-analytic2$fruit.cont <- floor(analytic2$fruit.cont) # round
 str(analytic2)
 ```
 
 ### Survey weighted summary
 
 ```{r summary, cache=TRUE}
-w.design <- svydesign(id=~1, weights=~weight, 
-                      data=analytic2)
+# Survey design
+w.design <- svydesign(id=~1, weights=~weight, data=analytic2)
+
+# Cross-tabulation
 xtabs(~fruit.cont, analytic2)
 svytable(~fruit.cont, w.design)
 svyhist(~fruit.cont, w.design)
@@ -33,12 +46,18 @@ svyby(~fruit.cont, ~phyact, w.design, svymean, deff = TRUE)
 
 ### Poisson regression
 
+Let us fit the traditional (not design-adjusted) Poisson regression using the `glm` function: 
+
 ```{r pr, cache=TRUE}
-analytic2$phyact2=relevel(analytic2$phyact, ref ="Inactive")
-fit1<-glm(fruit.cont ~phyact2, data=analytic2, family=poisson)
 require(jtools)
+analytic2$phyact2=relevel(analytic2$phyact, ref ="Inactive")
+
+# Poisson regression - crude
+fit1 <- glm(fruit.cont ~phyact2, data=analytic2, family=poisson)
 summ(fit1, confint = TRUE, digits = 3)
-fit2<-glm(fruit.cont ~phyact2 + age + sex + 
+
+# Poisson regression - adjusted for covariates
+fit2 <- glm(fruit.cont ~ phyact2 + age + sex + 
                income + race + bmicat + 
                smoke + edu, data=analytic2, family=poisson)
 summ(fit2, confint = TRUE, digits = 3, vifs = TRUE)
@@ -46,41 +65,56 @@ summ(fit2, confint = TRUE, digits = 3, vifs = TRUE)
 
 ### Survey weighted Poisson regression
 
+Now, let's fit the design-adjusted Poisson regression using the `svyglm` function: 
+
 ```{r prs, cache=TRUE}
-w.design<-update (w.design , phyact2=relevel(phyact, ref ="Inactive"))
-fit1<-svyglm(fruit.cont ~phyact2, design=w.design, family=poisson)
+require(jtools)
+# Design
+w.design <- update (w.design , phyact2=relevel(phyact, ref ="Inactive"))
+
+# Design-adjusted Poisson - crude
+fit1 <- svyglm(fruit.cont ~phyact2, design=w.design, family=poisson)
 summ(fit1, confint = TRUE, digits = 3)
+
+# Design-adjusted Poisson - adjusted for covariates
 fit2<-svyglm(fruit.cont ~phyact2 + age + sex + 
                income + race + bmicat + 
                smoke + edu, design=w.design, family=poisson)
-require(jtools)
 summ(fit2, confint = TRUE, digits = 3, vifs = TRUE)
 ```
 
 ### Negative binomial regression
 
+Let's fit the negative binomial regression model using the `glm` function. Below, we specify the dispersion parameter (theta) is equal to 1, which suggests that the ratio of mean and variance is assumed to be 1.   
+
 ```{r nb, cache=TRUE}
 require(MASS)
 analytic2$phyact2=relevel(analytic2$phyact, ref ="Inactive")
-fit3<- glm(fruit.cont ~phyact2, data=analytic2,
-           family = negative.binomial(theta = 1))
+
+# Negative binomial regression - crude
+fit3<- glm(fruit.cont ~ phyact2, data=analytic2, family = negative.binomial(theta = 1))
 round(exp(cbind(coef(fit3), confint(fit3))),2)
-fit4<-glm(fruit.cont ~phyact2 + age + sex + 
-                  income + race + bmicat + 
-                  smoke + edu, data=analytic2,
+
+# Negative binomial regression - adjusted for covariates
+fit4<-glm(fruit.cont ~phyact2 + age + sex + income + race + bmicat + smoke + edu, data=analytic2,
           family = negative.binomial(theta = 1))
 round(exp(cbind(coef(fit4), confint(fit4))),2)
 ```
 
 ### Survey weighted negative binomial regression
 
+Now, let's fit the design-adjusted negative binomial regression model:
+
 ```{r nbs, cache=TRUE}
 require(sjstats)
+
+# Design-adjusted negative binomial - crude
 fit3<- svyglm.nb(fruit.cont ~phyact2, design=w.design)
 round(exp(cbind(coef(fit3), confint(fit3))),2)
-fit4<-svyglm.nb(fruit.cont ~phyact2 + age + sex + 
-                  income + race + bmicat + 
-                  smoke + edu, design=w.design)
+
+# Design-adjusted negative binomial - adjusted for covariates
+fit4<-svyglm.nb(fruit.cont ~phyact2 + age + sex + income + race + bmicat + smoke + edu, 
+                design=w.design)
 round(exp(cbind(coef(fit4), confint(fit4))),2)
 ```
 

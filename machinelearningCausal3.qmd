@@ -8,12 +8,15 @@ require(randomForest)
 require(tmle)
 require(xgboost)
 require(kableExtra)
-load(file = "Data/machinelearningCausal/cl2.RData")
 ```
 
 For this example we will be looking at the binary outcome variable `death`.
 
 ```{r tab1bin, cache=TRUE, echo = TRUE}
+# Data
+load(file = "Data/machinelearningCausal/cl2.RData")
+
+# Table 1
 tab1 <- CreateTableOne(vars = c("Death"),
                        data = ObsData, 
                        strata = "RHC.use", 
@@ -121,23 +124,23 @@ For this example, we will include the following learners:
 
 -   Parametric
 
-    -   `SL.mean`
+    -   `SL.mean`: only mean
 
-    -   `SL.glm`
+    -   `SL.glm`: generalized linear model
 
 -   Highly data-adaptive
 
-    -   `SL.glmnet`
+    -   `SL.glmnet`: penalized regression such as lasso
 
-    -   `SL.xgboost`
+    -   `SL.xgboost`: extreme gradient boosting
 
 -   Allowing non-linear/monotonic relationships
 
-    -   `SL.randomForest`
+    -   `SL.randomForest`: random forest
 
-    -   `tmle.SL.dbarts2`
+    -   `tmle.SL.dbarts2`: bayesian additive regression tree
 
-    -   `SL.svm`
+    -   `SL.svm`: support vector machine
 
 ```{r, cache=TRUE}
 # Construct the SuperLearner library
@@ -152,10 +155,10 @@ SL.library <- c("SL.mean",
 
 ### TMLE with SuperLearner   {-}
 
-To run TMLE, first install the tmle package:
+To run TMLE, we need to install the tmle package and load it on the R environment. 
 
 ```{r, eval=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
-install.packages(c('tmle', 'xgboost'))
+#install.packages(c('tmle', 'xgboost'))
 require(tmle)
 require(xgboost)
 ```
@@ -175,7 +178,8 @@ tmle.fit <- tmle::tmle(Y = ObsData$Death,
                    A = ObsData$RHC.use, 
                    W = ObsData.noYA, 
                    family = "binomial", 
-                   V = 10,
+                   V.Q = 10,
+                   V.g = 10,
                    Q.SL.library = SL.library, 
                    g.SL.library = SL.library)
 
@@ -214,7 +218,8 @@ tmle.fit.def <- tmle::tmle(Y = ObsData$Death,
                            A = ObsData$RHC.use, 
                            W = ObsData.noYA, 
                            family = "binomial", 
-                           V = 10)
+                           V.Q = 10,
+                           V.g = 10)
 # Q.SL.library = SL.library.test,  ## removed this line
 # g.SL.library = SL.library.test)  ## removed this line
 
