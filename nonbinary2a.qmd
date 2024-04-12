@@ -1,0 +1,218 @@
+## Survival analysis: NHANES {.unnumbered}
+
+The tutorial demonstrates analyzing complex survey data (NHANES) with mortality as a survival outcome. See the [tutorial in the previous chapter](accessing7.html) on linking public-use US mortality data with the NHANES.
+
+We will explore the relationship between caffeine consumption and mortality in adults with diabetes using NHANES 1999-2010 datasets. We will follow the following article by [Neves et al. (2018)](https://doi.org/10.3389/fendo.2018.00547).
+
+### Load required packages
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
+# Load required packages
+library(tableone)
+library(survival)
+library(Publish)
+library(survey)
+library(DataExplorer)
+```
+
+### Load datasets
+
+Let us load NHANES 1999-2000, 2001-2002, 2003-2004, 2005-2006, 2007-2008, and 2009-2010 datasets and merged all cycles.
+
+```{r load, cache=TRUE, warning=FALSE, message=FALSE}
+# Load
+load("Data/nonbinary/coffee.RData")
+ls()
+
+# Merge all cycles
+dat.full <- rbind(dat.analytic1999, dat.analytic2001, dat.analytic2003, 
+                  dat.analytic2005, dat.analytic2007, dat.analytic2009)
+head(dat.full)
+dim(dat.full)
+```
+
+The merged dataset contains 62,160 subjects with 26 relevant variables:
+
+-   id: Respondent sequence/ID number
+-   survey.weight: Full sample 2 year weights
+-   psu: Masked pseudo-PSU
+-   strata: Masked pseudo-stratum
+-   caff: Caffeine (exposure variable)
+-   stime: Follow-up time (time from interview date to death or censoring)
+-   status: Mortality status
+-   sex: Sex
+-   age: Age in years
+-   race: Race/ethnicity
+-   income: Annual household income
+-   smoking: Smoking status
+-   diabetic.nephropathy: Diabetic nephropathy (no data)
+-   bmi.cat: BMI - categorical
+-   education: Education level
+-   carbohyd: Carbohydrate in gm
+-   alcohol: Alcohol consumption
+-   diab.years: Years since diabetes
+-   htn: Hypertension
+-   daib.retino: Diabetes retinopathy
+-   macrovascular: Macrovascular complications
+-   insulin: Insulin
+-   survey.cycle: Survey cycle
+-   physical.activity: Physical activity
+-   diabetes: Diabetes status
+-   cal.total: Total calories in kcal
+
+### Data pre-processing
+
+#### Eligibility criteria
+
+The authors considered adults aged 18 years or more, only diabetic, and total calories between 500 and 3500.
+
+```{r Eligibility, cache=TRUE, warning=FALSE, message=FALSE}
+# Total samples in the merged dataset
+nrow(dat.full) # N = 62,160
+
+# Age >= 18 years
+dat2 <- subset(dat.full, age >= 18) 
+nrow(dat2) # N = 35,379
+
+# With diabetes
+dat3 <- subset(dat2, diabetes == "Yes") 
+nrow(dat3) # N = 4,687 - numbers don't match with the paper (N = 4,544)
+
+# Implausible alimentary reports
+dat4 <- subset(dat3, cal.total >= 500 & cal.total <= 3500) 
+nrow(dat4) # N = 4,083 - numbers don't match with the paper (N = 3,948)
+```
+
+#### Complete case data
+
+Let us drop missing values in the exposure and outcome:
+
+```{r cc1, cache=TRUE, warning=FALSE, message=FALSE}
+# Drop missing exposure and outcome
+dat <- dat4[complete.cases(dat4$id),]
+dat <- dat[complete.cases(dat$caff),]
+dat <- dat[complete.cases(dat$status),]
+dat <- dat[complete.cases(dat$stime),] # N = 4,080
+dim(dat)
+
+# Missing plot
+plot_missing(dat)
+```
+
+Now, let us drop variables with high missingness for this exercise. As explained in the [Missing data analysis chapter](missingdata.html), a better approach could be imputing missing values under the missing at random assumption.
+
+```{r cc2, cache=TRUE, warning=FALSE, message=FALSE}
+# Drop variables with high missingness
+dat$diabetic.nephropathy <- dat$diab.years <- dat$daib.retino <- dat$income <- NULL
+
+# Complete case data
+dat <- na.omit(dat)
+dim(dat) # N = 3,780
+```
+
+### Table 1
+
+Now, let us create Table 1 stratified by coffee consumption (exposure), separately for males and females, as done in the article.
+
+```{r tab1, cache=TRUE, warning=FALSE, message=FALSE}
+vars <- c("age", "race", "education", "smoking", "alcohol", "carbohyd", "physical.activity",
+          "bmi.cat", "htn", "macrovascular", "insulin", "survey.cycle")
+
+tab1a <- CreateTableOne(vars = vars, strata = "caff", data = dat[dat$sex=="Female",], 
+                        test = F)
+tab1b <- CreateTableOne(vars = vars, strata = "caff", data = dat[dat$sex=="Male",], 
+                        test = F)
+
+tab1 <- list(Female = tab1a, Male = tab1b)
+print(tab1, showAllLevels = T, smd = T)
+```
+
+### Survey design
+
+The paper analyzed the data separately for males and females. Let us create the survey design:
+
+```{r , cache=TRUE, warning=FALSE, message=FALSE}
+# Revised weight - weight divided by 6 cycles
+dat.full$svy.weight <- dat.full$survey.weight/6 
+dat$svy.weight <- dat$survey.weight/6 
+summary(dat$svy.weight)
+
+# Create an indicator variable
+dat.full$miss <- 1
+dat.full$miss[dat.full$id %in% dat$id] <- 0
+
+# Set up the design
+w.design0 <- svydesign(strata = ~strata, id = ~psu, weights = ~svy.weight, 
+                       data = dat.full, nest = TRUE)
+
+# Subset the design
+w.design1 <- subset(w.design0, miss == 0)
+
+# Subset the design for females
+w.design.f <- subset(w.design1, sex == "Female")
+dim(w.design.f)
+
+# Subset the design for males
+w.design.m <- subset(w.design1, sex == "Male")
+dim(w.design.m)
+```
+
+### Kaplan-Meier plot
+
+Let us create the Kaplan-Meier plot for males and females:
+
+```{r kmplot, cache=TRUE, warning=FALSE, message=FALSE}
+# KM for females
+fit0.f <- svykm(Surv(stime, status) ~ caff, design = w.design.f)
+plot(fit0.f)
+
+# KM for males
+fit0.m <- svykm(Surv(stime, status) ~ caff, design = w.design.m)
+plot(fit0.m)
+```
+
+### Cox PH
+
+Now, we will fit the Cox proportional hazards model, separately for males and females. Let us run the unadjusted model first.
+
+```{r coxunadj, cache=TRUE, warning=FALSE, message=FALSE}
+# Unadjusted Cox PH for females
+fit1.f <- svycoxph(Surv(stime, status) ~ caff, design = w.design.f)
+publish(fit1.f)
+
+# Unadjusted Cox PH for males
+fit1.m <- svycoxph(Surv(stime, status) ~ caff, design = w.design.m)
+publish(fit1.m)
+```
+
+Now, we will fit the Cox PH model, adjusting for covariates.
+
+```{r coxadj, cache=TRUE, warning=FALSE, message=FALSE}
+# Covariate adjusted Cox PH for females
+fit2.f <- svycoxph(Surv(stime, status) ~ caff + age + race + education + smoking + 
+                     alcohol +  carbohyd + physical.activity + bmi.cat + htn +
+                     macrovascular + insulin + survey.cycle, design = w.design.f)
+publish(fit2.f)
+
+# Covariate adjusted Cox PH for males
+fit2.m <- svycoxph(Surv(stime, status) ~ caff + age + race + education + smoking + 
+                     alcohol +  carbohyd + physical.activity + bmi.cat + htn +
+                     macrovascular + insulin + survey.cycle, design = w.design.m)
+publish(fit2.m)
+```
+
+The adjusted results are approximately the same as in Table 2 of the article. Caffeine consumption was associated with mortality among women but not among men.
+
+### PH assumption
+
+Now, we will check the proportional hazard assumption.
+
+```{r proportional, cache=TRUE, warning=FALSE, message=FALSE}
+# PH assumption among females
+cox.zph(fit2.f)
+
+# PH assumption among males
+cox.zph(fit2.m)
+```
+
+The large p-values indicate that the proportional hazard assumption was met for both models.

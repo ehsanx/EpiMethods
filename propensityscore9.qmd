@@ -1,0 +1,381 @@
+## PSW with multiple tx {.unnumbered}
+
+```{r setup, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
+# Load required packages
+library(dplyr)
+library(kableExtra)
+library(tableone)
+library(survey)
+library(Publish)
+library(DataExplorer)
+library(MatchIt)
+library(optmatch)
+library(data.table)
+```
+
+### Problem
+
+In this chapter, we will use **propensity score weighting (PSW)** for **multiple treatment categories**. We will use CCHS data that was used in the [previous chapter](propensityscore1.html) on exact matching with CCHS.
+
+### Load data
+
+Let us import the dataset:
+
+```{r load, cache=TRUE}
+rm(list = ls())
+load("Data/propensityscore/cchs123b.RData")
+ls()
+```
+
+-   `analytic.miss`: Full dataset of 397,173 participants from CCHS cycles 1.1, 2.1, and 3.1 with missing values in some covariates
+-   `analytic2`: Analytic dataset of 185,613 participants without missing in the covariates.
+
+### Pre-processing
+
+Let us create the full and analytic datasets for only CCHS 3.1.
+
+```{r cchs31, cache=TRUE}
+# Full dataset with missing
+dat.full <- subset(analytic.miss, cycle == "31")
+dim(dat.full)
+
+# Analytic dataset without missing
+dat.analytic <- subset(analytic2, cycle == "31")
+dim(dat.analytic)
+```
+
+We will use the analytic dataset (`dat.analytic`) to run our PSW analysis with the following variables: - Outcome: CVD - Exposure: phyact (3-level physical activity) - Covariates: age, sex, married (marital status), race, edu (education), income, bmi (body mass index), doctor (whether visited to a doctor), stress, smoke, drink (drink alcohol or not), fruit (fruit consumption), bp (blood pressure), diab (diabetes), OA (osteoarthritis), immigrate (immigrant or not)\
+- Sampling weight: weight
+
+```{r datahead, cache=TRUE}
+# Is there any character variable?
+str(dat.analytic) 
+
+# Make all variables (except for ID and weight) as factor
+var.names <- c("CVD", "phyact", "age", "sex", "married", "race", "edu", "income", "bmi", "doctor", 
+               "stress", "smoke", "drink", "fruit", "bp", "diab", "province", "OA", "immigrate")
+dat.full[var.names] <- lapply(dat.full[var.names] , factor)
+dat.analytic[var.names] <- lapply(dat.analytic[var.names], factor)
+
+# Outcome - CVD
+table(dat.analytic$CVD, useNA = "always")
+dat.full$CVD <- car::recode(dat.full$CVD, "'no event' = 'No'; 'event' = 'Yes'; else = NA ")
+dat.full$CVD <- factor(dat.full$CVD, levels = c("No", "Yes"))
+
+dat.analytic$CVD <- car::recode(dat.analytic$CVD, "'no event' = 'No'; 'event' = 'Yes'; else = NA ")
+dat.analytic$CVD <- factor(dat.analytic$CVD, levels = c("No", "Yes"))
+table(dat.analytic$CVD, useNA = "always")
+
+# Exposure - physical activity
+table(dat.analytic$phyact, useNA = "always")
+dat.full$phyact <- factor(dat.full$phyact, levels = c("Inactive", "Moderate", "Active"))
+dat.analytic$phyact <- factor(dat.analytic$phyact, levels = c("Inactive", "Moderate", "Active"))
+
+# Table 1
+vars <- c("age", "sex", "married", "race", "edu", "income", "bmi", "doctor", "stress", 
+          "smoke", "drink", "fruit", "bp", "diab", "OA", "immigrate")
+tab1 <- CreateTableOne(vars = vars, strata = "phyact", data = dat.analytic, test = F)
+print(tab1, smd = T, showAllLevels = T)
+```
+
+### PSW for multiple tx
+
+#### Nominal categories (option 1)
+
+For this part (option 1), we consider physical activity as a nominal variable.
+
+##### Estimating Propensity score
+
+Let us fit the PS model by considering physical activity as a nominal variable and estimate the propensity scores:
+
+```{r nominalfit, cache=TRUE}
+# Formula
+ps.formula <- formula(phyact ~ age + sex + married + race + edu + income + bmi + 
+                        doctor + stress + smoke + drink + fruit + bp + diab + 
+                        OA + immigrate)
+
+# PS model
+library(VGAM)
+ps.fit <- vglm(ps.formula, weights = weight, data = dat.analytic, 
+               family = multinomial(parallel = FALSE))
+
+# Propensity scores
+ps <- data.frame(fitted(ps.fit))
+head(ps)
+
+# Summary
+apply(ps, 2, summary)
+```
+
+##### Creating weights
+
+Let us create PS weights. For subject $i$, PS weight is calculated as
+
+$$w_i = \frac{1}{P(A_i = a|L)}, $$ where $A$ is the exposure with levels $a$ (Inactive, Moderate, and Active in our case), and $L$ is the list of covariates.
+
+```{r nominalwgt, cache=TRUE}
+# IPW
+dat.analytic$ipw <- ifelse(dat.analytic$phyact=="Active", 1/ps$Active, 
+                           ifelse(dat.analytic$phyact=="Moderate", 1/ps$Moderate, 
+                                  1/ps$Inactive))
+with(dat.analytic, by(ipw, phyact, summary))
+```
+
+##### Balance checking
+
+Now, we will check the balance in terms of SMD:
+
+```{r nominalbalance, cache=TRUE}
+library(survey)
+vars <- c("age", "sex", "married", "race", "edu", "income", "bmi", "doctor", "stress", 
+          "smoke", "drink", "fruit", "bp", "diab", "OA", "immigrate")
+
+# Design
+w.design <- svydesign(id = ~1, weights = ~ipw, data = dat.analytic)
+
+# Table 1
+tabw <- svyCreateTableOne(vars = vars, strata = "phyact", data = w.design, test = F)
+print(tabw, smd = T, showAllLevels = T)
+```
+
+All covariates are balanced in terms of SMD (SMD $\le$ 0.20).
+
+##### Outcome analysis
+
+Now, we will fit the outcome model. To get the correct estimate of the standard error, we will set up the design with full data and subset the design.
+
+```{r nominaloutcome, cache=TRUE, warning=FALSE, message=FALSE}
+# Create an indicator variable in the full dataset
+dat.full$ind <- 0
+dat.full$ind[dat.full$ID %in% dat.analytic$ID] <- 1
+
+# New weight = IPW * survey weight
+dat.analytic$ATEweight <- with(dat.analytic, ipw * weight)
+
+# New weight variable in the full dataset
+dat.full$ATEweight <- 0
+dat.full$ATEweight[dat.full$ID %in% dat.analytic$ID] <- dat.analytic$ATEweight
+
+# Survey setup with full data 
+w.design0 <- svydesign(id = ~1, weights = ~ATEweight, data = dat.full)
+
+# Subset the design for analytic sample
+w.design1 <- subset(w.design0, ind == 1)
+
+# Weighted proportion
+w.prop <- svyby(formula = ~CVD, by = ~phyact, design = w.design1, FUN = svymean)
+w.prop
+
+# Outcome model
+fit <- svyglm(CVD ~ phyact, design = w.design1, family = binomial)
+publish(fit, confint.method = "robust", pvalue.method = "robust")
+```
+
+#### Ordinal categories (for comparison)
+
+For comparison, let us consider physical activity as a ordinal variable (option 2).
+
+##### Define ordinal variable
+
+```{r ordinalvar, cache=TRUE}
+# Exposure - ordinal physical activity
+dat.full$phyact.ord <- factor(dat.full$phyact, levels = c("Inactive", "Moderate", "Active"), 
+                              ordered = T)
+dat.analytic$phyact.ord <- factor(dat.analytic$phyact, 
+                                  levels = c("Inactive", "Moderate", "Active"), ordered = T)
+head(dat.analytic$phyact.ord)
+```
+
+##### Estimating Propensity score
+
+```{r ordinalfit, cache=TRUE}
+# Formula
+ps.formula2 <- formula(phyact.ord ~ age + sex + married + race + edu + income + bmi + 
+                        doctor + stress + smoke + drink + fruit + bp + diab + 
+                        OA + immigrate)
+
+# PS model
+library(VGAM)
+ps.fit2 <- vglm(ps.formula2, weights = weight, data = dat.analytic, family = propodds)
+
+# Propensity scores
+ps2 <- data.frame(fitted(ps.fit2))
+head(ps2)
+
+# Summary
+apply(ps2, 2, summary)
+```
+
+##### Creating weights
+
+Let us create PS weights:
+
+```{r ordinalwgt, cache=TRUE}
+# IPW
+dat.analytic$ipw2 <- ifelse(dat.analytic$phyact=="Active", 1/ps2$Active, 
+                           ifelse(dat.analytic$phyact=="Moderate", 1/ps2$Moderate, 
+                                  1/ps2$Inactive))
+with(dat.analytic, by(ipw2, phyact.ord, summary))
+```
+
+##### Balance checking
+
+Now, we will check the balance in terms of SMD:
+
+```{r ordinalbalance, cache=TRUE}
+library(survey)
+vars <- c("age", "sex", "married", "race", "edu", "income", "bmi", "doctor", "stress", 
+          "smoke", "drink", "fruit", "bp", "diab", "OA", "immigrate")
+
+# Design
+w.design <- svydesign(id = ~1, weights = ~ipw2, data = dat.analytic)
+
+# Table 1
+tabw2 <- svyCreateTableOne(vars = vars, strata = "phyact", data = w.design, test = F)
+print(tabw2, smd = T, showAllLevels = T)
+```
+
+Again, all covariates are balanced in terms of SMD.
+
+##### Outcome analysis
+
+Now, we will fit the outcome model:
+
+```{r ordinaloutcome, cache=TRUE, warning=FALSE, message=FALSE}
+# Create an indicator variable in the full dataset
+dat.full$ind <- 0
+dat.full$ind[dat.full$ID %in% dat.analytic$ID] <- 1
+
+# New weight = IPW * survey weight
+dat.analytic$ATEweight2 <- with(dat.analytic, ipw2 * weight)
+
+# New weight variable in the full dataset
+dat.full$ATEweight2 <- 0
+dat.full$ATEweight2[dat.full$ID %in% dat.analytic$ID] <- dat.analytic$ATEweight2
+
+# Survey setup with full data 
+w.design0 <- svydesign(id = ~1, weights = ~ATEweight2, data = dat.full)
+
+# Subset the design for analytic sample
+w.design1 <- subset(w.design0, ind == 1)
+
+# Weighted proportion
+w.prop2 <- svyby(formula = ~CVD, by = ~phyact, design = w.design1, FUN = svymean)
+w.prop2
+
+# Outcome model
+fit2 <- svyglm(CVD ~ phyact, design = w.design1, family = binomial)
+publish(fit2, confint.method = "robust", pvalue.method = "robust")
+```
+
+#### Machine learning / GBM (option 3)
+
+In this part, we will use [Gradient Boosting](https://en.wikipedia.org/wiki/Gradient_boosting) as one of the machine learning techniques to estimate the propensity scores.
+
+##### Estimating Propensity score
+
+```{r gbmfit1, cache=TRUE, warning=FALSE, message=FALSE}
+# Formula
+ps.formula3 <- formula(phyact.ord ~ age + sex + married + race + edu + income + bmi + 
+                        doctor + stress + smoke + drink + fruit + bp + diab + 
+                        OA + immigrate)
+
+# PS model
+pacman::p_load(twang)
+set.seed(123)
+ps.fit3 <- mnps(ps.formula3, data = dat.analytic, estimand = "ATE", verbose = FALSE,
+                stop.method = c("es.max"), n.trees = 200, sampw = dat.analytic$weight)
+summary(ps.fit3)
+```
+
+```{r gbmfit2, cache=TRUE}
+# Propensity scores
+ps3 <- data.frame(Active = ps.fit3$psList$Active$ps,
+                 Moderate = ps.fit3$psList$Moderate$ps,
+                 Inactive = ps.fit3$psList$Inactive$ps)
+names(ps3) <- c("Active","Moderate","Inactive")
+head(ps3)
+
+# Summary
+apply(ps3, 2, summary)
+```
+
+##### Creating weights
+
+Let us create PS weights:
+
+```{r gbmwgt, cache=TRUE}
+# IPW
+dat.analytic$ipw3 <- ifelse(dat.analytic$phyact=="Active", 1/ps3$Active, 
+                           ifelse(dat.analytic$phyact=="Moderate", 1/ps3$Moderate, 
+                                  1/ps3$Inactive))
+with(dat.analytic, by(ipw3, phyact, summary))
+```
+
+Weights are not large compared to options 1 and 2.
+
+##### Balance checking
+
+Now, we will check the balance in terms of SMD:
+
+```{r gbmbalance, cache=TRUE}
+library(survey)
+vars <- c("age", "sex", "married", "race", "edu", "income", "bmi", "doctor", "stress", 
+          "smoke", "drink", "fruit", "bp", "diab", "OA", "immigrate")
+
+# Design
+w.design <- svydesign(id = ~1, weights = ~ipw3, data = dat.analytic)
+
+# Table 1
+tabw <- svyCreateTableOne(vars = vars, strata = "phyact", data = w.design, test = F)
+print(tabw, smd = T, showAllLevels = T)
+```
+
+All covariates are balanced in terms of SMD.
+
+```{r gbmbalance2, cache=TRUE}
+plot(ps.fit3, color = TRUE, plots = 2, figureRows = 1)
+```
+
+```{r gbmbalance3, cache=TRUE}
+plot(ps.fit3, plots = 3, color=TRUE, pairwiseMax = FALSE)
+```
+
+##### Outcome analysis
+
+Now, we will fit the outcome model:
+
+```{r gbmloutcome, cache=TRUE, warning=FALSE, message=FALSE}
+# Create an indicator variable in the full dataset
+dat.full$ind <- 0
+dat.full$ind[dat.full$ID %in% dat.analytic$ID] <- 1
+
+# New weight = IPW * survey weight
+dat.analytic$ATEweight3 <- with(dat.analytic, ipw3 * weight)
+
+# New weight variable in the full dataset
+dat.full$ATEweight3 <- 0
+dat.full$ATEweight3[dat.full$ID %in% dat.analytic$ID] <- dat.analytic$ATEweight3
+
+# Survey setup with full data 
+w.design0 <- svydesign(id = ~1, weights = ~ATEweight3, data = dat.full)
+
+# Subset the design for analytic sample
+w.design1 <- subset(w.design0, ind == 1)
+
+# Weighted proportion
+w.prop <- svyby(formula = ~CVD, by = ~phyact, design = w.design1, FUN = svymean)
+w.prop
+
+# Outcome model
+fit3 <- svyglm(CVD ~ phyact, design = w.design1, family = binomial)
+publish(fit3, confint.method = "robust", pvalue.method = "robust")
+```
+
+#### Other approches for multiple treatments
+
+Not covered here, but possible to do in a multiple treatments context:
+
+-   Propensity score matching
+-   Propensity score stratification
+-   Marginal mean weighting
