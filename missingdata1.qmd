@@ -12,7 +12,6 @@ Missing data can lead to biased or incorrect results. Imputation helps in making
 
 In this discussion, our primary guide and source of information is the work titled "Flexible Imputation of Missing Data" by Stef van Buuren, denoted here as [@van2018flexible]. This book is an invaluable resource for anyone looking to delve deeper into the intricacies of handling missing data, especially in the context of statistical analyses. Below we also cited the relevant section numbers.
 
-
 First, you need to load the necessary libraries:
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
@@ -29,15 +28,15 @@ library(mitools)
 
 In this section, we are going to introduce three types of missing data that we will encounter in data analysis.
 
-1. **Missing Completely at Random (MCAR)**:
+1.  **Missing Completely at Random (MCAR)**:
 
 The reason data is missing is completely random and not related to any measured or unmeasured variables. It's often an unrealistic assumption.
 
-2. **Missing at Random (MAR)**:
+2.  **Missing at Random (MAR)**:
 
 The missing data is related to variables that are observed.
 
-3. **Missing Not at Random (MNAR)**:
+3.  **Missing Not at Random (MNAR)**:
 
 The missing data is related to variables that are not observed.
 
@@ -45,9 +44,9 @@ The missing data is related to variables that are not observed.
 
 The type of missingness affects how you handle the missing data:
 
-- If data is MCAR, you can still analyze the complete cases without introducing bias.
-- If data is MAR, you can use imputation to replace the missing values.
-- If data is MNAR, it's challenging to address, and estimates will likely be biased. We could do some sensitivity analyses to check the impact.
+-   If data is MCAR, you can still analyze the complete cases without introducing bias.
+-   If data is MAR, you can use imputation to replace the missing values.
+-   If data is MNAR, it's challenging to address, and estimates will likely be biased. We could do some sensitivity analyses to check the impact.
 
 ### Video content (optional)
 
@@ -61,8 +60,6 @@ For those who prefer a video walkthrough, feel free to watch the video below, wh
 </iframe>
 :::
 
-
-
 ### Data imputation
 
 #### Getting to know the data
@@ -73,7 +70,7 @@ Before imputing, you should understand the data. The tutorial uses the `analytic
 1.  Take a look here for those who are interested in how the [analytic data](https://ehsanx.github.io/SurveyDataAnalysis/) was created.
 
 2.  For the purposes of this lab, we are just going to treat the data as SRS, and not going to deal with intricacies of survey data analysis.
-::: 
+:::
 
 ```{r load, cache=TRUE}
 require(VIM)
@@ -209,7 +206,7 @@ In this context, we're trying to fill in missing values for the variable 'age'. 
     -   If `subject 19` (say) has missing values in `age` variable, find out his `predicted age` $\hat{Y}$ (say, 45.5).
     -   Find others subjects, `subjects 2, 15, 24` (say) who has their `age` measured and their predicted age $\hat{Y}$ (say, `predicted ages` 43.9,45.7,46.1 with real ages 43,45,46 respectively) are close to `subject 19` (predicted age 45.5).
     -   Randomly select `subject 2` with real/observed age 43, and impute 43 for `subject 19`'s missing age.
-::: 
+:::
 
 The strength of PMM lies in its approach. Instead of imputing a potentially artificial value based on a prediction, it imputes a real, observed value from the dataset. This ensures that the imputed data retains the original data's characteristics and doesn't introduce any unrealistic values. It offers a safeguard against extrapolation, ensuring that the imputed values are always within the plausible range of the dataset.
 
@@ -233,7 +230,6 @@ For those who prefer a video walkthrough, feel free to watch the video below, wh
 </iframe>
 :::
 
-
 #### Multiple imputation and workflow
 
 -   Ref: [@van2018flexible], Sections 1.4 and 5.1
@@ -243,9 +239,9 @@ We have learned different methods of imputation. In this section, we will introd
 
 -   **Step 0: Set imputation model**: Before starting the imputation process, it's crucial to determine the appropriate imputation model based on the nature of the missing data and the relationships between variables. This model will guide how the missing values are estimated. For instance, if the data is missing at random, a linear regression model might be used for continuous data, while logistic regression might be used for binary data. The choice of model can significantly impact the quality of the imputed data, so it's essential to understand the underlying mechanisms causing the missingness and select a model accordingly.
 
--   **Step 1: The incomplete dataset will be imputed $m$ times**: In this step, the incomplete dataset is imputed multiple times, resulting in $m$ different "complete" datasets. The reason for creating multiple datasets is to capture the uncertainty around the missing values. Each of these datasets will have slightly different imputed values, reflecting the variability and uncertainty in the imputation process. The number of imputations, $m$, is typically chosen based on the percentage of missing data and the desired level of accuracy. Common choices for $m$ range from 5 to 50, but more imputations provide more accurate results, especially when the percentage of missing data is high.
+-   **Step 1: The incomplete dataset will be imputed** $m$ times: In this step, the incomplete dataset is imputed multiple times, resulting in $m$ different "complete" datasets. The reason for creating multiple datasets is to capture the uncertainty around the missing values. Each of these datasets will have slightly different imputed values, reflecting the variability and uncertainty in the imputation process. The number of imputations, $m$, is typically chosen based on the percentage of missing data and the desired level of accuracy. Common choices for $m$ range from 5 to 50, but more imputations provide more accurate results, especially when the percentage of missing data is high.
 
--   **Step 2: Each $m$ complete datasets will be analyzed separately by standard analysis (e.g., regression model)**: Once the $m$ complete datasets are generated, each one is analyzed separately using standard statistical methods. For example, if the research question involves understanding the relationship between two variables, a regression model might be applied to each dataset. This step produces $m$ sets of analysis results, one for each imputed dataset.
+-   **Step 2: Each** $m$ complete datasets will be analyzed separately by standard analysis (e.g., regression model): Once the $m$ complete datasets are generated, each one is analyzed separately using standard statistical methods. For example, if the research question involves understanding the relationship between two variables, a regression model might be applied to each dataset. This step produces $m$ sets of analysis results, one for each imputed dataset.
 
 -   **Step 3: The analysis results will be pooled / aggregated together by Rubin's rules (1987)**: The final step involves combining the results from the $m$ separate analyses into a single set of results. This is done using Rubin's rules (1987) [@little1987multiple], which provide a way to aggregate the estimates and adjust for the variability between the imputed datasets. The pooled results give a more accurate and robust estimate than analyzing a single imputed dataset. Rubin's rules ensure that the combined results reflect both the within-imputation variability (the variability in results from analyzing each dataset separately) and the between-imputation variability (the differences in results across the imputed datasets).
 
@@ -416,21 +412,20 @@ est1 <- mice::pool(fit4)
 est1
 ```
 
-
 `Class: mipo    m = 10` (transposed version to accommodate space)
 
-| Term         | (Intercept)  | age        | bmi        | diastolicBP |
-|--------------|--------------|------------|------------|-------------|
-| m            | 10           | 10         | 10         | 10          |
-| Estimate     | 195.40679314 | 0.04699243 | -0.50032666| -0.08347279 |
-| $\bar{u}$    | 2313.6362339 | 0.1686837  | 0.8722547  | 0.2909291   |
-| b            | 237.04075365 | 0.07372796 | 0.01274940 | 0.02857675  |
-| t            | 2574.3810629 | 0.2497845  | 0.8862790  | 0.3223635   |
-| df_com       | 26           | 26         | 26         | 26          |
-| df           | 21.22870     | 13.72019   | 23.80807   | 21.35356    |
-| RIV          | 0.11269915   | 0.48078595 | 0.01607826 | 0.10804843  |
-| $\lambda$    | 0.10128447   | 0.32468295 | 0.01582384 | 0.09751237  |
-| FMI          | 0.17547051   | 0.40546159 | 0.08924771 | 0.17162783  |
+| Term      | (Intercept)  | age        | bmi         | diastolicBP |
+|-----------|--------------|------------|-------------|-------------|
+| m         | 10           | 10         | 10          | 10          |
+| Estimate  | 195.40679314 | 0.04699243 | -0.50032666 | -0.08347279 |
+| $\bar{u}$ | 2313.6362339 | 0.1686837  | 0.8722547   | 0.2909291   |
+| b         | 237.04075365 | 0.07372796 | 0.01274940  | 0.02857675  |
+| t         | 2574.3810629 | 0.2497845  | 0.8862790   | 0.3223635   |
+| df_com    | 26           | 26         | 26          | 26          |
+| df        | 21.22870     | 13.72019   | 23.80807    | 21.35356    |
+| RIV       | 0.11269915   | 0.48078595 | 0.01607826  | 0.10804843  |
+| $\lambda$ | 0.10128447   | 0.32468295 | 0.01582384  | 0.09751237  |
+| FMI       | 0.17547051   | 0.40546159 | 0.08924771  | 0.17162783  |
 
 Here:
 
@@ -610,16 +605,18 @@ for (i in 1:200){
  ## variables are attributed to sampling variation
 ```
 
-
-
 ### Convergence and diagnostics
 
 #### Convergence
 
+When an algorithm converges, it means that the sequence of estimates generated by the algorithm stabilizes and reaches a distribution that does not depend on the initial values. This is crucial for imputation and other statistical analyses because it indicates that the estimates are representative of the true underlying statistical properties and are not biased by initial assumptions or specific starting conditions.
+
 -   Ref: [@van2018flexible], Section 6.5.2
 
 -   **MCMC Algorithm in MICE**: The MICE package implements a MCMC algorithm for imputation. The coefficients should be converged and irrelevant to the order which variable is imputed first.
+
 -   **Understanding pattern**: For convergence to be achieved, these chains should mix well with each other, meaning their paths should overlap and crisscross freely. If they show distinct, separate trends or paths, it indicates a lack of convergence, suggesting that the imputation may not be reliable.
+
 -   **Visualizing Convergence**: We could plot the imputation object to see the streams.
 
 ```{r convergence, cache=TRUE}
@@ -640,9 +637,9 @@ plot(imputation5_2)
 
 #### Diagnostics
 
--   Ref: [@van2018flexible], Section 6.6
-
 Model diagnostics plays a pivotal role in ensuring the robustness and accuracy of model fitting. Particularly in the realm of missing value imputations, where observed data serves as the foundation for estimating absent values, it becomes imperative to rigorously assess the imputation process. A straightforward diagnostic technique involves comparing the distributions of the observed data with the imputed values, especially when segmented or conditioned based on the variables that originally had missing entries. This comparison helps in discerning any discrepancies or biases introduced during the imputation, ensuring that the filled values align well with the inherent patterns of the observed data.
+
+-   Ref: [@van2018flexible], Section 6.6
 
 ```{r diagnostics, cache=TRUE}
 ## We could compare the imputed and observed data using Density plots

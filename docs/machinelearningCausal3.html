@@ -501,7 +501,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data spliting</span></a>
+ <span class="menu-text">Data Splitting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1146,6 +1146,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="tmle" class="level3 unnumbered page-columns page-full"><h3 class="unnumbered anchored" data-anchor-id="tmle">TMLE</h3>
 <p>TMLE works by first constructing an initial outcome and extracting a crude estimate of the treatment effect. Then, TMLE aims to refine the initial estimate in the direction of the true value of the parameter of interest through use of the exposure model.</p>
+<p>To label the treatment effect given by TMLE as causal, the same conditional exchangeability, positivity, and consistency assumptions must be met as for other modeling strategies (see <a href="propensityscore0.html">introduction to propensity score</a>). TMLE also assumes that at least one of the exposure or outcome model is correctly specified. If this does not hold, TMLE does not necessarily produce a consistent estimator.</p>
 
 <div class="no-row-height column-margin column-container"><div class="">
 <p><span class="citation" data-cites="luque2018targeted">Luque-Fernandez et al. (<a href="#ref-luque2018targeted" role="doc-biblioref">2018</a>)</span> discussed the implementation of TMLE, and providing a detailed step-by-step guide, primarily focusing on a binary outcome.</p>
@@ -1158,6 +1159,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ol>
 <p>The tmle package implements TMLE for both binary and continuous outcomes, and uses the SuperLearner to construct the exposure and outcome models.</p>
 <p>The <em>tmle</em> method takes a number of parameters, including:</p>
+<pre><code>#&gt; Warning: package 'knitr' was built under R version 4.2.3</code></pre>
 <div class="cell-output-display">
 <table class="table table-striped table-hover table-condensed" data-quarto-postprocess="true">
 <thead><tr class="header">
@@ -1202,28 +1204,28 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>First, we need to define the number of cross-validation folds to use for each model. This depends on our effective sample size <span class="citation" data-cites="phillips2023ConsiderationsSL">(<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">Phillips et al. 2023</a>)</span>.</p>
 <p>Our effective sample size for the outcome model is:</p>
 <div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-3_395a735e7bfe8156581a440a27eb1250">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData) </span>
-<span id="cb2-2"><a href="#cb2-2"></a>p <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>Death <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n </span>
-<span id="cb2-3"><a href="#cb2-3"></a>n_eff <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p, <span class="dv">1</span><span class="sc">-</span>p))) </span>
-<span id="cb2-4"><a href="#cb2-4"></a>n_eff</span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; [1] 5735</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData) </span>
+<span id="cb3-2"><a href="#cb3-2"></a>p <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>Death <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n </span>
+<span id="cb3-3"><a href="#cb3-3"></a>n_eff <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p, <span class="dv">1</span><span class="sc">-</span>p))) </span>
+<span id="cb3-4"><a href="#cb3-4"></a>n_eff</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; [1] 5735</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Our effective sample size for the exposure model is:</p>
 <div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-4_5278f6d7f3ae20bbdae8cd06076a0baf">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>p_exp <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>RHC.use <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n </span>
-<span id="cb3-2"><a href="#cb3-2"></a>n_eff_exp <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p, <span class="dv">1</span><span class="sc">-</span>p))) </span>
-<span id="cb3-3"><a href="#cb3-3"></a>n_eff_exp</span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; [1] 5735</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>p_exp <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>RHC.use <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n </span>
+<span id="cb4-2"><a href="#cb4-2"></a>n_eff_exp <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p, <span class="dv">1</span><span class="sc">-</span>p))) </span>
+<span id="cb4-3"><a href="#cb4-3"></a>n_eff_exp</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; [1] 5735</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>For both models, the effective sample size is the same as our sample size, <span class="math inline">\(n = 5735\)</span>.</p>
-<p>Since <span class="math inline">\(500 \leq n_{eff} \leq 5000\)</span>, we should use 10 or more cross-validation folds according to <span class="citation" data-cites="phillips2023ConsiderationsSL">Phillips et al. (<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">2023</a>)</span>. For the sake of computational feasibility, we will use <strong>10 folds</strong> in this example.</p>
+<p>For both models, the effective sample size is the same as our sample size, <span class="math inline">\(n = 5,735\)</span>.</p>
+<p>Since <span class="math inline">\(5,000 \leq n_{eff} \leq 10,000\)</span>, we should use 5 or more cross-validation folds according to <span class="citation" data-cites="phillips2023ConsiderationsSL">Phillips et al. (<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">2023</a>)</span>. For the sake of computational feasibility, we will use <strong>5 folds</strong> in this example.</p>
 </section><section id="candidate-learners" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="candidate-learners">Candidate learners</h4>
 <p>The second step is to define the library of learners we will feed in to SuperLearner as potential options for each model (exposure and outcome). In this example, some of our covariates are continuous variables, such as temperature and blood pressure, so we need to include learners that allow non-linear/monotonic relationships.</p>
-<p>Since <span class="math inline">\(n\)</span> is large (<span class="math inline">\(&gt;500\)</span>), we should include as many learners as is computationally feasible in our libraries.</p>
+<p>Since <span class="math inline">\(n\)</span> is large (<span class="math inline">\(&gt;5000\)</span>), we should include as many learners as is computationally feasible in our libraries.</p>
 <p>Furthermore, we have 50 covariates:</p>
 <div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-5_761ba531574b010a0930994338c54836">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">length</span>(<span class="fu">c</span>(baselinevars, <span class="st">"Length.of.Stay"</span>))</span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; [1] 50</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">length</span>(<span class="fu">c</span>(baselinevars, <span class="st">"Length.of.Stay"</span>))</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; [1] 50</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><span class="math inline">\(5735/20 = 286.75\)</span>, and <span class="math inline">\(50&lt;286.75\)</span>, so we do not have high-dimensional data and including screeners is optional <span class="citation" data-cites="phillips2023ConsiderationsSL">(<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">Phillips et al. 2023</a>)</span>.</p>
 <p>Since the requirements for the exposure and outcome models are the same in this example, we will use the same SuperLearner library for both. Overall for this example we need to make sure to include:</p>
@@ -1259,78 +1261,82 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
 </ul>
 <div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-6_213727d0c7fb854e528080a71adcfc6a">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Construct the SuperLearner library</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a>SL.library <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.mean"</span>, </span>
-<span id="cb5-3"><a href="#cb5-3"></a>                <span class="st">"SL.glm"</span>, </span>
-<span id="cb5-4"><a href="#cb5-4"></a>                <span class="st">"SL.glmnet"</span>, </span>
-<span id="cb5-5"><a href="#cb5-5"></a>                <span class="st">"SL.xgboost"</span>, </span>
-<span id="cb5-6"><a href="#cb5-6"></a>                <span class="st">"SL.randomForest"</span>, </span>
-<span id="cb5-7"><a href="#cb5-7"></a>                <span class="st">"tmle.SL.dbarts2"</span>, </span>
-<span id="cb5-8"><a href="#cb5-8"></a>                <span class="st">"SL.svm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Construct the SuperLearner library</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>SL.library <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.mean"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3"></a>                <span class="st">"SL.glm"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4"></a>                <span class="st">"SL.glmnet"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5"></a>                <span class="st">"SL.xgboost"</span>, </span>
+<span id="cb6-6"><a href="#cb6-6"></a>                <span class="st">"SL.randomForest"</span>, </span>
+<span id="cb6-7"><a href="#cb6-7"></a>                <span class="st">"tmle.SL.dbarts2"</span>, </span>
+<span id="cb6-8"><a href="#cb6-8"></a>                <span class="st">"SL.svm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="tmle-with-superlearner" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="tmle-with-superlearner">TMLE with SuperLearner</h3>
 <p>To run TMLE, we need to install the tmle package and load it on the R environment.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">#install.packages(c('tmle', 'xgboost'))</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">require</span>(tmle)</span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">require</span>(xgboost)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">#install.packages(c('tmle', 'xgboost'))</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">require</span>(tmle)</span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="fu">require</span>(xgboost)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We also need to create a data frame containing only the covariates:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
-<span id="cb7-2"><a href="#cb7-2"></a>                              <span class="sc">!</span><span class="fu">c</span>(Death, RHC.use))</span>
-<span id="cb7-3"><a href="#cb7-3"></a>ObsData<span class="sc">$</span>Death <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(ObsData<span class="sc">$</span>Death)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
+<span id="cb8-2"><a href="#cb8-2"></a>                              <span class="sc">!</span><span class="fu">c</span>(Death, RHC.use))</span>
+<span id="cb8-3"><a href="#cb8-3"></a>ObsData<span class="sc">$</span>Death <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(ObsData<span class="sc">$</span>Death)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then we can run TMLE using the <code>tmle</code> method from the <code>tmle</code> package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>tmle.fit <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Death, </span>
-<span id="cb8-2"><a href="#cb8-2"></a>                   <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
-<span id="cb8-3"><a href="#cb8-3"></a>                   <span class="at">W =</span> ObsData.noYA, </span>
-<span id="cb8-4"><a href="#cb8-4"></a>                   <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb8-5"><a href="#cb8-5"></a>                   <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
-<span id="cb8-6"><a href="#cb8-6"></a>                   <span class="at">V.g =</span> <span class="dv">10</span>,</span>
-<span id="cb8-7"><a href="#cb8-7"></a>                   <span class="at">Q.SL.library =</span> SL.library, </span>
-<span id="cb8-8"><a href="#cb8-8"></a>                   <span class="at">g.SL.library =</span> SL.library)</span>
-<span id="cb8-9"><a href="#cb8-9"></a></span>
-<span id="cb8-10"><a href="#cb8-10"></a>tmle.est.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
-<span id="cb8-11"><a href="#cb8-11"></a>tmle.ci.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>) </span>
+<span id="cb9-2"><a href="#cb9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3"></a>tmle.fit <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Death, </span>
+<span id="cb9-4"><a href="#cb9-4"></a>                   <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
+<span id="cb9-5"><a href="#cb9-5"></a>                   <span class="at">W =</span> ObsData.noYA, </span>
+<span id="cb9-6"><a href="#cb9-6"></a>                   <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
+<span id="cb9-7"><a href="#cb9-7"></a>                   <span class="at">V.Q =</span> <span class="dv">5</span>,</span>
+<span id="cb9-8"><a href="#cb9-8"></a>                   <span class="at">V.g =</span> <span class="dv">5</span>,</span>
+<span id="cb9-9"><a href="#cb9-9"></a>                   <span class="at">Q.SL.library =</span> SL.library, </span>
+<span id="cb9-10"><a href="#cb9-10"></a>                   <span class="at">g.SL.library =</span> SL.library)</span>
+<span id="cb9-11"><a href="#cb9-11"></a></span>
+<span id="cb9-12"><a href="#cb9-12"></a>tmle.est.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
+<span id="cb9-13"><a href="#cb9-13"></a>tmle.ci.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>ATE for binary outcome using user-specified library: 1.28 and 95% CI is 1.1992981, 1.3761869</p>
 <p>These results show those who received RHC had odds of death that were 1.28 times as high as the odds of death in those who did not receive RHC.</p>
 </section><section id="understanding-defaults" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="understanding-defaults">Understanding defaults</h3>
 <p>We can compare the results using our specified SuperLearner library to the results we would get when using the <code>tmle</code> package’s default SuperLearner libraries. To do this we simply do not specify libraries for the <code>Q.SL.library</code> and <code>g.SL.library</code> arguments.</p>
 <div class="cell" data-hash="machinelearningCausal3_cache/html/unnamed-chunk-12_588b5471761774cb5f863b2931bc525a">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># small test library </span></span>
-<span id="cb9-2"><a href="#cb9-2"></a><span class="co"># with only glm just </span></span>
-<span id="cb9-3"><a href="#cb9-3"></a><span class="co"># for sake of making this work</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a>SL.library.test <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># small test library </span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co"># with only glm just </span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co"># for sake of making this work</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>SL.library.test <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SL.glm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>tmle.fit.def <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Death, </span>
-<span id="cb10-2"><a href="#cb10-2"></a>                           <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
-<span id="cb10-3"><a href="#cb10-3"></a>                           <span class="at">W =</span> ObsData.noYA, </span>
-<span id="cb10-4"><a href="#cb10-4"></a>                           <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
-<span id="cb10-5"><a href="#cb10-5"></a>                           <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
-<span id="cb10-6"><a href="#cb10-6"></a>                           <span class="at">V.g =</span> <span class="dv">10</span>)</span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="co"># Q.SL.library = SL.library.test,  ## removed this line</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="co"># g.SL.library = SL.library.test)  ## removed this line</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a></span>
-<span id="cb10-10"><a href="#cb10-10"></a>tmle.est.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
-<span id="cb10-11"><a href="#cb10-11"></a>tmle.ci.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>) </span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a>tmle.fit.def <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Death, </span>
+<span id="cb11-4"><a href="#cb11-4"></a>                           <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
+<span id="cb11-5"><a href="#cb11-5"></a>                           <span class="at">W =</span> ObsData.noYA, </span>
+<span id="cb11-6"><a href="#cb11-6"></a>                           <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
+<span id="cb11-7"><a href="#cb11-7"></a>                           <span class="at">V.Q =</span> <span class="dv">5</span>,</span>
+<span id="cb11-8"><a href="#cb11-8"></a>                           <span class="at">V.g =</span> <span class="dv">5</span>)</span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co"># Q.SL.library = SL.library.test,  ## removed this line</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co"># g.SL.library = SL.library.test)  ## removed this line</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a></span>
+<span id="cb11-12"><a href="#cb11-12"></a>tmle.est.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
+<span id="cb11-13"><a href="#cb11-13"></a>tmle.ci.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>ATE for binary outcome using default library: 1.32 with 95% CI 1.1466162, 1.5219877.</p>
 <p>These ATE when using the default SuperLearner library (1.31) is very close to the ATE when using our user-specified SuperLearner library (1.29). However, the confidence interval from TMLE using the default SuperLearner library (1.17, 1.46) is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library (1.20, 1.39).</p>
 </section><section id="comparison-of-results" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="comparison-of-results">Comparison of results</h3>
 <p>We can also compare these results to those from a basic regression and from the literature.</p>
-<div class="cell" data-hash="machinelearningCausal3_cache/html/reg2bin_70846281d0c66e5ae664153dbd6ab6de">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># adjust the exposure variable </span></span>
-<span id="cb11-2"><a href="#cb11-2"></a><span class="co"># (primary interest) + covariates</span></span>
-<span id="cb11-3"><a href="#cb11-3"></a>baselineVars.Death <span class="ot">&lt;-</span> <span class="fu">c</span>(baselinevars, <span class="st">"Length.of.Stay"</span>)</span>
-<span id="cb11-4"><a href="#cb11-4"></a>out.formula.bin <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(</span>
-<span id="cb11-5"><a href="#cb11-5"></a>  <span class="fu">paste</span>(<span class="st">"Death~ RHC.use +"</span>,</span>
-<span id="cb11-6"><a href="#cb11-6"></a>        <span class="fu">paste</span>(baselineVars.Death, </span>
-<span id="cb11-7"><a href="#cb11-7"></a>              <span class="at">collapse =</span> <span class="st">"+"</span>)))</span>
-<span id="cb11-8"><a href="#cb11-8"></a>fit1.bin <span class="ot">&lt;-</span> <span class="fu">lm</span>(out.formula.bin, <span class="at">data =</span> ObsData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="machinelearningCausal3_cache/html/reg2bin_0f3bb8f6203100b76920f156e73b5fab">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># adjust the exposure variable </span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co"># (primary interest) + covariates</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>baselineVars.Death <span class="ot">&lt;-</span> <span class="fu">c</span>(baselinevars, <span class="st">"Length.of.Stay"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4"></a>out.formula.bin <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  <span class="fu">paste</span>(<span class="st">"Death~ RHC.use +"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6"></a>        <span class="fu">paste</span>(baselineVars.Death, </span>
+<span id="cb12-7"><a href="#cb12-7"></a>              <span class="at">collapse =</span> <span class="st">"+"</span>)))</span>
+<span id="cb12-8"><a href="#cb12-8"></a>fit1.bin <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula.bin, <span class="at">data =</span> ObsData, <span class="at">family=</span><span class="st">"binomial"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><span class="citation" data-cites="connors1996effectiveness">Connors et al. (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> conducted a propensity score matching analysis. Table 4 showed that, after propensity score pair (1-to-1) matching, the odds of in-hospital mortality were 39% higher in those who received RHC (OR: 1.39 (1.15, 1.67)).</p>
 <div class="cell" data-hash="machinelearningCausal3_cache/html/summarytablebin_7ebdac933ca5a680738bae7e8c1dfc98">

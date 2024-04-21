@@ -501,7 +501,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data spliting</span></a>
+ <span class="menu-text">Data Splitting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1163,12 +1163,12 @@ Note
 </div>
 <section id="constructing-superlearner" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="constructing-superlearner">Constructing SuperLearner</h3>
 <p>Just as we did for a binary outcome, we will need to specify two SuperLearners, one for the exposure and one for the outcome model.</p>
-<p>The effective sample size for a continuous outcome is just <span class="math inline">\(n_{eff}=n=5735\)</span>. We calculated the effective sample size for the exposure model earlier, which also turned out to be <span class="math inline">\(n_{eff}=n=5735\)</span>. So once again we will use <em>10 folds</em> because <span class="math inline">\(500 \leq n_{eff} \leq 5000\)</span> <span class="citation" data-cites="phillips2023ConsiderationsSL">(<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">Phillips et al. 2023</a>)</span>.</p>
+<p>The effective sample size for a continuous outcome is just <span class="math inline">\(n_{eff}=n=5,735\)</span>. We calculated the effective sample size for the exposure model earlier, which also turned out to be <span class="math inline">\(n_{eff}=n=5,735\)</span>. So once again we will use <em>5 folds</em> because <span class="math inline">\(5,000 \leq n_{eff} \leq 10,000\)</span> <span class="citation" data-cites="phillips2023ConsiderationsSL">(<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">Phillips et al. 2023</a>)</span>.</p>
 <p>Similarly to our example with the binary outcome, the key considerations for the library of learners are:</p>
 <ul>
 <li><p>We have some continuous covariates, and should therefore include learners that allow non-linear/monotonic relationships.</p></li>
 <li><p>We have a large <span class="math inline">\(n\)</span>, so should include as many learners as is computationally feasible.</p></li>
-<li><p>We have 49 covariates and 5735 observations, so we do not have high-dimensional data and including screeners is optional.</p></li>
+<li><p>We have 49 covariates and 5,735 observations, so we do not have high-dimensional data and including screeners is optional.</p></li>
 </ul>
 <p>Again the requirements for the exposure and outcome models are the same and we can use the same library for both models. Note that even though one model will have a binary dependent variable, and one will have a continuous dependent variable, most of the available learners automatically adapt to binary and continuous dependent variables.</p>
 <p>For this example, we will use the same SuperLearner library as for the binary outcome example.</p>
@@ -1207,15 +1207,17 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <span id="cb5-5"><a href="#cb5-5"></a>                                 RHC.use))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># run tmle</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>tmle.fit.cont <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Length.of.Stay_transf, </span>
-<span id="cb6-3"><a href="#cb6-3"></a>                       <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
-<span id="cb6-4"><a href="#cb6-4"></a>                       <span class="at">W =</span> ObsData.noYA, </span>
-<span id="cb6-5"><a href="#cb6-5"></a>                       <span class="at">family =</span> <span class="st">"gaussian"</span>, </span>
-<span id="cb6-6"><a href="#cb6-6"></a>                       <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
-<span id="cb6-7"><a href="#cb6-7"></a>                       <span class="at">V.g =</span> <span class="dv">10</span>,</span>
-<span id="cb6-8"><a href="#cb6-8"></a>                       <span class="at">Q.SL.library =</span> SL.library,</span>
-<span id="cb6-9"><a href="#cb6-9"></a>                       <span class="at">g.SL.library =</span> SL.library)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>) </span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># run tmle</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>tmle.fit.cont <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Length.of.Stay_transf, </span>
+<span id="cb6-5"><a href="#cb6-5"></a>                       <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
+<span id="cb6-6"><a href="#cb6-6"></a>                       <span class="at">W =</span> ObsData.noYA, </span>
+<span id="cb6-7"><a href="#cb6-7"></a>                       <span class="at">family =</span> <span class="st">"gaussian"</span>, </span>
+<span id="cb6-8"><a href="#cb6-8"></a>                       <span class="at">V.Q =</span> <span class="dv">5</span>,</span>
+<span id="cb6-9"><a href="#cb6-9"></a>                       <span class="at">V.g =</span> <span class="dv">5</span>,</span>
+<span id="cb6-10"><a href="#cb6-10"></a>                       <span class="at">Q.SL.library =</span> SL.library,</span>
+<span id="cb6-11"><a href="#cb6-11"></a>                       <span class="at">g.SL.library =</span> SL.library)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Once the <code>tmle</code> method has run, we still have one step to complete to get our final estimate. At this point, we must transform the average treatment effect generated by the <code>tmle</code> method (<span class="math inline">\(\widehat{ATE}\)</span>) back to the outcome’s original scale:</p>
 <p><span class="math display">\[
@@ -1226,14 +1228,14 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <span id="cb7-2"><a href="#cb7-2"></a>tmle.est.cont <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a>  tmle.fit.cont<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
 <span id="cb7-4"><a href="#cb7-4"></a>tmle.est.cont</span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; [1] 5.336911</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; [1] 2.939622</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We also have to transform the confidence interval back to the original scale:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>tmle.ci.cont <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>  tmle.fit.cont<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>ATE for continuous outcome: 5.3369112, and 95 % CI is 3.9001351, 6.7797942.</p>
+<p>ATE for continuous outcome: 2.9396218, and 95 % CI is 1.959698, 3.9195455.</p>
 <p>The results indicate that if all participants had received RHC, the average length of stay in hospital would be 2.95 (1.99, 3.91) days longer than if no participants had received RHC.</p>
 </section><section id="understanding-defaults" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="understanding-defaults">Understanding defaults</h3>
 <p>Transform outcome:</p>
@@ -1255,18 +1257,20 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <span id="cb10-5"><a href="#cb10-5"></a>                                 RHC.use))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># run tmle</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a>tmle.fit.cont.def <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(</span>
-<span id="cb11-3"><a href="#cb11-3"></a>  <span class="at">Y =</span> ObsData<span class="sc">$</span>Length.of.Stay_transf, </span>
-<span id="cb11-4"><a href="#cb11-4"></a>  <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
-<span id="cb11-5"><a href="#cb11-5"></a>  <span class="at">W =</span> ObsData.noYA,</span>
-<span id="cb11-6"><a href="#cb11-6"></a>  <span class="at">family =</span> <span class="st">"gaussian"</span>,</span>
-<span id="cb11-7"><a href="#cb11-7"></a>  <span class="at">V.Q =</span> <span class="dv">10</span>,</span>
-<span id="cb11-8"><a href="#cb11-8"></a>  <span class="at">V.g =</span> <span class="dv">10</span>)</span>
-<span id="cb11-9"><a href="#cb11-9"></a><span class="co"># Q.SL.library = SL.library.test,  </span></span>
-<span id="cb11-10"><a href="#cb11-10"></a><span class="do">## removed this line</span></span>
-<span id="cb11-11"><a href="#cb11-11"></a><span class="co"># g.SL.library = SL.library.test)  </span></span>
-<span id="cb11-12"><a href="#cb11-12"></a><span class="do">## removed this line</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>) </span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co"># run tmle</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>tmle.fit.cont.def <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(</span>
+<span id="cb11-5"><a href="#cb11-5"></a>  <span class="at">Y =</span> ObsData<span class="sc">$</span>Length.of.Stay_transf, </span>
+<span id="cb11-6"><a href="#cb11-6"></a>  <span class="at">A =</span> ObsData<span class="sc">$</span>RHC.use, </span>
+<span id="cb11-7"><a href="#cb11-7"></a>  <span class="at">W =</span> ObsData.noYA,</span>
+<span id="cb11-8"><a href="#cb11-8"></a>  <span class="at">family =</span> <span class="st">"gaussian"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9"></a>  <span class="at">V.Q =</span> <span class="dv">5</span>,</span>
+<span id="cb11-10"><a href="#cb11-10"></a>  <span class="at">V.g =</span> <span class="dv">5</span>)</span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co"># Q.SL.library = SL.library.test,  </span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="do">## removed this line</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co"># g.SL.library = SL.library.test)  </span></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="do">## removed this line</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Transform the average treatment effect generated by the <code>tmle</code> method (<span class="math inline">\(\widehat{ATE}\)</span>) back to the outcome’s original scale:</p>
 <p><span class="math display">\[
@@ -1284,7 +1288,7 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>tmle.ci.cont.def <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>  tmle.fit.cont.def<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>ATE for continuous outcome using default library: 3.3528911, and 95% CI 1.4320906, 4.856064.</p>
+<p>ATE for continuous outcome using default library: 3.0362984, and 95% CI 1.2686301, 4.8039667.</p>
 <p>The estimate using the default SuperLearner library (2.18) is similar to the estimate we got when using our user-specified SuperLearner library (2.95). However, the confidence interval using the default SuperLearner library (1.25, 4.37) was much wider than that using our user-specified SuperLearner library (1.99, 3.91).</p>
 </section><section id="comparison-of-results" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="comparison-of-results">Comparison of results</h3>
 <p>Adjusted regression:</p>
@@ -1338,6 +1342,7 @@ Y_{transformed} = \frac{Y-Y_{min}}{Y_{max}-Y_{min}}
 </table>
 </div>
 </div>
+<p>Differences in results can likely be attributed to the use of different SuperLearner libraries, the use of different combinations of variables used, or random sampling associated with the cross-validation used in the SuperLearner algorithm.</p>
 </section><section id="references" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="references">References</h3>
 
 

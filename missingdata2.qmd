@@ -31,7 +31,7 @@ md.pattern(analyticx)
 
 ### Imputing
 
-In the following chunk, we address the missing data by performing multiple imputations. This means that instead of filling in each missing value with a single estimate, we create multiple versions (datasets) where each missing value is filled in differently based on a specified algorithm. This helps in capturing the uncertainty around the missing values. The chunk sets up the parameters for multiple imputations, ensuring reproducibility and efficiency, and then performs the imputations on the dataset with missing values. 
+In the following chunk, we address the missing data by performing multiple imputations. This means that instead of filling in each missing value with a single estimate, we create multiple versions (datasets) where each missing value is filled in differently based on a specified algorithm. This helps in capturing the uncertainty around the missing values. The chunk sets up the parameters for multiple imputations, ensuring reproducibility and efficiency, and then performs the imputations on the dataset with missing values.
 
 ```{r imp, cache=TRUE}
 # imputation <- mice(analyticx, m=5, maxit=5, seed = 504007)
@@ -39,15 +39,15 @@ set.seed(504)
 imputation <- parlmice(analyticx, m=5, maxit=5, cluster.seed=504007)
 ```
 
-- **Data Input**: The primary input for the imputation function is the dataset with missing values. This dataset is what we aim to impute.
-- **Number of Imputations**: The option `m=5` indicates that we want to create 5 different imputed datasets. Each of these datasets will have the missing values filled in slightly differently, based on the underlying imputation algorithm and the randomness introduced.
-- **Maximum Iterations**: The imputation process is iterative, meaning it refines its estimates over several rounds. The option `maxit=5` specifies that the algorithm should run for a maximum of 5 iterations. This helps in achieving more accurate imputations, especially when the missing data mechanism is complex.
-- **Setting Seed**: In computational processes that involve randomness, it's often useful to set a "seed" value. This ensures that the random processes are reproducible. If you run the imputation multiple times with the same seed, you'll get the same results each time. Two seed values are set in the chunk: one using the general `set.seed()` function and another specifically for the imputation function as `cluster.seed`.
-- **Parallel Processing**: The function `parlmice` used for imputation indicates that the imputations are done in parallel. This means that instead of imputing one dataset after the other, the function tries to impute multiple datasets simultaneously (if the computational resources allow). This can speed up the process, especially when dealing with large datasets or when creating many imputed datasets.
+-   **Data Input**: The primary input for the imputation function is the dataset with missing values. This dataset is what we aim to impute.
+-   **Number of Imputations**: The option `m=5` indicates that we want to create 5 different imputed datasets. Each of these datasets will have the missing values filled in slightly differently, based on the underlying imputation algorithm and the randomness introduced.
+-   **Maximum Iterations**: The imputation process is iterative, meaning it refines its estimates over several rounds. The option `maxit=5` specifies that the algorithm should run for a maximum of 5 iterations. This helps in achieving more accurate imputations, especially when the missing data mechanism is complex.
+-   **Setting Seed**: In computational processes that involve randomness, it's often useful to set a "seed" value. This ensures that the random processes are reproducible. If you run the imputation multiple times with the same seed, you'll get the same results each time. Two seed values are set in the chunk: one using the general `set.seed()` function and another specifically for the imputation function as `cluster.seed`.
+-   **Parallel Processing**: The function `parlmice` used for imputation indicates that the imputations are done in parallel. This means that instead of imputing one dataset after the other, the function tries to impute multiple datasets simultaneously (if the computational resources allow). This can speed up the process, especially when dealing with large datasets or when creating many imputed datasets.
 
 ### Create new variable
 
-After imputation, we might want to create new variables or modify existing ones to better suit our analysis. Here, we transform one of the variables into a binary category based on a threshold. This can help in simplifying the analysis or making the results more interpretable.
+After imputation, we might want to create new variables or modify existing ones to better suit our analysis. Here, we transform one of the variables into a binary category based on a threshold. The choice of thresholds should be based on the data (i.e. median, quintiles, etc.) or on the literature (clinically relevant). This can help in simplifying the analysis or making the results more interpretable.
 
 ```{r newvar, cache=TRUE}
 impdata <- complete(imputation, action="long") #stacked data
@@ -72,10 +72,10 @@ plot_missing(subset(impdata, subset=.imp==2))
 
 **Comparing Original and Imputed Data (First Imputed Dataset)**:
 
-- In this chunk, we focus on the first imputed dataset. We extract this dataset and display the initial entries to get a sense of the data.
-- We then remove any remaining missing values (if any) and display the initial entries of this complete dataset.
-- Next, we compare the IDs (or unique identifiers) of the entries in the complete dataset with the original dataset to see which entries had missing values. 
-- We then create a new variable that indicates whether an entry had missing values or not and tabulate this information.
+-   In this chunk, we focus on the first imputed dataset. We extract this dataset and display the initial entries to get a sense of the data.
+-   We then remove any remaining missing values (if any) and display the initial entries of this complete dataset.
+-   Next, we compare the IDs (or unique identifiers) of the entries in the complete dataset with the original dataset to see which entries had missing values.
+-   We then create a new variable that indicates whether an entry had missing values or not and tabulate this information.
 
 ```{r check2, cache=TRUE }
 analytic.miss1 <- subset(impdata, subset=.imp==1)
@@ -117,8 +117,8 @@ tail(analytic.miss1$ID[analytic.miss1$miss==1])
 
 **Aggregating Missingness Information Across All Imputed Datasets**:
 
-- In the fourth chunk, we aim to consolidate the missingness information across all imputed datasets. We initialize a variable in the main dataset to indicate missingness.
-- We then loop through each of the imputed datasets and update the main dataset's missingness variable based on the missingness information from each imputed dataset. This gives us a consolidated view of which entries had missing values across all imputed datasets.
+-   In the fourth chunk, we aim to consolidate the missingness information across all imputed datasets. We initialize a variable in the main dataset to indicate missingness.
+-   We then loop through each of the imputed datasets and update the main dataset's missingness variable based on the missingness information from each imputed dataset. This gives us a consolidated view of which entries had missing values across all imputed datasets.
 
 ```{r check4, cache=TRUE }
 impdata$miss<-1
@@ -204,18 +204,17 @@ OR
 
 This segment offers a hands-on approach to understanding the imputation process. Here's a breakdown:
 
-1. **Fitting Models to Individual Imputed Datasets**:
-   - A list is initialized to store the results of models fitted to each imputed dataset.
-   - For every dataset, the specific imputed data is extracted.
-   - A survey design is established, considering factors like primary sampling units, stratification, and weights. This ensures the analysis aligns with the survey's design.
-   - This design is then refined to only consider complete data entries.
-   - A logistic regression model is then applied to this refined data.
-   - The results of this modeling are stored and displayed for review.
-
-2. **Pooling Results from All Models**:
-   - After individual analysis, the next step is to combine or 'pool' these results.
-   - A special function is used to merge the results from all the models. This function accounts for variations between datasets and offers a combined estimate.
-   - A summary of this combined data is then displayed, offering insights like coefficients, standard errors, and more. Another version of this summary, focusing on log-effects, is also presented for deeper insights.
+1.  **Fitting Models to Individual Imputed Datasets**:
+    -   A list is initialized to store the results of models fitted to each imputed dataset.
+    -   For every dataset, the specific imputed data is extracted.
+    -   A survey design is established, considering factors like primary sampling units, stratification, and weights. This ensures the analysis aligns with the survey's design.
+    -   This design is then refined to only consider complete data entries.
+    -   A logistic regression model is then applied to this refined data.
+    -   The results of this modeling are stored and displayed for review.
+2.  **Pooling Results from All Models**:
+    -   After individual analysis, the next step is to combine or 'pool' these results.
+    -   A special function is used to merge the results from all the models. This function accounts for variations between datasets and offers a combined estimate.
+    -   A summary of this combined data is then displayed, offering insights like coefficients, standard errors, and more. Another version of this summary, focusing on log-effects, is also presented for deeper insights.
 
 ```{r fit3, cache=TRUE}
 fits2 <- vector("list", m)
@@ -267,7 +266,6 @@ x <- all.vars(formula(fit))
 for (i in 1:m) x <- c(x, all.vars(formula(data.list[[i]])))
 table(x)-1
 ```
-
 
 #### Video content (optional)
 

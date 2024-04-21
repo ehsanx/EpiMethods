@@ -1,4 +1,4 @@
-## Continuous Outcomes  {.unnumbered}
+## Continuous Outcomes {.unnumbered}
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 require(tableone)
@@ -28,17 +28,16 @@ tab1 <- CreateTableOne(vars = c("Length.of.Stay"),
 print(tab1, showAllLevels = FALSE, )
 ```
 
-
 ```{r tab1x, cache=TRUE, echo = TRUE}
 median(ObsData$Length.of.Stay[ObsData$RHC.use==0])
 median(ObsData$Length.of.Stay[ObsData$RHC.use==1])
 ```
 
-### Constructing SuperLearner {-}
+### Constructing SuperLearner {.unnumbered}
 
 Just as we did for a binary outcome, we will need to specify two SuperLearners, one for the exposure and one for the outcome model.
 
-The effective sample size for a continuous outcome is just $n_{eff}=n=5735$. We calculated the effective sample size for the exposure model earlier, which also turned out to be $n_{eff}=n=5735$. So once again we will use *10 folds* because $500 \leq n_{eff} \leq 5000$ [@phillips2023ConsiderationsSL].
+The effective sample size for a continuous outcome is just $n_{eff}=n=5,735$. We calculated the effective sample size for the exposure model earlier, which also turned out to be $n_{eff}=n=5,735$. So once again we will use *5 folds* because $5,000 \leq n_{eff} \leq 10,000$ [@phillips2023ConsiderationsSL].
 
 Similarly to our example with the binary outcome, the key considerations for the library of learners are:
 
@@ -46,7 +45,7 @@ Similarly to our example with the binary outcome, the key considerations for the
 
 -   We have a large $n$, so should include as many learners as is computationally feasible.
 
--   We have 49 covariates and 5735 observations, so we do not have high-dimensional data and including screeners is optional.
+-   We have 49 covariates and 5,735 observations, so we do not have high-dimensional data and including screeners is optional.
 
 Again the requirements for the exposure and outcome models are the same and we can use the same library for both models. Note that even though one model will have a binary dependent variable, and one will have a continuous dependent variable, most of the available learners automatically adapt to binary and continuous dependent variables.
 
@@ -63,7 +62,7 @@ SL.library <- c("SL.mean",
                 "SL.svm")
 ```
 
-### Dealing with continuous outcomes {-}
+### Dealing with continuous outcomes {.unnumbered}
 
 For this example, we will be examining the length of stay in hospital outcome.
 
@@ -95,19 +94,19 @@ ObsData.noYA <- dplyr::select(ObsData,
                                  RHC.use))
 ```
 
-
 ```{r tmlepkg33defaultb, message=FALSE, warning=FALSE, eval=FALSE}
+set.seed(1444) 
+
 # run tmle
 tmle.fit.cont <- tmle::tmle(Y = ObsData$Length.of.Stay_transf, 
                        A = ObsData$RHC.use, 
                        W = ObsData.noYA, 
                        family = "gaussian", 
-                       V.Q = 10,
-                       V.g = 10,
+                       V.Q = 5,
+                       V.g = 5,
                        Q.SL.library = SL.library,
                        g.SL.library = SL.library)
 ```
-
 
 ```{r tmlepkg33defaultx, message=FALSE, warning=FALSE, eval=FALSE, echo=FALSE}
 saveRDS(tmle.fit.cont, 
@@ -124,14 +123,12 @@ $$
 tmle.fit.cont <- readRDS(file="Data/machinelearningCausal/tmlefitcont.RDS")
 ```
 
-
 ```{r tmlepkg33defaultx3, message=FALSE, warning=FALSE}
 # transform back the ATE estimate
 tmle.est.cont <- (max.Y-min.Y)*
   tmle.fit.cont$estimates$ATE$psi
 tmle.est.cont
 ```
-
 
 ```{r tmlepkg33defaultx3b, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
 saveRDS(tmle.est.cont, file = "Data/machinelearningCausal/tmlecontinuous.RDS")
@@ -143,7 +140,6 @@ We also have to transform the confidence interval back to the original scale:
 tmle.ci.cont <- (max.Y-min.Y)*
   tmle.fit.cont$estimates$ATE$CI
 ```
-
 
 ```{r tmlepkg2defaultx, results='hide', message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
 saveRDS(tmle.ci.cont, file = "Data/machinelearningCausal/tmlecontinuousci.RDS")
@@ -158,7 +154,7 @@ ATE for continuous outcome: `r tmle.est.cont`, and 95 % CI is `r tmle.ci.cont`.
 
 The results indicate that if all participants had received RHC, the average length of stay in hospital would be 2.95 (1.99, 3.91) days longer than if no participants had received RHC.
 
-### Understanding defaults {-}
+### Understanding defaults {.unnumbered}
 
 Transform outcome:
 
@@ -182,22 +178,22 @@ ObsData.noYA <- dplyr::select(ObsData,
                                  RHC.use))
 ```
 
-
 ```{r tmlepkg33default1bb, message=FALSE, warning=FALSE, eval=FALSE}
+set.seed(1444) 
+
 # run tmle
 tmle.fit.cont.def <- tmle::tmle(
   Y = ObsData$Length.of.Stay_transf, 
   A = ObsData$RHC.use, 
   W = ObsData.noYA,
   family = "gaussian",
-  V.Q = 10,
-  V.g = 10)
+  V.Q = 5,
+  V.g = 5)
 # Q.SL.library = SL.library.test,  
 ## removed this line
 # g.SL.library = SL.library.test)  
 ## removed this line
 ```
-
 
 ```{r tmlepkg33default1bbc, message=FALSE, warning=FALSE, eval=FALSE, echo=FALSE}
 saveRDS(tmle.fit.cont.def, file = "Data/machinelearningCausal/tmlefitcontdef.RDS")
@@ -213,14 +209,12 @@ $$
 tmle.fit.cont.def <- readRDS(file = "Data/machinelearningCausal/tmlefitcontdef.RDS")
 ```
 
-
 ```{r, cache=TRUE}
 # transform back the ATE estimate
 tmle.est.cont.def <- (max.Y-min.Y)*
   tmle.fit.cont.def$estimates$ATE$psi
 tmle.est.cont.def
 ```
-
 
 ```{r, echo=FALSE, eval=FALSE}
 saveRDS(tmle.est.cont.def, file = "Data/machinelearningCausal/tmlecontinuousdef.RDS")
@@ -233,7 +227,6 @@ tmle.ci.cont.def <- (max.Y-min.Y)*
   tmle.fit.cont.def$estimates$ATE$CI
 ```
 
-
 ```{r tmlepkg2default1x, results='hide', message=FALSE, warning=FALSE, eval=FALSE, echo=FALSE}
 saveRDS(tmle.ci.cont.def, file = "Data/machinelearningCausal/tmlecontinuouscidef.RDS")
 ```
@@ -243,12 +236,11 @@ tmle.est.cont.def <- readRDS(file = "Data/machinelearningCausal/tmlecontinuousde
 tmle.ci.cont.def <- readRDS(file = "Data/machinelearningCausal/tmlecontinuouscidef.RDS")
 ```
 
-
 ATE for continuous outcome using default library: `r tmle.est.cont.def`, and 95% CI `r tmle.ci.cont.def`.
 
 The estimate using the default SuperLearner library (2.18) is similar to the estimate we got when using our user-specified SuperLearner library (2.95). However, the confidence interval using the default SuperLearner library (1.25, 4.37) was much wider than that using our user-specified SuperLearner library (1.99, 3.91).
 
-### Comparison of results {-}
+### Comparison of results {.unnumbered}
 
 Adjusted regression:
 
@@ -308,4 +300,6 @@ kab <- kable(results,digits = 2)
 row_spec(kab, 1:4)
 ```
 
-### References {-}
+Differences in results can likely be attributed to the use of different SuperLearner libraries, the use of different combinations of variables used, or random sampling associated with the cross-validation used in the SuperLearner algorithm.
+
+### References {.unnumbered}

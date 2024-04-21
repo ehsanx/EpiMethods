@@ -1,5 +1,4 @@
-## Binary Outcomes  {.unnumbered}
-
+## Binary Outcomes {.unnumbered}
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 require(tableone)
@@ -24,9 +23,11 @@ tab1 <- CreateTableOne(vars = c("Death"),
 print(tab1, showAllLevels = FALSE, )
 ```
 
-### TMLE {-}
+### TMLE {.unnumbered}
 
 TMLE works by first constructing an initial outcome and extracting a crude estimate of the treatment effect. Then, TMLE aims to refine the initial estimate in the direction of the true value of the parameter of interest through use of the exposure model.
+
+To label the treatment effect given by TMLE as causal, the same conditional exchangeability, positivity, and consistency assumptions must be met as for other modeling strategies (see [introduction to propensity score](propensityscore0.html)). TMLE also assumes that at least one of the exposure or outcome model is correctly specified. If this does not hold, TMLE does not necessarily produce a consistent estimator.
 
 ::: column-margin
 @luque2018targeted discussed the implementation of TMLE, and providing a detailed step-by-step guide, primarily focusing on a binary outcome.
@@ -67,11 +68,11 @@ kable(df, format = "html", align = 'll', col.names = c("Term", "Description")) %
   row_spec(0, bold = TRUE, color = "white", background = "#D3D3D3")
 ```
 
-### Constructing SuperLearner  {-}
+### Constructing SuperLearner {.unnumbered}
 
 We will need to specify two SuperLearners, one for the exposure and one for the outcome model. We will need to consider the characteristics of our sample in order to decide the number of cross-validation folds and construct a diverse and computationally feasible library of algorithms.
 
-#### Number of folds  {-}
+#### Number of folds {.unnumbered}
 
 First, we need to define the number of cross-validation folds to use for each model. This depends on our effective sample size [@phillips2023ConsiderationsSL].
 
@@ -92,15 +93,15 @@ n_eff_exp <- min(n, 5*(n*min(p, 1-p)))
 n_eff_exp
 ```
 
-For both models, the effective sample size is the same as our sample size, $n = 5735$.
+For both models, the effective sample size is the same as our sample size, $n = 5,735$.
 
-Since $500 \leq n_{eff} \leq 5000$, we should use 10 or more cross-validation folds according to @phillips2023ConsiderationsSL. For the sake of computational feasibility, we will use **10 folds** in this example.
+Since $5,000 \leq n_{eff} \leq 10,000$, we should use 5 or more cross-validation folds according to @phillips2023ConsiderationsSL. For the sake of computational feasibility, we will use **5 folds** in this example.
 
-#### Candidate learners  {-}
+#### Candidate learners {.unnumbered}
 
 The second step is to define the library of learners we will feed in to SuperLearner as potential options for each model (exposure and outcome). In this example, some of our covariates are continuous variables, such as temperature and blood pressure, so we need to include learners that allow non-linear/monotonic relationships.
 
-Since $n$ is large ($>500$), we should include as many learners as is computationally feasible in our libraries.
+Since $n$ is large ($>5000$), we should include as many learners as is computationally feasible in our libraries.
 
 Furthermore, we have 50 covariates:
 
@@ -153,9 +154,9 @@ SL.library <- c("SL.mean",
                 "SL.svm")
 ```
 
-### TMLE with SuperLearner   {-}
+### TMLE with SuperLearner {.unnumbered}
 
-To run TMLE, we need to install the tmle package and load it on the R environment. 
+To run TMLE, we need to install the tmle package and load it on the R environment.
 
 ```{r, eval=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
 #install.packages(c('tmle', 'xgboost'))
@@ -174,19 +175,20 @@ ObsData$Death <- as.numeric(ObsData$Death)
 Then we can run TMLE using the `tmle` method from the `tmle` package:
 
 ```{r, eval = FALSE}
+set.seed(1444) 
+
 tmle.fit <- tmle::tmle(Y = ObsData$Death, 
                    A = ObsData$RHC.use, 
                    W = ObsData.noYA, 
                    family = "binomial", 
-                   V.Q = 10,
-                   V.g = 10,
+                   V.Q = 5,
+                   V.g = 5,
                    Q.SL.library = SL.library, 
                    g.SL.library = SL.library)
 
 tmle.est.bin <- tmle.fit$estimates$OR$psi
 tmle.ci.bin <- tmle.fit$estimates$OR$CI
 ```
-
 
 ```{r, eval = FALSE, echo=FALSE}
 saveRDS(tmle.est.bin, file = "Data/machinelearningCausal/tmlebin.RDS")
@@ -202,7 +204,7 @@ ATE for binary outcome using user-specified library: `r round(tmle.est.bin, 2)` 
 
 These results show those who received RHC had odds of death that were `r round(tmle.est.bin, 2)` times as high as the odds of death in those who did not receive RHC.
 
-### Understanding defaults  {-}
+### Understanding defaults {.unnumbered}
 
 We can compare the results using our specified SuperLearner library to the results we would get when using the `tmle` package's default SuperLearner libraries. To do this we simply do not specify libraries for the `Q.SL.library` and `g.SL.library` arguments.
 
@@ -214,19 +216,20 @@ SL.library.test <- c("SL.glm")
 ```
 
 ```{r, eval = FALSE}
+set.seed(1444) 
+
 tmle.fit.def <- tmle::tmle(Y = ObsData$Death, 
                            A = ObsData$RHC.use, 
                            W = ObsData.noYA, 
                            family = "binomial", 
-                           V.Q = 10,
-                           V.g = 10)
+                           V.Q = 5,
+                           V.g = 5)
 # Q.SL.library = SL.library.test,  ## removed this line
 # g.SL.library = SL.library.test)  ## removed this line
 
 tmle.est.bin.def <- tmle.fit.def$estimates$OR$psi
 tmle.ci.bin.def <- tmle.fit.def$estimates$OR$CI
 ```
-
 
 ```{r, eval = FALSE, echo=FALSE}
 saveRDS(tmle.est.bin.def, file = "Data/machinelearningCausal/tmlebindef.RDS")
@@ -242,13 +245,13 @@ ATE for binary outcome using default library: `r round(tmle.est.bin.def, 2)` wit
 
 These ATE when using the default SuperLearner library (1.31) is very close to the ATE when using our user-specified SuperLearner library (1.29). However, the confidence interval from TMLE using the default SuperLearner library (1.17, 1.46) is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library (1.20, 1.39).
 
-### Comparison of results  {-}
+### Comparison of results {.unnumbered}
 
 We can also compare these results to those from a basic regression and from the literature.
 
 ```{r reg1bin, cache=TRUE, echo = FALSE, results='hide', echo=FALSE}
 # adjust the exposure variable (primary interest)
-fit0.bin <- lm(Death~RHC.use, data = ObsData)
+fit0.bin <- glm(Death~RHC.use, data = ObsData, family="binomial")
 require(Publish)
 crude.fit.bin <- publish(fit0.bin, digits=1)$regressionTable[2,]
 ```
@@ -261,7 +264,7 @@ out.formula.bin <- as.formula(
   paste("Death~ RHC.use +",
         paste(baselineVars.Death, 
               collapse = "+")))
-fit1.bin <- lm(out.formula.bin, data = ObsData)
+fit1.bin <- glm(out.formula.bin, data = ObsData, family="binomial")
 ```
 
 ```{r, cache=TRUE, echo = FALSE}
@@ -300,5 +303,4 @@ kab <- kable(results,digits = 2)
 row_spec(kab, 1:4)
 ```
 
-
-### References {-}
+### References {.unnumbered}
