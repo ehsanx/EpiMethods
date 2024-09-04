@@ -11,7 +11,7 @@ require(car)
 library(knitr)
 ```
 
-In the code chunk below, we create a function called `invalid.exclude`. This function can be used to exclude invalid responses from the dataset, where don't know, refusal, and not stated are considered invalid responses. 
+In the code chunk below, we create a function called `invalid.exclude`. This function can be used to exclude invalid responses from the dataset, where don't know, refusal, and not stated are considered invalid responses.
 
 ```{r setupFunc, warning=FALSE, message=FALSE, cache=TRUE}
 # Function to exclude invalid responses
@@ -58,7 +58,7 @@ print(tab1, showAllLevels = TRUE, smd = T)
 
 #### Multinomial Model fitting
 
-Before fitting the multinomial regression, let us redefine the reference categories of the variables. 
+Before fitting the multinomial regression, let us redefine the reference categories of the variables.
 
 ```{r mm1, cache=TRUE}
 analytic$MHcondition2 <- relevel(analytic$MHcondition, ref = "Poor or Fair")
@@ -68,7 +68,7 @@ analytic$Sex2 <- relevel(analytic$Sex, ref = "FEMALE")
 analytic$RaceEthnicity2 <- relevel(analytic$RaceEthnicity, ref = "NON-WHITE")
 ```
 
-Now we will fit the multinomial logistic regression model using the `multinom` function from the `nnet` package: 
+Now we will fit the multinomial logistic regression model using the `multinom` function from the `nnet` package:
 
 ```{r mm2, cache=TRUE}
 require(nnet)
@@ -81,7 +81,7 @@ kable(round(exp(cbind(coef(fit4), confint(fit4))),2))
 
 #### Survey-weighted Tables
 
-Now, we will set up the survey design with the survey weights and then see design-adjusted summary statistics. 
+Now, we will set up the survey design with the survey weights and then see design-adjusted summary statistics.
 
 ```{r t1s, cache=TRUE}
 require(survey)
@@ -101,7 +101,7 @@ print(tab1b, showAllLevels = TRUE)
 
 #### Setting up the design
 
-Let us redefine the reference categories within the survey design and convert the design to use replicate weights. 
+Let us redefine the reference categories within the survey design and convert the design to use replicate weights.
 
 ```{r dd, cache=TRUE}
 w.design <- svydesign(id=~1, weights=~Weight, data=analytic)
@@ -144,7 +144,7 @@ analytic$MHcondition3 <- factor(analytic$MHcondition,
 
 #### Ordinal logistic
 
-Let's fit the ordinal logistic using the `polr` function: 
+Let's fit the ordinal logistic using the `polr` function:
 
 ```{r olr, cache=TRUE}
 require(MASS)
@@ -177,7 +177,7 @@ kable(round(exp(cbind(coef(fit5o), confint(fit5o))),2))
 
 #### Assessing model fit
 
-We can use the `regTermTest` function from the `survey` package to do the Wald test of a regression coefficient. 
+We can use the `regTermTest` function from the `survey` package to do the Wald test of a regression coefficient.
 
 ```{r rolrsassess, cache=TRUE}
 regTermTest(fit5o, ~CommunityBelonging2 , df = Inf) 
