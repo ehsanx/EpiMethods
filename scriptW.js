@@ -7,7 +7,7 @@ function selectAnswer(quizId, selectedAnswer, element) {
         "quiz5": ["B"],
         "quiz6": ["B"],
         "quiz7": ["B"],
-        "quiz8": ["D"],
+        "quiz8": ["B"],
         "quiz9": ["B"],
         "quiz10": ["C"],
         "quiz11": ["B"],
