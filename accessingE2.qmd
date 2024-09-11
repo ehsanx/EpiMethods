@@ -1,0 +1,538 @@
+## Exercise 2 (A) {.unnumbered}
+
+
+::: callout-tip
+You cannot input any codes on this website but need to download the exercise files on your computer. You can download all of the related files in a zip file **accessingEx2.zip** from [Github folder](https://github.com/ehsanx/EpiMethods/tree/main/LabExercises/), or just by clicking this link [directly](https://github.com/ehsanx/EpiMethods/raw/main/LabExercises/accessingEx2.zip).
+
+-   Navigate to the GitHub folder (above link) where the ZIP file is located.
+-   Click on the file name (above zip file) to open its preview window.
+-   Click on the Download button to download the file. If you can't see the Download button, click on "Download Raw File" link that should appear on the page.
+:::
+
+```{r chunkSetup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Statement
+
+We will use the following article:
+
+-   Xu KY, Hartz SM, Borodovsky JT, Bierut LJ, Grucza RA. Association between benzodiazepine use with or without opioid use and all-cause mortality in the United States, 1999-2015. JAMA Network Open. 2020;3(12):e2028557. DOI: [10.1001/jamanetworkopen.2020.28557](https://pubmed.ncbi.nlm.nih.gov/33295972/).
+
+The authors exposed the relationship between benzodiazepine use with or without opioid use (exposure) and all-cause mortality (outcome), adjusting for confounders. The exposure and confounders information was extracted from the [National Health and Nutrition Examination Surveys (NHANES)](https://wwwn.cdc.gov/nchs/nhanes/default.aspx) 1999-2014 cycles, and public-use mortality data was downloaded from the [CDC website](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/datalinkage/linked_mortality/). Our main tasks include merging the datasets, applying eligibility criteria, and creating Table 1. Please note that recreating the analytic dataset after applying eligibility criteria was difficult due to the level of detail provided by the authors in the main manuscript and supplemental materials. Therefore, the numbers in your Table 1 will differ from Table 1 of the paper. However, you should be able to reproduce the numbers for this exercise given by the instructor.
+
+# Question I: \[50% grade\]
+
+## 1(a) Importing dataset
+
+```{r}
+# Importing dataset
+load("Data/accessing/nhanes_mortality_1999_2014.RData")
+ls()
+```
+
+There are 16 datasets (8 NHANES, 8 mortality):
+
+-   dat.nhanes99: NHANES data for 1999-2000 cycle
+
+-   dat.nhanes01: NHANES data for 2001-2002 cycle
+
+-   dat.nhanes03: NHANES data for 2003-2004 cycle
+
+-   dat.nhanes05: NHANES data for 2005-2006 cycle
+
+-   dat.nhanes07: NHANES data for 2007-2008 cycle
+
+-   dat.nhanes09: NHANES data for 2009-2010 cycle
+
+-   dat.nhanes11: NHANES data for 2011-2012 cycle
+
+-   dat.nhanes13: NHANES data for 2013-2014 cycle
+
+-   dat.mortality99: Mortality data for 1999-2000 cycle
+
+-   dat.mortality01: Mortality data for 2001-2003 cycle
+
+-   dat.mortality03: Mortality data for 2003-2004 cycle
+
+-   dat.mortality05: Mortality data for 2005-2006 cycle
+
+-   dat.mortality07: Mortality data for 2007-2008 cycle
+
+-   dat.mortality09: Mortality data for 2009-2010 cycle
+
+-   dat.mortality11: Mortality data for 2010-2012 cycle
+
+-   dat.mortality13: Mortality data for 2011-2014 cycle
+
+The `mortality` datasets have the following variables:
+
+-   `SEQN`: Respondent sequence number. We will use the 'SEQN' variable to merge an NHANES cycle with its corresponding mortality data.
+-   `mortstat`: All-cause mortality status
+-   `permth_int`: Person-Months of Follow-up from NHANES Interview date
+-   `permth_exm`: Person-Months of Follow-up from NHANES Mobile Examination Center (MEC) Date
+-   `CYCLE`: Survey cycle
+
+The NHANES datasets have the following variables:
+
+-   `SEQN`: Respondent sequence number
+-   `CYCLE`: Survey cycle
+-   `SDMVSTRA`: Masked variance pseudo-stratum
+-   `SDMVPSU`: Masked variance pseudo-PSU
+-   `WTMEC2YR`: Full sample 2-year MEC exam weight
+-   `RIDSTATR`: Interview/examination status
+-   `RIDAGEYR`: Age in years at screening
+-   `RIAGENDR`: Gender
+-   `DMDEDUC2`: Education level (adults 20+)
+-   `INDFMPIR`: Family monthly poverty income ratio
+-   `RIDRETH1`: Race/ethnicity
+-   `DMDMARTL`: Marital status
+-   `SMOKING_HARMONIZED`: Harmonized smoking variable \[SMQ020/SMQ040\]
+-   `BPQ020`: Ever told had high blood pressure
+-   `LIPIDEM_HARMONIZED`: Lipidemia harmonized \[BPQ060/BPQ080\]
+-   `MCQ160F`: Ever told you had a stroke
+-   `MCQ160E`: Ever told you had a heart attack
+-   `DIQ010`: Doctor told you have diabetes
+-   `MCQ160B`: Ever told you had congestive heart failure
+-   `PULMOND_HARMONIZED`: Harmonized pulmonary condition variable \[MCQ160G/MCQ160K/MCQ160O\]
+-   `MCQ160L`: Ever told you had liver condition
+-   `MCQ160A`: Ever told you had arthritis
+-   `KIDNEYD_HARMONIZED`: Harmonized kidney disease variable \[KIQ020/KIQ022\]
+-   `MCQ220`: Ever told you had cancer or malignancy
+-   `ANYHOSP_INLASTYEAR`: Harmonized indicator of any hospital visit in last year \[HUD070/HUQ070/HUQ071\]
+-   `HUQ090`: Seen a mental health professional in past year
+-   `HUQ010`: General health condition \[Excellent/Very Good/Good/Fair/Poor\]
+-   `PFQ090`: Last 12 months, received care at emergency room
+-   `REGULAR_EDCARE`: Harmonized type or place most often go for healthcare \[HUQ040/HUQ041\]
+-   `HUQ020`: Health condition compared to a year ago
+-   `NUMHOSP_INLASTYEAR`: Harmonized number of hospitalizations in last year \[HUD080/HUQ080\]
+-   `TAKERX_INLASTMONTH`: Harmonized taken prescription/medicine in past month \[RDX030/RDXUSE\]
+-   `benzodiazepines`: Any benzodiazepines reported, harmonized from RDX/RDX_DRUG data tables
+-   `opioids`: Any opioids reported, harmonized from RDX/RDX_DRUG data tables
+-   `ssris`: Any ssris reported, harmonized from RDX/RDX_DRUG data tables
+-   `antidepressants`: Any anti-depressants (SNRIs, MAOIs, or TCAs) reported, harmonized from RDX/RDX_DRUG data tables
+-   `antidepres_othr`: Any other anti-depressants reported, harmonized from RDX/RDX_DRUG data tables
+-   `antipsychotics`: Any anti-psychotics reported, harmonized from RDX/RDX_DRUG data tables
+-   `analgesics`: Any analgesics reported, harmonized from RDX/RDX_DRUG data tables
+-   `muscle_relax`: Any muscle relaxants reported, harmonized from RDX/RDX_DRUG data tables
+-   `anticonvulsant`: Any anti-convulsants reported, harmonized from RDX/RDX_DRUG data tables
+-   `hormonalagents`: Any hormonal agents reported, harmonized from RDX/RDX_DRUG data tables
+-   `gastrointestin`: Any gastrointestinal agents reported, harmonized from RDX/RDX_DRUG data tables
+-   `cardi_metab_ag`: Any cardiac or metabolic medications reported, harmonized from RDX/RDX_DRUG data tables
+-   `resp_antihist`: Any respiratory medicators or antihistamines reported, harmonized from RDX/RDX_DRUG data tables
+-   `cns_morethan2`: \> 2 CNS medications reported, harmonized from RDX/RDX_DRUG data tables
+-   `ncns_lessthan5`: \< 5 NCNS medications reported, harmonized from RDX/RDX_DRUG data tables
+-   `REGULAR_DRINKING`: Harmonized regular drinker status \[ALQ100/ALD100/ALQ110/ALQ120U/ALQ120Q\]
+
+We refer this [OER website](https://ehsanx.github.io/EpiMethods/accessing7.html) for guidance on downloading mortality data and linking to NHANES. You can also review the R script (`xu-et-al-2020-data-preparation.r`) to see how the variables listed above were downloaded and derived.
+
+## 1(b) Merging datasets
+
+Merge the mortality datasets with the NHANES datasets.
+
+**Hint:**
+
+-   `SEQN` is the unique identifier in the datasets.
+-   Make sure that your merged dataset includes information for 82,091 individuals.
+
+```{r}
+# your code here
+
+# Mortality data
+# dat.mort <- rbind(..
+
+# NHANES
+# dat.nhanes <- 
+
+# Merging
+# dat <- merge(..
+```
+
+## 1(c) Subsetting according to eligibility
+
+Subset the dataset according to the eligibility criteria / restriction specified in the paper (see Figure 1 of the paper). The authors dropped individuals:
+
+-   Aged less than 20 years
+-   Did not participate in mobile examination interviews
+-   Missing prescription medication data or refused to answer
+-   Missing data on other covariates (medical comorbidities, alcohol, smoking, blood pressure, and health care use)
+-   Died within 1 year of follow-up
+-   Were not taking SSRIs, benzodiazepines, or opioids
+
+**Hint 1:** The following variables could be used to subset based on eligibility:
+
+-   `RIDAGEYR` for age
+-   `RIDSTATR` for mobile examination interviews
+-   `TAKERX_INLASTMONTH` for prescription medication
+-   The following for the missing covariate information: `BPQ020`, `LIPIDEM_HARMONIZED`, `MCQ160F`, `MCQ160E`, `DIQ010`, `MCQ160B`, `PULMOND_HARMONIZED`, `MCQ160L`, `MCQ160A`, `KIDNEYD_HARMONIZED`, `MCQ220`, `SMOKING_HARMONIZED`, `REGULAR_DRINKING`, `REGULAR_EDCARE`\
+-   `mortstat` and `permth_int` for death within 1 year of follow-up
+-   `benzodiazepines`, `ssris`, `opioids` for Benzodiazepine use with or without opioid use
+
+**Hint 2:** After subsetting, the analytic dataset contains information for 4,049 individuals (do not match with the paper)
+
+```{r}
+# your code here
+
+# 20+
+# dat1 <- subset(dat, ..
+
+# Did not participate in mobile examination interviews
+# dat2 <- subset(dat1, ...
+
+# Missing prescription medication data or refused to answer
+# dat3 <- subset(dat2, ...
+
+
+# Missing data on other covariates 
+# dat4 <- ...
+
+# Died within 1 y of follow-up
+# dat5 <- subset(dat4, ...
+
+# Were not taking SSRIs, benzodiazepines, or opioids
+# dat6 <- subset(dat5, 
+```
+
+## 1(d) Creating the exposure variable
+
+Create the exposure variable (Benzodiazepine Use With or Without Opioid Use).
+
+**Hint:** It's a categorical variable with four categories as shown in Figure 1 or Table 1 of the paper. If your analytic sample size is 4,049, you could have the following frequencies:
+
+| exposure          | n     |
+|:------------------|:------|
+| BZDs plus opioids | 408   |
+| BZDs only         | 961   |
+| Opioids only      | 1,434 |
+| Neither           | 1,246 |
+
+```{r}
+# your code here
+
+# library(dplyr)
+# dat6 <- dat6 %>% 
+#   mutate(exposure = case_when(...
+```
+
+# Question II: \[30% grade\]
+
+## 2(a) Recoding
+
+Recode the confounders/covariates in shown in Table 1, except for the following:
+
+-   Antimicrobial drugs
+-   $<5$ Non-CNS medications
+-   Disabled
+
+The main reason these four variables were not considered is that the authors provided insufficient detail in the main manuscript or supplemental materials to derive these variables. An example of recoding some of the variables is given below. But you can use other functions as well.
+
+```{r,warning=FALSE,message=FALSE, eval=FALSE}
+library(car)
+
+# Age
+#summary(dat6$RIDAGEYR)
+dat6$age <- dat6$RIDAGEYR
+dat6$age.cat <- car::recode(dat6$RIDAGEYR, " 60:70 = '60-70y'; else = 'Others' ", 
+                            as.factor = T)
+dat6$age.cat <- relevel(dat6$age.cat, ref = "Others")
+table(dat6$age.cat, useNA = "always")
+  
+# Male
+table(dat6$RIAGENDR, useNA = "always")
+dat6$gender <- relevel(dat6$RIAGENDR, ref = "Female")
+
+# College graduate 
+#table(dat6$DMDEDUC2, useNA = "always")
+dat6$education <- car::recode(dat6$DMDEDUC2, " c('College Graduate or above', 
+                           'College graduate or above') = 'College graduate'; 
+                           c('Less Than 9th Grade', 
+                           '9-11th Grade (Includes 12th grade with no diploma)',
+                           'High School Grad/GED or Equivalent', 'Less than 9th grade', 
+                           '9-11th grade (Includes 12th grade with no diploma)', 
+                           'High school graduate/GED or equivalent',
+                           'Some College or AA degree', 'Some college or AA degree') = 
+                           'Less than college'; else = NA ", as.factor = T)
+dat6$education <- relevel(dat6$education, ref = "Less than college")
+table(dat6$education, useNA = "always")
+
+# Poverty to income ratio 
+# table(dat6$INDFMPIR, useNA = "always")
+## Your code here
+# dat6$poverty.ratio <- car::recode(dat6$INDFMPIR ...
+
+# White
+# table(dat6$RIDRETH1, useNA = "always")
+## Your code here
+# dat6$race <- car::recode(dat6$RIDRETH1,...
+
+# Partnered
+#table(dat6$DMDMARTL, useNA = "always")
+## Your code here
+# dat6$marital <- car::recode(dat6$DMDMARTL, ...
+table(dat6$marital, useNA = "always")
+
+# Smoking
+#table(dat6$SMOKING_HARMONIZED, useNA = "always")
+dat6$smoking <- car::recode(dat6$SMOKING_HARMONIZED, " c('Every day', 'Some days') = 
+                            'Yes'; c('LOGICAL SKIP', 'Not at all') = 'No';
+                            else = NA", as.factor = T)
+table(dat6$smoking, useNA = "always")
+
+# Hypertension
+# table(dat6$BPQ020, useNA = "always")
+## Your code here
+# dat6$hypertension <- car::recode(dat6$BPQ020, ...
+table(dat6$hypertension, useNA = "always")
+
+# Hyperlipidemia
+#table(dat6$LIPIDEM_HARMONIZED, useNA = "always")
+dat6$hyperlipidemia <- car::recode(dat6$LIPIDEM_HARMONIZED, " 'No' = 'No';
+                                   'Yes' = 'Yes'; else = NA", as.factor = T)
+table(dat6$hyperlipidemia, useNA = "always")
+
+# Stroke
+#table(dat6$MCQ160F, useNA = "always")
+dat6$stroke <- car::recode(dat6$MCQ160F, " 'No' = 'No'; 'Yes' = 'Yes'; else = NA", 
+                           as.factor = T)
+table(dat6$stroke, useNA = "always")
+
+# Myocardial infarction
+#table(dat6$MCQ160E, useNA = "always")
+dat6$heart.attack <- car::recode(dat6$MCQ160E, " 'No' = 'No'; 'Yes' = 'Yes'; else = NA", 
+                                 as.factor = T)
+table(dat6$heart.attack, useNA = "always")
+
+# Diabetes
+#table(dat6$DIQ010, useNA = "always")
+dat6$diabetes <- car::recode(dat6$DIQ010, " c('No', 'Borderline') = 'No'; 
+                             'Yes' = 'Yes'; else = NA", as.factor = T)
+table(dat6$diabetes, useNA = "always")
+
+# Congestive heart failure
+#table(dat6$MCQ160B, useNA = "always")
+dat6$heart.failure <- car::recode(dat6$MCQ160B, " 'No' = 'No'; 'Yes' = 'Yes';
+                                  else = NA", as.factor = T)
+table(dat6$heart.failure, useNA = "always")
+
+# Pulmonary	disease	
+#table(dat6$PULMOND_HARMONIZED, useNA = "always")
+dat6$pulmonary.disease <- car::recode(dat6$PULMOND_HARMONIZED, " 'No' = 'No'; 
+                                      'Yes' = 'Yes'; else = NA", as.factor = T)
+table(dat6$pulmonary.disease, useNA = "always")
+
+# Liver	disease	
+#table(dat6$MCQ160L, useNA = "always")
+dat6$liver.disease <- car::recode(dat6$MCQ160L, " 'No' = 'No'; 'Yes' = 'Yes'; 
+                                  else = NA", as.factor = T)
+table(dat6$liver.disease, useNA = "always")
+
+# Arthritis		
+#table(dat6$MCQ160A, useNA = "always")
+dat6$arthritis <- car::recode(dat6$MCQ160A, " 'No' = 'No'; 'Yes' = 'Yes'; 
+                              else = NA", as.factor = T)
+table(dat6$arthritis, useNA = "always")
+
+# Kidney	disease	
+#table(dat6$KIDNEYD_HARMONIZED, useNA = "always")
+dat6$kidney.disease <- car::recode(dat6$KIDNEYD_HARMONIZED, " 'No' = 'No'; 
+                                   'Yes' = 'Yes'; else = NA", as.factor = T)
+table(dat6$kidney.disease, useNA = "always")
+
+# Cancer		
+#table(dat6$MCQ220, useNA = "always")
+dat6$cancer <- car::recode(dat6$MCQ220, " 'No' = 'No'; 'Yes' = 'Yes'; else = NA",
+                           as.factor = T)
+table(dat6$cancer, useNA = "always")
+
+# Regular	drinking	
+#table(dat6$REGULAR_DRINKING, useNA = "always")
+dat6$regular.drinking <- car::recode(dat6$REGULAR_DRINKING, " 'No' = 'No'; 
+                                     'Yes' = 'Yes'; else = NA", as.factor = T)
+table(dat6$regular.drinking, useNA = "always")
+
+# Antimicrobial	drugs	- not available
+# table(dat6$antimicrobial.drugs, useNA = "always")
+
+# Hormonal	agents	
+table(dat6$hormonalagents, useNA = "always")
+
+# Anticonvulsants		
+table(dat6$anticonvulsant, useNA = "always")
+
+# Any	analgesics	
+table(dat6$analgesics, useNA = "always")
+
+# Muscle	relaxants	
+table(dat6$muscle_relax, useNA = "always")
+
+# Gastrointestinal	agents	
+table(dat6$gastrointestin, useNA = "always")
+
+# Cardiac	or	metabolic medications		
+table(dat6$cardi_metab_ag, useNA = "always")
+
+# Respiratory	medications	or antihistamines		
+table(dat6$resp_antihist, useNA = "always")
+
+# >2 CNS	medications
+table(dat6$cns_morethan2, useNA = "always")
+
+# <5 Non-CNS	medications 
+table(dat6$ncns_lessthan5, useNA = "always")
+
+# Antidepressants	(SNRIs,	MAOIs,	or	TCAs)
+table(dat6$antidepressants, useNA = "always")
+
+# Other	antidepressants	
+table(dat6$antidepres_othr, useNA = "always")
+
+# Antipsychotics		
+table(dat6$antipsychotics, useNA = "always")
+
+# Any	hospitalization	in <1y
+#table(dat6$ANYHOSP_INLASTYEAR, useNA = "always")
+dat6$hospitalization.any <- car::recode(dat6$ANYHOSP_INLASTYEAR, " 'No' = 'No'; 
+                                     'Yes' = 'Yes'; else = NA", as.factor = T)
+table(dat6$hospitalization.any, useNA = "always")
+
+# Any	psychiatric	visit in <1y
+#table(dat6$HUQ090, useNA = "always")
+dat6$hospitalization.psy <- car::recode(dat6$HUQ090, " 'No' = 'No'; 'Yes' = 'Yes'; 
+                                        else = NA", as.factor = T)
+table(dat6$hospitalization.psy, useNA = "always")
+
+# Good current	health
+#table(dat6$HUQ010, useNA = "always")
+dat6$good.current.health <- car::recode(dat6$HUQ010, " c('Excellent,', 'Very good,',
+                                        'Good,') = 'Yes'; c('Fair, or', 'Poor?') = 'No';
+                                        else = NA", as.factor = T)
+table(dat6$good.current.health, useNA = "always")
+
+# Require	special	health equipment		
+#table(dat6$PFQ090, useNA = "always")
+dat6$special.health <- car::recode(dat6$PFQ090, " 'No' = 'No'; 'Yes' = 'Yes'; 
+                                   else = NA", as.factor = T)
+table(dat6$special.health, useNA = "always")
+
+# Disabled - not available		
+# table(dat6$disabled, useNA = "always")
+
+# Regular	ED	care
+#table(dat6$REGULAR_EDCARE, useNA = "always")
+dat6$regular.ED.care <- car::recode(dat6$REGULAR_EDCARE, " 'Hospital emergency room' = 
+                                    'Yes'; else = 'No'",  as.factor = T)
+table(dat6$regular.ED.care, useNA = "always")
+
+# Worsening	health	
+#table(dat6$HUQ020, useNA = "always")
+dat6$worsening.health <- car::recode(dat6$HUQ020, " c('Better,', 'About the same?') = 'No'; 
+                                     'Worse, or' = 'Yes'; else = NA", as.factor = T)
+table(dat6$worsening.health, useNA = "always")
+
+# >2 Overnight	hospitalizations in <1y
+#table(dat6$NUMHOSP_INLASTYEAR, useNA = "always")
+dat6$hospitalization.3plus <- car::recode(dat6$NUMHOSP_INLASTYEAR, " c('0', '1', '2') = 'No'; 
+                                        c('3', '4', '5', '6 or more') = 'Yes';
+                                        else = NA", as.factor = T)
+table(dat6$hospitalization.3plus, useNA = "always")
+```
+
+## 2(b) Table 1
+
+Reproduce Table 1 presented in the above paper. Please note that the numbers in your Table 1 will differ from Table 1 of the paper. But the numbers could look as follows:
+
+| Characteristic                   | Overall       | BZDs plus opioids | BZDs only     | Opioids only  | Neither       |
+|----------------|------------|------------|------------|------------|------------|
+| n                                | 4049          | 408               | 961           | 1434          | 1246          |
+| age (mean (SD))                  | 53.47 (17.06) | 55.13 (14.86)     | 56.34 (17.06) | 51.54 (17.23) | 52.94 (17.21) |
+| age.cat = 60-70y (%)             | 835 (20.6)    | 84 (20.6)         | 190 (19.8)    | 306 (21.3)    | 255 (20.5)    |
+| gender = Male (%)                | 1423 (35.1)   | 157 (38.5)        | 311 (32.4)    | 591 (41.2)    | 364 (29.2)    |
+| education = College graduate (%) | 749 (18.5)    | 46 (11.3)         | 193 (20.1)    | 208 (14.5)    | 302 (24.2)    |
+| poverty.ratio = More than 2 (%)  | 1980 (51.9)   | 154 (39.8)        | 491 (54.3)    | 626 (46.2)    | 709 (60.7)    |
+| race = White (%)                 | 2540 (62.7)   | 280 (68.6)        | 656 (68.3)    | 735 (51.3)    | 869 (69.7)    |
+| marital = Partnered (%)          | 2240 (55.9)   | 223 (54.9)        | 517 (54.4)    | 780 (55.1)    | 720 (58.3)    |
+| smoking = Yes (%)                | 1066 (26.3)   | 157 (38.5)        | 227 (23.6)    | 431 (30.1)    | 251 (20.1)    |
+| hypertension = Yes (%)           | 1954 (48.3)   | 225 (55.1)        | 457 (47.6)    | 693 (48.3)    | 579 (46.5)    |
+| hyperlipidemia = Yes (%)         | 1723 (42.6)   | 191 (46.8)        | 442 (46.0)    | 540 (37.7)    | 550 (44.1)    |
+| stroke = Yes (%)                 | 263 ( 6.5)    | 39 ( 9.6)         | 56 ( 5.8)     | 82 ( 5.7)     | 86 ( 6.9)     |
+| heart.attack = Yes (%)           | 279 ( 6.9)    | 38 ( 9.3)         | 64 ( 6.7)     | 95 ( 6.6)     | 82 ( 6.6)     |
+| diabetes = Yes (%)               | 645 (15.9)    | 63 (15.4)         | 133 (13.8)    | 252 (17.6)    | 197 (15.8)    |
+| heart.failure = Yes (%)          | 232 ( 5.7)    | 36 ( 8.8)         | 53 ( 5.5)     | 77 ( 5.4)     | 66 ( 5.3)     |
+| pulmonary.disease = Yes (%)      | 578 (14.3)    | 95 (23.3)         | 117 (12.2)    | 214 (14.9)    | 152 (12.2)    |
+| liver.disease = Yes (%)          | 242 ( 6.0)    | 36 ( 8.8)         | 59 ( 6.1)     | 88 ( 6.1)     | 59 ( 4.7)     |
+| arthritis = Yes (%)              | 1989 (49.1)   | 290 (71.1)        | 417 (43.4)    | 791 (55.2)    | 491 (39.4)    |
+| kidney.disease = Yes (%)         | 191 ( 4.7)    | 27 ( 6.6)         | 44 ( 4.6)     | 72 ( 5.0)     | 48 ( 3.9)     |
+| cancer = Yes (%)                 | 571 (14.1)    | 81 (19.9)         | 154 (16.0)    | 190 (13.2)    | 146 (11.7)    |
+| regular.drinking = Yes (%)       | 1219 (30.1)   | 109 (26.7)        | 301 (31.3)    | 395 (27.5)    | 414 (33.2)    |
+| hormonalagents = Yes (%)         | 1004 (24.8)   | 116 (28.4)        | 265 (27.6)    | 282 (19.7)    | 341 (27.4)    |
+| anticonvulsant = Yes (%)         | 822 (20.3)    | 187 (45.8)        | 399 (41.5)    | 153 (10.7)    | 83 ( 6.7)     |
+| analgesics = Yes (%)             | 2167 (53.5)   | 403 (98.8)        | 176 (18.3)    | 1388 (96.8)   | 200 (16.1)    |
+| muscle_relax = Yes (%)           | 394 ( 9.7)    | 96 (23.5)         | 53 ( 5.5)     | 206 (14.4)    | 39 ( 3.1)     |
+| gastrointestin = Yes (%)         | 1055 (26.1)   | 163 (40.0)        | 257 (26.7)    | 352 (24.5)    | 283 (22.7)    |
+| cardi_metab_ag = Yes (%)         | 2205 (54.5)   | 259 (63.5)        | 559 (58.2)    | 716 (49.9)    | 671 (53.9)    |
+| resp_antihist = Yes (%)          | 952 (23.5)    | 151 (37.0)        | 150 (15.6)    | 444 (31.0)    | 207 (16.6)    |
+| cns_morethan2 = Yes (%)          | 635 (15.7)    | 238 (58.3)        | 127 (13.2)    | 243 (16.9)    | 27 ( 2.2)     |
+| antidepressants = Yes (%)        | 208 ( 5.1)    | 52 (12.7)         | 88 ( 9.2)     | 51 ( 3.6)     | 17 ( 1.4)     |
+| antidepres_othr = Yes (%)        | 472 (11.7)    | 71 (17.4)         | 119 (12.4)    | 135 ( 9.4)    | 147 (11.8)    |
+| antipsychotics = Yes (%)         | 193 ( 4.8)    | 26 ( 6.4)         | 68 ( 7.1)     | 25 ( 1.7)     | 74 ( 5.9)     |
+| hospitalization.any = Yes (%)    | 905 (22.4)    | 121 (29.7)        | 206 (21.4)    | 376 (26.2)    | 202 (16.2)    |
+| hospitalization.psy = Yes (%)    | 856 (21.1)    | 95 (23.3)         | 271 (28.2)    | 155 (10.8)    | 335 (26.9)    |
+| good.current.health = Yes (%)    | 2527 (62.4)   | 173 (42.4)        | 627 (65.2)    | 824 (57.5)    | 903 (72.5)    |
+| special.health = Yes (%)         | 793 (19.6)    | 144 (35.3)        | 139 (14.5)    | 337 (23.5)    | 173 (13.9)    |
+| regular.ED.care = Yes (%)        | 98 ( 2.4)     | 13 ( 3.2)         | 15 ( 1.6)     | 57 ( 4.0)     | 13 ( 1.0)     |
+| worsening.health = Yes (%)       | 865 (21.4)    | 131 (32.1)        | 197 (20.5)    | 359 (25.1)    | 178 (14.3)    |
+| hospitalization.3plus = Yes(%)   | 124 ( 3.1)    | 22 ( 5.4)         | 21 ( 2.2)     | 48 ( 3.3)     | 33 ( 2.6)     |
+
+```{r,warning=FALSE,message=FALSE}
+# your code here
+
+library(tableone)
+vars <- c("age", "age.cat", "gender", "education", "poverty.ratio", "race", 
+          "marital", "smoking", "hypertension", "hyperlipidemia", "stroke", 
+          "heart.attack", "diabetes", "heart.failure", "pulmonary.disease", 
+          "liver.disease", "arthritis", "kidney.disease", "cancer", 
+          "regular.drinking", #"antimicrobial.drugs", 
+          "hormonalagents", "anticonvulsant", "analgesics", "muscle_relax", 
+          "gastrointestin", "cardi_metab_ag", "resp_antihist", "cns_morethan2", 
+          #"ncns_lessthan5", 
+          "antidepressants", "antidepres_othr", "antipsychotics", 
+          "hospitalization.any", "hospitalization.psy", "good.current.health",
+          "special.health", #"disabled",
+          "regular.ED.care", "worsening.health", "hospitalization.3plus"
+          )
+# tab1 <- CreateTableOne(...
+```
+
+# Question III: \[20% grade\]
+
+## 3(a) Regression
+
+Consider all-cause mortality as a binary variable. Run logistic regression model for finding the association between Benzodiazepine Use With or Without Opioid Use (the exposure variable created in 1(d)) and all-cause mortality (the outcome variable). Adjust the model for three confounders: sex, age, and race/ethnicity. Also, use the `Neither` as the reference category for the exposure variable. Please note that we will not be using survey features (e.g., PSU, strata, weight) in this exercise. However, we will learn how to utilize these survey features in the [Survey data analysis](https://ehsanx.github.io/EpiMethods/surveydata.html) lab.
+
+```{r}
+# your code here
+
+# fit <- glm(
+```
+
+## 3(b) Reporting odds ratio
+
+Report the odds ratios and associated confidence intervals.
+
+```{r,warning=FALSE,message=FALSE}
+# your code here
+
+# library(Publish)
+```
+
+# Knit your file
+
+Please knit your file once you finished and submit the knitted PDF or doc file. Please also fill-up the following table:
+
+**Group name**: \*\* xyz \*\*
+
+| Student initial   | \% contribution |
+|:------------------|:----------------|
+| Student 1 initial | x%              |
+| Student 2 initial | x%              |
+| Student 3 initial | x%              |

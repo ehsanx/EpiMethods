@@ -1,0 +1,267 @@
+## Exercise 1 Solution (A) {.unnumbered}
+
+```{r chunkSetup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(car)
+library(tableone)
+library(Publish)
+```
+
+We will use the following article:
+
+Palis, Marchand & Oviedo-Joekes. (2020). The relationship between sense of community belonging and self-rated mental health among Canadians with mental or substance use disorders. Journal of Mental Health, 29(2): 168-175. DOI: [10.1080/09638237.2018.1437602](https://www.tandfonline.com/doi/abs/10.1080/09638237.2018.1437602?journalCode=ijmh20) (available in the "Library Online Course Reserves": [open link](https://www.researchgate.net/profile/Heather_Palis/publication/323136807_The_relationship_between_sense_of_community_belonging_and_self-rated_mental_health_among_Canadians_with_mental_or_substance_use_disorders/links/5a96ff210f7e9ba42974c0dd/The-relationship-between-sense-of-community-belonging-and-self-rated-mental-health-among-Canadians-with-mental-or-substance-use-disorders.pdf).
+
+-   Download the [CCHS MH topical index](https://gsg.uottawa.ca/data/teaching/escc-cchs/fmgd_pumf/2012/cchs_mh_topical_index.pdf)
+-   Download the [CCHS MH Data Dictionary](https://gsg.uottawa.ca/data/teaching/escc-cchs/fmgd_pumf/2012/cchs_mh_datadictionary.pdf)
+
+# Question 1: \[60% grade\]
+
+## 1(a) Importing dataset
+
+```{r}
+# Importing dataset
+load("Data/accessing/cchsMH.RData")
+```
+
+## 1(b) Subsetting according to eligibility
+
+Subset the dataset according to the eligibility criteria / restriction specified in the paper
+
+-   Identify the variable needed for eligibility criteria
+
+**Hint**
+
+-   Read the first paragraph of **Analytic sample** (page 2) for the eligibility criteria
+-   Eligibility criteria was determined based on only **one** variable. Only work with 'YES' category.
+
+```{r}
+# Subsetting according to eligibility
+dat <- subset(cmh, MHPFY=="YES")
+```
+
+## 1(c) Retaining necessary variables
+
+In the dataset, retain only the variables associated with outcome measure, explanatory variable, potential confounders and survey weight. There should be eight variables (one outcome, one exposure, five confounders, and one survey weight).
+
+Here are the steps:
+
+-   Identify the outcome variable
+
+-   Identify the explanatory variable
+
+-   Identify the potential confounders
+
+-   Identify the survey weight variable
+
+-   **Hint**
+
+    1.  Read
+
+    -   first and second paragraphs of **Study variables** for the outcome, explanatory and confounding variables
+    -   third paragraph of the **Statistical analyses** for the survey weights variable.
+
+    2.  There were **five** potential confounders.
+    3.  Potentially useful functions for this exercise:
+
+    -   [%in%](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/match)
+    -   [levels](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/levels)
+    -   [recode](https://rdrr.io/cran/car/man/recode.html)
+    -   [subset](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/subset)
+    -   [as.factor](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/factor)
+    -   [relevel](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/relevel)
+    -   or [dplyr ways](https://ehsanx.github.io/intro2R/data-analysis-with-dplyr.html): [filter](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/filter), [select](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/select)
+
+```{r}
+dat <- with(dat, data.frame(srmh = SCR_082, # Outcome - SMRH
+                            community = GEN_10, # explanatory - community belonging
+                            sex = DHH_SEX, # sex
+                            age = DHHGAGE, # age
+                            race = SDCGCGT, # respondent's racial identity
+                            income = INCG7, # main source of income
+                            help = PNC_01A, # received help for problems
+                            weight = WTS_M)) # sampling weight
+```
+
+## 1(e) Creating analytic dataset
+
+Outcome variable has a category 'NOT STATED', but for our analysis, we will omit anyone associated with this category. Similarly, for explanatory variable, we have categories such as DON'T KNOW, REFUSAL and NOT STATED. We will omit anyone with these categories.
+
+-   Assign missing values for categories such as DON'T KNOW, REFUSAL and NOT STATED.
+-   Recode the variables as shown in Table 1 in the article. You can use any function/package of your choice. Here is an example (but feel free to use other functions. In R there are many other ways to do this same task.
+
+```{r}
+## your code here
+# levels(your.data.frame$your.age.variable) <- 
+#   list("15 to 24 years" = c("15 TO 19 YEARS", "20 TO 24 YEARS"),
+#        "25 to 34 years" = c("25 TO 29 YEARS", "30 TO 34 YEARS"),
+#        "35 to 44 years" = c("35 TO 39 YEARS", "40 TO 44 YEARS"),
+#        "45 to 54 years" = c("45 TO 49 YEARS", "50 TO 54 YEARS"),
+#        "55 to 64 years" = c("55 TO 59 YEARS", "60 TO 64 YEARS"),
+#        "65 years or older" = c("65 TO 69 YEARS", "70 TO 74 YEARS", 
+#        "75 TO 79 YEARS", "80 YEARS OR MORE"))
+
+# Outcome variable: Self-rated Mental Health
+#table(dat$srmh, useNA = "always")
+dat$srmh <- car::recode(dat$srmh, " c('FAIR','POOR') = 'Poor or Fair'; 
+                        'GOOD' = 'Good'; c('EXCELLENT', 'VERY GOOD') = 
+                        'Very good or excellent'; else = NA ")
+dat$srmh <- factor(dat$srmh, levels=c("Poor or Fair", "Good", "Very good or excellent"))
+
+# Explanatory variable: Community belonging
+#table(dat$community, useNA = "always")
+dat$community <- recode(dat$community, recodes = " 'VERY STRONG' = 'Very strong';
+                        'SOMEWHAT STRONG' = 'Somewhat strong'; 'SOMEWHAT WEAK' = 
+                        'Somewhat weak'; 'VERY WEAK' = 'Very weak'; else = NA ")
+dat$community <- factor(dat$community, levels = c("Very weak", "Somewhat weak",
+                                                  "Somewhat strong", "Very strong"))
+
+# Sex
+#table(dat$sex, useNA = "always")
+dat$sex <- recode(dat$sex, recodes = "'MALE' = 'Males'; 'FEMALE' = 'Females'; 
+                  else = NA")
+
+# Age group
+#table(dat$age, useNA = "always")
+levels(dat$age) <- list("15 to 24 years" = c("15 TO 19 YEARS", "20 TO 24 YEARS"),
+                        "25 to 34 years" = c("25 TO 29 YEARS", "30 TO 34 YEARS"),
+                        "35 to 44 years" = c("35 TO 39 YEARS", "40 TO 44 YEARS"),
+                        "45 to 54 years" = c("45 TO 49 YEARS", "50 TO 54 YEARS"),
+                        "55 to 64 years" = c("55 TO 59 YEARS", "60 TO 64 YEARS"),
+                        "65 years or older" = c("65 TO 69 YEARS", "70 TO 74 YEARS", 
+                                                "75 TO 79 YEARS", "80 YEARS OR MORE"))
+
+# Race/Ethnicity
+#table(dat$race, useNA = "always")
+dat$race <- recode(dat$race, " 'WHITE'='White'; 'NON-WHITE'='Non-white'; else=NA ")
+
+# Income
+#table(dat$income, useNA = "always") 
+levels(dat$income) <- list("Employment Income" = "EMPLOYMENT INC.",
+                           "Worker's Compensation" = "EI/WORKER'S COMP",
+                           "Senior Benefits" = "SENIOR BENEFITS", 
+                           "Other" = "OTHER",
+                           "Not applicable" = "NOT APPLICABLE")
+```
+
+## 1(f) Number of columns and variable names
+
+Report the number of columns in your analytic dataset, and the variable names.
+
+```{r}
+# Number of columns
+ncol(dat)
+
+# Variable names
+names(dat)
+```
+
+# Question 2: Table 1 \[20% grade\]
+
+Reproduce Table 1 presented in the article (or see below). Omit the 'Main source of income' variable from the table. The table you produce should report numbers as follows, with all columns as shown in the table. In other words, the numbers should match.
+
+| Self-rated Mental Health Variable | Total n(%)  | Poor or Fair n(%) | Good n(%)   | Very good or excellent n(%) |
+|-----------------------------------|-------------|-------------------|-------------|-----------------------------|
+| **Study sample**                  | 2628 (100)  | 1002 (38.1)       | 885 (33.7)  | 741 (28.2)                  |
+| **Community belonging**           |             |                   |             |                             |
+| \- Very weak                      | 480 (18.3)  | 282 (28.1)        | 118 (13.3)a | 80 (10.8)a                  |
+| \- Somewhat weak                  | 857 (32.6)  | 358 (35.7)        | 309 (34.9)  | 190 (25.6)                  |
+| \- Somewhat strong                | 1005 (38.2) | 288 (28.7)        | 362 (40.9)  | 355 (47.9)                  |
+| \- Very strong                    | 286 (10.9)  | 74 (7.4)a         | 96 (10.8)a  | 116 (15.7)a                 |
+| **Sex**                           |             |                   |             |                             |
+| \- Females                        | 1407 (53.5) | 616 (61.5)        | 487 (55.0)  | 304 (41.0)                  |
+| \- Males                          | 1221 (46.5) | 386 (38.5)        | 398 (45.0)  | 437 (59.0)                  |
+| **Age group**                     |             |                   |             |                             |
+| \- 15 to 24 years                 | 740 (28.2)  | 191 (19.1)        | 264 (29.8)  | 285 (38.5)                  |
+| \- 25 to 34 years                 | 475 (18.1)  | 141 (14.1)        | 167 (18.9)  | 167 (22.5)                  |
+| \- 35 to 44 years                 | 393 (15.0)  | 185 (18.5)        | 119 (13.4)a | 89 (12.0)a                  |
+| \- 45 to 54 years                 | 438 (16.6)  | 220 (22.0)        | 139 (15.7)  | 79 (10.7)a                  |
+| \- 55 to 64 years                 | 379 (14.4)  | 198 (19.7)        | 113 (12.8)a | 68 (9.2)a                   |
+| \- 65 years or older              | 203 (7.7)   | 67 (6.6)a         | 83 (8.4)a   | 53 (7.1)b                   |
+| **Race/Ethnicity**                |             |                   |             |                             |
+| \- Non-white                      | 458 (17.4)  | 184 (18.4)        | 140 (15.8)  | 134 (18.1)                  |
+| \- White                          | 2170 (82.6) | 818 (81.6)        | 745 (84.2)  | 607 (81.9)                  |
+| **Main source of income**         |             |                   |             |                             |
+| \- Employment Income\^d           | 1054 (40.1) | 289 (28.8)        | 386 (43.6)  | 379 (51.1)                  |
+| \- Worker's Compensation\^e       | 160 (6.1)   | 91 (9.1)a         | 44 (5.0)b   | 25 (3.4)c                   |
+| \- Senior Benefits\^f             | 134 (5.1)   | 57 (5.7)a         | 42 (4.7)b   | 35 (4.7)                    |
+| \- Other\^g                       | 184 (7.0)   | 82 (8.2)a         | 60 (6.8)a   | 42 (5.7)b                   |
+| \- Not applicable\^h              | 851 (32.4)  | 402 (40.1)        | 263 (29.7)  | 186 (25.1)                  |
+| \- Not Stated\^i                  | 245 (9.3)   | 81 (8.1)a         | 90 (10.2)a  | 74 (10.0)                   |
+
+$^a$ Coefficient of variation between 16.6 and 25.0%. $^b$ Coefficient of variation between 25.1 and 33.3%. $^c$ Coefficient of variation \> 33.3%. $^d$ Employment Income: Wages/salaries or self-employment. $^e$ Worker's compensation: Employment insurance or worker's compensation or social assistance/welfare. $^f$ Senior Benefits: Benefits from Canada or Quebec Pension Plan or job related retirement pensions, superannuation and annuities or RRSP/RRIF of Old Age Security and Guaranteed Income Supplement. $^g$ Other: Dividends/interest or child tax benefit or child support or alimony or other or no income. $^h$ Not applicable: Respondents who live in a household with only one person. The income variable "main source of personal income" is applicable only to those that live in a household of more than one person. $^i$ Not Stated: Question was not answered (don't know, refusal, not stated).
+
+```{r,warning=FALSE,message=FALSE}
+# Drop main source of income
+dat <- dplyr::select(dat,-c(income))
+
+# Drop received help for problems 
+dat <- dplyr::select(dat,-c(help))
+```
+
+```{r,warning=FALSE,message=FALSE}
+# Complete case data
+dat <- as.data.frame(na.omit(dat))
+
+vars <- c("community", "sex", "age", "race")
+
+# Summary table
+tab1 <- CreateTableOne(vars = vars, data = dat, strata ="srmh", includeNA = F, test = F, 
+                       addOverall = T)
+#print(tab1, showAllLevels = T)
+
+kableone <- function(x, ...) {
+   capture.output(x <- print(x, showAllLevels= TRUE, padColnames = TRUE, 
+                             insertLevel = TRUE))
+   knitr::kable(x, ...)
+}
+kableone(tab1, printToggle = FALSE)
+```
+
+# Question 3: \[20% grade\]
+
+## 3(a) Subset
+
+Subset the dataset excluding 'Very good or excellent' responses from the self-rated mental health variable
+
+```{r}
+dat3 <- dplyr::filter(dat, srmh != "Very good or excellent")
+```
+
+## 3(b) Recode
+
+Recode self-rated mental health variable and make it a binary variable: 'Good' vs. 'Poor' (simplifying category labels only). Convert that variable to a factor variable with 'Poor' being the reference level.
+
+```{r}
+dat3$srmh <- recode(dat3$srmh, recodes = " 'Poor or Fair' = 'Poor'; 'Good' = 'Good'; 
+                    else = NA", levels = c("Poor", "Good"))
+```
+
+## 3(c) Regression
+
+Run a logistic regression model for finding the relationship between community belonging (Reference: Very weak) and self-rated mental health (Reference: Poor) among respondents with mental or substance use disorders. Adjust the model for three confounders: sex, age, and race/ethnicity. Do not need to report summary of the model.
+
+```{r}
+fit <- glm(I(srmh=="Good") ~ community + sex + age + race, data = dat3, 
+           family = binomial)
+```
+
+## 3(d) Reporting odds ratio
+
+Report the odds ratios and associated confidence intervals. Publish or jtools package could be useful to report the odds ratios with confidence intervals.
+
+```{r,warning=FALSE,message=FALSE}
+require(Publish)
+publish(fit)
+```
+
+# Knit your file
+
+Please knit your file once you finished and submit the knitted PDF or doc file. Please also fill-up the following table:
+
+**Group name**: \*\* xyz \*\*
+
+| Student initial   | \% contribution |
+|:------------------|:----------------|
+| Student 1 initial | x%              |
+| Student 2 initial | x%              |
+| Student 3 initial | x%              |
