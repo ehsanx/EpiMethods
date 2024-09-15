@@ -1031,7 +1031,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>There are unmeasured factors (e.g., birth defects) that also influence both birthweight and infant mortality.</li>
 </ul>
 <p>We will set up this data generating process using <strong>simcausal</strong>.</p>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-2_2466450c103303d96cc410450430a4b6">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>D <span class="ot">&lt;-</span> <span class="fu">DAG.empty</span>()</span>
 <span id="cb2-2"><a href="#cb2-2"></a>D <span class="ot">&lt;-</span> D <span class="sc">+</span> </span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="fu">node</span>(<span class="st">"Smoking"</span>, <span class="at">distr =</span> <span class="st">"rbern"</span>, <span class="at">prob =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
@@ -1043,7 +1043,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="visualizing-the-dag" class="level4"><h4 class="anchored" data-anchor-id="visualizing-the-dag">Visualizing the DAG</h4>
 <p>Let’s plot the DAG to see how these variables are related:</p>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-3_c927a958681bad11199d0221ed49ce62">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plotDAG</span>(Dset, <span class="at">xjitter =</span> <span class="fl">0.1</span>, <span class="at">yjitter =</span> <span class="fl">0.1</span>, </span>
 <span id="cb3-2"><a href="#cb3-2"></a>        <span class="at">edge_attrs =</span> <span class="fu">list</span>(<span class="at">width =</span> <span class="dv">1</span>, <span class="at">arrow.width =</span> <span class="dv">1</span>, <span class="at">arrow.size =</span> <span class="dv">1</span>),</span>
 <span id="cb3-3"><a href="#cb3-3"></a>        <span class="at">vertex_attrs =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">15</span>, <span class="at">label.cex =</span> <span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1070,7 +1070,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>In this pathway, LowBirthweight is a mediator because it transmits the effect of Smoking on Mortality. In this context, LowBirthweight explains part of the mechanism by which Smoking increases the risk of Mortality (through its effect on birthweight). However, we would not be able to fully decompose the direct and indirect effects of Smoking on Mortality in the presence of the unmeasured variable (e.g., birth defects or another unobserved confounder), because this unmeasured variable creates confounding that affects both LowBirthweight and Mortality.</p>
 </section><section id="simulate-data" class="level4"><h4 class="anchored" data-anchor-id="simulate-data">Simulate Data</h4>
 <p>We now simulate data based on the DAG structure.</p>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-4_58a43446a9bcf09ca123821e7abdfa08">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">sim</span>(Dset, <span class="at">n =</span> <span class="dv">10000</span>, <span class="at">rndseed =</span> <span class="dv">123</span>)</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; simulating observed dataset from the DAG object</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="fu">head</span>(sim_data) <span class="sc">%&gt;%</span></span>
@@ -1136,8 +1136,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </table>
 </div>
 </div>
-</section><section id="visualizing-hypothetical-distribution" class="level4"><h4 class="anchored" data-anchor-id="visualizing-hypothetical-distribution">Visualizing hypothetical distribution</h4>
-<div class="cell">
+</section><section id="visualizing-hypothetical-distributions" class="level4"><h4 class="anchored" data-anchor-id="visualizing-hypothetical-distributions">Visualizing Hypothetical Distributions</h4>
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-5_f6d6159393f61f3b3a69d28b2b6f522a">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Simulate continuous birth weight based on binary LowBirthweight variable</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb5-3"><a href="#cb5-3"></a>sim_data<span class="sc">$</span>BirthWeight <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(sim_data<span class="sc">$</span>LowBirthweight <span class="sc">==</span> <span class="dv">1</span>, </span>
@@ -1171,7 +1171,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section></section><section id="analysis" class="level3"><h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
 <section id="crude-bivariate-relationships" class="level4"><h4 class="anchored" data-anchor-id="crude-bivariate-relationships">Crude Bivariate Relationships</h4>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-6_7b3a4df9f3530d282d1563a5d2fb179c">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Calculate the summary statistics (mean birth weight, LBW prevalence, and mortality prevalence) by smoking status</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>summary_stats <span class="ot">&lt;-</span> sim_data <span class="sc">%&gt;%</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a>  <span class="fu">group_by</span>(Smoking) <span class="sc">%&gt;%</span></span>
@@ -1221,7 +1221,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="incorrect-adjustment-conditioning-on-a-collider" class="level4"><h4 class="anchored" data-anchor-id="incorrect-adjustment-conditioning-on-a-collider">Incorrect Adjustment: Conditioning on a Collider</h4>
 <p>We now show what happens when we adjust for <strong>LowBirthweight</strong>, which acts as a collider.</p>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-7_704d9abecafc2abf020a407fb7d195d0">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Model adjusted for LowBirthweight (incorrect adjustment)</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>fit_incorrect <span class="ot">&lt;-</span> <span class="fu">glm</span>(Mortality <span class="sc">~</span> Smoking <span class="sc">+</span> LowBirthweight, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> sim_data)</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="fu">publish</span>(fit_incorrect, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable <span class="sc">%&gt;%</span></span>
@@ -1276,7 +1276,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p><strong>Explanation</strong>: Adjusting for the collider (Low Birthweight) leads to biased estimates of the effect of smoking on mortality. By conditioning on this collider, we are introducing a spurious association between <strong>Smoking</strong> and <strong>Birth Defect (Unmeasured)</strong>.</p>
 </section><section id="stratification" class="level4"><h4 class="anchored" data-anchor-id="stratification">Stratification</h4>
 <p>We will now stratify the data by <strong>Low Birthweight</strong> and calculate the effect of smoking on mortality separately for <strong>low birthweight</strong> and <strong>normal birthweight</strong> infants.</p>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-8_ce0065b800155f58824c14cf26e9dbd5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Subset for low birthweight</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>fit_stratified_LBW <span class="ot">&lt;-</span> <span class="fu">glm</span>(Mortality <span class="sc">~</span> Smoking, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> <span class="fu">subset</span>(sim_data, LowBirthweight <span class="sc">==</span> <span class="st">"Low Birthweight"</span>))</span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="fu">publish</span>(fit_stratified_LBW, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable <span class="sc">%&gt;%</span></span>
@@ -1353,7 +1353,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="interaction-approach" class="level4"><h4 class="anchored" data-anchor-id="interaction-approach">Interaction Approach</h4>
 <p>We include an interaction term between <strong>Smoking</strong> and <strong>LowBirthweight</strong> to test whether the effect of smoking on mortality differs by birthweight status.</p>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-9_e5c5f480b668bb463b8647bf32523a4d">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>fit_interaction <span class="ot">&lt;-</span> <span class="fu">glm</span>(Mortality <span class="sc">~</span> Smoking <span class="sc">*</span> LowBirthweight, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> sim_data)</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">publish</span>(fit_interaction, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable <span class="sc">%&gt;%</span></span>
 <span id="cb10-3"><a href="#cb10-3"></a>  <span class="fu">kable</span>(<span class="st">"html"</span>, <span class="at">caption =</span> <span class="st">"Interaction Model Regression Table"</span>) <span class="sc">%&gt;%</span></span>
@@ -1406,7 +1406,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="correct-approach-no-adjustment-for-lowbirthweight" class="level4"><h4 class="anchored" data-anchor-id="correct-approach-no-adjustment-for-lowbirthweight">Correct Approach: No Adjustment for LowBirthweight</h4>
 <p>Here, we show the correct approach, which is to avoid adjusting for the collider (<strong>LowBirthweight</strong>). This avoids the introduction of collider bias.</p>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-10_42c2cc54e0da49b051aede467290355f">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Correct model (no adjustment for LowBirthweight)</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>fit_correct <span class="ot">&lt;-</span> <span class="fu">glm</span>(Mortality <span class="sc">~</span> Smoking, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> sim_data)</span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="fu">publish</span>(fit_correct, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable <span class="sc">%&gt;%</span></span>
@@ -1445,7 +1445,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="comparing-estimates" class="level4"><h4 class="anchored" data-anchor-id="comparing-estimates">Comparing Estimates</h4>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-11_bf9aab00204e9987012cc5ea64945474">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Extract ORs from publish output for each model</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>or_incorrect <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit_incorrect, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"OddsRatio"</span>]</span>
 <span id="cb12-3"><a href="#cb12-3"></a>or_stratified_LBW <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit_stratified_LBW, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"OddsRatio"</span>]</span>
@@ -1458,7 +1458,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p></p><figcaption class="figure-caption">DAG plot with incorrect adjustment</figcaption><p></p>
 </figure>
 </div>
-<div class="cell">
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-12_e974ea01c32e1b6778e893e2735251a6">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Extract ORs from publish output for correct model</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>or_correct <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit_correct, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"OddsRatio"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1485,6 +1485,82 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <li>The correct model (unadjusted for LowBirthweight), with an OR of 2.31.</li>
 </ul>
 <p>These comparisons highlight how adjusting for a collider (Low Birthweight) introduces bias, while avoiding this adjustment gives an unbiased estimate of the effect of <strong>Smoking</strong> on <strong>Mortality</strong>.</p>
+</section><section id="visualizing-estimates" class="level4"><h4 class="anchored" data-anchor-id="visualizing-estimates">Visualizing Estimates</h4>
+<div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-13_c281b680ee1c0d8a9706e359a81c217e">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Helper function to clean and convert ORs and CIs</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a>extract_or_ci <span class="ot">&lt;-</span> <span class="cf">function</span>(or_str, ci_str) {</span>
+<span id="cb14-3"><a href="#cb14-3"></a>  or_val <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(or_str <span class="sc">==</span> <span class="st">"Ref"</span>, <span class="cn">NA</span>, <span class="fu">as.numeric</span>(or_str))  <span class="co"># Convert OR to numeric, handle Ref</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>  </span>
+<span id="cb14-5"><a href="#cb14-5"></a>  <span class="co"># Split the CI string, handle empty or malformed CI strings</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a>  <span class="cf">if</span> (ci_str <span class="sc">!=</span> <span class="st">""</span> <span class="sc">&amp;&amp;</span> <span class="fu">grepl</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">["</span>, ci_str)) {</span>
+<span id="cb14-7"><a href="#cb14-7"></a>    ci_vals <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">[|</span><span class="sc">\\</span><span class="st">]"</span>, <span class="st">""</span>, <span class="fu">unlist</span>(<span class="fu">strsplit</span>(ci_str, <span class="st">";"</span>))))  <span class="co"># Split and convert CI</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a>  } <span class="cf">else</span> {</span>
+<span id="cb14-9"><a href="#cb14-9"></a>    ci_vals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>)  <span class="co"># Handle missing CIs</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a>  }</span>
+<span id="cb14-11"><a href="#cb14-11"></a>  </span>
+<span id="cb14-12"><a href="#cb14-12"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">OR =</span> or_val, <span class="at">CI.lower =</span> ci_vals[<span class="dv">1</span>], <span class="at">CI.upper =</span> ci_vals[<span class="dv">2</span>]))</span>
+<span id="cb14-13"><a href="#cb14-13"></a>}</span>
+<span id="cb14-14"><a href="#cb14-14"></a></span>
+<span id="cb14-15"><a href="#cb14-15"></a><span class="co"># Extract ORs and CIs for each model using the helper function</span></span>
+<span id="cb14-16"><a href="#cb14-16"></a>or_ci_incorrect <span class="ot">&lt;-</span> <span class="fu">extract_or_ci</span>(<span class="fu">publish</span>(fit_incorrect, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"OddsRatio"</span>],</span>
+<span id="cb14-17"><a href="#cb14-17"></a>                                 <span class="fu">publish</span>(fit_incorrect, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"CI.95"</span>])</span>
+<span id="cb14-18"><a href="#cb14-18"></a></span>
+<span id="cb14-19"><a href="#cb14-19"></a>or_ci_stratified_LBW <span class="ot">&lt;-</span> <span class="fu">extract_or_ci</span>(<span class="fu">publish</span>(fit_stratified_LBW, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"OddsRatio"</span>],</span>
+<span id="cb14-20"><a href="#cb14-20"></a>                                      <span class="fu">publish</span>(fit_stratified_LBW, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"CI.95"</span>])</span>
+<span id="cb14-21"><a href="#cb14-21"></a></span>
+<span id="cb14-22"><a href="#cb14-22"></a>or_ci_stratified_NBW <span class="ot">&lt;-</span> <span class="fu">extract_or_ci</span>(<span class="fu">publish</span>(fit_stratified_NBW, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"OddsRatio"</span>],</span>
+<span id="cb14-23"><a href="#cb14-23"></a>                                      <span class="fu">publish</span>(fit_stratified_NBW, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"CI.95"</span>])</span>
+<span id="cb14-24"><a href="#cb14-24"></a></span>
+<span id="cb14-25"><a href="#cb14-25"></a>or_ci_interaction1 <span class="ot">&lt;-</span> <span class="fu">extract_or_ci</span>(<span class="fu">publish</span>(fit_interaction, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">3</span>, <span class="st">"OddsRatio"</span>],</span>
+<span id="cb14-26"><a href="#cb14-26"></a>                                    <span class="fu">publish</span>(fit_interaction, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">3</span>, <span class="st">"CI.95"</span>])</span>
+<span id="cb14-27"><a href="#cb14-27"></a></span>
+<span id="cb14-28"><a href="#cb14-28"></a>or_ci_interaction2 <span class="ot">&lt;-</span> <span class="fu">extract_or_ci</span>(<span class="fu">publish</span>(fit_interaction, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">4</span>, <span class="st">"OddsRatio"</span>],</span>
+<span id="cb14-29"><a href="#cb14-29"></a>                                    <span class="fu">publish</span>(fit_interaction, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">4</span>, <span class="st">"CI.95"</span>])</span>
+<span id="cb14-30"><a href="#cb14-30"></a></span>
+<span id="cb14-31"><a href="#cb14-31"></a>or_ci_correct <span class="ot">&lt;-</span> <span class="fu">extract_or_ci</span>(<span class="fu">publish</span>(fit_correct, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"OddsRatio"</span>],</span>
+<span id="cb14-32"><a href="#cb14-32"></a>                               <span class="fu">publish</span>(fit_correct, <span class="at">print =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>, <span class="st">"CI.95"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Step 2: Create a data frame for the forest plot</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>forest_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-3"><a href="#cb15-3"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Incorrect (Adjusted for LBW)"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4"></a>            <span class="st">"Stratified (Low Birthweight)"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5"></a>            <span class="st">"Stratified (Normal Birthweight)"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6"></a>            <span class="st">"Interaction (Low Birthweight)"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7"></a>            <span class="st">"Interaction (Normal Birthweight)"</span>,</span>
+<span id="cb15-8"><a href="#cb15-8"></a>            <span class="st">"Correct (Unadjusted)"</span>),</span>
+<span id="cb15-9"><a href="#cb15-9"></a>  <span class="at">OR =</span> <span class="fu">c</span>(or_ci_incorrect<span class="sc">$</span>OR, or_ci_stratified_LBW<span class="sc">$</span>OR, or_ci_stratified_NBW<span class="sc">$</span>OR, or_ci_interaction2<span class="sc">$</span>OR, or_ci_interaction1<span class="sc">$</span>OR, or_ci_correct<span class="sc">$</span>OR),</span>
+<span id="cb15-10"><a href="#cb15-10"></a>  <span class="at">CI.lower =</span> <span class="fu">c</span>(or_ci_incorrect<span class="sc">$</span>CI.lower, or_ci_stratified_LBW<span class="sc">$</span>CI.lower, or_ci_stratified_NBW<span class="sc">$</span>CI.lower, or_ci_interaction2<span class="sc">$</span>CI.lower, or_ci_interaction1<span class="sc">$</span>CI.lower, or_ci_correct<span class="sc">$</span>CI.lower),</span>
+<span id="cb15-11"><a href="#cb15-11"></a>  <span class="at">CI.upper =</span> <span class="fu">c</span>(or_ci_incorrect<span class="sc">$</span>CI.upper, or_ci_stratified_LBW<span class="sc">$</span>CI.upper, or_ci_stratified_NBW<span class="sc">$</span>CI.upper, or_ci_interaction2<span class="sc">$</span>CI.upper, or_ci_interaction1<span class="sc">$</span>CI.upper, or_ci_correct<span class="sc">$</span>CI.upper)</span>
+<span id="cb15-12"><a href="#cb15-12"></a>)</span>
+<span id="cb15-13"><a href="#cb15-13"></a></span>
+<span id="cb15-14"><a href="#cb15-14"></a><span class="co"># Display the data frame to ensure it's correct</span></span>
+<span id="cb15-15"><a href="#cb15-15"></a><span class="fu">print</span>(forest_data)</span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">#&gt;                              Model   OR CI.lower CI.upper</span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="co">#&gt; 1     Incorrect (Adjusted for LBW) 0.73     0.63     0.84</span></span>
+<span id="cb15-18"><a href="#cb15-18"></a><span class="co">#&gt; 2     Stratified (Low Birthweight) 0.69     0.55     0.85</span></span>
+<span id="cb15-19"><a href="#cb15-19"></a><span class="co">#&gt; 3  Stratified (Normal Birthweight) 0.77     0.63     0.93</span></span>
+<span id="cb15-20"><a href="#cb15-20"></a><span class="co">#&gt; 4    Interaction (Low Birthweight) 0.69     0.55     0.85</span></span>
+<span id="cb15-21"><a href="#cb15-21"></a><span class="co">#&gt; 5 Interaction (Normal Birthweight) 0.77     0.63     0.93</span></span>
+<span id="cb15-22"><a href="#cb15-22"></a><span class="co">#&gt; 6             Correct (Unadjusted) 2.31     2.12     2.53</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Create the forest plot</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="fu">ggplot</span>(forest_data, <span class="fu">aes</span>(<span class="at">x =</span> OR, <span class="at">y =</span> Model)) <span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>  <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> CI.lower, <span class="at">xmax =</span> CI.upper), <span class="at">height =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span>  <span class="co"># Reference line at OR = 1</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Forest Plot of OR"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7"></a>       <span class="at">x =</span> <span class="st">"Odds Ratio (OR) and Confidence Intervals"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8"></a>       <span class="at">y =</span> <span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb16-11"><a href="#cb16-11"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>),</span>
+<span id="cb16-12"><a href="#cb16-12"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="confounding3b_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section></section><section id="simpsons-paradox-in-the-current-example" class="level3"><h3 class="anchored" data-anchor-id="simpsons-paradox-in-the-current-example">Simpson’s Paradox in the Current Example</h3>
 <p>Simpson’s Paradox occurs when the relationship between two variables changes direction when data is stratified by a third variable. In our case, we observe this paradox when examining the effect of maternal smoking on infant mortality, particularly in relation to birth weight.</p>
 <ul>

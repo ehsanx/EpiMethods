@@ -35,7 +35,7 @@ We will generate data to simulate the birthweight paradox. We assume that:
 
 We will set up this data generating process using **simcausal**.
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache = TRUE}
 D <- DAG.empty()
 D <- D + 
   node("Smoking", distr = "rbern", prob = 0.3) +
@@ -50,7 +50,7 @@ Dset <- set.DAG(D)
 
 Let's plot the DAG to see how these variables are related:
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache = TRUE}
 plotDAG(Dset, xjitter = 0.1, yjitter = 0.1, 
         edge_attrs = list(width = 1, arrow.width = 1, arrow.size = 1),
         vertex_attrs = list(size = 15, label.cex = 0.8))
@@ -81,7 +81,7 @@ In this pathway, LowBirthweight is a mediator because it transmits the effect of
 
 We now simulate data based on the DAG structure.
 
-```{r}
+```{r, cache = TRUE}
 sim_data <- sim(Dset, n = 10000, rndseed = 123)
 head(sim_data) %>%
   kable("html", caption = "First 6 Rows of Simulated Data") %>%
@@ -90,9 +90,9 @@ head(sim_data) %>%
                 position = "center")
 ```
 
-#### Visualizing hypothetical distribution
+#### Visualizing Hypothetical Distributions
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache = TRUE}
 # Simulate continuous birth weight based on binary LowBirthweight variable
 set.seed(123)
 sim_data$BirthWeight <- ifelse(sim_data$LowBirthweight == 1, 
@@ -126,7 +126,7 @@ ggplot(sim_data, aes(x = BirthWeight, fill = Smoking, color = Smoking)) +
 
 #### Crude Bivariate Relationships
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache = TRUE}
 # Calculate the summary statistics (mean birth weight, LBW prevalence, and mortality prevalence) by smoking status
 summary_stats <- sim_data %>%
   group_by(Smoking) %>%
@@ -153,7 +153,7 @@ summary_stats %>%
 
 We now show what happens when we adjust for **LowBirthweight**, which acts as a collider.
 
-```{r}
+```{r, cache = TRUE}
 # Model adjusted for LowBirthweight (incorrect adjustment)
 fit_incorrect <- glm(Mortality ~ Smoking + LowBirthweight, family = binomial(), data = sim_data)
 publish(fit_incorrect, print = FALSE)$regressionTable %>%
@@ -169,7 +169,7 @@ publish(fit_incorrect, print = FALSE)$regressionTable %>%
 
 We will now stratify the data by **Low Birthweight** and calculate the effect of smoking on mortality separately for **low birthweight** and **normal birthweight** infants.
 
-```{r}
+```{r, cache = TRUE}
 # Subset for low birthweight
 fit_stratified_LBW <- glm(Mortality ~ Smoking, family = binomial(), data = subset(sim_data, LowBirthweight == "Low Birthweight"))
 publish(fit_stratified_LBW, print = FALSE)$regressionTable %>%
@@ -191,7 +191,7 @@ publish(fit_stratified_NBW, print = FALSE)$regressionTable %>%
 
 We include an interaction term between **Smoking** and **LowBirthweight** to test whether the effect of smoking on mortality differs by birthweight status.
 
-```{r}
+```{r, cache = TRUE}
 fit_interaction <- glm(Mortality ~ Smoking * LowBirthweight, family = binomial(), data = sim_data)
 publish(fit_interaction, print = FALSE)$regressionTable %>%
   kable("html", caption = "Interaction Model Regression Table") %>%
@@ -204,7 +204,7 @@ publish(fit_interaction, print = FALSE)$regressionTable %>%
 
 Here, we show the correct approach, which is to avoid adjusting for the collider (**LowBirthweight**). This avoids the introduction of collider bias.
 
-```{r}
+```{r, cache = TRUE}
 # Correct model (no adjustment for LowBirthweight)
 fit_correct <- glm(Mortality ~ Smoking, family = binomial(), data = sim_data)
 publish(fit_correct, print = FALSE)$regressionTable %>%
@@ -216,7 +216,7 @@ publish(fit_correct, print = FALSE)$regressionTable %>%
 
 #### Comparing Estimates
 
-```{r}
+```{r, cache = TRUE}
 # Extract ORs from publish output for each model
 or_incorrect <- publish(fit_incorrect, print = FALSE)$regressionTable[2, "OddsRatio"]
 or_stratified_LBW <- publish(fit_stratified_LBW, print = FALSE)$regressionTable[2, "OddsRatio"]
@@ -227,7 +227,7 @@ or_interaction2 <- publish(fit_interaction, print = FALSE)$regressionTable[4, "O
 
 ![DAG plot with incorrect adjustment](images/confounding/daginc.png)
 
-```{r}
+```{r, cache = TRUE}
 # Extract ORs from publish output for correct model
 or_correct <- publish(fit_correct, print = FALSE)$regressionTable[2, "OddsRatio"]
 ```
@@ -246,6 +246,78 @@ Now we compare the estimates from:
 -   The correct model (unadjusted for LowBirthweight), with an OR of `r or_correct`.
 
 These comparisons highlight how adjusting for a collider (Low Birthweight) introduces bias, while avoiding this adjustment gives an unbiased estimate of the effect of **Smoking** on **Mortality**.
+
+#### Visualizing Estimates
+
+```{r, cache = TRUE}
+# Helper function to clean and convert ORs and CIs
+extract_or_ci <- function(or_str, ci_str) {
+  or_val <- ifelse(or_str == "Ref", NA, as.numeric(or_str))  # Convert OR to numeric, handle Ref
+  
+  # Split the CI string, handle empty or malformed CI strings
+  if (ci_str != "" && grepl("\\[", ci_str)) {
+    ci_vals <- as.numeric(gsub("\\[|\\]", "", unlist(strsplit(ci_str, ";"))))  # Split and convert CI
+  } else {
+    ci_vals <- c(NA, NA)  # Handle missing CIs
+  }
+  
+  return(list(OR = or_val, CI.lower = ci_vals[1], CI.upper = ci_vals[2]))
+}
+
+# Extract ORs and CIs for each model using the helper function
+or_ci_incorrect <- extract_or_ci(publish(fit_incorrect, print = FALSE)$regressionTable[2, "OddsRatio"],
+                                 publish(fit_incorrect, print = FALSE)$regressionTable[2, "CI.95"])
+
+or_ci_stratified_LBW <- extract_or_ci(publish(fit_stratified_LBW, print = FALSE)$regressionTable[2, "OddsRatio"],
+                                      publish(fit_stratified_LBW, print = FALSE)$regressionTable[2, "CI.95"])
+
+or_ci_stratified_NBW <- extract_or_ci(publish(fit_stratified_NBW, print = FALSE)$regressionTable[2, "OddsRatio"],
+                                      publish(fit_stratified_NBW, print = FALSE)$regressionTable[2, "CI.95"])
+
+or_ci_interaction1 <- extract_or_ci(publish(fit_interaction, print = FALSE)$regressionTable[3, "OddsRatio"],
+                                    publish(fit_interaction, print = FALSE)$regressionTable[3, "CI.95"])
+
+or_ci_interaction2 <- extract_or_ci(publish(fit_interaction, print = FALSE)$regressionTable[4, "OddsRatio"],
+                                    publish(fit_interaction, print = FALSE)$regressionTable[4, "CI.95"])
+
+or_ci_correct <- extract_or_ci(publish(fit_correct, print = FALSE)$regressionTable[2, "OddsRatio"],
+                               publish(fit_correct, print = FALSE)$regressionTable[2, "CI.95"])
+```
+
+```{r, cache = FALSE}
+# Step 2: Create a data frame for the forest plot
+forest_data <- data.frame(
+  Model = c("Incorrect (Adjusted for LBW)",
+            "Stratified (Low Birthweight)",
+            "Stratified (Normal Birthweight)",
+            "Interaction (Low Birthweight)",
+            "Interaction (Normal Birthweight)",
+            "Correct (Unadjusted)"),
+  OR = c(or_ci_incorrect$OR, or_ci_stratified_LBW$OR, or_ci_stratified_NBW$OR, or_ci_interaction2$OR, or_ci_interaction1$OR, or_ci_correct$OR),
+  CI.lower = c(or_ci_incorrect$CI.lower, or_ci_stratified_LBW$CI.lower, or_ci_stratified_NBW$CI.lower, or_ci_interaction2$CI.lower, or_ci_interaction1$CI.lower, or_ci_correct$CI.lower),
+  CI.upper = c(or_ci_incorrect$CI.upper, or_ci_stratified_LBW$CI.upper, or_ci_stratified_NBW$CI.upper, or_ci_interaction2$CI.upper, or_ci_interaction1$CI.upper, or_ci_correct$CI.upper)
+)
+
+# Display the data frame to ensure it's correct
+print(forest_data)
+```
+
+```{r, cache = FALSE}
+# Create the forest plot
+ggplot(forest_data, aes(x = OR, y = Model)) +
+  geom_point(size = 3) +
+  geom_errorbarh(aes(xmin = CI.lower, xmax = CI.upper), height = 0.2) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "red") +  # Reference line at OR = 1
+  labs(title = "Forest Plot of OR",
+       x = "Odds Ratio (OR) and Confidence Intervals",
+       y = "") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 14),
+        plot.title = element_text(size = 16, face = "bold"))
+
+```
+
 
 ### Simpson's Paradox in the Current Example
 
