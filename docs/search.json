@@ -875,6 +875,69 @@
     "text": "Quiz (R)\n\nDownloading the File:\n\nNavigate to the link: See here.\nRight-click on the link and select “Save link as…” from the dropdown menu.\nAlternatively click here for downloading the quizzes.\nChoose a destination folder on your computer where you’d like to save the file (e.g., Desktop). Remember this location, as you’ll need to navigate to it later.\n\nSetting Up RStudio:\n\nIf you don’t have RStudio installed, see the download link in here.\nLaunch RStudio after installing.\n\nInstalling Necessary R Packages:\n\nBefore running the R Markdown file, ensure you have the required packages. In RStudio’s console (located at the bottom left by default), enter the following commands to install them:\ninstall.packages(\"learnr\")\ninstall.packages(\"xfun\")\n\nOpening and Running the File:\n\nIn RStudio, go to File > Open File....\nNavigate to the folder where you saved the Rmd file and select it to open.\nOnce the file is open in RStudio, you’ll see a “Run Document” button (green) at the top of the script editor. Click on it to run the R Markdown Quiz file."
   },
   {
+    "objectID": "confoundingE.html",
+    "href": "confoundingE.html",
+    "title": "Exercise (R)",
+    "section": "",
+    "text": "Problem 1: Summarizing Analytic Dataset\nFor this next section, refer to the following examples in the Advanced Epi Methods text. Additionally, you may find it useful to review Naimi & Whitcomb (2020) as a primer on how to estimate odds ratios, risk ratios, and risk differences via generalized linear models (see Table 2 of the article).\nPlease knit your file once you finished and submit the knitted PDF or doc file. Please also fill-up the group member names."
+  },
+  {
+    "objectID": "confoundingE.html#problem-statement",
+    "href": "confoundingE.html#problem-statement",
+    "title": "Exercise (R)",
+    "section": "Problem Statement",
+    "text": "Problem Statement\nThe following lab builds upon the RHC data set used in a previous Lab Assignment and explores the marginal and conditional effects of right-heart-catheteriziation treatment (swang1) on mortality (death). We begin by loading the RHC data set that we have seen earlier.\n\n# Import the rhc data set\ndf <- read.csv('Data/rhc.csv', header = TRUE)\n\nWe then apply the following data-wrangling procedures, which we implemented previously:\n\nGenerate a variable age.cat that converts age into a factor with levels [0, 50), [50, 60), [60, 70), [70, 80), and [80, Inf).\nConvert race into a factor with levels white, black, and other.\nConvert sex into a factor with levels Male and Female.\nConvert cat1 into a factor with levels ARF, CHF, MOSF, and Other.\nConvert ca into a factor with levels None, Localized (Yes), and Metastatic.\nGenerate a variable called n.comorbidities that counts the total number of the following comorbidities per person: cardiohx, chfhx, dementhx, psychhx, chrpulhx, renalhx, liverhx, gibledhx, malighx, immunhx, transhx, amihx.\nConvert swang1 into a factor with levels No RHC and RHC.\nConvert death into a logical vector with FALSE/TRUE values.\n\n\n# Generate age.cat\ndf$age.cat <- cut(df$age, breaks = c(0, 50, 60, 70, 80, Inf), \n                  include.lowest = TRUE, right = FALSE)\n\n# Factor `race`\ndf$race <- factor(x = df$race, levels = c('white', 'black', 'other'))\n\n# Factor `sex`\ndf$sex <- factor(x = df$sex, levels = c('Male', 'Female'))\n\n# Factor `cat1`\ndf$cat1 <- factor(df$cat1)\nlevels(df$cat1) = list(ARF = 'ARF',\n                       CHF = 'CHF',\n                       MOSF = c('MOSF w/Malignancy', 'MOSF w/Sepsis'),\n                       Other = c('Cirrhosis', 'Colon Cancer', 'Coma', \n                                 'COPD', 'Lung Cancer'))\n\n# Factoring `ca`\ndf$ca <- factor(x = df$ca, \n                levels = c('No', 'Yes', 'Metastatic'),\n                labels = c('None', 'Localized (Yes)', 'Metastatic'))\n\n# Generate n.comorbiditis\ndf$n.comorbidities <- rowSums(x = subset(df, select = cardiohx:amihx), na.rm = TRUE)\n\n# Factor `swang1`\ndf$swang1 <- factor(x = df$swang1, levels = c('No RHC', 'RHC'))\n\n# Convert `death` into a logical vector\ndf$death <- factor(df$death, levels = c('No', 'Yes'), labels = c('FALSE', 'TRUE'))\ndf$death <- as.logical(df$death)"
+  },
+  {
+    "objectID": "confoundingE.html#a-generating-the-analytic-dataset",
+    "href": "confoundingE.html#a-generating-the-analytic-dataset",
+    "title": "Exercise (R)",
+    "section": "1(a): Generating the analytic dataset",
+    "text": "1(a): Generating the analytic dataset\nGenerate an analytic dataset called df.analytic according to the following parameters:\n\nContains the variables age.cat, sex, race, cat1, ca, dnr1, aps1, surv2md1, n.comorbidities, adld3p, das2d3pc, temp1, hrt1, meanbp1, resp1, wblc1, pafi1, paco21, ph1, crea1, alb1, scoma1, swang1, death\n\nSubset to complete case observations\n\nNOTE. The resulting analytic dataset should have 24 columns and 1439 rows.\n\n# Generate df.analytic\n# df.analytic <- ... # Complete the code here\n\n# Verify the number of columns and rows within df.analytic\n#"
+  },
+  {
+    "objectID": "confoundingE.html#b-generating-a-descriptive-table-1.-20-grade",
+    "href": "confoundingE.html#b-generating-a-descriptive-table-1.-20-grade",
+    "title": "Exercise (R)",
+    "section": "1(b): Generating a descriptive Table 1. [20% grade]",
+    "text": "1(b): Generating a descriptive Table 1. [20% grade]\nUsing df.analytic, produce a descriptive Table 1 that matches the following sample table:\n\n\n\n\n\n\n\n\n\nOverall\nFALSE\nTRUE\n\n\n\nn\n1439\n733\n706\n\n\nadld3p (mean (SD))\n1.18 (1.82)\n0.96 (1.68)\n1.41 (1.93)\n\n\nage.cat (%)\n\n\n\n\n\n   [0,50)\n377 (26.2)\n253 (34.5)\n124 (17.6)\n\n\n   [50,60)\n245 (17.0)\n115 (15.7)\n130 (18.4)\n\n\n   [60,70)\n360 (25.0)\n158 (21.6)\n202 (28.6)\n\n\n   [70,80)\n308 (21.4)\n144 (19.6)\n164 (23.2)\n\n\n   [80,Inf]\n149 (10.4)\n63 ( 8.6)\n86 (12.2)\n\n\nalb1 (mean (SD))\n3.24 (0.64)\n3.22 (0.66)\n3.25 (0.62)\n\n\naps1 (mean (SD))\n48.63 (17.32)\n47.51 (17.24)\n49.80 (17.32)\n\n\nca (%)\n\n\n\n\n\n   None\n1121 (77.9)\n629 (85.8)\n492 (69.7)\n\n\n   Localized (Yes)\n217 (15.1)\n88 (12.0)\n129 (18.3)\n\n\n   Metastatic\n101 ( 7.0)\n16 ( 2.2)\n85 (12.0)\n\n\ncat1 (%)\n\n\n\n\n\n   ARF\n556 (38.6)\n331 (45.2)\n225 (31.9)\n\n\n   CHF\n303 (21.1)\n134 (18.3)\n169 (23.9)\n\n\n   MOSF\n290 (20.2)\n136 (18.6)\n154 (21.8)\n\n\n   Other\n290 (20.2)\n132 (18.0)\n158 (22.4)\n\n\ncrea1 (mean (SD))\n2.08 (2.21)\n1.96 (2.08)\n2.21 (2.34)\n\n\ndas2d3pc (mean (SD))\n20.36 (7.19)\n21.75 (7.63)\n18.91 (6.39)\n\n\ndnr1 = Yes (%)\n98 ( 6.8)\n26 ( 3.5)\n72 (10.2)\n\n\nhrt1 (mean (SD))\n111.26 (38.50)\n112.14 (38.18)\n110.36 (38.84)\n\n\nmeanbp1 (mean (SD))\n82.90 (37.49)\n86.51 (39.21)\n79.15 (35.25)\n\n\nn.comorbidities (mean (SD))\n1.75 (1.22)\n1.51 (1.20)\n2.00 (1.19)\n\n\npaco21 (mean (SD))\n40.52 (13.60)\n40.72 (14.47)\n40.31 (12.64)\n\n\npafi1 (mean (SD))\n247.64 (110.40)\n237.35 (109.56)\n258.33 (110.34)\n\n\nph1 (mean (SD))\n7.39 (0.10)\n7.39 (0.10)\n7.39 (0.09)\n\n\nrace (%)\n\n\n\n\n\n   white\n1110 (77.1)\n564 (76.9)\n546 (77.3)\n\n\n   black\n243 (16.9)\n129 (17.6)\n114 (16.1)\n\n\n   other\n86 ( 6.0)\n40 ( 5.5)\n46 ( 6.5)\n\n\nresp1 (mean (SD))\n29.03 (12.17)\n29.08 (12.34)\n28.98 (11.99)\n\n\nscoma1 (mean (SD))\n5.60 (16.22)\n6.30 (17.77)\n4.87 (14.41)\n\n\nsex = Female (%)\n617 (42.9)\n336 (45.8)\n281 (39.8)\n\n\nsurv2md1 (mean (SD))\n0.70 (0.16)\n0.73 (0.13)\n0.66 (0.17)\n\n\nswang1 = RHC (%)\n390 (27.1)\n196 (26.7)\n194 (27.5)\n\n\ntemp1 (mean (SD))\n37.32 (1.65)\n37.52 (1.67)\n37.11 (1.60)\n\n\nwblc1 (mean (SD))\n14.54 (11.71)\n14.36 (8.45)\n14.72 (14.33)\n\n\n\nNOTE. Ensure that the order of all variables and the levels of all factors matches the sample table.\n\n# Load the `tableone` package into the library\nlibrary(tableone)\n\n# Generate the Table 1\n#"
+  },
+  {
+    "objectID": "confoundingE.html#a-crude-models-30-grade",
+    "href": "confoundingE.html#a-crude-models-30-grade",
+    "title": "Exercise (R)",
+    "section": "2(a): Crude Models [30% grade]",
+    "text": "2(a): Crude Models [30% grade]\nUsing df.analytic, estimate the crude odds ratio, risk ratio, and risk difference for the effect of swang1 (exposure) on death (outcome). Please adhere to the following instructions, and round your estimates to 3 decimal places.\n\nWhen estimating crude ORs, use a logistic model.\n\n\n# Estimate & print crude odds ratio, \n# and associated confidence interval\n\n\nWhen estimating crude RRs, use a Poisson model with robust SEs.\n\n\n# Estimate & print crude risk ratio,\n# and associated confidence interval\n\n\nWhen estimating crude RDs, use a Gaussian model with robust SEs.\n\n\n# Estimate & print crude risk difference, and \n# associated confidence interval"
+  },
+  {
+    "objectID": "confoundingE.html#b-conditional-models-20-grade",
+    "href": "confoundingE.html#b-conditional-models-20-grade",
+    "title": "Exercise (R)",
+    "section": "2(b): Conditional Models [20% grade]",
+    "text": "2(b): Conditional Models [20% grade]\nUsing df.analytic, estimate the conditional odds ratio, risk ratio, and risk difference for the effect of swang1 (exposure) on death (outcome). Please adhere to the following instructions, and round your estimates to 3 decimal places. Adjust for all covariates found in df.analytic.\n\nWhen estimating conditional odds ratios, use a logistic model.\n\n\n# Estimate & print conditional odds ratio, and \n# associated confidence interval\n\n\nWhen estimating conditional risk ratios, use a Poisson model with robust SEs (i.e., modified Poisson regression).\n\n\n# Estimate & print conditional risk ratio, \n# and associated confidence interval\n\n\nWhen estimating conditional risk differences, use a Gaussian model with an identity link and robust SEs (i.e., linear regression with robust SEs).\n\n\n# Estimate & print conditional risk difference, \n# and associated confidence interval"
+  },
+  {
+    "objectID": "confoundingE.html#c-marginal-models-30-grade",
+    "href": "confoundingE.html#c-marginal-models-30-grade",
+    "title": "Exercise (R)",
+    "section": "2(c): Marginal Models [30% grade]",
+    "text": "2(c): Marginal Models [30% grade]\nUsing df.analytic, estimate the marginal odds ratio, risk ratio, and risk difference for the effect of swang1 (exposure) on death (outcome). Please adhere to the following instructions: Round your estimates to 3 decimal places. Adjust for all covariates found in df.analytic. Bootstrap could be used to estimate confidence intervals, but we won’t be calculating confidence intervals for the marginal models.\n\nWhen estimating marginal odds ratios, use a logistic model.\n\n\n# Estimate & print conditional odds ratio\n\n\nWhen estimating marginal risk ratios, use a Poisson model with robust SEs (i.e., modified Poisson regression).\n\n\n# Estimate & print conditional risk ratio\n\n\nWhen estimating marginal risk differences, use a Gaussian model with an identity link and robust SEs (i.e., linear regression with robust SEs).\n\n\n# Estimate & print conditional risk difference"
+  },
+  {
+    "objectID": "confoundingE.html#d-summarizing-models",
+    "href": "confoundingE.html#d-summarizing-models",
+    "title": "Exercise (R)",
+    "section": "2(d): Summarizing Models",
+    "text": "2(d): Summarizing Models\nBased upon the results from 2(a) - 2(c), complete the following table by replacing 9.999 with estimates from the corresponding models (edit if needed/your results are different):\n\n\n\n\n\n\n\n\nModeling Strategy\nOR (95% CI)\nRR (95% CI)\nRD (95% CI)\n\n\n\nCrude Est.\n\n\n\n\n\n   swang1 [RHC]\n1.038 (0.823, 1.310)\n1.019 (0.906, 1.146)\n0.009 (-0.049, 0.067)\n\n\nConditional Est.\n\n\n\n\n\n   swang1 [RHC]\n1.072 (0.805, 1.427)\n1.030 (0.913, 1.161)\n0.013 (-0.044, 0.071)\n\n\nMarginal Est.\n\n\n\n\n\n   swang1 [RHC]\n1.058\n1.03\n0.013"
+  },
+  {
+    "objectID": "confoundingE.html#e-interpreting-optional",
+    "href": "confoundingE.html#e-interpreting-optional",
+    "title": "Exercise (R)",
+    "section": "2(e): Interpreting (optional)",
+    "text": "2(e): Interpreting (optional)\nWhich of the three measure of effects are collapsible and why?\nConditional estimates are adjusted for covariates and show the effect of the exposure (RHC) accounting for confounders. Marginal estimates reflect the overall effect of the exposure across the entire population without considering stratification by covariates, providing an “average” effect.\n\nThe conditional OR (1.072) and the marginal OR (1.058) are different. This difference illustrates the non-collapsibility of the odds ratio. Even after adjusting for covariates (conditional), the OR changes when calculating the marginal estimate across the population, because the odds ratio is sensitive to how covariates interact with the exposure and outcome.\nThe conditional RR (1.030) and marginal RR (1.030) are identical. This indicates that the RR is collapsible because adjusting for covariates (conditional model) does not change the overall effect when you average it across the population (marginal model).\nThe conditional RD (0.013) and marginal RD (0.013) are also identical, further supporting that the RD is collapsible. Whether you adjust for covariates or average across the entire population, the absolute difference in risk remains the same."
+  },
+  {
     "objectID": "predictivefactors.html#background",
     "href": "predictivefactors.html#background",
     "title": "Prediction ideas",
