@@ -1,0 +1,273 @@
+---
+title: "SPPH 604 001 Lab Excerise: Adjustment"
+author:
+urlcolor: blue
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+  word_document:
+    toc: yes
+    toc_depth: '2'
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: 2
+  html_notebook:
+    toc: yes
+    toc_depth: 2
+---
+
+```{r chunkSetup, include=FALSE}
+# Setting the RMD chunk options
+knitr::opts_chunk$set(echo = TRUE,          # Chunk code included in output
+                      warning = FALSE,      # Warnings suppressed from output
+                      message = FALSE)      # Messages suppressed from output
+```
+
+\newpage
+# Assignment Setup
+
+The following lab builds upon the `RHC` data set used in **Lab Assignment #1** and explores the marginal and conditional effects of right-heart-catheteriziation treatment (`swang1`) on mortality (`death`).
+
+We begin by loading the `RHC` data set from **Lab #1**...
+
+```{r, eval=FALSE}
+# Import the rhc data set
+df <- read.csv('Data/rhc.csv', header = TRUE)
+```
+
+We then apply the following data-wrangling procedures, which we implemented in **Lab #1**:
+
+-   Generate a variable `age.cat` that converts `age` into a factor with levels `[0, 50)`, `[50, 60)`, `[60, 70)`, `[70, 80)`, and `[80, Inf)`.
+-   Convert `race` into a factor with levels `white`, `black`, and `other`.
+-   Convert `sex` into a factor with levels `Male` and `Female`.
+-   Convert `cat1` into a factor with levels `ARF`, `CHF`, `MOSF`, and `Other`.
+-   Convert `ca` into a factor with levels `None`, `Localized (Yes)`, and `Metastatic`.
+-   Generate a variable called `n.comorbidities` that counts the total number of the following comorbidities per person: `cardiohx`, `chfhx`, `dementhx`, `psychhx`, `chrpulhx`, `renalhx`, `liverhx`, `gibledhx`, `malighx`, `immunhx`, `transhx`, `amihx`.
+-   Convert `swang1` into a factor with levels `No RHC` and `RHC`.
+-   Convert `death` into a logical vector with FALSE/TRUE values.
+
+```{r, eval=FALSE}
+# Generate age.cat
+df$age.cat <- cut(df$age, breaks = c(0, 50, 60, 70, 80, Inf), 
+                  include.lowest = TRUE, right = FALSE)
+
+# Factor `race`
+df$race <- factor(x = df$race, levels = c('white', 'black', 'other'))
+
+# Factor `sex`
+df$sex <- factor(x = df$sex, levels = c('Male', 'Female'))
+
+# Factor `cat1`
+df$cat1 <- factor(df$cat1)
+levels(df$cat1) = list(ARF = 'ARF',
+                       CHF = 'CHF',
+                       MOSF = c('MOSF w/Malignancy', 'MOSF w/Sepsis'),
+                       Other = c('Cirrhosis', 'Colon Cancer', 'Coma', 
+                                 'COPD', 'Lung Cancer'))
+
+# Factoring `ca`
+df$ca <- factor(x = df$ca, 
+                levels = c('No', 'Yes', 'Metastatic'),
+                labels = c('None', 'Localized (Yes)', 'Metastatic'))
+
+# Generate n.comorbiditis
+df$n.comorbidities <- rowSums(x = subset(df, select = cardiohx:amihx), na.rm = TRUE)
+
+# Factor `swang1`
+df$swang1 <- factor(x = df$swang1, levels = c('No RHC', 'RHC'))
+
+# Convert `death` into a logical vector
+df$death <- factor(df$death, levels = c('No', 'Yes'), labels = c('FALSE', 'TRUE'))
+df$death <- as.logical(df$death)
+```
+
+# Problem 1: Summarizing Analytic Dataset
+
+## 1(a): Generating the analytic dataset
+
+Generate an analytic dataset called `df.analytic` according to the following parameters:
+
+-   Contains the variables `age.cat`, `sex`, `race`, `cat1`, `ca`, `dnr1`, `aps1`, `surv2md1`, `n.comorbidities`, `adld3p`, `das2d3pc`, `temp1`, `hrt1`, `meanbp1`, `resp1`, `wblc1`, `pafi1`, `paco21`, `ph1`, `crea1`, `alb1`, `scoma1`, `swang1`, `death`
+-   Subset to complete case observations
+
+**NOTE.** The resulting analytic dataset should have 24 columns and 1439 rows.
+
+```{r}
+# Generate df.analytic
+# df.analytic <- ... # Complete the code here
+
+# Verify the number of columns and rows within df.analytic
+#
+```
+
+## 1(b): Generating a descriptive Table 1. [20% grade]
+
+Using `df.analytic`, produce a descriptive Table 1 that matches the following sample table:
+
+|                             | Overall         | FALSE           | TRUE            |
+|:------------------------|:---------------|:---------------|:---------------|
+| n                           | 1439            | 733             | 706             |
+| adld3p (mean (SD))          | 1.18 (1.82)     | 0.96 (1.68)     | 1.41 (1.93)     |
+| age.cat (%)                 |                 |                 |                 |
+|    \[0,50)                  | 377 (26.2)      | 253 (34.5)      | 124 (17.6)      |
+|    \[50,60)                 | 245 (17.0)      | 115 (15.7)      | 130 (18.4)      |
+|    \[60,70)                 | 360 (25.0)      | 158 (21.6)      | 202 (28.6)      |
+|    \[70,80)                 | 308 (21.4)      | 144 (19.6)      | 164 (23.2)      |
+|    \[80,Inf\]               | 149 (10.4)      | 63 ( 8.6)       | 86 (12.2)       |
+| alb1 (mean (SD))            | 3.24 (0.64)     | 3.22 (0.66)     | 3.25 (0.62)     |
+| aps1 (mean (SD))            | 48.63 (17.32)   | 47.51 (17.24)   | 49.80 (17.32)   |
+| ca (%)                      |                 |                 |                 |
+|    None                     | 1121 (77.9)     | 629 (85.8)      | 492 (69.7)      |
+|    Localized (Yes)          | 217 (15.1)      | 88 (12.0)       | 129 (18.3)      |
+|    Metastatic               | 101 ( 7.0)      | 16 ( 2.2)       | 85 (12.0)       |
+| cat1 (%)                    |                 |                 |                 |
+|    ARF                      | 556 (38.6)      | 331 (45.2)      | 225 (31.9)      |
+|    CHF                      | 303 (21.1)      | 134 (18.3)      | 169 (23.9)      |
+|    MOSF                     | 290 (20.2)      | 136 (18.6)      | 154 (21.8)      |
+|    Other                    | 290 (20.2)      | 132 (18.0)      | 158 (22.4)      |
+| crea1 (mean (SD))           | 2.08 (2.21)     | 1.96 (2.08)     | 2.21 (2.34)     |
+| das2d3pc (mean (SD))        | 20.36 (7.19)    | 21.75 (7.63)    | 18.91 (6.39)    |
+| dnr1 = Yes (%)              | 98 ( 6.8)       | 26 ( 3.5)       | 72 (10.2)       |
+| hrt1 (mean (SD))            | 111.26 (38.50)  | 112.14 (38.18)  | 110.36 (38.84)  |
+| meanbp1 (mean (SD))         | 82.90 (37.49)   | 86.51 (39.21)   | 79.15 (35.25)   |
+| n.comorbidities (mean (SD)) | 1.75 (1.22)     | 1.51 (1.20)     | 2.00 (1.19)     |
+| paco21 (mean (SD))          | 40.52 (13.60)   | 40.72 (14.47)   | 40.31 (12.64)   |
+| pafi1 (mean (SD))           | 247.64 (110.40) | 237.35 (109.56) | 258.33 (110.34) |
+| ph1 (mean (SD))             | 7.39 (0.10)     | 7.39 (0.10)     | 7.39 (0.09)     |
+| race (%)                    |                 |                 |                 |
+|    white                    | 1110 (77.1)     | 564 (76.9)      | 546 (77.3)      |
+|    black                    | 243 (16.9)      | 129 (17.6)      | 114 (16.1)      |
+|    other                    | 86 ( 6.0)       | 40 ( 5.5)       | 46 ( 6.5)       |
+| resp1 (mean (SD))           | 29.03 (12.17)   | 29.08 (12.34)   | 28.98 (11.99)   |
+| scoma1 (mean (SD))          | 5.60 (16.22)    | 6.30 (17.77)    | 4.87 (14.41)    |
+| sex = Female (%)            | 617 (42.9)      | 336 (45.8)      | 281 (39.8)      |
+| surv2md1 (mean (SD))        | 0.70 (0.16)     | 0.73 (0.13)     | 0.66 (0.17)     |
+| swang1 = RHC (%)            | 390 (27.1)      | 196 (26.7)      | 194 (27.5)      |
+| temp1 (mean (SD))           | 37.32 (1.65)    | 37.52 (1.67)    | 37.11 (1.60)    |
+| wblc1 (mean (SD))           | 14.54 (11.71)   | 14.36 (8.45)    | 14.72 (14.33)   |
+
+**NOTE.** Ensure that the order of all variables and the levels of all factors matches the sample table.
+
+```{r}
+# Load the `tableone` package into the library
+library(tableone)
+
+# Generate the Table 1
+#
+```
+
+# Problem 2: Crude, Conditional and Marginal Regression Models
+
+For this next section, refer to [the following examples in the Advanced Epi Methods text.](https://ehsanx.github.io/EpiMethods/confounding5.html#conditional-and-crude-or) Additionally, you may find it useful to review [Naimi & Whitcomb (2020)](https://doi.org/10.1093/aje/kwaa044) as a primer on how to estimate odds ratios, risk ratios, and risk differences via generalized linear models (see Table 2 of the article).
+
+## 2(a): Crude Models [30% grade]
+
+Using `df.analytic`, estimate the crude odds ratio, risk ratio, and risk difference for the effect of `swang1` (exposure) on `death` (outcome). Please adhere to the following instructions, and round your estimates to 3 decimal places.
+
+-   When estimating crude ORs, use a logistic model.
+
+```{r}
+# Estimate & print crude odds ratio, 
+# and associated confidence interval
+```
+
+-   When estimating crude RRs, use a Poisson model with robust SEs.
+
+```{r}
+# Estimate & print crude risk ratio,
+# and associated confidence interval
+
+```
+
+-   When estimating crude RDs, use a Gaussian model with robust SEs.
+
+```{r}
+# Estimate & print crude risk difference, and 
+# associated confidence interval
+
+```
+
+## 2(b): Conditional Models [20% grade]
+
+Using `df.analytic`, estimate the conditional odds ratio, risk ratio, and risk difference for the effect of `swang1` (exposure) on `death` (outcome). Please adhere to the following instructions, and round your estimates to 3 decimal places. Adjust for all covariates found in `df.analytic`.
+
+-   When estimating conditional odds ratios, use a logistic model.
+
+```{r}
+# Estimate & print conditional odds ratio, and 
+# associated confidence interval
+
+```
+
+-   When estimating conditional risk ratios, use a Poisson model with robust SEs (i.e., modified Poisson regression).
+
+```{r}
+# Estimate & print conditional risk ratio, 
+# and associated confidence interval
+
+```
+
+-   When estimating conditional risk differences, use a Gaussian model with an identity link and robust SEs (i.e., linear regression with robust SEs).
+
+```{r}
+# Estimate & print conditional risk difference, 
+# and associated confidence interval
+
+```
+
+## 2(c): Marginal Models [30% grade]
+
+Using `df.analytic`, estimate the marginal odds ratio, risk ratio, and risk difference for the effect of `swang1` (exposure) on `death` (outcome). Please adhere to the following instructions: Round your estimates to 3 decimal places. Adjust for all covariates found in `df.analytic`. Bootstrap could be used to estimate confidence intervals, but we won't be calculating confidence intervals for the marginal models.
+
+-   When estimating marginal odds ratios, use a logistic model.
+
+```{r}
+# Estimate & print conditional odds ratio
+
+```
+
+-   When estimating marginal risk ratios, use a Poisson model with robust SEs (i.e., modified Poisson regression).
+
+```{r}
+# Estimate & print conditional risk ratio
+
+```
+
+-   When estimating marginal risk differences, use a Gaussian model with an identity link and robust SEs (i.e., linear regression with robust SEs).
+
+```{r}
+# Estimate & print conditional risk difference
+
+```
+
+## 2(d): Summarizing Models
+
+Based upon the results from 2(a) - 2(c), complete the following table by replacing `9.999` with estimates from the corresponding models (edit if needed/your results are different):
+
+| Modeling Strategy | OR (95% CI)          | RR (95% CI)          | RD (95% CI)           |
+|:-----------------|:-----------------|:-----------------|:------------------|
+| Crude Est.        |                      |                      |                       |
+|    swang1 \[RHC\] | 1.038 (0.823, 1.310) | 1.019 (0.906, 1.146) | 0.009 (-0.049, 0.067) |
+| Conditional Est.  |                      |                      |                       |
+|    swang1 \[RHC\] | 1.072 (0.805, 1.427) | 1.030 (0.913, 1.161) | 0.013 (-0.044, 0.071) |
+| Marginal Est.     |                      |                      |                       |
+|    swang1 \[RHC\] | 1.058                | 1.03                 | 0.013                 |
+
+## 2(e): Interpreting (optional)
+
+Which of the three measure of effects are collapsible and why?
+
+
+# Knit your file
+
+Please knit your file once you finished and submit the knitted PDF or doc file. Please also fill-up the following table:
+
+**Group name**: \*\* xyz \*\*
+
+| Student initial   | \% contribution |
+|:------------------|:----------------|
+| Student 1 initial | x%              |
+| Student 2 initial | x%              |
+| Student 3 initial | x%              |
