@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.4.555">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Advanced Epidemiological Methods - Exact Matching (CCHS)</title>
 <style>
@@ -14,11 +14,12 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -43,43 +44,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -105,7 +76,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -114,8 +91,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
 
@@ -126,26 +105,30 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - Exact Matching (CCHS)">
-<meta name="twitter:description" content="In the following code chunk, we load the necessary R libraries for our analysis.">
+<meta name="twitter:description" content="">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked">
 
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Exact Matching (CCHS)</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./propensityscore.html">Propensity score</a></li><li class="breadcrumb-item"><a href="./propensityscore1.html">Exact Matching (CCHS)</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Advanced Epidemiological Methods</a> 
         <div class="sidebar-tools-main">
-  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
   <i class="bi"></i>
   </div>
@@ -153,836 +136,988 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
     </div>
       </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Project</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data wrangling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R basics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data types</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automating tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing dataset</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data manipulation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Import external data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary tables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Markdown</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">App (W)</a>
+  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (W)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Accessing data</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accessing data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">Concepts (A)</a>
+  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data sources</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">Descriptions</a>
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descriptions</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing CCHS to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHANES to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing NHANES results</a>
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">Importing NHIS to R</a>
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHIS to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">Linking mortality data</a>
+  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linking mortality data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">Replicate Data Creation</a>
+  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Data Creation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">App (A)</a>
+  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise 1 (A)</a>
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">Exercise 1 Solution (A)</a>
+  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 Solution (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">Exercise 2 (A)</a>
+  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 2 (A)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research questions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">Concepts (Q)</a>
+  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (Q)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2a</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2b</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-2</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (Q)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (Q)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">App (Q)</a>
+  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (Q)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal roles</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">Concepts (R)</a>
+  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Confounding</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collider</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">Simpson’s Paradox</a>
+  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Simpson’s Paradox</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Z-bias</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collapsibility</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Change-in-estimate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">Exercise (R)</a>
+  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (R)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prediction ideas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">Concepts (P)</a>
+  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (P)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collinear predictors</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overfitting and performance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data Splitting</a>
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Splitting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bootstrap</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (P)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (P)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">Concepts (D)</a>
+  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Revisiting PICOT</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Assessing data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Bivariate analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Regression</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Performance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Blood Pressure</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Cholesterol</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Subsetting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">App (D)</a>
+  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (D)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">Concepts (M)</a>
+  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">Imputation in NHANES</a>
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation in NHANES</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing in outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance with NA</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Subpopulations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">MCAR tests</a>
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCAR tests</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Effect modification</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">App (M)</a>
+  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (M)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Propensity score</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">Concepts (S)</a>
+  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link active">Exact Matching (CCHS)</a>
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Exact Matching (CCHS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (CCHS)</a>
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (CCHS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (US)</a>
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (US)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">PSM in BMI-diabetes</a>
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in BMI-diabetes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">PSM with MI</a>
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">PS Weighting (US)</a>
+  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PS Weighting (US)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">PSM with MI in subset</a>
+  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI in subset</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">PSW with MI in subset</a>
+  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with MI in subset</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">PSW with multiple tx</a>
+  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with multiple tx</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">Quiz (S)</a>
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">App (S)</a>
+  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (S)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning (ML)</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine learning (ML)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">Concepts (L)</a>
+  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data spliting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">Supervised learning</a>
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Supervised learning</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">Unsupervised learning</a>
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unsupervised learning</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">NHIS Example</a>
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHIS Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">Replicate Results</a>
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">Quiz (L)</a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ML in causal inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">Concepts (C)</a>
+  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (C)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">Motivation</a>
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Motivation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">SuperLearner</a>
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">Binary Outcomes</a>
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary Outcomes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">Continuous Outcomes</a>
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous Outcomes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">Comparing results</a>
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">Quiz (C)</a>
+  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (C)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (C)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">Complex outcomes</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex outcomes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">Concepts (N)</a>
+  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (N)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">Polytomous and ordinal</a>
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polytomous and ordinal</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">Survival analysis</a>
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">Survival analysis: NHANES</a>
+  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis: NHANES</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">Poisson</a>
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Poisson</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">R functions (N)</a>
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (N)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">Quiz (N)</a>
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (N)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">Longitudinal data</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true">
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Longitudinal data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">Concepts (T)</a>
+  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (T)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">Mixed effects models</a>
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixed effects models</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">GEE</a>
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GEE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">R functions (T)</a>
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (T)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">Quiz (T)</a>
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (T)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./mediation.html" class="sidebar-item-text sidebar-link">Mediation analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true">
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">Concepts (I)</a>
+  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (I)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">Baron and Kenny</a>
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Baron and Kenny</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">Justification</a>
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Justification</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">Mediation Example</a>
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">R functions (I)</a>
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (I)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">Quiz (I)</a>
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (I)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Writing tools</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true">
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing tools</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">Collaborative Writing</a>
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collaborative Writing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">Formatting Tools</a>
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
       </ul>
 </li>
     </ul>
 </div>
-</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
@@ -999,8 +1134,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title d-none d-lg-block">Exact Matching (CCHS)</h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./propensityscore.html">Propensity score</a></li><li class="breadcrumb-item"><a href="./propensityscore1.html">Exact Matching (CCHS)</a></li></ol></nav><div class="quarto-title">
+<h1 class="title">Exact Matching (CCHS)</h1>
 </div>
 
 
@@ -1013,8 +1148,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </div>
   
 
+
 </header><p>In the following code chunk, we load the necessary R libraries for our analysis. <code>MatchIt</code> is used for matching methods to find comparable control units, <code>tableone</code> for creating Table 1 to describe baseline characteristics, <code>Publish</code> for generating readable output of regression analysis, and <code>survey</code> for analyzing complex survey samples.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/setup_389be1adc848ec1ead4cc6c15f4a879a">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(MatchIt)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">require</span>(tableone)</span>
@@ -1023,10 +1159,10 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="load-data" class="level3"><h3 class="anchored" data-anchor-id="load-data">Load data</h3>
 <p>In the following code chunk, we load the CCHS dataset which is related to the Canadian Community Health Survey (CCHS). We then use <code><a href="https://rdrr.io/r/base/ls.html">ls()</a></code> to list all objects in the workspace and <code>str</code> to display the structure of the data frame, providing a quick overview of the data and checking for any character variables.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/data_b6242cd3d8636a1bbdafd29120024f99">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">load</span>(<span class="st">"Data/propensityscore/cchs123b.RData"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ls</span>()</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic.miss"   "analytic2"       "has_annotations"</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "analytic.miss" "analytic2"</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="fu">str</span>(analytic.miss) <span class="co"># is there any character variable?</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 'data.frame':    397173 obs. of  22 variables:</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;  $ CVD      : chr  "event" "no event" "no event" "no event" ...</span></span>
@@ -1054,7 +1190,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="data-pre-pocessing" class="level3"><h3 class="anchored" data-anchor-id="data-pre-pocessing">Data pre-pocessing</h3>
 <p>In the following code chunk, we define a vector containing the names of variables of interest that needs to be converted to factor variables. We then convert these variables to factors, ensuring they are treated as categorical in subsequent analyses. We also <code>recode</code> the Osteoarthritis (OA) variable into a numeric binary format and display the frequency table of OA before and after the transformation.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/data2_b4d1fbf20c03eca84be8a2720add3dd2">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stress"</span>, <span class="st">"married"</span>, <span class="st">"income"</span>, <span class="st">"race"</span>, </span>
 <span id="cb3-2"><a href="#cb3-2"></a>               <span class="st">"bmi"</span>, <span class="st">"phyact"</span>, <span class="st">"smoke"</span>, <span class="st">"doctor"</span>, <span class="st">"drink"</span>, <span class="st">"bp"</span>, <span class="st">"province"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3"></a>               <span class="st">"immigrate"</span>, <span class="st">"fruit"</span>, <span class="st">"diab"</span>, <span class="st">"edu"</span>, <span class="st">"CVD"</span>, <span class="st">"OA"</span>)</span>
@@ -1071,7 +1207,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="identify-subjects-with-missing" class="level3"><h3 class="anchored" data-anchor-id="identify-subjects-with-missing">Identify subjects with missing</h3>
 <p>In the following code chunk, we create a new variable <code>miss</code> and initially assign all its values to 1 in the full dataset (that contains some missing observations). We then adjust this assignment by setting miss to 0 for observations that are also present in another complete case dataset. That means any row with <code>miss</code> equal to 0 means that row has no missing observations. Finally, we display the frequency table of the miss variable to check the number of missing and non-missing observations.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/miss_54bffef0a0ba74b9715e77dd7455b7d6">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>analytic.miss<span class="sc">$</span>miss <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="fu">head</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span>
@@ -1089,7 +1225,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section><section id="setting-design" class="level3"><h3 class="anchored" data-anchor-id="setting-design">Setting Design</h3>
 <section id="unconditional-design" class="level4"><h4 class="anchored" data-anchor-id="unconditional-design">Unconditional design</h4>
 <p>In the following code chunk, we explore the summary of the weight variable and establish an unconditional survey design object <code>w.design0</code> using the <code>svydesign</code> function, which will be used for subsequent survey-weighted analyses. We then explore the summary, standard deviation, and sum of the weights within our design object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/design_8add528f321be64256c1edf07cdad333">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">summary</span>(analytic.miss<span class="sc">$</span>weight)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;    1.17   65.28  126.63  200.09  243.21 7154.95</span></span>
@@ -1105,7 +1241,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="conditioning-the-design" class="level4"><h4 class="anchored" data-anchor-id="conditioning-the-design">Conditioning the design</h4>
 <p>In the following code chunk, we create a new survey design object <code>w.design</code> by subsetting <code>w.design0</code> to only include observations without missing data <code>(miss == 0)</code>. We then explore the summary, standard deviation, and sum of the weights within this new design object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/design2_5cbe08638157353fbd7f586743db7d7e">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, miss <span class="sc">==</span> <span class="dv">0</span>)</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">summary</span>(<span class="fu">weights</span>(w.design))</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
@@ -1117,7 +1253,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="subset-data-more" class="level4"><h4 class="anchored" data-anchor-id="subset-data-more">Subset data (more!)</h4>
 <p>We subset the data for fast results (less computation). We will only work with cycle 1.1, and the people from Northern provinces in Canada.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/design3_e78c0f8f5bdf4b3472fe8a45bdd27239">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>w.design1 <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design, cycle <span class="sc">==</span> <span class="dv">11</span> <span class="sc">&amp;</span> province <span class="sc">==</span> <span class="st">"North"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">sum</span>(<span class="fu">weights</span>(w.design1))</span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; [1] 42786.28</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1125,7 +1261,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section></section><section id="preliminary-analysis" class="level3"><h3 class="anchored" data-anchor-id="preliminary-analysis">Preliminary analysis</h3>
 <section id="table-1" class="level4"><h4 class="anchored" data-anchor-id="table-1">Table 1</h4>
 <p>In the following code chunk, we define a new variable vector <code>var.names</code> and create a categorical table using <code>svyCreateCatTable</code> to explore the distribution of <code>age</code> and <code>sex</code> across strata of <code>OA</code> within our subsetted design object <code>w.design1</code>. We then print the table with standardized mean differences (SMD) to assess the balance of these variables across strata.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/tab_a87e0ef9900a24f78aa6b427858274f3">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>var.names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"sex"</span>)</span>
 <span id="cb8-2"><a href="#cb8-2"></a>tab0 <span class="ot">&lt;-</span> <span class="fu">svyCreateCatTable</span>(<span class="at">var =</span> var.names, <span class="at">strata=</span> <span class="st">"OA"</span>, <span class="at">data=</span>w.design1,<span class="at">test=</span><span class="cn">FALSE</span>)</span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="fu">print</span>(tab0, <span class="at">smd =</span> <span class="cn">TRUE</span>)</span>
@@ -1144,7 +1280,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="treatment-effect" class="level4"><h4 class="anchored" data-anchor-id="treatment-effect">Treatment effect</h4>
 <p>In the following code chunk, we fit a logistic regression model using <code>svyglm</code> to estimate the effect of <code>OA</code> and other covariates on the binary outcome <code>CVD</code> (cardiovascular disease). We then use <code>publish</code> to display the results in a readable format.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/tx_b768a08d6f6682d04da92a072debdf8c">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> stress <span class="sc">+</span> married <span class="sc">+</span> </span>
 <span id="cb9-2"><a href="#cb9-2"></a>                         income <span class="sc">+</span> race <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> smoke <span class="sc">+</span></span>
 <span id="cb9-3"><a href="#cb9-3"></a>                         immigrate <span class="sc">+</span> fruit <span class="sc">+</span> diab <span class="sc">+</span> edu,</span>
@@ -1196,7 +1332,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section></section><section id="matching-estimating-treatment-effect" class="level3"><h3 class="anchored" data-anchor-id="matching-estimating-treatment-effect">Matching: Estimating treatment effect</h3>
 <p>Going back to the data (<strong>not working on design here while matching</strong>)</p>
 <p>In the following code chunk, we create a new dataset by omitting <code>NA</code> values from <code>analytic.miss</code> and converting it to a data frame. We then create a subset <code>analytic11n</code> which includes only observations from cycle 1.1 and the Northern provinces. We display the dimensions of this subset, as well as frequency tables of <code>OA</code> and a cross-tabulation of <code>OA</code> and <code>age</code> to understand the distribution of our target variable and a key covariate.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/effect_fb5ad33cbfbb4fc2fff2f84aa3fb196d">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Create the dataset without design features</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>analytic2 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">na.omit</span>(analytic.miss))</span>
 <span id="cb10-3"><a href="#cb10-3"></a>analytic11n <span class="ot">&lt;-</span> <span class="fu">subset</span>(analytic2, cycle <span class="sc">==</span> <span class="dv">11</span> <span class="sc">&amp;</span> province <span class="sc">==</span> <span class="st">"North"</span>)</span>
@@ -1218,7 +1354,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <section id="matching-by-1-matching-variable" class="level4"><h4 class="anchored" data-anchor-id="matching-by-1-matching-variable">Matching by 1 matching variable</h4>
 <p>In the following code chunk, we perform exact matching using a single variable, <code>age</code>. We define the matching formula and apply the <code>matchit</code> function to create matched sets of treated and control units. The resulting <code>matching.obj</code> object is displayed to summarize the matching results.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match1_afef3d17396fa5ad0f38cb24a13bbd5d">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>match.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2"></a>matching.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(match.formula,</span>
 <span id="cb11-3"><a href="#cb11-3"></a>                        <span class="at">data =</span> analytic11n,</span>
@@ -1232,7 +1368,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="matching-by-2-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-2-matching-variables">Matching by 2 matching variables</h4>
 <p>In the following code chunk, we extend the matching to include two variables, <code>age</code> and <code>sex</code>. We create a new variable <code>var.comb</code> that concatenates these two variables and display its frequency table and the number of unique combinations. We then perform exact matching using both variables and display the resulting object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match2_1bc4a99a512e98b34585732ae998c093">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb12-2"><a href="#cb12-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>)])</span>
 <span id="cb12-3"><a href="#cb12-3"></a><span class="fu">table</span>(var.comb)</span>
@@ -1258,7 +1394,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="matching-by-3-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-3-matching-variables">Matching by 3 matching variables</h4>
 <p>In the following code chunk, we further extend the matching to include three variables: <code>age</code>, <code>sex</code>, and <code>stress</code>. We explore the unique combinations of these variables and their distribution across levels of <code>OA</code>. We then perform exact matching using these three variables and display the resulting object.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match3_91d16b5f7ec48601e916494aad3a243c">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb13-2"><a href="#cb13-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>, <span class="st">'stress'</span>)])</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="fu">table</span>(var.comb)</span>
@@ -1321,7 +1457,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="matching-by-4-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-4-matching-variables">Matching by 4 matching variables</h4>
 <p>The process of matching by 4 variables involves creating combinations of the 4 variables, exploring their distributions, and performing exact matching.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/match4_b9f24e58776f9503b5d1c09ef78fba25">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb14-2"><a href="#cb14-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>,</span>
 <span id="cb14-3"><a href="#cb14-3"></a>                                    <span class="st">'stress'</span>,<span class="st">'income'</span>)])</span>
@@ -1340,7 +1476,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb14-16"><a href="#cb14-16"></a><span class="co">#&gt;  - covariates: age, sex, stress, income</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="matching-by-5-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-5-matching-variables">Matching by 5 matching variables</h4>
-<div class="cell" data-hash="propensityscore1_cache/html/match5_ee290ef054223049251f5e5c54764bc1">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb15-2"><a href="#cb15-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>,</span>
 <span id="cb15-3"><a href="#cb15-3"></a>                                    <span class="st">'stress'</span>,<span class="st">'income'</span>,<span class="st">'race'</span>)])</span>
@@ -1358,7 +1494,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb15-15"><a href="#cb15-15"></a><span class="co">#&gt;  - covariates: age, sex, stress, income, race</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="matching-by-6-matching-variables" class="level4"><h4 class="anchored" data-anchor-id="matching-by-6-matching-variables">Matching by 6 matching variables</h4>
-<div class="cell" data-hash="propensityscore1_cache/html/match6_1cb51e3c7d3671cb8e83ffa7cd05f66d">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>var.comb <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">'paste0'</span>, </span>
 <span id="cb16-2"><a href="#cb16-2"></a>                    analytic11n[, <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'sex'</span>,</span>
 <span id="cb16-3"><a href="#cb16-3"></a>                                    <span class="st">'stress'</span>,<span class="st">'income'</span>,<span class="st">'race'</span>,<span class="st">'edu'</span>)])</span>
@@ -1406,7 +1542,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section></section><section id="treatment-effect-1" class="level3"><h3 class="anchored" data-anchor-id="treatment-effect-1">Treatment effect</h3>
 <section id="convert-data-to-design" class="level4"><h4 class="anchored" data-anchor-id="convert-data-to-design">Convert data to design</h4>
 <p>In the following code chunk, we create a new variable matched in the <code>analytic.miss</code> dataset to indicate whether an observation was included in the matched dataset <code>OACVD.match.11n</code>. We then create a new survey design object <code>w.design.m</code> that includes only the matched observations for subsequent analyses.</p>
-<div class="cell" data-hash="propensityscore1_cache/html/tx2_e66e2866179c5cc37d58b3a27f27f67a">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>analytic.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb17-2"><a href="#cb17-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -1426,7 +1562,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </section><section id="outcome-analysis" class="level4"><h4 class="anchored" data-anchor-id="outcome-analysis">Outcome analysis</h4>
 <p>The subsequent code chunks involve fitting logistic regression models to estimate the treatment effect, both in a crude and adjusted manner, respectively. The models are fitted using the matched survey design object and the results are displayed in a readable format.</p>
 <section id="crude" class="level5"><h5 class="anchored" data-anchor-id="crude">Crude</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/est2_9fa4571e2fb6e48eba2982d4761bfde4">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA,</span>
 <span id="cb18-2"><a href="#cb18-2"></a>                   <span class="at">design =</span> w.design.m,</span>
 <span id="cb18-3"><a href="#cb18-3"></a>                   <span class="at">family =</span> <span class="fu">binomial</span>(logit))</span>
@@ -1436,7 +1572,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb18-7"><a href="#cb18-7"></a><span class="co">#&gt;        OA            3.14 [0.80;12.40]   0.1025</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="adjusted" class="level5"><h5 class="anchored" data-anchor-id="adjusted">Adjusted</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/est3_5b255853590977a332345bb51961efb3">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> </span>
 <span id="cb19-2"><a href="#cb19-2"></a>                        age <span class="sc">+</span> sex <span class="sc">+</span> stress <span class="sc">+</span> income <span class="sc">+</span> race <span class="sc">+</span> edu,</span>
 <span id="cb19-3"><a href="#cb19-3"></a>                   <span class="at">design =</span> w.design.m,</span>
@@ -1473,7 +1609,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </ul></section></section><section id="matching-by-a-lot-of-variables" class="level3"><h3 class="anchored" data-anchor-id="matching-by-a-lot-of-variables">Matching by a lot of variables</h3>
 <p>The code chunks involve performing matching using a large number of variables and estimating the treatment effect using the matched data. The process involves creating matched datasets, converting them to survey design objects, and fitting logistic regression models.</p>
 <section id="matching-part-in-data" class="level4"><h4 class="anchored" data-anchor-id="matching-part-in-data">Matching part in data</h4>
-<div class="cell" data-hash="propensityscore1_cache/html/match10_5305d71ad4fea66ec0da9e3e01112663">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>match.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">"OA ~ age + sex + stress + married + </span></span>
 <span id="cb20-2"><a href="#cb20-2"></a><span class="st">                         income + race + bmi + phyact + smoke +</span></span>
 <span id="cb20-3"><a href="#cb20-3"></a><span class="st">                         immigrate + fruit + diab + edu"</span>)</span>
@@ -1540,7 +1676,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </section><section id="treatment-effect-estimation-in-design" class="level4"><h4 class="anchored" data-anchor-id="treatment-effect-estimation-in-design">Treatment effect estimation in design</h4>
 <section id="create-design" class="level5"><h5 class="anchored" data-anchor-id="create-design">Create design</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/match11_cd2b5e4f583e3bff5366435e716794e1">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>analytic.miss<span class="sc">$</span>matched2 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="fu">length</span>(analytic.miss<span class="sc">$</span>ID) <span class="co"># full data</span></span>
 <span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; [1] 397173</span></span>
@@ -1558,7 +1694,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb21-15"><a href="#cb21-15"></a>w.design.m2 <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, matched2 <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="outcome-analysis-1" class="level5"><h5 class="anchored" data-anchor-id="outcome-analysis-1">outcome analysis</h5>
-<div class="cell" data-hash="propensityscore1_cache/html/match12_592ee9ec86b4895657d4ab6696ddd2b5">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>fit.outcome <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(CVD<span class="sc">==</span><span class="st">"event"</span>) <span class="sc">~</span> OA <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> stress <span class="sc">+</span> married <span class="sc">+</span></span>
 <span id="cb22-2"><a href="#cb22-2"></a>                         income <span class="sc">+</span> race <span class="sc">+</span> bmi <span class="sc">+</span> phyact <span class="sc">+</span> smoke <span class="sc">+</span></span>
 <span id="cb22-3"><a href="#cb22-3"></a>                         immigrate <span class="sc">+</span> fruit <span class="sc">+</span> diab <span class="sc">+</span> edu,</span>
@@ -1572,16 +1708,16 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <ul>
 <li>Why the above model not fitting?</li>
 </ul></section></section></section><section id="save-data-for-later-use" class="level3"><h3 class="anchored" data-anchor-id="save-data-for-later-use">Save data for later use</h3>
-<div class="cell" data-hash="propensityscore1_cache/html/savedata_2325ed7e464d8f009a7dde30240d0b05">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">save</span>(analytic11n, analytic2, analytic.miss, <span class="at">file=</span><span class="st">"Data/propensityscore/cchs123c.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
-<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Tip
 </div>
 </div>
@@ -1622,9 +1758,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1711,10 +1861,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
-  function tippyHover(el, contentFn) {
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1724,8 +1891,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1737,9 +1913,245 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1779,12 +2191,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="./propensityscore0.html" class="pagination-link">
+      <a href="./propensityscore0.html" class="pagination-link" aria-label="Concepts (S)">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Concepts (S)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./propensityscore2.html" class="pagination-link">
+      <a href="./propensityscore2.html" class="pagination-link" aria-label="PSM in OA-CVD (CCHS)">
         <span class="nav-page-text">PSM in OA-CVD (CCHS)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>

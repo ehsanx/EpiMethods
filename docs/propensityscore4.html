@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.4.555">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Advanced Epidemiological Methods - PSM in BMI-diabetes</title>
 <style>
@@ -14,11 +14,12 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -43,48 +44,20 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+/* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
-.hanging div.csl-entry {
+.hanging-indent div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -98,8 +71,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}
-</style>
+}</style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -124,7 +96,13 @@ div.csl-indent {
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -133,8 +111,10 @@ div.csl-indent {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
 
@@ -145,26 +125,30 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - PSM in BMI-diabetes">
-<meta name="twitter:description" content="See explained in the previous chapter on PSM in OA-CVD (US), there are four steps of the propensity score matching:">
+<meta name="twitter:description" content="">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked">
 
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">PSM in BMI-diabetes</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./propensityscore.html">Propensity score</a></li><li class="breadcrumb-item"><a href="./propensityscore4.html">PSM in BMI-diabetes</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Advanced Epidemiological Methods</a> 
         <div class="sidebar-tools-main">
-  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
   <i class="bi"></i>
   </div>
@@ -172,836 +156,988 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
     </div>
       </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Project</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data wrangling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R basics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data types</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automating tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing dataset</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data manipulation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Import external data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary tables</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Markdown</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">App (W)</a>
+  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (W)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (W)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Accessing data</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accessing data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">Concepts (A)</a>
+  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data sources</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">Descriptions</a>
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descriptions</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing CCHS to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHANES to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing NHANES results</a>
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reproducing NHANES results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">Importing NHIS to R</a>
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHIS to R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">Linking mortality data</a>
+  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linking mortality data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">Replicate Data Creation</a>
+  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Data Creation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">App (A)</a>
+  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise 1 (A)</a>
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">Exercise 1 Solution (A)</a>
+  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 Solution (A)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">Exercise 2 (A)</a>
+  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 2 (A)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research questions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">Concepts (Q)</a>
+  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (Q)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2a</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2b</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-2</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (Q)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (Q)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">App (Q)</a>
+  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (Q)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal roles</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">Concepts (R)</a>
+  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Confounding</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collider</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">Simpson’s Paradox</a>
+  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Simpson’s Paradox</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Z-bias</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collapsibility</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Change-in-estimate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">Exercise (R)</a>
+  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (R)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prediction ideas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">Concepts (P)</a>
+  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (P)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collinear predictors</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overfitting and performance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data Splitting</a>
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Splitting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bootstrap</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (P)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (P)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">Concepts (D)</a>
+  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Revisiting PICOT</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Assessing data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Bivariate analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Regression</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Performance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Blood Pressure</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Cholesterol</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Subsetting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">App (D)</a>
+  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (D)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (D)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">Concepts (M)</a>
+  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">Imputation in NHANES</a>
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation in NHANES</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing in outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance with NA</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Subpopulations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">MCAR tests</a>
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCAR tests</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Effect modification</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">App (M)</a>
+  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (M)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (M)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Propensity score</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">Concepts (S)</a>
+  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">Exact Matching (CCHS)</a>
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exact Matching (CCHS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (CCHS)</a>
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (CCHS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (US)</a>
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (US)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link active">PSM in BMI-diabetes</a>
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">PSM in BMI-diabetes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">PSM with MI</a>
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">PS Weighting (US)</a>
+  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PS Weighting (US)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">PSM with MI in subset</a>
+  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI in subset</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">PSW with MI in subset</a>
+  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with MI in subset</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">PSW with multiple tx</a>
+  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with multiple tx</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">Quiz (S)</a>
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">App (S)</a>
+  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (S)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (S)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning (ML)</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine learning (ML)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">Concepts (L)</a>
+  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data spliting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">Supervised learning</a>
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Supervised learning</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">Unsupervised learning</a>
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unsupervised learning</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">NHIS Example</a>
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHIS Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">Replicate Results</a>
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">Quiz (L)</a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ML in causal inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">Concepts (C)</a>
+  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (C)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">Motivation</a>
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Motivation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">SuperLearner</a>
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">Binary Outcomes</a>
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary Outcomes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">Continuous Outcomes</a>
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous Outcomes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">Comparing results</a>
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing results</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">Quiz (C)</a>
+  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (C)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (C)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">Complex outcomes</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex outcomes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">Concepts (N)</a>
+  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (N)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">Polytomous and ordinal</a>
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polytomous and ordinal</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">Survival analysis</a>
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">Survival analysis: NHANES</a>
+  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis: NHANES</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">Poisson</a>
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Poisson</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">R functions (N)</a>
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (N)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">Quiz (N)</a>
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (N)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">Longitudinal data</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true">
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Longitudinal data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">Concepts (T)</a>
+  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (T)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">Mixed effects models</a>
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixed effects models</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">GEE</a>
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GEE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">R functions (T)</a>
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (T)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">Quiz (T)</a>
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (T)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./mediation.html" class="sidebar-item-text sidebar-link">Mediation analysis</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true">
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">Concepts (I)</a>
+  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (I)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">Baron and Kenny</a>
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Baron and Kenny</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">Justification</a>
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Justification</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">Mediation Example</a>
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">R functions (I)</a>
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (I)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">Quiz (I)</a>
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (I)</span></a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Writing tools</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true">
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing tools</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">Collaborative Writing</a>
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collaborative Writing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">Formatting Tools</a>
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
       </ul>
 </li>
     </ul>
 </div>
-</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
@@ -1014,8 +1150,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title d-none d-lg-block">PSM in BMI-diabetes</h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./propensityscore.html">Propensity score</a></li><li class="breadcrumb-item"><a href="./propensityscore4.html">PSM in BMI-diabetes</a></li></ol></nav><div class="quarto-title">
+<h1 class="title">PSM in BMI-diabetes</h1>
 </div>
 
 
@@ -1027,6 +1163,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     
   </div>
   
+
 
 </header><section id="propensity-analysis-problem" class="level3"><h3 class="anchored" data-anchor-id="propensity-analysis-problem">Propensity analysis problem</h3>
 <ul>
@@ -1106,11 +1243,11 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
 </ul></section></section><section id="pre-processing" class="level3"><h3 class="anchored" data-anchor-id="pre-processing">Pre-processing</h3>
 <section id="load-data" class="level4"><h4 class="anchored" data-anchor-id="load-data">Load data</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/data_f8531c065e3b63c0572cb81818f3488a">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"Data/propensityscore/NHANES15lab5.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="variable-summary" class="level4"><h4 class="anchored" data-anchor-id="variable-summary">Variable summary</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/varsum_f2f2bf9d04f1301125b5add0d1dc84c0">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Exposure</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>analytic.with.miss<span class="sc">$</span>bmi <span class="ot">&lt;-</span> <span class="fu">with</span>(analytic.with.miss, </span>
 <span id="cb2-3"><a href="#cb2-3"></a>                                   <span class="fu">ifelse</span>(bmi<span class="sc">&gt;</span><span class="dv">25</span>, <span class="st">"Overweight"</span>, </span>
@@ -1126,18 +1263,18 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-13"><a href="#cb2-13"></a><span class="fu">names</span>(analytic.with.miss)[<span class="fu">names</span>(analytic.with.miss) <span class="sc">==</span> <span class="st">"weight"</span>] <span class="ot">&lt;-</span> <span class="st">"interview.weight"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="reproducibility" class="level4"><h4 class="anchored" data-anchor-id="reproducibility">Reproducibility</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/seed_3186bfe213e6c33d35ace6aaf26a91f0">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">set.seed</span>(<span class="dv">504</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="approach-by-zanutto-2006" class="level3"><h3 class="anchored" data-anchor-id="approach-by-zanutto-2006">Approach by Zanutto (2006)</h3>
 <section id="step-1" class="level4"><h4 class="anchored" data-anchor-id="step-1">Step 1</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep1_6d32070cc8624361f83a27472f949565">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Specify the PS model to estimate propensity scores</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(bmi<span class="sc">==</span><span class="st">"Not overweight"</span>) <span class="sc">~</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> education <span class="sc">+</span> </span>
 <span id="cb4-3"><a href="#cb4-3"></a>                           married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2" class="level4"><h4 class="anchored" data-anchor-id="step-2">Step 2</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep2_b1c258265c3cb2df0654315e7322b6a4">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">require</span>(MatchIt)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co"># Complete data for matching</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a>analytic.data <span class="ot">&lt;-</span> analytic.with.miss[<span class="fu">complete.cases</span>(analytic.with.miss),]</span>
@@ -1166,7 +1303,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb5-26"><a href="#cb5-26"></a>matched.data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3" class="level4"><h4 class="anchored" data-anchor-id="step-3">Step 3</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep3_174b24e0834e9bfc1908f2b6cce1338b">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Balance checking</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>cov <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
 <span id="cb6-3"><a href="#cb6-3"></a>         <span class="st">"education"</span>, <span class="st">"married"</span>, <span class="st">"cholesterol"</span>, </span>
@@ -1203,7 +1340,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <p>All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.</p>
 </section><section id="step-4" class="level4"><h4 class="anchored" data-anchor-id="step-4">Step 4</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zanstep4_84cfa718c70e07ee688628cd9f0ff295">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co"># Setup the design with survey features</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a>analytic.with.miss<span class="sc">$</span>matched <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -1222,77 +1359,89 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb7-16"><a href="#cb7-16"></a><span class="fu">require</span>(jtools)</span>
 <span id="cb7-17"><a href="#cb7-17"></a><span class="fu">summ</span>(fit, <span class="at">exp =</span> <span class="cn">TRUE</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Observations </td>
-   <td style="text-align:right;"> 4094 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
-   <td style="text-align:right;"> I(diabetes == "Yes") </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Type </td>
-   <td style="text-align:right;"> Survey-weighted generalized linear model </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Family </td>
-   <td style="text-align:right;"> binomial </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Link </td>
-   <td style="text-align:right;"> logit </td>
-  </tr>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Observations</td>
+<td style="text-align: right;">4094</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Dependent variable</td>
+<td style="text-align: right;">I(diabetes == "Yes")</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Type</td>
+<td style="text-align: right;">Survey-weighted generalized linear model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Family</td>
+<td style="text-align: right;">binomial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Link</td>
+<td style="text-align: right;">logit</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (Cragg-Uhler) </td>
-   <td style="text-align:right;"> 0.071 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (McFadden) </td>
-   <td style="text-align:right;"> 0.054 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> AIC </td>
-   <td style="text-align:right;"> 2336.725 </td>
-  </tr>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (Cragg-Uhler)</td>
+<td style="text-align: right;">0.071</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (McFadden)</td>
+<td style="text-align: right;">0.054</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">AIC</td>
+<td style="text-align: right;">2336.725</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
-<thead><tr>
-<th style="text-align:left;">   </th>
-   <th style="text-align:right;"> exp(Est.) </th>
-   <th style="text-align:right;"> 2.5% </th>
-   <th style="text-align:right;"> 97.5% </th>
-   <th style="text-align:right;"> t val. </th>
-   <th style="text-align:right;"> p </th>
-  </tr></thead>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">exp(Est.)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">97.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
+</tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
-   <td style="text-align:right;"> 0.165 </td>
-   <td style="text-align:right;"> 0.141 </td>
-   <td style="text-align:right;"> 0.195 </td>
-   <td style="text-align:right;"> -21.678 </td>
-   <td style="text-align:right;"> 0.000 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> bmiNot overweight </td>
-   <td style="text-align:right;"> 0.245 </td>
-   <td style="text-align:right;"> 0.173 </td>
-   <td style="text-align:right;"> 0.346 </td>
-   <td style="text-align:right;"> -7.980 </td>
-   <td style="text-align:right;"> 0.000 </td>
-  </tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">(Intercept)</td>
+<td style="text-align: right;">0.165</td>
+<td style="text-align: right;">0.141</td>
+<td style="text-align: right;">0.195</td>
+<td style="text-align: right;">-21.678</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">bmiNot overweight</td>
+<td style="text-align: right;">0.245</td>
+<td style="text-align: right;">0.173</td>
+<td style="text-align: right;">0.346</td>
+<td style="text-align: right;">-7.980</td>
+<td style="text-align: right;">0.000</td>
+</tr>
 </tbody>
-<tfoot><tr><td style="padding: 0; " colspan="100%">
-<sup></sup> Standard errors: Robust</td></tr></tfoot>
+<tfoot><tr class="odd">
+<td style="text-align: left; padding: 0;">
+<sup></sup> Standard errors: Robust</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr></tfoot>
 </table>
 </div>
 </div>
+</div>
 </section><section id="double-adjustment" class="level4"><h4 class="anchored" data-anchor-id="double-adjustment">Double adjustment</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Zandoubleadj_b9bc97b8b0ece5dac4ab4d47558467a2">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">library</span>(survey)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="co"># Outcome model with covariates adjustment</span></span>
 <span id="cb8-3"><a href="#cb8-3"></a>fit.DA <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> bmi <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> </span>
@@ -1300,205 +1449,217 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb8-5"><a href="#cb8-5"></a>               <span class="at">design =</span> w.design.m, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb8-6"><a href="#cb8-6"></a><span class="fu">summ</span>(fit.DA, <span class="at">exp =</span> <span class="cn">TRUE</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Observations </td>
-   <td style="text-align:right;"> 4094 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
-   <td style="text-align:right;"> I(diabetes == "Yes") </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Type </td>
-   <td style="text-align:right;"> Survey-weighted generalized linear model </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Family </td>
-   <td style="text-align:right;"> binomial </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Link </td>
-   <td style="text-align:right;"> logit </td>
-  </tr>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Observations</td>
+<td style="text-align: right;">4094</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Dependent variable</td>
+<td style="text-align: right;">I(diabetes == "Yes")</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Type</td>
+<td style="text-align: right;">Survey-weighted generalized linear model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Family</td>
+<td style="text-align: right;">binomial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Link</td>
+<td style="text-align: right;">logit</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (Cragg-Uhler) </td>
-   <td style="text-align:right;"> 0.212 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (McFadden) </td>
-   <td style="text-align:right;"> 0.166 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> AIC </td>
-   <td style="text-align:right;"> 2063.466 </td>
-  </tr>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (Cragg-Uhler)</td>
+<td style="text-align: right;">0.212</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (McFadden)</td>
+<td style="text-align: right;">0.166</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">AIC</td>
+<td style="text-align: right;">2063.466</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
-<thead><tr>
-<th style="text-align:left;">   </th>
-   <th style="text-align:right;"> exp(Est.) </th>
-   <th style="text-align:right;"> 2.5% </th>
-   <th style="text-align:right;"> 97.5% </th>
-   <th style="text-align:right;"> t val. </th>
-   <th style="text-align:right;"> p </th>
-  </tr></thead>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">exp(Est.)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">97.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
+</tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
-   <td style="text-align:right;"> 0.045 </td>
-   <td style="text-align:right;"> 0.010 </td>
-   <td style="text-align:right;"> 0.199 </td>
-   <td style="text-align:right;"> -4.101 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> bmiNot overweight </td>
-   <td style="text-align:right;"> 0.235 </td>
-   <td style="text-align:right;"> 0.159 </td>
-   <td style="text-align:right;"> 0.348 </td>
-   <td style="text-align:right;"> -7.219 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> genderMale </td>
-   <td style="text-align:right;"> 1.317 </td>
-   <td style="text-align:right;"> 1.082 </td>
-   <td style="text-align:right;"> 1.604 </td>
-   <td style="text-align:right;"> 2.740 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> age </td>
-   <td style="text-align:right;"> 1.051 </td>
-   <td style="text-align:right;"> 1.044 </td>
-   <td style="text-align:right;"> 1.059 </td>
-   <td style="text-align:right;"> 13.280 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceHispanic </td>
-   <td style="text-align:right;"> 0.896 </td>
-   <td style="text-align:right;"> 0.649 </td>
-   <td style="text-align:right;"> 1.237 </td>
-   <td style="text-align:right;"> -0.665 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceOther </td>
-   <td style="text-align:right;"> 1.158 </td>
-   <td style="text-align:right;"> 0.565 </td>
-   <td style="text-align:right;"> 2.374 </td>
-   <td style="text-align:right;"> 0.401 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceWhite </td>
-   <td style="text-align:right;"> 0.778 </td>
-   <td style="text-align:right;"> 0.507 </td>
-   <td style="text-align:right;"> 1.193 </td>
-   <td style="text-align:right;"> -1.152 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeBetween.25kto54k </td>
-   <td style="text-align:right;"> 0.830 </td>
-   <td style="text-align:right;"> 0.551 </td>
-   <td style="text-align:right;"> 1.251 </td>
-   <td style="text-align:right;"> -0.889 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeBetween.55kto99k </td>
-   <td style="text-align:right;"> 0.872 </td>
-   <td style="text-align:right;"> 0.621 </td>
-   <td style="text-align:right;"> 1.224 </td>
-   <td style="text-align:right;"> -0.794 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeOver100k </td>
-   <td style="text-align:right;"> 0.669 </td>
-   <td style="text-align:right;"> 0.418 </td>
-   <td style="text-align:right;"> 1.072 </td>
-   <td style="text-align:right;"> -1.669 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> educationHigh.School </td>
-   <td style="text-align:right;"> 0.948 </td>
-   <td style="text-align:right;"> 0.733 </td>
-   <td style="text-align:right;"> 1.225 </td>
-   <td style="text-align:right;"> -0.408 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> educationSchool </td>
-   <td style="text-align:right;"> 0.872 </td>
-   <td style="text-align:right;"> 0.448 </td>
-   <td style="text-align:right;"> 1.695 </td>
-   <td style="text-align:right;"> -0.405 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> marriedNever.married </td>
-   <td style="text-align:right;"> 1.055 </td>
-   <td style="text-align:right;"> 0.677 </td>
-   <td style="text-align:right;"> 1.646 </td>
-   <td style="text-align:right;"> 0.237 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> marriedPreviously.married </td>
-   <td style="text-align:right;"> 0.849 </td>
-   <td style="text-align:right;"> 0.534 </td>
-   <td style="text-align:right;"> 1.348 </td>
-   <td style="text-align:right;"> -0.694 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> cholesterol </td>
-   <td style="text-align:right;"> 0.991 </td>
-   <td style="text-align:right;"> 0.986 </td>
-   <td style="text-align:right;"> 0.995 </td>
-   <td style="text-align:right;"> -3.810 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> diastolicBP </td>
-   <td style="text-align:right;"> 1.005 </td>
-   <td style="text-align:right;"> 0.992 </td>
-   <td style="text-align:right;"> 1.018 </td>
-   <td style="text-align:right;"> 0.749 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> systolicBP </td>
-   <td style="text-align:right;"> 1.003 </td>
-   <td style="text-align:right;"> 0.993 </td>
-   <td style="text-align:right;"> 1.012 </td>
-   <td style="text-align:right;"> 0.559 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">(Intercept)</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">0.199</td>
+<td style="text-align: right;">-4.101</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">bmiNot overweight</td>
+<td style="text-align: right;">0.235</td>
+<td style="text-align: right;">0.159</td>
+<td style="text-align: right;">0.348</td>
+<td style="text-align: right;">-7.219</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">genderMale</td>
+<td style="text-align: right;">1.317</td>
+<td style="text-align: right;">1.082</td>
+<td style="text-align: right;">1.604</td>
+<td style="text-align: right;">2.740</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">age</td>
+<td style="text-align: right;">1.051</td>
+<td style="text-align: right;">1.044</td>
+<td style="text-align: right;">1.059</td>
+<td style="text-align: right;">13.280</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">raceHispanic</td>
+<td style="text-align: right;">0.896</td>
+<td style="text-align: right;">0.649</td>
+<td style="text-align: right;">1.237</td>
+<td style="text-align: right;">-0.665</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">raceOther</td>
+<td style="text-align: right;">1.158</td>
+<td style="text-align: right;">0.565</td>
+<td style="text-align: right;">2.374</td>
+<td style="text-align: right;">0.401</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">raceWhite</td>
+<td style="text-align: right;">0.778</td>
+<td style="text-align: right;">0.507</td>
+<td style="text-align: right;">1.193</td>
+<td style="text-align: right;">-1.152</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">incomeBetween.25kto54k</td>
+<td style="text-align: right;">0.830</td>
+<td style="text-align: right;">0.551</td>
+<td style="text-align: right;">1.251</td>
+<td style="text-align: right;">-0.889</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">incomeBetween.55kto99k</td>
+<td style="text-align: right;">0.872</td>
+<td style="text-align: right;">0.621</td>
+<td style="text-align: right;">1.224</td>
+<td style="text-align: right;">-0.794</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">incomeOver100k</td>
+<td style="text-align: right;">0.669</td>
+<td style="text-align: right;">0.418</td>
+<td style="text-align: right;">1.072</td>
+<td style="text-align: right;">-1.669</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">educationHigh.School</td>
+<td style="text-align: right;">0.948</td>
+<td style="text-align: right;">0.733</td>
+<td style="text-align: right;">1.225</td>
+<td style="text-align: right;">-0.408</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">educationSchool</td>
+<td style="text-align: right;">0.872</td>
+<td style="text-align: right;">0.448</td>
+<td style="text-align: right;">1.695</td>
+<td style="text-align: right;">-0.405</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">marriedNever.married</td>
+<td style="text-align: right;">1.055</td>
+<td style="text-align: right;">0.677</td>
+<td style="text-align: right;">1.646</td>
+<td style="text-align: right;">0.237</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">marriedPreviously.married</td>
+<td style="text-align: right;">0.849</td>
+<td style="text-align: right;">0.534</td>
+<td style="text-align: right;">1.348</td>
+<td style="text-align: right;">-0.694</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">cholesterol</td>
+<td style="text-align: right;">0.991</td>
+<td style="text-align: right;">0.986</td>
+<td style="text-align: right;">0.995</td>
+<td style="text-align: right;">-3.810</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">diastolicBP</td>
+<td style="text-align: right;">1.005</td>
+<td style="text-align: right;">0.992</td>
+<td style="text-align: right;">1.018</td>
+<td style="text-align: right;">0.749</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">systolicBP</td>
+<td style="text-align: right;">1.003</td>
+<td style="text-align: right;">0.993</td>
+<td style="text-align: right;">1.012</td>
+<td style="text-align: right;">0.559</td>
+<td style="text-align: right;">NA</td>
+</tr>
 </tbody>
-<tfoot><tr><td style="padding: 0; " colspan="100%">
-<sup></sup> Standard errors: Robust</td></tr></tfoot>
+<tfoot><tr class="even">
+<td style="text-align: left; padding: 0;">
+<sup></sup> Standard errors: Robust</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr></tfoot>
 </table>
+</div>
 </div>
 </div>
 </section></section><section id="approach-by-dugoff-et-al.-2014" class="level3"><h3 class="anchored" data-anchor-id="approach-by-dugoff-et-al.-2014">Approach by DuGoff et al.&nbsp;(2014)</h3>
 <section id="step-1-1" class="level4"><h4 class="anchored" data-anchor-id="step-1-1">Step 1</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep1_46746072ec34226e7b2714adf29dcd6e">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Specify the PS model to estimate propensity scores</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>ps.formula2 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(bmi <span class="sc">==</span> <span class="st">"Not overweight"</span>) <span class="sc">~</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> education <span class="sc">+</span> </span>
 <span id="cb9-3"><a href="#cb9-3"></a>                           married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP <span class="sc">+</span> </span>
 <span id="cb9-4"><a href="#cb9-4"></a>                           psu <span class="sc">+</span> strata <span class="sc">+</span> interview.weight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2-1" class="level4"><h4 class="anchored" data-anchor-id="step-2-1">Step 2</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep2_3ba1569244665c5ec1f4d52f45ee0cd6">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Propensity scores</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>ps.fit2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(ps.formula2, <span class="at">data =</span> analytic.data, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb10-3"><a href="#cb10-3"></a>analytic.data<span class="sc">$</span>PS2 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(ps.fit2)</span>
@@ -1520,7 +1681,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb10-19"><a href="#cb10-19"></a>matched.data2 <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj2) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3-1" class="level4"><h4 class="anchored" data-anchor-id="step-3-1">Step 3</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep3_6e9f5b2913f50f369c980489d5c1d30f">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Balance checking</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>cov2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
 <span id="cb11-3"><a href="#cb11-3"></a>          <span class="st">"education"</span>, <span class="st">"married"</span>, <span class="st">"cholesterol"</span>, </span>
@@ -1561,7 +1722,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 <p>All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.</p>
 </section><section id="step-4-1" class="level4"><h4 class="anchored" data-anchor-id="step-4-1">Step 4</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGstep4_313748d87fc6969bd110e4ca289a6b4b">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Setup the design with survey features</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a>analytic.with.miss<span class="sc">$</span>matched2 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb12-3"><a href="#cb12-3"></a>analytic.with.miss<span class="sc">$</span>matched2[analytic.with.miss<span class="sc">$</span>ID <span class="sc">%in%</span> matched.data2<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
@@ -1578,278 +1739,302 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb12-14"><a href="#cb12-14"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(out.formula, <span class="at">design =</span> w.design.m2, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb12-15"><a href="#cb12-15"></a><span class="fu">summ</span>(fit2, <span class="at">exp =</span> <span class="cn">TRUE</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Observations </td>
-   <td style="text-align:right;"> 4074 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
-   <td style="text-align:right;"> I(diabetes == "Yes") </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Type </td>
-   <td style="text-align:right;"> Survey-weighted generalized linear model </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Family </td>
-   <td style="text-align:right;"> binomial </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Link </td>
-   <td style="text-align:right;"> logit </td>
-  </tr>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Observations</td>
+<td style="text-align: right;">4074</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Dependent variable</td>
+<td style="text-align: right;">I(diabetes == "Yes")</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Type</td>
+<td style="text-align: right;">Survey-weighted generalized linear model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Family</td>
+<td style="text-align: right;">binomial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Link</td>
+<td style="text-align: right;">logit</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (Cragg-Uhler) </td>
-   <td style="text-align:right;"> 0.083 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (McFadden) </td>
-   <td style="text-align:right;"> 0.063 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> AIC </td>
-   <td style="text-align:right;"> 2322.836 </td>
-  </tr>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (Cragg-Uhler)</td>
+<td style="text-align: right;">0.083</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (McFadden)</td>
+<td style="text-align: right;">0.063</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">AIC</td>
+<td style="text-align: right;">2322.836</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
-<thead><tr>
-<th style="text-align:left;">   </th>
-   <th style="text-align:right;"> exp(Est.) </th>
-   <th style="text-align:right;"> 2.5% </th>
-   <th style="text-align:right;"> 97.5% </th>
-   <th style="text-align:right;"> t val. </th>
-   <th style="text-align:right;"> p </th>
-  </tr></thead>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">exp(Est.)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">97.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
+</tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
-   <td style="text-align:right;"> 0.174 </td>
-   <td style="text-align:right;"> 0.149 </td>
-   <td style="text-align:right;"> 0.202 </td>
-   <td style="text-align:right;"> -22.325 </td>
-   <td style="text-align:right;"> 0.000 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> bmiNot overweight </td>
-   <td style="text-align:right;"> 0.221 </td>
-   <td style="text-align:right;"> 0.163 </td>
-   <td style="text-align:right;"> 0.299 </td>
-   <td style="text-align:right;"> -9.749 </td>
-   <td style="text-align:right;"> 0.000 </td>
-  </tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">(Intercept)</td>
+<td style="text-align: right;">0.174</td>
+<td style="text-align: right;">0.149</td>
+<td style="text-align: right;">0.202</td>
+<td style="text-align: right;">-22.325</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">bmiNot overweight</td>
+<td style="text-align: right;">0.221</td>
+<td style="text-align: right;">0.163</td>
+<td style="text-align: right;">0.299</td>
+<td style="text-align: right;">-9.749</td>
+<td style="text-align: right;">0.000</td>
+</tr>
 </tbody>
-<tfoot><tr><td style="padding: 0; " colspan="100%">
-<sup></sup> Standard errors: Robust</td></tr></tfoot>
+<tfoot><tr class="odd">
+<td style="text-align: left; padding: 0;">
+<sup></sup> Standard errors: Robust</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr></tfoot>
 </table>
 </div>
 </div>
+</div>
 </section><section id="double-adjustment-1" class="level4"><h4 class="anchored" data-anchor-id="double-adjustment-1">Double adjustment</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/duGdoubleadj2_321ba9f4fe609e5d6f035b310885c19c">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Outcome model with covariates adjustment</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>fit2.DA <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> bmi <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> </span>
 <span id="cb13-3"><a href="#cb13-3"></a>                 education <span class="sc">+</span> married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP, </span>
 <span id="cb13-4"><a href="#cb13-4"></a>               <span class="at">design =</span> w.design.m, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb13-5"><a href="#cb13-5"></a><span class="fu">summ</span>(fit2.DA, <span class="at">exp =</span> <span class="cn">TRUE</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Observations </td>
-   <td style="text-align:right;"> 4094 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
-   <td style="text-align:right;"> I(diabetes == "Yes") </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Type </td>
-   <td style="text-align:right;"> Survey-weighted generalized linear model </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Family </td>
-   <td style="text-align:right;"> binomial </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Link </td>
-   <td style="text-align:right;"> logit </td>
-  </tr>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Observations</td>
+<td style="text-align: right;">4094</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Dependent variable</td>
+<td style="text-align: right;">I(diabetes == "Yes")</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Type</td>
+<td style="text-align: right;">Survey-weighted generalized linear model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Family</td>
+<td style="text-align: right;">binomial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Link</td>
+<td style="text-align: right;">logit</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (Cragg-Uhler) </td>
-   <td style="text-align:right;"> 0.212 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (McFadden) </td>
-   <td style="text-align:right;"> 0.166 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> AIC </td>
-   <td style="text-align:right;"> 2063.466 </td>
-  </tr>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (Cragg-Uhler)</td>
+<td style="text-align: right;">0.212</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (McFadden)</td>
+<td style="text-align: right;">0.166</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">AIC</td>
+<td style="text-align: right;">2063.466</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
-<thead><tr>
-<th style="text-align:left;">   </th>
-   <th style="text-align:right;"> exp(Est.) </th>
-   <th style="text-align:right;"> 2.5% </th>
-   <th style="text-align:right;"> 97.5% </th>
-   <th style="text-align:right;"> t val. </th>
-   <th style="text-align:right;"> p </th>
-  </tr></thead>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">exp(Est.)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">97.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
+</tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
-   <td style="text-align:right;"> 0.045 </td>
-   <td style="text-align:right;"> 0.010 </td>
-   <td style="text-align:right;"> 0.199 </td>
-   <td style="text-align:right;"> -4.101 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> bmiNot overweight </td>
-   <td style="text-align:right;"> 0.235 </td>
-   <td style="text-align:right;"> 0.159 </td>
-   <td style="text-align:right;"> 0.348 </td>
-   <td style="text-align:right;"> -7.219 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> genderMale </td>
-   <td style="text-align:right;"> 1.317 </td>
-   <td style="text-align:right;"> 1.082 </td>
-   <td style="text-align:right;"> 1.604 </td>
-   <td style="text-align:right;"> 2.740 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> age </td>
-   <td style="text-align:right;"> 1.051 </td>
-   <td style="text-align:right;"> 1.044 </td>
-   <td style="text-align:right;"> 1.059 </td>
-   <td style="text-align:right;"> 13.280 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceHispanic </td>
-   <td style="text-align:right;"> 0.896 </td>
-   <td style="text-align:right;"> 0.649 </td>
-   <td style="text-align:right;"> 1.237 </td>
-   <td style="text-align:right;"> -0.665 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceOther </td>
-   <td style="text-align:right;"> 1.158 </td>
-   <td style="text-align:right;"> 0.565 </td>
-   <td style="text-align:right;"> 2.374 </td>
-   <td style="text-align:right;"> 0.401 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceWhite </td>
-   <td style="text-align:right;"> 0.778 </td>
-   <td style="text-align:right;"> 0.507 </td>
-   <td style="text-align:right;"> 1.193 </td>
-   <td style="text-align:right;"> -1.152 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeBetween.25kto54k </td>
-   <td style="text-align:right;"> 0.830 </td>
-   <td style="text-align:right;"> 0.551 </td>
-   <td style="text-align:right;"> 1.251 </td>
-   <td style="text-align:right;"> -0.889 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeBetween.55kto99k </td>
-   <td style="text-align:right;"> 0.872 </td>
-   <td style="text-align:right;"> 0.621 </td>
-   <td style="text-align:right;"> 1.224 </td>
-   <td style="text-align:right;"> -0.794 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeOver100k </td>
-   <td style="text-align:right;"> 0.669 </td>
-   <td style="text-align:right;"> 0.418 </td>
-   <td style="text-align:right;"> 1.072 </td>
-   <td style="text-align:right;"> -1.669 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> educationHigh.School </td>
-   <td style="text-align:right;"> 0.948 </td>
-   <td style="text-align:right;"> 0.733 </td>
-   <td style="text-align:right;"> 1.225 </td>
-   <td style="text-align:right;"> -0.408 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> educationSchool </td>
-   <td style="text-align:right;"> 0.872 </td>
-   <td style="text-align:right;"> 0.448 </td>
-   <td style="text-align:right;"> 1.695 </td>
-   <td style="text-align:right;"> -0.405 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> marriedNever.married </td>
-   <td style="text-align:right;"> 1.055 </td>
-   <td style="text-align:right;"> 0.677 </td>
-   <td style="text-align:right;"> 1.646 </td>
-   <td style="text-align:right;"> 0.237 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> marriedPreviously.married </td>
-   <td style="text-align:right;"> 0.849 </td>
-   <td style="text-align:right;"> 0.534 </td>
-   <td style="text-align:right;"> 1.348 </td>
-   <td style="text-align:right;"> -0.694 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> cholesterol </td>
-   <td style="text-align:right;"> 0.991 </td>
-   <td style="text-align:right;"> 0.986 </td>
-   <td style="text-align:right;"> 0.995 </td>
-   <td style="text-align:right;"> -3.810 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> diastolicBP </td>
-   <td style="text-align:right;"> 1.005 </td>
-   <td style="text-align:right;"> 0.992 </td>
-   <td style="text-align:right;"> 1.018 </td>
-   <td style="text-align:right;"> 0.749 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> systolicBP </td>
-   <td style="text-align:right;"> 1.003 </td>
-   <td style="text-align:right;"> 0.993 </td>
-   <td style="text-align:right;"> 1.012 </td>
-   <td style="text-align:right;"> 0.559 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">(Intercept)</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">0.199</td>
+<td style="text-align: right;">-4.101</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">bmiNot overweight</td>
+<td style="text-align: right;">0.235</td>
+<td style="text-align: right;">0.159</td>
+<td style="text-align: right;">0.348</td>
+<td style="text-align: right;">-7.219</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">genderMale</td>
+<td style="text-align: right;">1.317</td>
+<td style="text-align: right;">1.082</td>
+<td style="text-align: right;">1.604</td>
+<td style="text-align: right;">2.740</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">age</td>
+<td style="text-align: right;">1.051</td>
+<td style="text-align: right;">1.044</td>
+<td style="text-align: right;">1.059</td>
+<td style="text-align: right;">13.280</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">raceHispanic</td>
+<td style="text-align: right;">0.896</td>
+<td style="text-align: right;">0.649</td>
+<td style="text-align: right;">1.237</td>
+<td style="text-align: right;">-0.665</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">raceOther</td>
+<td style="text-align: right;">1.158</td>
+<td style="text-align: right;">0.565</td>
+<td style="text-align: right;">2.374</td>
+<td style="text-align: right;">0.401</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">raceWhite</td>
+<td style="text-align: right;">0.778</td>
+<td style="text-align: right;">0.507</td>
+<td style="text-align: right;">1.193</td>
+<td style="text-align: right;">-1.152</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">incomeBetween.25kto54k</td>
+<td style="text-align: right;">0.830</td>
+<td style="text-align: right;">0.551</td>
+<td style="text-align: right;">1.251</td>
+<td style="text-align: right;">-0.889</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">incomeBetween.55kto99k</td>
+<td style="text-align: right;">0.872</td>
+<td style="text-align: right;">0.621</td>
+<td style="text-align: right;">1.224</td>
+<td style="text-align: right;">-0.794</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">incomeOver100k</td>
+<td style="text-align: right;">0.669</td>
+<td style="text-align: right;">0.418</td>
+<td style="text-align: right;">1.072</td>
+<td style="text-align: right;">-1.669</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">educationHigh.School</td>
+<td style="text-align: right;">0.948</td>
+<td style="text-align: right;">0.733</td>
+<td style="text-align: right;">1.225</td>
+<td style="text-align: right;">-0.408</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">educationSchool</td>
+<td style="text-align: right;">0.872</td>
+<td style="text-align: right;">0.448</td>
+<td style="text-align: right;">1.695</td>
+<td style="text-align: right;">-0.405</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">marriedNever.married</td>
+<td style="text-align: right;">1.055</td>
+<td style="text-align: right;">0.677</td>
+<td style="text-align: right;">1.646</td>
+<td style="text-align: right;">0.237</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">marriedPreviously.married</td>
+<td style="text-align: right;">0.849</td>
+<td style="text-align: right;">0.534</td>
+<td style="text-align: right;">1.348</td>
+<td style="text-align: right;">-0.694</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">cholesterol</td>
+<td style="text-align: right;">0.991</td>
+<td style="text-align: right;">0.986</td>
+<td style="text-align: right;">0.995</td>
+<td style="text-align: right;">-3.810</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">diastolicBP</td>
+<td style="text-align: right;">1.005</td>
+<td style="text-align: right;">0.992</td>
+<td style="text-align: right;">1.018</td>
+<td style="text-align: right;">0.749</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">systolicBP</td>
+<td style="text-align: right;">1.003</td>
+<td style="text-align: right;">0.993</td>
+<td style="text-align: right;">1.012</td>
+<td style="text-align: right;">0.559</td>
+<td style="text-align: right;">NA</td>
+</tr>
 </tbody>
-<tfoot><tr><td style="padding: 0; " colspan="100%">
-<sup></sup> Standard errors: Robust</td></tr></tfoot>
+<tfoot><tr class="even">
+<td style="text-align: left; padding: 0;">
+<sup></sup> Standard errors: Robust</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr></tfoot>
 </table>
 </div>
 </div>
-<div class="callout-tip callout callout-style-default callout-captioned">
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Tip
 </div>
 </div>
@@ -1861,7 +2046,7 @@ Tip
 </div>
 </section></section><section id="approach-by-austin-et-al.-2018" class="level3"><h3 class="anchored" data-anchor-id="approach-by-austin-et-al.-2018">Approach by Austin et al.&nbsp;(2018)</h3>
 <section id="step-1-2" class="level4"><h4 class="anchored" data-anchor-id="step-1-2">Step 1</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep1_7a68261d087257fb5a0690e4b6188def">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Specify the PS model to estimate propensity scores</span></span>
 <span id="cb14-2"><a href="#cb14-2"></a>ps.formula3 <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">I</span>(bmi <span class="sc">==</span> <span class="st">"Not overweight"</span>) <span class="sc">~</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> education <span class="sc">+</span> </span>
 <span id="cb14-3"><a href="#cb14-3"></a>                           married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP)</span>
@@ -1872,7 +2057,7 @@ Tip
 <span id="cb14-8"><a href="#cb14-8"></a>                             <span class="at">data =</span> analytic.data, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-2-2" class="level4"><h4 class="anchored" data-anchor-id="step-2-2">Step 2</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep2_2aadf986822e071f7a93f1bf13d5f3af">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Propensity scores</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a>ps.fit3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(ps.formula3, <span class="at">design =</span> analytic.design, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb15-3"><a href="#cb15-3"></a>analytic.data<span class="sc">$</span>PS3 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(ps.fit3)</span>
@@ -1894,7 +2079,7 @@ Tip
 <span id="cb15-19"><a href="#cb15-19"></a>matched.data3 <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj3) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="step-3-2" class="level4"><h4 class="anchored" data-anchor-id="step-3-2">Step 3</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep_ffec308e8054ac98d13825e8224f799f">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Balance checking</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a>cov <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"gender"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>, <span class="st">"income"</span>, </span>
 <span id="cb16-3"><a href="#cb16-3"></a>         <span class="st">"education"</span>, <span class="st">"married"</span>, <span class="st">"cholesterol"</span>, </span>
@@ -1931,7 +2116,7 @@ Tip
 </div>
 <p>All SMDs are less than your specified cut-point? If yes, that indicates that there is good covariate balancing.</p>
 </section><section id="step-4-2" class="level4"><h4 class="anchored" data-anchor-id="step-4-2">Step 4</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausstep4_b2835e50f11b87dc43de96a154f7eb8f">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Setup the design with survey features</span></span>
 <span id="cb17-2"><a href="#cb17-2"></a>analytic.with.miss<span class="sc">$</span>matched3 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb17-3"><a href="#cb17-3"></a>analytic.with.miss<span class="sc">$</span>matched3[analytic.with.miss<span class="sc">$</span>ID <span class="sc">%in%</span> matched.data3<span class="sc">$</span>ID] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
@@ -1948,283 +2133,307 @@ Tip
 <span id="cb17-14"><a href="#cb17-14"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(out.formula, <span class="at">design =</span> w.design.m3, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb17-15"><a href="#cb17-15"></a><span class="fu">summ</span>(fit3, <span class="at">exp =</span> <span class="cn">TRUE</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Observations </td>
-   <td style="text-align:right;"> 4058 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
-   <td style="text-align:right;"> I(diabetes == "Yes") </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Type </td>
-   <td style="text-align:right;"> Survey-weighted generalized linear model </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Family </td>
-   <td style="text-align:right;"> binomial </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Link </td>
-   <td style="text-align:right;"> logit </td>
-  </tr>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Observations</td>
+<td style="text-align: right;">4058</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Dependent variable</td>
+<td style="text-align: right;">I(diabetes == "Yes")</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Type</td>
+<td style="text-align: right;">Survey-weighted generalized linear model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Family</td>
+<td style="text-align: right;">binomial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Link</td>
+<td style="text-align: right;">logit</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (Cragg-Uhler) </td>
-   <td style="text-align:right;"> 0.071 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (McFadden) </td>
-   <td style="text-align:right;"> 0.054 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> AIC </td>
-   <td style="text-align:right;"> 2364.398 </td>
-  </tr>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (Cragg-Uhler)</td>
+<td style="text-align: right;">0.071</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (McFadden)</td>
+<td style="text-align: right;">0.054</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">AIC</td>
+<td style="text-align: right;">2364.398</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
-<thead><tr>
-<th style="text-align:left;">   </th>
-   <th style="text-align:right;"> exp(Est.) </th>
-   <th style="text-align:right;"> 2.5% </th>
-   <th style="text-align:right;"> 97.5% </th>
-   <th style="text-align:right;"> t val. </th>
-   <th style="text-align:right;"> p </th>
-  </tr></thead>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">exp(Est.)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">97.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
+</tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
-   <td style="text-align:right;"> 0.169 </td>
-   <td style="text-align:right;"> 0.142 </td>
-   <td style="text-align:right;"> 0.202 </td>
-   <td style="text-align:right;"> -19.891 </td>
-   <td style="text-align:right;"> 0.000 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> bmiNot overweight </td>
-   <td style="text-align:right;"> 0.244 </td>
-   <td style="text-align:right;"> 0.178 </td>
-   <td style="text-align:right;"> 0.334 </td>
-   <td style="text-align:right;"> -8.825 </td>
-   <td style="text-align:right;"> 0.000 </td>
-  </tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">(Intercept)</td>
+<td style="text-align: right;">0.169</td>
+<td style="text-align: right;">0.142</td>
+<td style="text-align: right;">0.202</td>
+<td style="text-align: right;">-19.891</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">bmiNot overweight</td>
+<td style="text-align: right;">0.244</td>
+<td style="text-align: right;">0.178</td>
+<td style="text-align: right;">0.334</td>
+<td style="text-align: right;">-8.825</td>
+<td style="text-align: right;">0.000</td>
+</tr>
 </tbody>
-<tfoot><tr><td style="padding: 0; " colspan="100%">
-<sup></sup> Standard errors: Robust</td></tr></tfoot>
+<tfoot><tr class="odd">
+<td style="text-align: left; padding: 0;">
+<sup></sup> Standard errors: Robust</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr></tfoot>
 </table>
 </div>
 </div>
+</div>
 </section><section id="double-adjustment-2" class="level4"><h4 class="anchored" data-anchor-id="double-adjustment-2">Double adjustment</h4>
-<div class="cell" data-hash="propensityscore4_cache/html/Ausdoubleadj_6fd64edad05a872658c93fe40c7d983a">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Outcome model with covariates adjustment</span></span>
 <span id="cb18-2"><a href="#cb18-2"></a>fit3.DA <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(diabetes <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> bmi <span class="sc">+</span> gender <span class="sc">+</span> age <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> </span>
 <span id="cb18-3"><a href="#cb18-3"></a>                 education <span class="sc">+</span> married <span class="sc">+</span> cholesterol <span class="sc">+</span> diastolicBP <span class="sc">+</span> systolicBP, </span>
 <span id="cb18-4"><a href="#cb18-4"></a>               <span class="at">design =</span> w.design.m, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb18-5"><a href="#cb18-5"></a><span class="fu">summ</span>(fit3.DA, <span class="at">exp =</span> <span class="cn">TRUE</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Observations </td>
-   <td style="text-align:right;"> 4094 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Dependent variable </td>
-   <td style="text-align:right;"> I(diabetes == "Yes") </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Type </td>
-   <td style="text-align:right;"> Survey-weighted generalized linear model </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Family </td>
-   <td style="text-align:right;"> binomial </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Link </td>
-   <td style="text-align:right;"> logit </td>
-  </tr>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Observations</td>
+<td style="text-align: right;">4094</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Dependent variable</td>
+<td style="text-align: right;">I(diabetes == "Yes")</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Type</td>
+<td style="text-align: right;">Survey-weighted generalized linear model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Family</td>
+<td style="text-align: right;">binomial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Link</td>
+<td style="text-align: right;">logit</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"><tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (Cragg-Uhler) </td>
-   <td style="text-align:right;"> 0.212 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> Pseudo-R² (McFadden) </td>
-   <td style="text-align:right;"> 0.166 </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> AIC </td>
-   <td style="text-align:right;"> 2063.466 </td>
-  </tr>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true"><tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (Cragg-Uhler)</td>
+<td style="text-align: right;">0.212</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Pseudo-R² (McFadden)</td>
+<td style="text-align: right;">0.166</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">AIC</td>
+<td style="text-align: right;">2063.466</td>
+</tr>
 </tbody></table>
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
-<thead><tr>
-<th style="text-align:left;">   </th>
-   <th style="text-align:right;"> exp(Est.) </th>
-   <th style="text-align:right;"> 2.5% </th>
-   <th style="text-align:right;"> 97.5% </th>
-   <th style="text-align:right;"> t val. </th>
-   <th style="text-align:right;"> p </th>
-  </tr></thead>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">exp(Est.)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">97.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">t val.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p</th>
+</tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;font-weight: bold;"> (Intercept) </td>
-   <td style="text-align:right;"> 0.045 </td>
-   <td style="text-align:right;"> 0.010 </td>
-   <td style="text-align:right;"> 0.199 </td>
-   <td style="text-align:right;"> -4.101 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> bmiNot overweight </td>
-   <td style="text-align:right;"> 0.235 </td>
-   <td style="text-align:right;"> 0.159 </td>
-   <td style="text-align:right;"> 0.348 </td>
-   <td style="text-align:right;"> -7.219 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> genderMale </td>
-   <td style="text-align:right;"> 1.317 </td>
-   <td style="text-align:right;"> 1.082 </td>
-   <td style="text-align:right;"> 1.604 </td>
-   <td style="text-align:right;"> 2.740 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> age </td>
-   <td style="text-align:right;"> 1.051 </td>
-   <td style="text-align:right;"> 1.044 </td>
-   <td style="text-align:right;"> 1.059 </td>
-   <td style="text-align:right;"> 13.280 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceHispanic </td>
-   <td style="text-align:right;"> 0.896 </td>
-   <td style="text-align:right;"> 0.649 </td>
-   <td style="text-align:right;"> 1.237 </td>
-   <td style="text-align:right;"> -0.665 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceOther </td>
-   <td style="text-align:right;"> 1.158 </td>
-   <td style="text-align:right;"> 0.565 </td>
-   <td style="text-align:right;"> 2.374 </td>
-   <td style="text-align:right;"> 0.401 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> raceWhite </td>
-   <td style="text-align:right;"> 0.778 </td>
-   <td style="text-align:right;"> 0.507 </td>
-   <td style="text-align:right;"> 1.193 </td>
-   <td style="text-align:right;"> -1.152 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeBetween.25kto54k </td>
-   <td style="text-align:right;"> 0.830 </td>
-   <td style="text-align:right;"> 0.551 </td>
-   <td style="text-align:right;"> 1.251 </td>
-   <td style="text-align:right;"> -0.889 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeBetween.55kto99k </td>
-   <td style="text-align:right;"> 0.872 </td>
-   <td style="text-align:right;"> 0.621 </td>
-   <td style="text-align:right;"> 1.224 </td>
-   <td style="text-align:right;"> -0.794 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> incomeOver100k </td>
-   <td style="text-align:right;"> 0.669 </td>
-   <td style="text-align:right;"> 0.418 </td>
-   <td style="text-align:right;"> 1.072 </td>
-   <td style="text-align:right;"> -1.669 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> educationHigh.School </td>
-   <td style="text-align:right;"> 0.948 </td>
-   <td style="text-align:right;"> 0.733 </td>
-   <td style="text-align:right;"> 1.225 </td>
-   <td style="text-align:right;"> -0.408 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> educationSchool </td>
-   <td style="text-align:right;"> 0.872 </td>
-   <td style="text-align:right;"> 0.448 </td>
-   <td style="text-align:right;"> 1.695 </td>
-   <td style="text-align:right;"> -0.405 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> marriedNever.married </td>
-   <td style="text-align:right;"> 1.055 </td>
-   <td style="text-align:right;"> 0.677 </td>
-   <td style="text-align:right;"> 1.646 </td>
-   <td style="text-align:right;"> 0.237 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> marriedPreviously.married </td>
-   <td style="text-align:right;"> 0.849 </td>
-   <td style="text-align:right;"> 0.534 </td>
-   <td style="text-align:right;"> 1.348 </td>
-   <td style="text-align:right;"> -0.694 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> cholesterol </td>
-   <td style="text-align:right;"> 0.991 </td>
-   <td style="text-align:right;"> 0.986 </td>
-   <td style="text-align:right;"> 0.995 </td>
-   <td style="text-align:right;"> -3.810 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> diastolicBP </td>
-   <td style="text-align:right;"> 1.005 </td>
-   <td style="text-align:right;"> 0.992 </td>
-   <td style="text-align:right;"> 1.018 </td>
-   <td style="text-align:right;"> 0.749 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-<tr>
-<td style="text-align:left;font-weight: bold;"> systolicBP </td>
-   <td style="text-align:right;"> 1.003 </td>
-   <td style="text-align:right;"> 0.993 </td>
-   <td style="text-align:right;"> 1.012 </td>
-   <td style="text-align:right;"> 0.559 </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">(Intercept)</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">0.199</td>
+<td style="text-align: right;">-4.101</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">bmiNot overweight</td>
+<td style="text-align: right;">0.235</td>
+<td style="text-align: right;">0.159</td>
+<td style="text-align: right;">0.348</td>
+<td style="text-align: right;">-7.219</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">genderMale</td>
+<td style="text-align: right;">1.317</td>
+<td style="text-align: right;">1.082</td>
+<td style="text-align: right;">1.604</td>
+<td style="text-align: right;">2.740</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">age</td>
+<td style="text-align: right;">1.051</td>
+<td style="text-align: right;">1.044</td>
+<td style="text-align: right;">1.059</td>
+<td style="text-align: right;">13.280</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">raceHispanic</td>
+<td style="text-align: right;">0.896</td>
+<td style="text-align: right;">0.649</td>
+<td style="text-align: right;">1.237</td>
+<td style="text-align: right;">-0.665</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">raceOther</td>
+<td style="text-align: right;">1.158</td>
+<td style="text-align: right;">0.565</td>
+<td style="text-align: right;">2.374</td>
+<td style="text-align: right;">0.401</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">raceWhite</td>
+<td style="text-align: right;">0.778</td>
+<td style="text-align: right;">0.507</td>
+<td style="text-align: right;">1.193</td>
+<td style="text-align: right;">-1.152</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">incomeBetween.25kto54k</td>
+<td style="text-align: right;">0.830</td>
+<td style="text-align: right;">0.551</td>
+<td style="text-align: right;">1.251</td>
+<td style="text-align: right;">-0.889</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">incomeBetween.55kto99k</td>
+<td style="text-align: right;">0.872</td>
+<td style="text-align: right;">0.621</td>
+<td style="text-align: right;">1.224</td>
+<td style="text-align: right;">-0.794</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">incomeOver100k</td>
+<td style="text-align: right;">0.669</td>
+<td style="text-align: right;">0.418</td>
+<td style="text-align: right;">1.072</td>
+<td style="text-align: right;">-1.669</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">educationHigh.School</td>
+<td style="text-align: right;">0.948</td>
+<td style="text-align: right;">0.733</td>
+<td style="text-align: right;">1.225</td>
+<td style="text-align: right;">-0.408</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">educationSchool</td>
+<td style="text-align: right;">0.872</td>
+<td style="text-align: right;">0.448</td>
+<td style="text-align: right;">1.695</td>
+<td style="text-align: right;">-0.405</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">marriedNever.married</td>
+<td style="text-align: right;">1.055</td>
+<td style="text-align: right;">0.677</td>
+<td style="text-align: right;">1.646</td>
+<td style="text-align: right;">0.237</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">marriedPreviously.married</td>
+<td style="text-align: right;">0.849</td>
+<td style="text-align: right;">0.534</td>
+<td style="text-align: right;">1.348</td>
+<td style="text-align: right;">-0.694</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">cholesterol</td>
+<td style="text-align: right;">0.991</td>
+<td style="text-align: right;">0.986</td>
+<td style="text-align: right;">0.995</td>
+<td style="text-align: right;">-3.810</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">diastolicBP</td>
+<td style="text-align: right;">1.005</td>
+<td style="text-align: right;">0.992</td>
+<td style="text-align: right;">1.018</td>
+<td style="text-align: right;">0.749</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">systolicBP</td>
+<td style="text-align: right;">1.003</td>
+<td style="text-align: right;">0.993</td>
+<td style="text-align: right;">1.012</td>
+<td style="text-align: right;">0.559</td>
+<td style="text-align: right;">NA</td>
+</tr>
 </tbody>
-<tfoot><tr><td style="padding: 0; " colspan="100%">
-<sup></sup> Standard errors: Robust</td></tr></tfoot>
+<tfoot><tr class="even">
+<td style="text-align: left; padding: 0;">
+<sup></sup> Standard errors: Robust</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr></tfoot>
 </table>
+</div>
 </div>
 </div>
 </section></section><section id="references" class="level2"><h2 class="anchored" data-anchor-id="references">References</h2>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="ref-austin2018propensity" class="csl-entry" role="doc-biblioentry">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-austin2018propensity" class="csl-entry" role="listitem">
 Austin, Peter C, Nathaniel Jembere, and Maria Chiu. 2018. <span>“Propensity Score Matching and Complex Surveys.”</span> <em>Statistical Methods in Medical Research</em> 27 (4): 1240–57.
 </div>
-<div id="ref-dugoff2014generalizing" class="csl-entry" role="doc-biblioentry">
+<div id="ref-dugoff2014generalizing" class="csl-entry" role="listitem">
 DuGoff, Eva H, Megan Schuler, and Elizabeth A Stuart. 2014. <span>“Generalizing Observational Study Results: Applying Propensity Score Methods to Complex Surveys.”</span> <em>Health Services Research</em> 49 (1): 284–303.
 </div>
-<div id="ref-zanutto2006comparison" class="csl-entry" role="doc-biblioentry">
+<div id="ref-zanutto2006comparison" class="csl-entry" role="listitem">
 Zanutto, Elaine L. 2006. <span>“A Comparison of Propensity Score and Linear Regression Analysis of Complex Survey Data.”</span> <em>Journal of Data Science</em> 4 (1): 67–91.
 </div>
 </div>
@@ -2255,9 +2464,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -2344,10 +2567,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
-  function tippyHover(el, contentFn) {
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -2357,8 +2597,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -2370,9 +2619,245 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -2412,12 +2897,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="./propensityscore3.html" class="pagination-link">
+      <a href="./propensityscore3.html" class="pagination-link" aria-label="PSM in OA-CVD (US)">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">PSM in OA-CVD (US)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./propensityscore5.html" class="pagination-link">
+      <a href="./propensityscore5.html" class="pagination-link" aria-label="PSM with MI">
         <span class="nav-page-text">PSM with MI</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
