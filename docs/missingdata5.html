@@ -515,7 +515,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (R)</span></a>
+ <span class="menu-text">Exercise 1 (R)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1428,7 +1428,7 @@ window.Quarto = {
 </div>
 </div>
 <p>We have about 10% missing values in income, followed by hypertension (8.4%), bmi (6.8%), education (0.2%), and diabetes (0.1%).</p>
-</section></section><section id="dealing-with-missing-values-in-covariates" class="level3"><h3 class="anchored" data-anchor-id="dealing-with-missing-values-in-covariates">Dealing with missing values in covariates</h3>
+</section></section><section id="dealing-with-missing-values-in-covariates" class="level3 page-columns page-full"><h3 class="anchored" data-anchor-id="dealing-with-missing-values-in-covariates">Dealing with missing values in covariates</h3>
 <ul>
 <li>Now we will perform multiple imputation to deal with missing values only in covariates. We will use the <code>dat.analytic2</code> dataset that contains missing values in the covariates but no missing values in the outcome or exposure.</li>
 <li>For this exercise, we will consider 5 imputed datasets, 3 iterations, and the predictive mean matching method for bmi and income.
@@ -1439,31 +1439,673 @@ window.Quarto = {
 </ul>
 </li>
 </ul>
-<section id="step-0-set-up-the-imputation-model" class="level4"><h4 class="anchored" data-anchor-id="step-0-set-up-the-imputation-model">Step 0: Set up the imputation model</h4>
-<div class="cell">
+<section id="step-0-set-up-the-imputation-model" class="level4 page-columns page-full"><h4 class="anchored" data-anchor-id="step-0-set-up-the-imputation-model">Step 0: Set up the imputation model</h4>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>In this tutorial, we used <code>stata</code> as an auxiliary variable. There are two ways we can deal with this:</p>
+<ol type="a">
+<li>Use <code>strata</code> to predict other variables, but <strong>don’t impute</strong> <code>strata</code>: <code>meth["strata"] &lt;- ""</code> (this skips strata’s imputation). In our case, since <code>strata</code> has no missing observations, this step is unnecessary, as MICE will automatically not impute fully observed variables. However, this strategy is useful for blocking the imputation of auxiliary variables with missing data.</li>
+</ol>
+<ul>
+<li><p>Also, do not change the <code>predictorMatrix</code> for auxiliary variables, allowing them (e.g., strata in our case) to be used as predictors for other variables.</p></li>
+<li><p>Setting <code>pred["strata", ] &lt;- 0</code> would remove all predictors for <code>strata</code>, which means <code>strata</code> cannot be imputed because there are no variables to predict its missing values. However, <code>strata</code> can still be used as a predictor for other variables. If <code>strata</code> has no missing values (as in our case), this step is unnecessary since MICE does not attempt to impute fully observed variables.</p></li>
+</ul>
+<ol start="2" type="a">
+<li>
+<strong>Impute</strong> <code>strata</code> and use it as a predictor (if strata had missing values): If <code>strata</code> had missing data, you wouldn’t need to change anything in <code>predictorMatrix</code> or <code>method</code>. MICE would impute <code>strata</code> and use it as a predictor by default. In our case, since <code>strata</code> has no missing values, imputation is not necessary. Note that:</li>
+</ol>
+<ul>
+<li><p>You should not set <code>pred["strata", ] &lt;- 1</code> because this would incorrectly make <code>strata</code> a predictor for itself, which is invalid. MICE automatically handles this by setting diagonal entries to 0, so you don’t need to manually ensure this unless you’ve changed it. If you do so (set the row values to 1), you need to then set <code>pred["strata", "strata"] &lt;- 0</code> to ensure <code>strata</code> does not predict itself.</p></li>
+<li><p>Do not use <code>pred[, "strata"] &lt;- 0</code> because this would prevent <code>strata</code> from being used as a predictor for other variables, which is contrary to the idea of using it as an auxiliary variable.</p></li>
+</ul>
+<p>Whether to <strong>impute or not impute auxiliary variables</strong> depends on their role in the analysis and the potential impact of their missing data. If they are strong predictors or are necessary for future analyses, imputing them may be justified. However, if their missingness is not consequential, and imputing them introduces more noise or complexity, it may be better to leave them unimputed.</p>
+</div></div><div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Step 0: Set imputation model</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>ini <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.analytic2, <span class="at">maxit =</span> <span class="dv">0</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb9-3"><a href="#cb9-3"></a>pred <span class="ot">&lt;-</span> ini<span class="sc">$</span>pred</span>
 <span id="cb9-4"><a href="#cb9-4"></a></span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="co"># Use the strata variable as an auxiliary variable in the imputation model</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a>pred[<span class="st">"strata"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a></span>
-<span id="cb9-8"><a href="#cb9-8"></a><span class="co"># Do not use survey weight or PSU variable as auxiliary variables</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a>pred[,<span class="st">"studyid"</span>] <span class="ot">&lt;-</span> pred[<span class="st">"studyid"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a>pred[,<span class="st">"psu"</span>] <span class="ot">&lt;-</span> pred[<span class="st">"psu"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a>pred[,<span class="st">"survey.weight"</span>] <span class="ot">&lt;-</span> pred[<span class="st">"survey.weight"</span>,] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a></span>
-<span id="cb9-13"><a href="#cb9-13"></a><span class="co"># Set imputation method</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a>meth <span class="ot">&lt;-</span> ini<span class="sc">$</span>meth</span>
-<span id="cb9-15"><a href="#cb9-15"></a>meth[<span class="st">"bmi"</span>] <span class="ot">&lt;-</span> <span class="st">"pmm"</span></span>
-<span id="cb9-16"><a href="#cb9-16"></a>meth[<span class="st">"income"</span>] <span class="ot">&lt;-</span> <span class="st">"pmm"</span></span>
-<span id="cb9-17"><a href="#cb9-17"></a>meth</span>
-<span id="cb9-18"><a href="#cb9-18"></a><span class="co">#&gt;       studyid survey.weight           psu        strata           cvd </span></span>
-<span id="cb9-19"><a href="#cb9-19"></a><span class="co">#&gt;            ""            ""            ""            ""            "" </span></span>
-<span id="cb9-20"><a href="#cb9-20"></a><span class="co">#&gt;     arthritis       age.cat           sex     education          race </span></span>
-<span id="cb9-21"><a href="#cb9-21"></a><span class="co">#&gt;            ""            ""            ""     "polyreg"            "" </span></span>
-<span id="cb9-22"><a href="#cb9-22"></a><span class="co">#&gt;        income           bmi       smoking           htn      diabetes </span></span>
-<span id="cb9-23"><a href="#cb9-23"></a><span class="co">#&gt;         "pmm"         "pmm"            ""      "logreg"      "logreg"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="fu">kable</span>(pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">studyid</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">survey.weight</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">psu</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">strata</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">cvd</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">arthritis</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">age.cat</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sex</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">education</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">race</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">income</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">bmi</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">smoking</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">htn</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">diabetes</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">studyid</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">survey.weight</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">psu</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">strata</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cvd</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">arthritis</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age.cat</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sex</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">education</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">race</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">income</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bmi</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">smoking</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">htn</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">diabetes</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co"># Use the strata variable as an auxiliary variable in the imputation model</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a>pred[<span class="st">"strata"</span>,]</span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;       studyid survey.weight           psu        strata           cvd </span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt;             1             1             1             0             1 </span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt;     arthritis       age.cat           sex     education          race </span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt;             1             1             1             1             1 </span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt;        income           bmi       smoking           htn      diabetes </span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt;             1             1             1             1             1</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co"># Do not change the pred matrix for strata. </span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co"># This allows strata to be used as a predictor for other variables.</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="co"># Do not use id, survey weight or PSU variable as auxiliary variables</span></span>
+<span id="cb10-14"><a href="#cb10-14"></a>pred[, <span class="fu">c</span>(<span class="st">"studyid"</span>, <span class="st">"psu"</span>, <span class="st">"survey.weight"</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="co"># Remove them as predictors for other variables</span></span>
+<span id="cb10-16"><a href="#cb10-16"></a></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="fu">kable</span>(pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">studyid</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">survey.weight</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">psu</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">strata</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">cvd</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">arthritis</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">age.cat</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sex</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">education</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">race</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">income</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">bmi</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">smoking</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">htn</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">diabetes</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">studyid</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">survey.weight</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">psu</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">strata</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cvd</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">arthritis</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age.cat</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sex</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">education</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">race</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">income</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bmi</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">smoking</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">htn</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">diabetes</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<ul>
+<li>The rows represent the variables that can be imputed. The entries in each row show which variables will be used as predictors to impute the variable corresponding to that row.</li>
+<li>The columns represent the variables that can be used as predictors to impute other variables. An entry of 1 in a cell means that the corresponding variable (from the column) will be used to predict the variable represented by the row.</li>
+<li>
+<code>pred[, c("studyid", "psu", "survey.weight")] &lt;- 0</code> action sets all values in the columns for <code>studyid</code>, <code>psu</code>, and <code>survey.weight</code> to 0. Effectively, it tells MICE not to use them as predictors when imputing other variables. In other words, these variables will not be used to predict missing values in other variables.</li>
+</ul>
+</div></div><div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Set imputation method</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>meth <span class="ot">&lt;-</span> ini<span class="sc">$</span>meth</span>
+<span id="cb11-3"><a href="#cb11-3"></a>meth[<span class="st">"bmi"</span>] <span class="ot">&lt;-</span> <span class="st">"pmm"</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>meth[<span class="st">"income"</span>] <span class="ot">&lt;-</span> <span class="st">"pmm"</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a>meth</span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt;       studyid survey.weight           psu        strata           cvd </span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt;            ""            ""            ""            ""            "" </span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt;     arthritis       age.cat           sex     education          race </span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt;            ""            ""            ""     "polyreg"            "" </span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt;        income           bmi       smoking           htn      diabetes </span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#&gt;         "pmm"         "pmm"            ""      "logreg"      "logreg"</span></span>
+<span id="cb11-12"><a href="#cb11-12"></a>meth[<span class="st">"strata"</span>] <span class="co"># method used for strata to be imputed</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co">#&gt; strata </span></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="co">#&gt;     ""</span></span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="co"># meth["strata"] &lt;- "" # you can skip auxiliary variable's imputation</span></span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="co"># Modify the method to skip imputation of "studyid", "psu", and "survey.weight"</span></span>
+<span id="cb11-17"><a href="#cb11-17"></a>meth[<span class="st">"studyid"</span>] <span class="ot">&lt;-</span> <span class="st">""</span></span>
+<span id="cb11-18"><a href="#cb11-18"></a>meth[<span class="st">"psu"</span>] <span class="ot">&lt;-</span> <span class="st">""</span></span>
+<span id="cb11-19"><a href="#cb11-19"></a>meth[<span class="st">"survey.weight"</span>] <span class="ot">&lt;-</span> <span class="st">""</span></span>
+<span id="cb11-20"><a href="#cb11-20"></a>meth</span>
+<span id="cb11-21"><a href="#cb11-21"></a><span class="co">#&gt;       studyid survey.weight           psu        strata           cvd </span></span>
+<span id="cb11-22"><a href="#cb11-22"></a><span class="co">#&gt;            ""            ""            ""            ""            "" </span></span>
+<span id="cb11-23"><a href="#cb11-23"></a><span class="co">#&gt;     arthritis       age.cat           sex     education          race </span></span>
+<span id="cb11-24"><a href="#cb11-24"></a><span class="co">#&gt;            ""            ""            ""     "polyreg"            "" </span></span>
+<span id="cb11-25"><a href="#cb11-25"></a><span class="co">#&gt;        income           bmi       smoking           htn      diabetes </span></span>
+<span id="cb11-26"><a href="#cb11-26"></a><span class="co">#&gt;         "pmm"         "pmm"            ""      "logreg"      "logreg"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>There is no missing for studyid, survey.weight, psu, strata, cvd, arthritis, age, sex, race, smoking. Hence, no method is assigned for these variables.</li>
@@ -1472,39 +2114,39 @@ window.Quarto = {
 </ul></section><section id="step-1-imputing-missing-values-using-mice" class="level4"><h4 class="anchored" data-anchor-id="step-1-imputing-missing-values-using-mice">Step 1: Imputing missing values using mice</h4>
 <section id="imputing-dataset-for-eligible-subjects" class="level5"><h5 class="anchored" data-anchor-id="imputing-dataset-for-eligible-subjects">1.1 Imputing dataset for eligible subjects</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Step 1: impute the incomplete data</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.analytic2,</span>
-<span id="cb10-3"><a href="#cb10-3"></a>                   <span class="at">seed =</span> <span class="dv">123</span>,</span>
-<span id="cb10-4"><a href="#cb10-4"></a>                   <span class="at">predictorMatrix =</span> pred,</span>
-<span id="cb10-5"><a href="#cb10-5"></a>                   <span class="at">method =</span> meth,</span>
-<span id="cb10-6"><a href="#cb10-6"></a>                   <span class="at">m =</span> <span class="dv">5</span>,</span>
-<span id="cb10-7"><a href="#cb10-7"></a>                   <span class="at">maxit =</span> <span class="dv">3</span>,</span>
-<span id="cb10-8"><a href="#cb10-8"></a>                   <span class="at">print =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Step 1: impute the incomplete data</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>imputation <span class="ot">&lt;-</span> <span class="fu">mice</span>(<span class="at">data =</span> dat.analytic2,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>                   <span class="at">seed =</span> <span class="dv">123</span>,</span>
+<span id="cb12-4"><a href="#cb12-4"></a>                   <span class="at">predictorMatrix =</span> pred,</span>
+<span id="cb12-5"><a href="#cb12-5"></a>                   <span class="at">method =</span> meth,</span>
+<span id="cb12-6"><a href="#cb12-6"></a>                   <span class="at">m =</span> <span class="dv">5</span>,</span>
+<span id="cb12-7"><a href="#cb12-7"></a>                   <span class="at">maxit =</span> <span class="dv">3</span>,</span>
+<span id="cb12-8"><a href="#cb12-8"></a>                   <span class="at">print =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will combine m = 5 datasets and create a stacked dataset. This dataset should contain 5*4,191 = 20,955 rows.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>impdata <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imputation, <span class="at">action=</span><span class="st">"long"</span>)</span>
-<span id="cb11-2"><a href="#cb11-2"></a></span>
-<span id="cb11-3"><a href="#cb11-3"></a><span class="fu">table</span>(impdata<span class="sc">$</span>age.cat)</span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt; </span></span>
-<span id="cb11-5"><a href="#cb11-5"></a><span class="co">#&gt; 20-49 50-64   65+ </span></span>
-<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; 11400  5485  4070</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>impdata <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imputation, <span class="at">action=</span><span class="st">"long"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="fu">table</span>(impdata<span class="sc">$</span>age.cat)</span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; </span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt; 20-49 50-64   65+ </span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; 11400  5485  4070</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note that age has no missing values, and everyone is above 20.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#Remove .id variable from the model as it was created in an intermediate step</span></span>
-<span id="cb12-2"><a href="#cb12-2"></a>impdata<span class="sc">$</span>.id <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a></span>
-<span id="cb12-4"><a href="#cb12-4"></a><span class="co"># Create an indicator of eligible subjects </span></span>
-<span id="cb12-5"><a href="#cb12-5"></a>impdata<span class="sc">$</span>ineligible <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb12-6"><a href="#cb12-6"></a></span>
-<span id="cb12-7"><a href="#cb12-7"></a><span class="co"># Number of subjects</span></span>
-<span id="cb12-8"><a href="#cb12-8"></a><span class="fu">nrow</span>(impdata)</span>
-<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt; [1] 20955</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">#Remove .id variable from the model as it was created in an intermediate step</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a>impdata<span class="sc">$</span>.id <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co"># Create an indicator of eligible subjects </span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>impdata<span class="sc">$</span>ineligible <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co"># Number of subjects</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="fu">nrow</span>(impdata)</span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt; [1] 20955</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s see whether there is any missing value after imputation:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>DataExplorer<span class="sc">::</span><span class="fu">plot_missing</span>(impdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>DataExplorer<span class="sc">::</span><span class="fu">plot_missing</span>(impdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure"><p><img src="missingdata5_files/figure-html/step1d-1.png" class="img-fluid figure-img" width="672"></p>
@@ -1518,34 +2160,34 @@ window.Quarto = {
 </ul></section><section id="preparing-dataset-for-ineligible-subjects" class="level5"><h5 class="anchored" data-anchor-id="preparing-dataset-for-ineligible-subjects">1.2 Preparing dataset for ineligible subjects</h5>
 <p>The next task is adding the <strong>ineligible subjects</strong> in the imputed datasets, so that we can set up the survey design on the full dataset and then subset the design.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Number of ineligible subjects</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#dat.full$ineligible &lt;- 1</span></span>
-<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#dat.full$ineligible[dat.full$studyid %in% dat.analytic$studyid] &lt;- 0</span></span>
-<span id="cb14-4"><a href="#cb14-4"></a><span class="fu">table</span>(dat.full<span class="sc">$</span>ineligible, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt; </span></span>
-<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt;    0    1 &lt;NA&gt; </span></span>
-<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; 4191 5063    0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Number of ineligible subjects</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co">#dat.full$ineligible &lt;- 1</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#dat.full$ineligible[dat.full$studyid %in% dat.analytic$studyid] &lt;- 0</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="fu">table</span>(dat.full<span class="sc">$</span>ineligible, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="co">#&gt; </span></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt;    0    1 &lt;NA&gt; </span></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt; 4191 5063    0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will subset the data for ineligible subjects and create <code>m = 5</code> copies.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Subset for ineligible</span></span>
-<span id="cb15-2"><a href="#cb15-2"></a>dat.ineligible <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full, ineligible <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb15-3"><a href="#cb15-3"></a></span>
-<span id="cb15-4"><a href="#cb15-4"></a><span class="co"># Create m = 5 datasets with .imp 1 to m = 5</span></span>
-<span id="cb15-5"><a href="#cb15-5"></a>dat31 <span class="ot">&lt;-</span> dat.ineligible; dat31<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb15-6"><a href="#cb15-6"></a>dat32 <span class="ot">&lt;-</span> dat.ineligible; dat32<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb15-7"><a href="#cb15-7"></a>dat33 <span class="ot">&lt;-</span> dat.ineligible; dat33<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb15-8"><a href="#cb15-8"></a>dat34 <span class="ot">&lt;-</span> dat.ineligible; dat34<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">4</span></span>
-<span id="cb15-9"><a href="#cb15-9"></a>dat35 <span class="ot">&lt;-</span> dat.ineligible; dat35<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Subset for ineligible</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a>dat.ineligible <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full, ineligible <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb17-3"><a href="#cb17-3"></a></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co"># Create m = 5 datasets with .imp 1 to m = 5</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a>dat31 <span class="ot">&lt;-</span> dat.ineligible; dat31<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a>dat32 <span class="ot">&lt;-</span> dat.ineligible; dat32<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a>dat33 <span class="ot">&lt;-</span> dat.ineligible; dat33<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a>dat34 <span class="ot">&lt;-</span> dat.ineligible; dat34<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb17-9"><a href="#cb17-9"></a>dat35 <span class="ot">&lt;-</span> dat.ineligible; dat35<span class="sc">$</span>.imp <span class="ot">&lt;-</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The next step is combining ineligible datasets. Before merging the <code>stacked dataset for ineligible subjects</code> to the <code>imputed stacked dataset for eligible subjects,</code> we must ensure the variable names are the same.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Stacked data for ineligible subjects</span></span>
-<span id="cb16-2"><a href="#cb16-2"></a>dat.ineligible.stacked <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dat31, dat32, dat33, dat34, dat35)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Stacked data for ineligible subjects</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>dat.ineligible.stacked <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dat31, dat32, dat33, dat34, dat35)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We should have missing value in this ineligible part of the data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>DataExplorer<span class="sc">::</span><span class="fu">plot_missing</span>(dat.ineligible.stacked)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>DataExplorer<span class="sc">::</span><span class="fu">plot_missing</span>(dat.ineligible.stacked)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure"><p><img src="missingdata5_files/figure-html/step1h-1.png" class="img-fluid figure-img" width="672"></p>
@@ -1555,140 +2197,237 @@ window.Quarto = {
 </div>
 </section><section id="combining-eligible-imputed-and-ineligible-unimputed-subjects" class="level5"><h5 class="anchored" data-anchor-id="combining-eligible-imputed-and-ineligible-unimputed-subjects">1.3 Combining eligible (imputed) and ineligible (unimputed) subjects</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">names</span>(impdata)</span>
-<span id="cb18-2"><a href="#cb18-2"></a><span class="co">#&gt;  [1] ".imp"          "studyid"       "survey.weight" "psu"          </span></span>
-<span id="cb18-3"><a href="#cb18-3"></a><span class="co">#&gt;  [5] "strata"        "cvd"           "arthritis"     "age.cat"      </span></span>
-<span id="cb18-4"><a href="#cb18-4"></a><span class="co">#&gt;  [9] "sex"           "education"     "race"          "income"       </span></span>
-<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt; [13] "bmi"           "smoking"       "htn"           "diabetes"     </span></span>
-<span id="cb18-6"><a href="#cb18-6"></a><span class="co">#&gt; [17] "ineligible"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">names</span>(impdata)</span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="co">#&gt;  [1] ".imp"          "studyid"       "survey.weight" "psu"          </span></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt;  [5] "strata"        "cvd"           "arthritis"     "age.cat"      </span></span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt;  [9] "sex"           "education"     "race"          "income"       </span></span>
+<span id="cb20-5"><a href="#cb20-5"></a><span class="co">#&gt; [13] "bmi"           "smoking"       "htn"           "diabetes"     </span></span>
+<span id="cb20-6"><a href="#cb20-6"></a><span class="co">#&gt; [17] "ineligible"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">names</span>(dat.ineligible.stacked)</span>
-<span id="cb19-2"><a href="#cb19-2"></a><span class="co">#&gt;  [1] "studyid"       "survey.weight" "psu"           "strata"       </span></span>
-<span id="cb19-3"><a href="#cb19-3"></a><span class="co">#&gt;  [5] "cvd"           "rheumatoid"    "age"           "sex"          </span></span>
-<span id="cb19-4"><a href="#cb19-4"></a><span class="co">#&gt;  [9] "education"     "race"          "income"        "bmi"          </span></span>
-<span id="cb19-5"><a href="#cb19-5"></a><span class="co">#&gt; [13] "smoking"       "htn"           "diabetes"      "ineligible"   </span></span>
-<span id="cb19-6"><a href="#cb19-6"></a><span class="co">#&gt; [17] ".imp"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">names</span>(dat.ineligible.stacked)</span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="co">#&gt;  [1] "studyid"       "survey.weight" "psu"           "strata"       </span></span>
+<span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt;  [5] "cvd"           "rheumatoid"    "age"           "sex"          </span></span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="co">#&gt;  [9] "education"     "race"          "income"        "bmi"          </span></span>
+<span id="cb21-5"><a href="#cb21-5"></a><span class="co">#&gt; [13] "smoking"       "htn"           "diabetes"      "ineligible"   </span></span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="co">#&gt; [17] ".imp"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>As we can see, the variable names are different in the two datasets. Particularly, <code>arthritis</code> and <code>age.cat</code> variables are not available in the <code>dat.ineligible.stacked</code> dataset. Now we will recode these variables in the same format as done for <code>impdata</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Categorical age</span></span>
-<span id="cb20-2"><a href="#cb20-2"></a><span class="fu">summary</span>(dat.ineligible.stacked<span class="sc">$</span>age)</span>
-<span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt;    0.00    5.00   12.00   23.25   41.00   80.00</span></span>
-<span id="cb20-5"><a href="#cb20-5"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> </span>
-<span id="cb20-6"><a href="#cb20-6"></a>  <span class="fu">with</span>(dat.ineligible.stacked, </span>
-<span id="cb20-7"><a href="#cb20-7"></a>       <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">50</span>, <span class="st">"20-49"</span>, </span>
-<span id="cb20-8"><a href="#cb20-8"></a>              <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">65</span>, <span class="st">"50-64"</span>, </span>
-<span id="cb20-9"><a href="#cb20-9"></a>                     <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">65</span>, <span class="st">"65+"</span>, <span class="cn">NA</span>))))</span>
-<span id="cb20-10"><a href="#cb20-10"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> </span>
-<span id="cb20-11"><a href="#cb20-11"></a>  <span class="fu">factor</span>(dat.ineligible.stacked<span class="sc">$</span>age.cat, </span>
-<span id="cb20-12"><a href="#cb20-12"></a>         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"20-49"</span>, <span class="st">"50-64"</span>, <span class="st">"65+"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="co"># Categorical age</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="fu">summary</span>(dat.ineligible.stacked<span class="sc">$</span>age)</span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="co">#&gt;    0.00    5.00   12.00   23.25   41.00   80.00</span></span>
+<span id="cb22-5"><a href="#cb22-5"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> </span>
+<span id="cb22-6"><a href="#cb22-6"></a>  <span class="fu">with</span>(dat.ineligible.stacked, </span>
+<span id="cb22-7"><a href="#cb22-7"></a>       <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">50</span>, <span class="st">"20-49"</span>, </span>
+<span id="cb22-8"><a href="#cb22-8"></a>              <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">65</span>, <span class="st">"50-64"</span>, </span>
+<span id="cb22-9"><a href="#cb22-9"></a>                     <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">65</span>, <span class="st">"65+"</span>, <span class="cn">NA</span>))))</span>
+<span id="cb22-10"><a href="#cb22-10"></a>dat.ineligible.stacked<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> </span>
+<span id="cb22-11"><a href="#cb22-11"></a>  <span class="fu">factor</span>(dat.ineligible.stacked<span class="sc">$</span>age.cat, </span>
+<span id="cb22-12"><a href="#cb22-12"></a>         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"20-49"</span>, <span class="st">"50-64"</span>, <span class="st">"65+"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note that, we are assigning anyone with less than 20 age as missing.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">table</span>(dat.ineligible.stacked<span class="sc">$</span>age.cat, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
-<span id="cb21-2"><a href="#cb21-2"></a><span class="co">#&gt; </span></span>
-<span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; 20-49 50-64   65+  &lt;NA&gt; </span></span>
-<span id="cb21-4"><a href="#cb21-4"></a><span class="co">#&gt;  1100  2360  3430 18425</span></span>
-<span id="cb21-5"><a href="#cb21-5"></a><span class="co"># Recode arthritis</span></span>
-<span id="cb21-6"><a href="#cb21-6"></a>dat.ineligible.stacked<span class="sc">$</span>arthritis <span class="ot">&lt;-</span> </span>
-<span id="cb21-7"><a href="#cb21-7"></a>  car<span class="sc">::</span><span class="fu">recode</span>(dat.ineligible.stacked<span class="sc">$</span>rheumatoid, </span>
-<span id="cb21-8"><a href="#cb21-8"></a>  <span class="st">" 'No' = 'No arthritis'; 'Yes' = 'Rheumatoid arthritis' "</span>, </span>
-<span id="cb21-9"><a href="#cb21-9"></a>  <span class="at">as.factor =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">table</span>(dat.ineligible.stacked<span class="sc">$</span>age.cat, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="co">#&gt; </span></span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="co">#&gt; 20-49 50-64   65+  &lt;NA&gt; </span></span>
+<span id="cb23-4"><a href="#cb23-4"></a><span class="co">#&gt;  1100  2360  3430 18425</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a><span class="co"># Recode arthritis</span></span>
+<span id="cb23-6"><a href="#cb23-6"></a>dat.ineligible.stacked<span class="sc">$</span>arthritis <span class="ot">&lt;-</span> </span>
+<span id="cb23-7"><a href="#cb23-7"></a>  car<span class="sc">::</span><span class="fu">recode</span>(dat.ineligible.stacked<span class="sc">$</span>rheumatoid, </span>
+<span id="cb23-8"><a href="#cb23-8"></a>  <span class="st">" 'No' = 'No arthritis'; 'Yes' = 'Rheumatoid arthritis' "</span>, </span>
+<span id="cb23-9"><a href="#cb23-9"></a>  <span class="at">as.factor =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note: In the above step, we could also create two variables with missing values rather than recoding. The reason is that we will subset the design; no matter whether we recode or create missing values for ineligible, the only information we need from ineligible subjects is their survey features when creating the design.</p>
 <p>The next step is to combine these two datasets (<code>impdata</code> and <code>dat.ineligible.stacked</code>).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="co"># Variable names in the imputed dataset</span></span>
-<span id="cb22-2"><a href="#cb22-2"></a>vars <span class="ot">&lt;-</span> <span class="fu">names</span>(impdata) </span>
-<span id="cb22-3"><a href="#cb22-3"></a></span>
-<span id="cb22-4"><a href="#cb22-4"></a><span class="co"># Set up the dataset for ineligible - same variables as impdata</span></span>
-<span id="cb22-5"><a href="#cb22-5"></a>dat.ineligible.stacked <span class="ot">&lt;-</span> dat.ineligible.stacked[, vars]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># Variable names in the imputed dataset</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>vars <span class="ot">&lt;-</span> <span class="fu">names</span>(impdata) </span>
+<span id="cb24-3"><a href="#cb24-3"></a></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="co"># Set up the dataset for ineligible - same variables as impdata</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a>dat.ineligible.stacked <span class="ot">&lt;-</span> dat.ineligible.stacked[, vars]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we will merge ineligible and eligible subjects to make the full dataset of 5 <span class="math inline">\(\times\)</span> 9,254 = 46,270 subjects.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>impdata2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(impdata, dat.ineligible.stacked)</span>
-<span id="cb23-2"><a href="#cb23-2"></a>impdata2 <span class="ot">&lt;-</span> impdata2[<span class="fu">order</span>(impdata2<span class="sc">$</span>.imp, impdata2<span class="sc">$</span>studyid),]</span>
-<span id="cb23-3"><a href="#cb23-3"></a><span class="fu">dim</span>(impdata2)</span>
-<span id="cb23-4"><a href="#cb23-4"></a><span class="co">#&gt; [1] 46270    17</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>impdata2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(impdata, dat.ineligible.stacked)</span>
+<span id="cb25-2"><a href="#cb25-2"></a>impdata2 <span class="ot">&lt;-</span> impdata2[<span class="fu">order</span>(impdata2<span class="sc">$</span>.imp, impdata2<span class="sc">$</span>studyid),]</span>
+<span id="cb25-3"><a href="#cb25-3"></a><span class="fu">dim</span>(impdata2)</span>
+<span id="cb25-4"><a href="#cb25-4"></a><span class="co">#&gt; [1] 46270    17</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="prepating-survey-design-and-subpopulation-of-eligible" class="level5"><h5 class="anchored" data-anchor-id="prepating-survey-design-and-subpopulation-of-eligible">1.4 Prepating Survey design and subpopulation of eligible</h5>
 <p>The next step is to create the design on full dataset [with eligible (imputed) and ineligible (unimputed) subjects] of 5 <span class="math inline">\(\times\)</span> 9,254 = 46,270 subjects and subset the design for 5 <span class="math inline">\(\times\)</span> 4,716 = 23,580 subjects.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>m <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb24-2"><a href="#cb24-2"></a>allImputations <span class="ot">&lt;-</span> <span class="fu">imputationList</span>(<span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>m, <span class="cf">function</span>(n) </span>
-<span id="cb24-3"><a href="#cb24-3"></a>  <span class="fu">subset</span>(impdata2, <span class="at">subset=</span>.imp<span class="sc">==</span>n)))</span>
-<span id="cb24-4"><a href="#cb24-4"></a></span>
-<span id="cb24-5"><a href="#cb24-5"></a><span class="co"># Step 2: Survey data analysis</span></span>
-<span id="cb24-6"><a href="#cb24-6"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, </span>
-<span id="cb24-7"><a href="#cb24-7"></a>                       <span class="at">weights =</span> <span class="sc">~</span>survey.weight, </span>
-<span id="cb24-8"><a href="#cb24-8"></a>                       <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
-<span id="cb24-9"><a href="#cb24-9"></a>                      <span class="at">data =</span> allImputations, </span>
-<span id="cb24-10"><a href="#cb24-10"></a>                      <span class="at">nest =</span> <span class="cn">TRUE</span>) <span class="co"># Design on full data</span></span>
-<span id="cb24-11"><a href="#cb24-11"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, ineligible <span class="sc">==</span> <span class="dv">0</span>) <span class="co"># Subset the design</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>m <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>allImputations <span class="ot">&lt;-</span> <span class="fu">imputationList</span>(<span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>m, <span class="cf">function</span>(n) </span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">subset</span>(impdata2, <span class="at">subset=</span>.imp<span class="sc">==</span>n)))</span>
+<span id="cb26-4"><a href="#cb26-4"></a></span>
+<span id="cb26-5"><a href="#cb26-5"></a><span class="co"># Step 2: Survey data analysis</span></span>
+<span id="cb26-6"><a href="#cb26-6"></a>w.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, </span>
+<span id="cb26-7"><a href="#cb26-7"></a>                       <span class="at">weights =</span> <span class="sc">~</span>survey.weight, </span>
+<span id="cb26-8"><a href="#cb26-8"></a>                       <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
+<span id="cb26-9"><a href="#cb26-9"></a>                      <span class="at">data =</span> allImputations, </span>
+<span id="cb26-10"><a href="#cb26-10"></a>                      <span class="at">nest =</span> <span class="cn">TRUE</span>) <span class="co"># Design on full data</span></span>
+<span id="cb26-11"><a href="#cb26-11"></a>w.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(w.design0, ineligible <span class="sc">==</span> <span class="dv">0</span>) <span class="co"># Subset the design</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can see the length of the subsetted design:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">dim</span>(w.design)</span>
-<span id="cb25-2"><a href="#cb25-2"></a><span class="co">#&gt; [1] 4191   17    5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">dim</span>(w.design)</span>
+<span id="cb27-2"><a href="#cb27-2"></a><span class="co">#&gt; [1] 4191   17    5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The subsetted design contains 4,191 subjects with 17 variables and 5 imputed datasets. Now we will run the design-adjusted logistic regression on and pool the estimate using Rubin’s rule:</p>
 </section></section><section id="step-2-design-adjusted-regression-analysis" class="level4"><h4 class="anchored" data-anchor-id="step-2-design-adjusted-regression-analysis">Step 2: Design adjusted regression analysis</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># Design-adjusted logistic regression</span></span>
-<span id="cb26-2"><a href="#cb26-2"></a>fit <span class="ot">&lt;-</span> <span class="fu">with</span>(w.design, </span>
-<span id="cb26-3"><a href="#cb26-3"></a>            <span class="fu">svyglm</span>(<span class="fu">I</span>(cvd <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> arthritis <span class="sc">+</span> age.cat <span class="sc">+</span> </span>
-<span id="cb26-4"><a href="#cb26-4"></a>                     sex <span class="sc">+</span> education <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> </span>
-<span id="cb26-5"><a href="#cb26-5"></a>                     smoking <span class="sc">+</span> htn <span class="sc">+</span> diabetes, </span>
-<span id="cb26-6"><a href="#cb26-6"></a>                   <span class="at">family =</span> quasibinomial))</span>
-<span id="cb26-7"><a href="#cb26-7"></a>res <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">as.data.frame</span>(<span class="fu">cbind</span>(<span class="fu">coef</span>(fit[[<span class="dv">1</span>]]),</span>
-<span id="cb26-8"><a href="#cb26-8"></a>      <span class="fu">coef</span>(fit[[<span class="dv">2</span>]]),</span>
-<span id="cb26-9"><a href="#cb26-9"></a>      <span class="fu">coef</span>(fit[[<span class="dv">3</span>]]),</span>
-<span id="cb26-10"><a href="#cb26-10"></a>      <span class="fu">coef</span>(fit[[<span class="dv">4</span>]]),</span>
-<span id="cb26-11"><a href="#cb26-11"></a>      <span class="fu">coef</span>(fit[[<span class="dv">5</span>]]))))</span>
-<span id="cb26-12"><a href="#cb26-12"></a><span class="fu">names</span>(res) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"OR from m ="</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
-<span id="cb26-13"><a href="#cb26-13"></a><span class="fu">round</span>(<span class="fu">t</span>(res),<span class="dv">2</span>)</span>
-<span id="cb26-14"><a href="#cb26-14"></a><span class="co">#&gt;               (Intercept) arthritisRheumatoid arthritis age.cat50-64 age.cat65+</span></span>
-<span id="cb26-15"><a href="#cb26-15"></a><span class="co">#&gt; OR from m = 1        0.02                          2.03         4.71      13.08</span></span>
-<span id="cb26-16"><a href="#cb26-16"></a><span class="co">#&gt; OR from m = 2        0.02                          2.04         4.74      13.21</span></span>
-<span id="cb26-17"><a href="#cb26-17"></a><span class="co">#&gt; OR from m = 3        0.02                          2.12         4.58      11.88</span></span>
-<span id="cb26-18"><a href="#cb26-18"></a><span class="co">#&gt; OR from m = 4        0.02                          2.10         4.59      12.45</span></span>
-<span id="cb26-19"><a href="#cb26-19"></a><span class="co">#&gt; OR from m = 5        0.02                          2.07         4.47      12.25</span></span>
-<span id="cb26-20"><a href="#cb26-20"></a><span class="co">#&gt;               sexFemale educationHigh school educationCollege graduate or above</span></span>
-<span id="cb26-21"><a href="#cb26-21"></a><span class="co">#&gt; OR from m = 1      0.46                 0.75                               0.75</span></span>
-<span id="cb26-22"><a href="#cb26-22"></a><span class="co">#&gt; OR from m = 2      0.45                 0.76                               0.79</span></span>
-<span id="cb26-23"><a href="#cb26-23"></a><span class="co">#&gt; OR from m = 3      0.47                 0.71                               0.70</span></span>
-<span id="cb26-24"><a href="#cb26-24"></a><span class="co">#&gt; OR from m = 4      0.46                 0.70                               0.71</span></span>
-<span id="cb26-25"><a href="#cb26-25"></a><span class="co">#&gt; OR from m = 5      0.45                 0.75                               0.77</span></span>
-<span id="cb26-26"><a href="#cb26-26"></a><span class="co">#&gt;               raceBlack raceHispanic raceOthers income$20,000 to $74,999</span></span>
-<span id="cb26-27"><a href="#cb26-27"></a><span class="co">#&gt; OR from m = 1      0.96         0.54       0.86                     0.48</span></span>
-<span id="cb26-28"><a href="#cb26-28"></a><span class="co">#&gt; OR from m = 2      0.97         0.54       0.88                     0.48</span></span>
-<span id="cb26-29"><a href="#cb26-29"></a><span class="co">#&gt; OR from m = 3      0.98         0.54       0.85                     0.54</span></span>
-<span id="cb26-30"><a href="#cb26-30"></a><span class="co">#&gt; OR from m = 4      0.96         0.53       0.86                     0.51</span></span>
-<span id="cb26-31"><a href="#cb26-31"></a><span class="co">#&gt; OR from m = 5      0.99         0.55       0.87                     0.53</span></span>
-<span id="cb26-32"><a href="#cb26-32"></a><span class="co">#&gt;               income$75,000 and Over  bmi smokingPrevious smoker</span></span>
-<span id="cb26-33"><a href="#cb26-33"></a><span class="co">#&gt; OR from m = 1                   0.33 1.02                   1.55</span></span>
-<span id="cb26-34"><a href="#cb26-34"></a><span class="co">#&gt; OR from m = 2                   0.32 1.03                   1.55</span></span>
-<span id="cb26-35"><a href="#cb26-35"></a><span class="co">#&gt; OR from m = 3                   0.36 1.01                   1.59</span></span>
-<span id="cb26-36"><a href="#cb26-36"></a><span class="co">#&gt; OR from m = 4                   0.34 1.02                   1.56</span></span>
-<span id="cb26-37"><a href="#cb26-37"></a><span class="co">#&gt; OR from m = 5                   0.34 1.02                   1.55</span></span>
-<span id="cb26-38"><a href="#cb26-38"></a><span class="co">#&gt;               smokingCurrent smoker htnYes diabetesYes</span></span>
-<span id="cb26-39"><a href="#cb26-39"></a><span class="co">#&gt; OR from m = 1                  1.43   1.35        3.01</span></span>
-<span id="cb26-40"><a href="#cb26-40"></a><span class="co">#&gt; OR from m = 2                  1.47   1.30        3.01</span></span>
-<span id="cb26-41"><a href="#cb26-41"></a><span class="co">#&gt; OR from m = 3                  1.45   1.48        3.13</span></span>
-<span id="cb26-42"><a href="#cb26-42"></a><span class="co">#&gt; OR from m = 4                  1.44   1.46        3.03</span></span>
-<span id="cb26-43"><a href="#cb26-43"></a><span class="co">#&gt; OR from m = 5                  1.45   1.47        3.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="co"># Design-adjusted logistic regression</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a>fit <span class="ot">&lt;-</span> <span class="fu">with</span>(w.design, </span>
+<span id="cb28-3"><a href="#cb28-3"></a>            <span class="fu">svyglm</span>(<span class="fu">I</span>(cvd <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> arthritis <span class="sc">+</span> age.cat <span class="sc">+</span> </span>
+<span id="cb28-4"><a href="#cb28-4"></a>                     sex <span class="sc">+</span> education <span class="sc">+</span> race <span class="sc">+</span> income <span class="sc">+</span> bmi <span class="sc">+</span> </span>
+<span id="cb28-5"><a href="#cb28-5"></a>                     smoking <span class="sc">+</span> htn <span class="sc">+</span> diabetes, </span>
+<span id="cb28-6"><a href="#cb28-6"></a>                   <span class="at">family =</span> quasibinomial))</span>
+<span id="cb28-7"><a href="#cb28-7"></a>res <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">as.data.frame</span>(<span class="fu">cbind</span>(<span class="fu">coef</span>(fit[[<span class="dv">1</span>]]),</span>
+<span id="cb28-8"><a href="#cb28-8"></a>      <span class="fu">coef</span>(fit[[<span class="dv">2</span>]]),</span>
+<span id="cb28-9"><a href="#cb28-9"></a>      <span class="fu">coef</span>(fit[[<span class="dv">3</span>]]),</span>
+<span id="cb28-10"><a href="#cb28-10"></a>      <span class="fu">coef</span>(fit[[<span class="dv">4</span>]]),</span>
+<span id="cb28-11"><a href="#cb28-11"></a>      <span class="fu">coef</span>(fit[[<span class="dv">5</span>]]))))</span>
+<span id="cb28-12"><a href="#cb28-12"></a><span class="fu">names</span>(res) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"OR from m ="</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb28-13"><a href="#cb28-13"></a>res.rounded <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">t</span>(res),<span class="dv">2</span>)</span>
+<span id="cb28-14"><a href="#cb28-14"></a><span class="fu">kable</span>(res.rounded)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">(Intercept)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">arthritisRheumatoid arthritis</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">age.cat50-64</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">age.cat65+</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sexFemale</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">educationHigh school</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">educationCollege graduate or above</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">raceBlack</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">raceHispanic</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">raceOthers</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">income$20,000 to $74,999</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">income$75,000 and Over</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">bmi</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">smokingPrevious smoker</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">smokingCurrent smoker</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">htnYes</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">diabetesYes</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">OR from m = 1</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">2.03</td>
+<td style="text-align: right;">4.71</td>
+<td style="text-align: right;">13.08</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.96</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">0.48</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.55</td>
+<td style="text-align: right;">1.43</td>
+<td style="text-align: right;">1.35</td>
+<td style="text-align: right;">3.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OR from m = 2</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">2.04</td>
+<td style="text-align: right;">4.74</td>
+<td style="text-align: right;">13.21</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">0.79</td>
+<td style="text-align: right;">0.97</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">0.48</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: right;">1.03</td>
+<td style="text-align: right;">1.55</td>
+<td style="text-align: right;">1.47</td>
+<td style="text-align: right;">1.30</td>
+<td style="text-align: right;">3.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OR from m = 3</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">2.12</td>
+<td style="text-align: right;">4.58</td>
+<td style="text-align: right;">11.88</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">0.71</td>
+<td style="text-align: right;">0.70</td>
+<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.85</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: right;">1.01</td>
+<td style="text-align: right;">1.59</td>
+<td style="text-align: right;">1.45</td>
+<td style="text-align: right;">1.48</td>
+<td style="text-align: right;">3.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OR from m = 4</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">2.10</td>
+<td style="text-align: right;">4.59</td>
+<td style="text-align: right;">12.45</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0.70</td>
+<td style="text-align: right;">0.71</td>
+<td style="text-align: right;">0.96</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.56</td>
+<td style="text-align: right;">1.44</td>
+<td style="text-align: right;">1.46</td>
+<td style="text-align: right;">3.03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OR from m = 5</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">2.07</td>
+<td style="text-align: right;">4.47</td>
+<td style="text-align: right;">12.25</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.55</td>
+<td style="text-align: right;">1.45</td>
+<td style="text-align: right;">1.47</td>
+<td style="text-align: right;">3.05</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </section><section id="step-3-pooling-estimates" class="level4"><h4 class="anchored" data-anchor-id="step-3-pooling-estimates">Step 3: Pooling estimates</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># Step 3: Pooled estimates</span></span>
-<span id="cb27-2"><a href="#cb27-2"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit)</span>
-<span id="cb27-3"><a href="#cb27-3"></a>OR <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(pooled.estimates<span class="sc">$</span>coefficients), <span class="dv">2</span>)</span>
-<span id="cb27-4"><a href="#cb27-4"></a>OR <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(OR)</span>
-<span id="cb27-5"><a href="#cb27-5"></a>CI <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">confint</span>(pooled.estimates)), <span class="dv">2</span>)</span>
-<span id="cb27-6"><a href="#cb27-6"></a>OR <span class="ot">&lt;-</span> <span class="fu">cbind</span>(OR, CI)</span>
-<span id="cb27-7"><a href="#cb27-7"></a>OR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="co"># Step 3: Pooled estimates</span></span>
+<span id="cb29-2"><a href="#cb29-2"></a>pooled.estimates <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>(fit)</span>
+<span id="cb29-3"><a href="#cb29-3"></a>OR <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(pooled.estimates<span class="sc">$</span>coefficients), <span class="dv">2</span>)</span>
+<span id="cb29-4"><a href="#cb29-4"></a>OR <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(OR)</span>
+<span id="cb29-5"><a href="#cb29-5"></a>CI <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">confint</span>(pooled.estimates)), <span class="dv">2</span>)</span>
+<span id="cb29-6"><a href="#cb29-6"></a>OR <span class="ot">&lt;-</span> <span class="fu">cbind</span>(OR, CI)</span>
+<span id="cb29-7"><a href="#cb29-7"></a>OR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">

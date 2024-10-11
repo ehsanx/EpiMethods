@@ -8,7 +8,7 @@ Let us we are interested in exploring the relationship between **rheumatoid arth
 
 ::: column-margin
 In this tutorial, we used a similar approach to the one in a published article by @hossain2022association, but we used less data (restricted to only 2017--2018) to speed up the analysis. [Ref link](https://pubmed.ncbi.nlm.nih.gov/35301105/).
-::: 
+:::
 
 The purpose of this example is to *demonstrate how to do the missing data analysis with multiple imputation in the context of complex surveys*.
 
@@ -18,7 +18,6 @@ The main idea is:
 -   imputing missing values based on that analytic dataset
 -   keep count of the ineligible subjects from the full data who are not included in the analytic data
 -   adding those ineligible subjects back in the imputed datasets, so that we can utilize the survey features and subset the design.
-
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -169,29 +168,67 @@ We have about 10% missing values in income, followed by hypertension (8.4%), bmi
 
 #### Step 0: Set up the imputation model
 
+::: column-margin
+In this tutorial, we used `stata` as an  auxiliary variable. There are two ways we can deal with this:
+
+a) Use `strata` to predict other variables, but **don't impute** `strata`: `meth["strata"] <- ""` (this skips strata's imputation). In our case, since `strata` has no missing observations, this step is unnecessary, as MICE will automatically not impute fully observed variables. However, this strategy is useful for blocking the imputation of auxiliary variables with missing data. 
+
+- Also, do not change the `predictorMatrix` for auxiliary variables, allowing them (e.g., strata in our case) to be used as predictors for other variables.
+
+- Setting `pred["strata", ] <- 0` would remove all predictors for `strata`, which means `strata` cannot be imputed because there are no variables to predict its missing values. However, `strata` can still be used as a predictor for other variables. If `strata` has no missing values (as in our case), this step is unnecessary since MICE does not attempt to impute fully observed variables.
+
+b) **Impute** `strata` and use it as a predictor (if strata had missing values): If `strata` had missing data, you wouldn't need to change anything in `predictorMatrix` or `method`. MICE would impute `strata` and use it as a predictor by default. In our case, since `strata` has no missing values, imputation is not necessary. Note that:
+
+- You should not set `pred["strata", ] <- 1` because this would incorrectly make `strata` a predictor for itself, which is invalid. MICE automatically handles this by setting diagonal entries to 0, so you don't need to manually ensure this unless you've changed it. If you do so (set the row values to 1), you need to then set `pred["strata", "strata"] <- 0` to ensure `strata` does not predict itself.
+
+- Do not use `pred[, "strata"] <- 0` because this would prevent `strata` from being used as a predictor for other variables, which is contrary to the idea of using it as an auxiliary variable.
+
+Whether to **impute or not impute auxiliary variables** depends on their role in the analysis and the potential impact of their missing data. If they are strong predictors or are necessary for future analyses, imputing them may be justified. However, if their missingness is not consequential, and imputing them introduces more noise or complexity, it may be better to leave them unimputed.
+:::
+
 ```{r step0, cache=TRUE}
 # Step 0: Set imputation model
 ini <- mice(data = dat.analytic2, maxit = 0, print = FALSE)
 pred <- ini$pred
 
+kable(pred)
+
 # Use the strata variable as an auxiliary variable in the imputation model
-pred["strata",] <- 0
+pred["strata",]
+# Do not change the pred matrix for strata. 
+# This allows strata to be used as a predictor for other variables.
 
-# Do not use survey weight or PSU variable as auxiliary variables
-pred[,"studyid"] <- pred["studyid",] <- 0
-pred[,"psu"] <- pred["psu",] <- 0
-pred[,"survey.weight"] <- pred["survey.weight",] <- 0
+# Do not use id, survey weight or PSU variable as auxiliary variables
+pred[, c("studyid", "psu", "survey.weight")] <- 0
+# Remove them as predictors for other variables
 
+kable(pred)
+```
+
+::: column-margin
+- The rows represent the variables that can be imputed. The entries in each row show which variables will be used as predictors to impute the variable corresponding to that row.
+ - The columns represent the variables that can be used as predictors to impute other variables. An entry of 1 in a cell means that the corresponding variable (from the column) will be used to predict the variable represented by the row.
+ - `pred[, c("studyid", "psu", "survey.weight")] <- 0` action sets all values in the columns for `studyid`, `psu`, and `survey.weight` to 0. Effectively, it tells MICE not to use them as predictors when imputing other variables. In other words, these variables will not be used to predict missing values in other variables.
+::: 
+
+```{r step0a, cache=TRUE}
 # Set imputation method
 meth <- ini$meth
 meth["bmi"] <- "pmm"
 meth["income"] <- "pmm"
 meth
+meth["strata"] # method used for strata to be imputed
+# meth["strata"] <- "" # you can skip auxiliary variable's imputation
+# Modify the method to skip imputation of "studyid", "psu", and "survey.weight"
+meth["studyid"] <- ""
+meth["psu"] <- ""
+meth["survey.weight"] <- ""
+meth
 ```
 
 -   There is no missing for studyid, survey.weight, psu, strata, cvd, arthritis, age, sex, race, smoking. Hence, no method is assigned for these variables.
 -   For education, `polyreg` (Polytomous logistic regression) will be used.
--   Similarly, we will use `pmm` (Predictive mean matching) for bmi, income and used `logreg` (Logistic regression) for htn, diabetes. See the [Imputation](missingdata1.html) chapter to see how the PMM method works. 
+-   Similarly, we will use `pmm` (Predictive mean matching) for bmi, income and used `logreg` (Logistic regression) for htn, diabetes. See the [Imputation](missingdata1.html) chapter to see how the PMM method works.
 
 #### Step 1: Imputing missing values using mice
 
@@ -373,7 +410,8 @@ res <- exp(as.data.frame(cbind(coef(fit[[1]]),
       coef(fit[[4]]),
       coef(fit[[5]]))))
 names(res) <- paste("OR from m =", 1:5)
-round(t(res),2)
+res.rounded <- round(t(res),2)
+kable(res.rounded)
 ```
 
 #### Step 3: Pooling estimates
@@ -391,6 +429,5 @@ OR
 ### Conclusion
 
 Among US adults aged 20 years or more, the odds of CVD was approximately twice among those with rheumatoid arthritis than no arthritis.
-
 
 ### References
