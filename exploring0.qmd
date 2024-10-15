@@ -1,0 +1,161 @@
+
+## Univariate {.unnumbered}
+
+This tutorial covers various methods to explore the properties of individual variables in a dataset. Understanding individual variables helps us recognize the types of variables present and their behavior. For instance, visualizing variable distributions informs our modeling choices and highlights key features of the data.
+
+### Revisiting RHC Data {.unnumbered}
+
+::: callout-note
+This tutorial reuses data from earlier examples, including those related to a [predictive question](researchquestion1.html), machine learning with a [continuous outcome](machinelearning1.html), and machine learning with a [binary outcome](machinelearning4.html).
+:::
+
+```{r setupExploring0, include=FALSE}
+require(ggplot2)
+require(ggpubr)
+require(knitr)
+require(kableExtra)
+```
+
+```{r, cache=TRUE}
+ObsData <- readRDS(file = "Data/machinelearningCausal/rhcAnalyticTest.RDS")
+head(ObsData)
+```
+
+### First Steps
+
+To begin, it's important to assess the size of the dataset and the number of variables it contains. Use the `dim` function to check the dataset dimensions:
+
+```{r, cache=TRUE}
+dim(ObsData)
+```
+
+R will output the number of rows (observations) followed by the number of columns (variables).
+
+Next, we need to examine which variables are present. We can list the column names (variables) with the `colnames` function:
+
+```{r, cache=TRUE}
+colnames(ObsData)
+```
+
+We should also inspect the types of these variables. This can be done individually:
+
+```{r, cache=TRUE}
+class(ObsData$Cancer)
+```
+
+Or for all variables at once:
+
+```{r, cache=TRUE}
+sapply(ObsData, class)
+```
+
+### Basic Quantitative Summaries {.unnumbered}
+
+R's built-in `summary` function provides key statistics. For a continuous variable like `blood.pressure`, it outputs the minimum, maximum, mean, median, and quartile values:
+
+```{r, cache=TRUE}
+summary(ObsData$blood.pressure)
+```
+
+For a factor variable like `Disease.category`, the `summary` function gives counts for each category:
+
+```{r, cache=TRUE}
+summary(ObsData$Disease.category)
+```
+
+### Visualizing Continuous Variables
+
+To explore continuous variables, histograms are useful for visualizing distributions:
+
+```{r, cache=TRUE}
+ggplot(data = ObsData) + geom_histogram(aes(x = blood.pressure))
+```
+
+You can adjust the `binwidth` argument to change the detail of the histogram:
+
+```{r, cache=TRUE}
+ggplot(data = ObsData) + geom_histogram(aes(x = blood.pressure), binwidth = 5)
+```
+
+For multiple continuous variables, we can display several histograms simultaneously using the `ggpubr` package:
+
+```{r, cache=TRUE}
+plot1 <- ggplot(data = ObsData) + geom_histogram(aes(x = blood.pressure), binwidth = 10)
+plot2 <- ggplot(data = ObsData) + geom_histogram(aes(x = Temperature), binwidth = 1)
+plot3 <- ggplot(data = ObsData) + geom_histogram(aes(x = Weight), binwidth = 10)
+plot4 <- ggplot(data = ObsData) + geom_histogram(aes(x = Length.of.Stay), binwidth = 10)
+ggarrange(plot1, plot2, plot3, plot4)
+```
+
+### Visualizing Factor Variables
+
+The distribution of factor variables can be visualized using bar charts:
+
+```{r, cache=TRUE}
+ggplot(data = ObsData) + geom_bar(aes(x = Disease.category))
+```
+
+You can also display the bar chart horizontally:
+
+```{r, cache=TRUE}
+ggplot(data = ObsData) + geom_bar(aes(y = Disease.category))
+```
+
+To visualize multiple factor variables side by side:
+
+```{r, cache=TRUE}
+plot1 <- ggplot(data = ObsData) + geom_bar(aes(y = Disease.category))
+plot2 <- ggplot(data = ObsData) + geom_bar(aes(y = Medical.insurance))
+plot3 <- ggplot(data = ObsData) + geom_bar(aes(y = age))
+plot4 <- ggplot(data = ObsData) + geom_bar(aes(y = race))
+ggarrange(plot1, plot2, plot3, plot4)
+```
+
+
+### Exploring Missing Data {.unnumbered}
+
+Before diving deeper into the analysis, it's important to understand how much of your data is missing. You can check for missing values in your dataset using the `is.na()` function in R.
+
+To see how many missing values each column contains:
+
+```{r, cache=TRUE}
+miss <- sapply(ObsData, function(x) sum(is.na(x)))
+kable(miss)
+```
+
+Once identified, you can either impute the missing values or remove them, depending on the type of analysis and dataset.
+
+For example, to remove rows with missing data:
+
+```{r, cache=TRUE}
+na.omit(ObsData)
+```
+
+Alternatively, you can impute missing values using methods such as mean imputation or more advanced techniques:
+
+```{r, cache=TRUE}
+ObsData$blood.pressure[is.na(ObsData$blood.pressure)] <- mean(ObsData$blood.pressure, na.rm = TRUE)
+```
+
+::: callout-note
+We will learn more about exploring missing data in the  [package section](exploring.html), and then further details about imputation in the upcoming [missing data](missingdata.html) chapter.
+:::
+
+### Detecting Outliers {.unnumbered}
+
+Outliers are extreme values that can distort statistical analysis. To detect outliers in continuous variables, we can use boxplots or calculate Z-scores.
+
+For example, using a boxplot to identify outliers in the `blood.pressure` variable:
+
+```{r, cache=TRUE}
+ggplot(data = ObsData, aes(x = "", y = blood.pressure)) + 
+  geom_boxplot()
+```
+
+To detect outliers using Z-scores:
+
+```{r, cache=TRUE}
+z_scores <- scale(ObsData$blood.pressure)
+outliers <- which(abs(z_scores) > 3)
+ObsData[outliers, ]
+```

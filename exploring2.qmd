@@ -1,0 +1,389 @@
+
+## Useful Packages {.unnumbered}
+
+This tutorial introduces a variety of methods to explore a dataset, including summary statistics, variable distributions, correlations, and handling missing data.
+
+::: callout-note
+This tutorial uses the same dataset as previous tutorials, including working with a [predictive question](researchquestion1.html), machine learning with a [continuous outcome](machinelearning1.html), and machine learning with a [binary outcome](machinelearning4.html).
+:::
+
+```{r, cache=TRUE, echo=FALSE}
+ObsData <- readRDS(file = "Data/machinelearningCausal/rhcAnalyticTest.RDS")
+```
+
+### TableOne
+
+`TableOne` is an R package that provides a simple method to create the classic "Table 1" seen in health research papers, summarizing the characteristics of the dataset. It also offers functions like `svyCreateTableOne` for survey data, allowing users to account for strata and weights, and display counts and proportions for both weighted and unweighted data.
+
+```{r}
+require(tableone)
+```
+
+```{r, cache=TRUE}
+CreateTableOne(vars = c("Disease.category", "Cancer", "Cardiovascular", "Congestive.HF", 
+                        "Dementia", "Psychiatric", "Pulmonary", "Renal", "Hepatic", "GI.Bleed", "Tumor",
+                        "Immunosuppression", "Transfer.hx", "MI", "age", "sex", "edu", "DASIndex",
+                        "APACHE.score", "Glasgow.Coma.Score", "blood.pressure", "WBC", "Heart.rate",
+                        "Respiratory.rate", "Temperature", "PaO2vs.FIO2", "Albumin", "Hematocrit",
+                        "Bilirubin", "Creatinine", "Sodium", "Potassium", "PaCo2", "PH", "Weight",
+                        "DNR.status", "Medical.insurance", "Respiratory.Diag", "Cardiovascular.Diag",
+                        "Neurological.Diag", "Gastrointestinal.Diag", "Renal.Diag", "Metabolic.Diag",
+                        "Hematologic.Diag", "Sepsis.Diag", "Trauma.Diag", "Orthopedic.Diag", "race", 
+                        "income", "Length.of.Stay", "Death"),
+               strata = "RHC.use",
+               data = ObsData,
+               includeNA = TRUE,
+               test = TRUE)
+```
+
+### table1
+
+The `table1` package is useful for generating descriptive summary tables commonly used in medical research. Below are examples of how to use it.
+
+Basic usage of `table1`:
+
+```{r}
+require(table1)
+```
+
+```{r, cache=TRUE}
+ObsData$RHC.use.factor <- factor(ObsData$RHC.use, 
+                          levels = c(0, 1), 
+                          labels = c("No RHC", "Received RHC"))
+# Generate a basic Table 1 summarizing characteristics of ObsData, grouped by 'RHC.use'
+table1(~ age + sex + APACHE.score + Medical.insurance | RHC.use.factor, data = ObsData)
+```
+
+Customizing labels and formats
+
+```{r, cache=TRUE}
+# Label variables and modify the format
+labels <- list(
+  age = "Age (years)",
+  APACHE.score = "APACHE II Score",
+  Medical.insurance = "Medical Insurance Status"
+)
+
+table1(~ age + sex + APACHE.score + Medical.insurance | RHC.use.factor, data = ObsData,
+       label = labels, caption = "Table 1: Summary of patient characteristics")
+```
+
+Handling missing data
+
+```{r, cache=TRUE}
+# Including missing values in the summary table
+table1(~ age + sex + APACHE.score + Medical.insurance | RHC.use.factor, data = ObsData,
+       overall = TRUE, render.missing = TRUE)
+ObsData$RHC.use.factor <- NULL
+```
+
+### gtsummary
+
+`gtsummary` provides highly customizable functions to construct tables. It allows renaming variables, adding captions, and selecting specific measures for variable types. It is particularly useful for creating clean, customized Table 1s and includes options for survey data.
+
+```{r}
+require(gt)
+require(gtsummary)
+```
+
+```{r, cache=TRUE}
+tbl_summary(ObsData)
+```
+
+```{r, cache=TRUE}
+tbl_summary(ObsData, by = RHC.use,
+            statistic = list(
+                              all_continuous() ~ "{mean} ({sd})",
+                              all_categorical() ~ "{n} ({p}%)"
+                            ),
+            digits = all_continuous() ~ 2) |> 
+  as_gt() |>
+  gt::tab_source_note(gt::md("*Add note here.*"))
+```
+
+### DataExplorer
+
+`DataExplorer` offers functions for initial data exploration, including various visualizations. Below are some examples using the RHC dataset.
+
+```{r}
+require(DataExplorer)
+```
+
+The `introduce` function provides an overview of the dataset dimensions, variable types, and missingness.
+
+```{r, cache=TRUE}
+introduce(ObsData)
+```
+
+Plot the amount of missing data per variable:
+
+```{r, cache=TRUE}
+plot_missing(ObsData)
+```
+
+Visualize categorical variable distributions with the `plot_bar` function:
+
+```{r, cache=TRUE}
+plot_bar(ObsData)
+```
+
+Visualize the distribution of numerical variables with histograms:
+
+```{r, cache=TRUE}
+plot_histogram(ObsData)
+```
+
+Quantile-quantile plots can be used to assess whether numerical variables are normally distributed:
+
+```{r, cache=TRUE}
+plot_qq(ObsData)
+```
+
+Generate a correlation plot to show relationships between variables:
+
+```{r, cache=TRUE}
+plot_correlation(ObsData)
+```
+
+Boxplots can visualize variable distributions based on treatment or outcome:
+
+```{r, cache=TRUE}
+plot_boxplot(ObsData, by="RHC.use")
+```
+
+Automatically generate a full PDF report with the `create_report` function:
+
+```{r, eval=FALSE}
+create_report(ObsData)
+```
+
+### GGally
+
+`GGally` provides methods to combine multiple ggplot2 plots, enabling visualization of several variables at once.
+
+```{r}
+require(GGally)
+```
+
+```{r, cache=TRUE}
+ggpairs(ObsData, 
+        columns = c('age', 'sex', 'edu', 'blood.pressure', 'Medical.insurance'),
+        ggplot2::aes(color=as.factor(RHC.use)))
+```
+
+### modelsummary
+
+`modelsummary` provides functions to visualize data, including summaries, correlations, and Table 1-style tables.
+
+```{r}
+require(modelsummary)
+require(rmarkdown)
+require(markdown)
+```
+
+Overview of each variable:
+
+```{r, cache=TRUE}
+datasummary_skim(ObsData)
+```
+
+Create a Table 1 using `datasummary_balance`:
+
+```{r, cache=TRUE, warning=FALSE}
+datasummary_balance(~ RHC.use, ObsData)
+```
+
+You can also customize the appearance of tables generated with `modelsummary`. For example, you can adjust the number of digits displayed in the summaries.
+
+```{r, cache=TRUE}
+datasummary_balance(~ RHC.use, ObsData, 
+                    fmt="%.2f", 
+                    output="markdown")
+```
+
+Extract correlations between variables with `datasummary_correlation`:
+
+```{r, cache=TRUE}
+datasummary_correlation(ObsData)
+```
+
+Generate a contingency table using `datasummary_crosstab`:
+
+```{r, cache=TRUE}
+datasummary_crosstab(age ~ RHC.use, data=ObsData)
+```
+
+The `modelsummary` package also allows for professional display of regression models, combining results from multiple models into one table for easy comparison.
+
+```{r, cache=TRUE}
+# Example: Fit two regression models
+model1 <- lm(Length.of.Stay ~ age + sex + APACHE.score, data = ObsData)
+model2 <- lm(Length.of.Stay ~ age + sex + APACHE.score + Medical.insurance, data = ObsData)
+
+# Display both models side by side
+modelsummary(list(model1, model2), 
+             statistic = "p.value", 
+             stars = TRUE)
+```
+
+All tables generated by `modelsummary` can be saved in various formats such as LaTeX, HTML, or Word.
+
+```{r, eval=FALSE}
+# Save as a LaTeX file
+modelsummary(model1, output = "table.tex")
+
+# Save as an HTML file
+modelsummary(model1, output = "table.html")
+```
+
+### stargazer
+
+The `stargazer` package is widely used for outputting regression results in LaTeX, HTML, or plain text formats. It allows you to include various statistics, such as standard errors, t-values, p-values, and confidence intervals.
+
+```{r}
+require(stargazer)
+```
+
+```{r, cache=TRUE}
+# Example: Fit two regression models
+model1 <- lm(Length.of.Stay ~ age + sex + APACHE.score, data = ObsData)
+model2 <- lm(Length.of.Stay ~ age + sex + APACHE.score + Medical.insurance, data = ObsData)
+
+# Display the regression results using stargazer
+stargazer(model1, model2, type = "text", 
+          title = "Regression Results",
+          dep.var.labels = "Length of Stay",
+          covariate.labels = c("Age", "Sex", "APACHE Score", "Medical Insurance"),
+          out = "regression_table.txt")
+```
+
+### broom
+
+The `broom` package converts regression model outputs into tidy data frames, making it easy to extract and manipulate specific parts of the model for custom summaries.
+
+```{r}
+require(broom)
+```
+
+```{r, cache=TRUE}
+# Tidy the model results for model1
+tidy(model1)
+
+# Glance at model1 for a quick summary of goodness-of-fit statistics
+glance(model1)
+```
+
+### texreg
+
+The `texreg` package allows you to export regression tables into LaTeX, HTML, or Word. It supports outputting multiple regression models side by side for easy comparison.
+
+```{r}
+require(texreg)
+```
+
+```{r, cache=TRUE}
+# Export models into a LaTeX table
+texreg(list(model1, model2), 
+       file = "regression_table.tex", 
+       label = "tab:regression", 
+       caption = "Regression Models for Length of Stay")
+```
+
+You can also customize the output from these packages by specifying different statistics to display, such as including robust standard errors, changing the number of decimal places, or adding significance stars.
+
+```{r, cache=TRUE}
+stargazer(model1, model2, type = "text", 
+          se = list(coef(summary(model1))[ , "Std. Error"], 
+                    coef(summary(model2))[ , "Std. Error"]), 
+          star.cutoffs = c(0.05, 0.01, 0.001))
+```
+
+
+### janitor
+
+The `janitor` package simplifies data cleaning tasks, such as checking for duplicate records, cleaning column names, and generating cross-tabulations.
+
+```{r}
+require(janitor)
+```
+
+```{r, cache=TRUE}
+# Clean column names to make them syntactically valid
+ObsData_clean <- clean_names(ObsData)
+
+# Method 1: Using the data frame name in the tabyl function
+tabyl(ObsData, Disease.category, RHC.use)
+
+# Method 2: Using the pipe operator
+ObsData %>% tabyl(Disease.category, RHC.use)
+```
+
+### skimr
+
+The `skimr` package provides a more compact and readable summary compared to the default `summary()` function. It tailors its output for each variable type.
+
+```{r}
+require(skimr)
+```
+
+```{r, cache=TRUE}
+# Quick summary of the entire dataset
+skim(ObsData)
+```
+
+### corrplot
+
+The `corrplot` package is useful for visualizing correlation matrices with different styles (circle, color, etc.), making correlations easier to interpret.
+
+```{r}
+require(corrplot)
+```
+
+```{r, cache=TRUE}
+# Step 1: Select only numerical variables from ObsData
+ObsData_num <- dplyr::select(ObsData, where(is.numeric))
+
+# Step 2: Compute the correlation matrix
+corr_matrix <- cor(ObsData_num, use = "complete.obs")
+
+# Step 3: Plot the correlation matrix using corrplot
+corrplot::corrplot(corr_matrix, method = "circle")
+```
+
+### visdat
+
+The `visdat` package helps visualize missing data patterns, data types, and distributions.
+
+```{r}
+require(visdat)
+```
+
+```{r, cache=TRUE}
+# Visualize missing data patterns
+vis_miss(ObsData)
+
+# Visualize data types and missingness
+vis_dat(ObsData)
+```
+
+### naniar
+
+The `naniar` package provides tools to handle and visualize missing data, helping to explore missingness patterns in the data.
+
+```{r}
+require(naniar)
+```
+
+```{r, cache=TRUE}
+# Introduce some missing values for demonstration
+ObsData_with_NA <- ObsData
+ObsData_with_NA$age[sample(1:nrow(ObsData), 10)] <- NA
+ObsData_with_NA$sex[sample(1:nrow(ObsData), 10)] <- NA
+
+# Visualize missing data across variables
+gg_miss_var(ObsData_with_NA)
+
+# Plot the missing data upset plot
+naniar::gg_miss_upset(ObsData_with_NA)
+
+```

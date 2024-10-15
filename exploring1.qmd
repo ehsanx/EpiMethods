@@ -1,0 +1,87 @@
+
+## Bivariate {.unnumbered}
+
+In this tutorial, we will demonstrate methods for exploring pairwise relationships in the data. By doing so, we can identify which variables are correlated and uncover relationships that may be worth further examination in more detailed analyses.
+
+### Revisiting RHC Data {.unnumbered}
+
+::: callout-note
+This tutorial utilizes the same dataset as in previous tutorials, such as those focusing on a [predictive question](researchquestion1.html), machine learning with a [continuous outcome](machinelearning1.html), and machine learning with a [binary outcome](machinelearning4.html).
+:::
+
+```{r setupExploring1, include=FALSE}
+require(ggplot2)
+require(tidyverse)
+require(dplyr)
+require(reshape2)
+```
+
+```{r, cache=TRUE, include=FALSE}
+ObsData <- readRDS(file = "Data/machinelearningCausal/rhcAnalyticTest.RDS")
+```
+
+### Categorical Variables {.unnumbered}
+
+Stacked bar charts allow us to visualize the counts for combinations of two categorical variables:
+
+```{r, cache=TRUE}
+ggplot(ObsData, aes(y = Medical.insurance)) +
+  geom_bar(aes(fill = Disease.category)) +
+  theme(legend.position = "top")
+```
+
+### Numerical Variables {.unnumbered}
+
+For numerical variables, scatterplots can be used to observe any patterns or relationships between two variables:
+
+```{r, cache=TRUE}
+ggplot(ObsData, aes(x=Weight, y=APACHE.score)) + 
+  geom_point()
+```
+
+Another useful tool for examining pairwise relationships between numerical variables is a correlation heatmap:
+
+```{r, cache=TRUE}
+# Select all numerical variables
+ObsData_num <- select(ObsData, c("edu", "blood.pressure", "WBC", "Heart.rate", "Respiratory.rate", "Temperature", "PH", 'Weight', "Length.of.Stay"))
+
+# Create the correlation matrix
+corr_mat <- round(cor(ObsData_num), 2)
+head(corr_mat)
+
+# Reshape the correlation matrix using the reshape2 package
+melted_corr_mat <- reshape2::melt(corr_mat)
+```
+
+```{r, cache=TRUE}
+# Plot the correlation heatmap
+ggplot(data = melted_corr_mat, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
+```
+
+### Numerical-Categorical Relationships {.unnumbered}
+
+To explore the relationship between a numerical and a categorical variable, boxplots can be utilized:
+
+```{r, cache=TRUE}
+ObsData$RHC.use <- as.factor(ObsData$RHC.use)
+
+ggplot(ObsData, aes(x = RHC.use, y = APACHE.score)) +
+  geom_boxplot()
+```
+
+Also, we can compare the distribution of `blood.pressure` across different levels of `Disease.category` using box plots. This is another example of exploring how continuous variables behave across different groups. 
+
+```{r, cache=TRUE}
+ggplot(data = ObsData, aes(x = Disease.category, y = blood.pressure)) + 
+  geom_boxplot()
+```
+
+Similarly, you can create density plots for better visualization of distributions across groups:
+
+```{r, cache=TRUE}
+ggplot(data = ObsData, aes(x = blood.pressure, fill = Disease.category)) + 
+  geom_density(alpha = 0.5)
+```
+
