@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Advanced Epidemiological Methods - Exercise (S)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./machinelearning.html" rel="next">
+<link href="./propensityscoreS.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
+</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+<meta name="twitter:title" content="Advanced Epidemiological Methods - Exercise (S)">
+<meta name="twitter:description" content="">
+<meta name="twitter:card" content="summary">
+</head>
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./propensityscore.html">Propensity score</a></li><li class="breadcrumb-item"><a href="./propensityscoreE.html">Exercise (S)</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Advanced Epidemiological Methods</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Project</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data wrangling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R basics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data types</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automating tasks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data manipulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Import external data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary tables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Markdown</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (W)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (W)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (W)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (W)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accessing data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data sources</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descriptions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing CCHS to R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHANES to R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reproducing NHANES results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHIS to R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linking mortality data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Data Creation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 Solution (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 2 (A)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./exploring.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exploratory Data Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Univariate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bivariate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Useful Packages</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research questions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (Q)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2a</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2b</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (Q)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (Q)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (Q)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal roles</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Confounding</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Simpson’s Paradox</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Z-bias</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collapsibility</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Change-in-estimate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingE2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 2 (R)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prediction ideas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (P)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collinear predictors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overfitting and performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Splitting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bootstrap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (P)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (P)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Revisiting PICOT</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Assessing data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Bivariate analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Blood Pressure</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Cholesterol</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Subsetting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (D)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation in NHANES</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing in outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance with NA</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Subpopulations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCAR tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Effect modification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (M)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Propensity score</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exact Matching (CCHS)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (CCHS)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (US)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in BMI-diabetes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PS Weighting (US)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI in subset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with MI in subset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with multiple tx</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Exercise (S)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine learning (ML)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (L)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data spliting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Supervised learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unsupervised learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHIS Example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (L)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ML in causal inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (C)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary Outcomes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous Outcomes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (C)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (C)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex outcomes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (N)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polytomous and ordinal</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis: NHANES</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Poisson</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (N)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (N)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Longitudinal data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (T)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixed effects models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GEE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (T)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (T)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (I)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Baron and Kenny</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Justification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation Example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (I)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (I)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing tools</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collaborative Writing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formatting Tools</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#problem-statement" id="toc-problem-statement" class="nav-link active" data-scroll-target="#problem-statement">Problem Statement</a></li>
+  <li>
+<a href="#question-1-0-grade" id="toc-question-1-0-grade" class="nav-link" data-scroll-target="#question-1-0-grade">Question 1: [0% grade]</a>
+  <ul class="collapse">
+<li><a href="#a-importing-dataset" id="toc-a-importing-dataset" class="nav-link" data-scroll-target="#a-importing-dataset">1(a) Importing dataset</a></li>
+  <li><a href="#b-subsetting-according-to-eligibility" id="toc-b-subsetting-according-to-eligibility" class="nav-link" data-scroll-target="#b-subsetting-according-to-eligibility">1(b) Subsetting according to eligibility</a></li>
+  <li><a href="#c-run-the-design-adjusted-logistic-regression" id="toc-c-run-the-design-adjusted-logistic-regression" class="nav-link" data-scroll-target="#c-run-the-design-adjusted-logistic-regression">1(c) Run the design-adjusted logistic regression</a></li>
+  </ul>
+</li>
+  <li><a href="#question-2-propensity-score-matching-by-dugoff-et-al.-2014-50-grade" id="toc-question-2-propensity-score-matching-by-dugoff-et-al.-2014-50-grade" class="nav-link" data-scroll-target="#question-2-propensity-score-matching-by-dugoff-et-al.-2014-50-grade">Question 2: Propensity score matching by DuGoff et al.&nbsp;(2014) [50% grade]</a></li>
+  <li><a href="#question-3-propensity-score-matching-by-austin-et-al.-2018-50-grade" id="toc-question-3-propensity-score-matching-by-austin-et-al.-2018-50-grade" class="nav-link" data-scroll-target="#question-3-propensity-score-matching-by-austin-et-al.-2018-50-grade">Question 3: Propensity score matching by Austin et al.&nbsp;(2018) [50% grade]</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./propensityscore.html">Propensity score</a></li><li class="breadcrumb-item"><a href="./propensityscoreE.html">Exercise (S)</a></li></ol></nav><div class="quarto-title">
+<h1 class="title">Exercise (S)</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can download all of the related files in a zip file <strong>propensityscoreEx.zip</strong> from <a href="https://github.com/ehsanx/EpiMethods/tree/main/LabExercises/">Github folder</a>, or just by clicking this link <a href="https://github.com/ehsanx/EpiMethods/raw/main/LabExercises/propensityscoreEx.zip">directly</a>.</p>
+<ul>
+<li>Navigate to the GitHub folder (above link) where the ZIP file is located.</li>
+<li>Click on the file name (above zip file) to open its preview window.</li>
+<li>Click on the Download button to download the file. If you can’t see the Download button, click on “Download Raw File” link that should appear on the page.</li>
+</ul>
+</div>
+</div>
+<section id="problem-statement" class="level2"><h2 class="anchored" data-anchor-id="problem-statement">Problem Statement</h2>
+<p>We will use the article by <a href="https://doi.org/10.1002/nau.24711">Moon et al.&nbsp;(2021)</a>:</p>
+<p>We will reproduce some results from the article. The authors aggregated 4 NHANES cycles 2005-12 to create their analytic dataset. The full dataset contains 40,790 subjects with the following relevant variables for this exercise:</p>
+<p><strong>Survey information</strong></p>
+<ul>
+<li>SEQN: Respondent sequence number</li>
+<li>strata: Masked pseudo strata (strata is nested within PSU)</li>
+<li>psu: Masked pseudo PSU</li>
+<li>survey.weight: Full sample 8 year interview weight divided by 4</li>
+<li>survey.cycle: NHANES cycle</li>
+</ul>
+<p><strong>Outcome variable</strong></p>
+<ul>
+<li>cvd: Cardiovascular disease</li>
+</ul>
+<p><strong>Exposure</strong></p>
+<ul>
+<li>nocturia: Binary nocturia</li>
+</ul>
+<p><strong>Confounders and other variables</strong></p>
+<ul>
+<li>age: Age in years at screening</li>
+<li>gender: Gender</li>
+<li>race: Race/Ethnicity</li>
+<li>smoking: 100+ cigarettes in life</li>
+<li>alcohol: Alcohol consumption (12+ drinks in 1 year)</li>
+<li>sleep: Sleep duration, h</li>
+<li>bmi: Body Mass Index in kg/m<span class="math inline">\(^2\)</span>
+</li>
+<li>systolic: Systolic blood pressure, mmHg</li>
+<li>diastolic: Diastolic blood pressure, mmHg</li>
+<li>tcholesterol: Total cholesterol, mg/dl</li>
+<li>triglycerides: Triglycerides, mg/dl</li>
+<li>hdl: HDL‐cholesterol, mg/dl</li>
+<li>diabetes: Diabetes mellitus</li>
+<li>hypertension: Hypertension</li>
+</ul>
+<p>Two important <strong>warnings</strong> before we start:</p>
+<ul>
+<li><p>In this paper, there is insufficient information to create the analytic dataset. This is mainly because of not sufficiently defining the covariates and not explicitly explaining the inclusion/exclusion criteria.</p></li>
+<li><p>The authors did incorrect analyses. For example, they didn’t consider survey features. Since we will utilize survey features in our analysis, our results will likely be different than the results shown by the authors in Table 2.</p></li>
+</ul></section><section id="question-1-0-grade" class="level2"><h2 class="anchored" data-anchor-id="question-1-0-grade">Question 1: [0% grade]</h2>
+<section id="a-importing-dataset" class="level3"><h3 class="anchored" data-anchor-id="a-importing-dataset">1(a) Importing dataset</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Data/propensityscore/Moon2021.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="b-subsetting-according-to-eligibility" class="level3"><h3 class="anchored" data-anchor-id="b-subsetting-according-to-eligibility">1(b) Subsetting according to eligibility</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Age 20+</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>dat.analytic <span class="ot">&lt;-</span> dat.full[<span class="fu">complete.cases</span>(dat.full<span class="sc">$</span>age),]</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Complete outcome and exposure information</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>dat.analytic <span class="ot">&lt;-</span> dat.analytic[<span class="fu">complete.cases</span>(dat.analytic<span class="sc">$</span>cvd),] </span>
+<span id="cb2-6"><a href="#cb2-6"></a>dat.analytic <span class="ot">&lt;-</span> dat.analytic[<span class="fu">complete.cases</span>(dat.analytic<span class="sc">$</span>nocturia),] </span>
+<span id="cb2-7"><a href="#cb2-7"></a></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co"># Keep important variables only</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-10"><a href="#cb2-10"></a>  <span class="co"># Survey features</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a>  <span class="st">"SEQN"</span>, <span class="st">"strata"</span>, <span class="st">"psu"</span>, <span class="st">"survey.weight"</span>, </span>
+<span id="cb2-12"><a href="#cb2-12"></a>  </span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="co"># Survey cycle</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>  <span class="st">"survey.cycle"</span>, </span>
+<span id="cb2-15"><a href="#cb2-15"></a>  </span>
+<span id="cb2-16"><a href="#cb2-16"></a>  <span class="co"># Binary exposure</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a>  <span class="st">"nocturia"</span>,</span>
+<span id="cb2-18"><a href="#cb2-18"></a>  </span>
+<span id="cb2-19"><a href="#cb2-19"></a>  <span class="co"># Outcome</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a>  <span class="st">"cvd"</span>,</span>
+<span id="cb2-21"><a href="#cb2-21"></a>  </span>
+<span id="cb2-22"><a href="#cb2-22"></a>  <span class="co"># Covariates</span></span>
+<span id="cb2-23"><a href="#cb2-23"></a>  <span class="st">"age"</span>, <span class="st">"gender"</span>, <span class="st">"race"</span> , <span class="st">"smoking"</span>, <span class="st">"alcohol"</span>, <span class="st">"sleep"</span>, <span class="st">"bmi"</span>, <span class="st">"diabetes"</span>, </span>
+<span id="cb2-24"><a href="#cb2-24"></a>  <span class="st">"hypertension"</span>, <span class="st">"tcholesterol"</span>, <span class="st">"triglycerides"</span>, <span class="st">"hdl"</span>, <span class="st">"systolic"</span>, <span class="st">"diastolic"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25"></a></span>
+<span id="cb2-26"><a href="#cb2-26"></a>dat.analytic <span class="ot">&lt;-</span> dat.analytic[,vars]</span>
+<span id="cb2-27"><a href="#cb2-27"></a></span>
+<span id="cb2-28"><a href="#cb2-28"></a><span class="co"># Complete case</span></span>
+<span id="cb2-29"><a href="#cb2-29"></a>dat.analytic <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(dat.analytic) <span class="co">#  N = 15,404 (numbers do not match with Fig 1)</span></span>
+<span id="cb2-30"><a href="#cb2-30"></a><span class="fu">dim</span>(dat.analytic)</span>
+<span id="cb2-31"><a href="#cb2-31"></a><span class="co">#&gt; [1] 15404    21</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="c-run-the-design-adjusted-logistic-regression" class="level3"><h3 class="anchored" data-anchor-id="c-run-the-design-adjusted-logistic-regression">1(c) Run the design-adjusted logistic regression</h3>
+<p>Create the first column of Table 2 of the article, i.e., explore the relationship between binary nocturia and CVD among adults aged 20 years and more. Adjust the model for age, gender, race, body mass index, smoking status, alcohol consumption, sleep duration, hypertension, diabetes mellitus, and survey cycles.</p>
+<ul>
+<li><p>Hint 1: the authors did not utilize the survey features (e.g., strata, psu, survey weights). But you should utilize the survey features to answer this question.</p></li>
+<li><p>Hint 2: Adjust the model for age, gender, race, bmi, smoking, alcohol, sleep, tcholesterol, triglycerides, hdl, hypertension, diabetes, and survey cycle.</p></li>
+<li><p>Hint 3: Use Publish package to report the odds ratio with the 95% CI and p-value.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Create an indicator variable in the full data</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>dat.full<span class="sc">$</span>miss <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>dat.full<span class="sc">$</span>miss[dat.full<span class="sc">$</span>SEQN <span class="sc">%in%</span> dat.analytic<span class="sc">$</span>SEQN] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co"># Design setup</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>svy.design0 <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">strata =</span> <span class="sc">~</span>strata, <span class="at">id =</span> <span class="sc">~</span>psu, <span class="at">weights =</span> <span class="sc">~</span>survey.weight,</span>
+<span id="cb3-7"><a href="#cb3-7"></a>                         <span class="at">data =</span> dat.full, <span class="at">nest =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co"># Subset the design</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>svy.design <span class="ot">&lt;-</span> <span class="fu">subset</span>(svy.design0, miss <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co"># Design-adjusted logistic</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>fit.logit <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">I</span>(cvd <span class="sc">==</span> <span class="st">"Yes"</span>) <span class="sc">~</span> nocturia <span class="sc">+</span> age <span class="sc">+</span> gender <span class="sc">+</span> race <span class="sc">+</span> bmi <span class="sc">+</span> </span>
+<span id="cb3-14"><a href="#cb3-14"></a>                      smoking <span class="sc">+</span> alcohol <span class="sc">+</span> sleep <span class="sc">+</span> tcholesterol <span class="sc">+</span> triglycerides <span class="sc">+</span> </span>
+<span id="cb3-15"><a href="#cb3-15"></a>                      hdl <span class="sc">+</span> hypertension <span class="sc">+</span> diabetes <span class="sc">+</span> survey.cycle, </span>
+<span id="cb3-16"><a href="#cb3-16"></a>                    <span class="at">family =</span> binomial, <span class="at">design =</span> svy.design)</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="fu">publish</span>(fit.logit)</span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt;       Variable              Units OddsRatio         CI.95     p-value </span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt;       nocturia                 &lt;2       Ref                           </span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt;                                2+      1.44   [1.21;1.71]   0.0001496 </span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt;            age            [20,40)       Ref                           </span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt;                           [40,60)      4.21   [3.05;5.82]     &lt; 1e-04 </span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt;                           [60,80)     11.46  [7.89;16.64]     &lt; 1e-04 </span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt;                          [80,Inf)     25.28 [17.51;36.50]     &lt; 1e-04 </span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt;         gender               Male       Ref                           </span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt;                            Female      0.68   [0.58;0.79]     &lt; 1e-04 </span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt;           race          Hispanics       Ref                           </span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt;                Non-Hispanic White      1.32   [1.10;1.57]   0.0036168 </span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt;                Non-Hispanic Black      1.15   [0.92;1.44]   0.2362499 </span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt;                       Other races      1.55   [1.05;2.30]   0.0319116 </span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt;            bmi                         1.02   [1.01;1.03]   0.0003273 </span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt;        smoking                 No       Ref                           </span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt;                               Yes      1.74   [1.46;2.07]     &lt; 1e-04 </span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt;        alcohol                 No       Ref                           </span></span>
+<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt;                               Yes      0.92   [0.59;1.45]   0.7273627 </span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt;          sleep                         0.96   [0.90;1.01]   0.1146287 </span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt;   tcholesterol                         0.99   [0.99;0.99]     &lt; 1e-04 </span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt;  triglycerides                         1.00   [1.00;1.00]   0.4801803 </span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt;            hdl                         0.99   [0.98;1.00]   0.0416900 </span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt;   hypertension                 No       Ref                           </span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt;                               Yes      2.73   [2.27;3.29]     &lt; 1e-04 </span></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="co">#&gt;       diabetes                 No       Ref                           </span></span>
+<span id="cb3-43"><a href="#cb3-43"></a><span class="co">#&gt;                               Yes      1.83   [1.51;2.22]     &lt; 1e-04 </span></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co">#&gt;   survey.cycle            2005-06       Ref                           </span></span>
+<span id="cb3-45"><a href="#cb3-45"></a><span class="co">#&gt;                           2007-08      0.84   [0.65;1.07]   0.1644272 </span></span>
+<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt;                           2009-10      0.91   [0.73;1.12]   0.3793696 </span></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="co">#&gt;                           2011-11      0.82   [0.68;0.99]   0.0398975</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="question-2-propensity-score-matching-by-dugoff-et-al.-2014-50-grade" class="level2"><h2 class="anchored" data-anchor-id="question-2-propensity-score-matching-by-dugoff-et-al.-2014-50-grade">Question 2: Propensity score matching by DuGoff et al.&nbsp;(2014) [50% grade]</h2>
+<p>Create the second column of Table 2 (exploring the relationship between binary nocturia and CVD; the same exposure and outcome used in Question 1) using the propensity score <strong>1:1 matching</strong> analysis as per <a href="https://pubmed.ncbi.nlm.nih.gov/23855598/">DuGoff et al.&nbsp;(2014)</a> recommendations.</p>
+<p>Please read the hints carefully:</p>
+<ul>
+<li>
+<p>Hint 1: You should consider all four steps in the propensity score (PS) analysis:</p>
+<ul>
+<li><p>Step 1: Fit the PS model by considering survey features as covariates. Other covariates for the PS model are: age, gender, race, bmi, smoking, alcohol, sleep, tcholesterol, triglycerides, hdl, hypertension, diabetes, systolic, diastolic, and survey cycle.</p></li>
+<li><p>Step 2: Match an exposed subject (nocturia <span class="math inline">\(\ge2\)</span> times) with a control subject (nocturia &lt;2 times) without replacement within the caliper of 0.2 times the standard deviation of the logit of PS. Set your seed to 123.</p></li>
+<li><p>Step 3: Balance checking using SMD. Consider SMD &lt;0.1 as a good covariate balancing.</p></li>
+<li><p>Step 4: Fit the outcome model on the matched data. If needed, adjust for imbalanced covariates in the outcome model. Report the odds ratio with a 95% CI. For step 4, you should utilize the survey feature as the design (NOT covariates).</p></li>
+</ul>
+</li>
+<li><p>Hint 2: Compare your results with the results reported by the authors. [Expected answer: 2-3 sentences]</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># your codes here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="question-3-propensity-score-matching-by-austin-et-al.-2018-50-grade" class="level2"><h2 class="anchored" data-anchor-id="question-3-propensity-score-matching-by-austin-et-al.-2018-50-grade">Question 3: Propensity score matching by Austin et al.&nbsp;(2018) [50% grade]</h2>
+<p>Create the second column of Table 2 (exploring the relationship between binary nocturia and CVD; the same exposure and outcome used in Questions 1 and 2) using the propensity score <strong>1:4 matching</strong> analysis as per <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5843030/">Austin et al.&nbsp;(2018)</a> recommendations.</p>
+<p>Please read the hints carefully:</p>
+<ul>
+<li>
+<p>Hint 1: You should consider all four steps in the propensity score (PS) analysis:</p>
+<ul>
+<li><p>Step 1: Fit the PS model by considering survey features as design, i.e., fit the design-adjusted PS model. Other covariates for the PS model are: age, gender, race, bmi, smoking, alcohol, sleep, tcholesterol, triglycerides, hdl, hypertension, diabetes, systolic, diastolic, and survey cycle.</p></li>
+<li><p>Step 2: Match an exposed subject (nocturia <span class="math inline">\(\ge2\)</span> times) with 4 control subjects (nocturia &lt;2 times) with replacement within the caliper of 0.2 times the standard deviation of the logit of PS. Set your seed to 123.</p></li>
+<li><p>Step 3: Balance checking using SMD. Consider SMD &lt;0.1 as a good covariate balancing. Remember, you need to multiply matching weights and survey weights to get survey-based estimates.</p></li>
+<li><p>Step 4: Fit the outcome model on the matched data. If needed, adjust for imbalanced covariates in the outcome model. Report the odds ratio with a 95% CI. For step 4, you should utilize the survey feature as the design (NOT covariates).</p></li>
+</ul>
+</li>
+<li><p>Hint 2: Compare the results with Question 2. What’s the overall conclusion? [Expected answer: 2-3 sentences]</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># your codes here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./propensityscoreS.html" class="pagination-link" aria-label="App (S)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">App (S)</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./machinelearning.html" class="pagination-link" aria-label="Machine learning (ML)">
+        <span class="nav-page-text">Machine learning (ML)</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

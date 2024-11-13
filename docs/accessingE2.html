@@ -1,0 +1,2590 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Advanced Epidemiological Methods - Exercise 2 (A)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./exploring.html" rel="next">
+<link href="./accessingEsolution.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
+</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+<meta name="twitter:title" content="Advanced Epidemiological Methods - Exercise 2 (A)">
+<meta name="twitter:description" content="">
+<meta name="twitter:card" content="summary">
+</head>
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./accessing.html">Accessing data</a></li><li class="breadcrumb-item"><a href="./accessingE2.html">Exercise 2 (A)</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Advanced Epidemiological Methods</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Project</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data wrangling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R basics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data types</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automating tasks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data manipulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Import external data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary tables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Markdown</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (W)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (W)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (W)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (W)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accessing data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data sources</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descriptions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing CCHS to R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHANES to R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reproducing NHANES results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Importing NHIS to R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linking mortality data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Data Creation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 Solution (A)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Exercise 2 (A)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./exploring.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exploratory Data Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Univariate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bivariate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Useful Packages</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research questions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (Q)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2a</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive question-2b</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal question-2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (Q)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (Q)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (Q)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal roles</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Confounding</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Simpson’s Paradox</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Z-bias</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collapsibility</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Change-in-estimate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 1 (R)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingE2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise 2 (R)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prediction ideas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (P)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collinear predictors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overfitting and performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Splitting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bootstrap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (P)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (P)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survey data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Revisiting PICOT</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Assessing data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Bivariate analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CCHS: Performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Blood Pressure</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Cholesterol</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHANES: Subsetting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (D)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (D)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing data analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Imputation in NHANES</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missing in outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance with NA</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Subpopulations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCAR tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Effect modification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (M)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (M)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Propensity score</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exact Matching (CCHS)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (CCHS)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in OA-CVD (US)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM in BMI-diabetes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PS Weighting (US)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSM with MI in subset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with MI in subset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PSW with multiple tx</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">App (S)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (S)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine learning (ML)</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (L)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data spliting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross-validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary outcome</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Supervised learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unsupervised learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NHIS Example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Replicate Results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercise (L)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ML in causal inference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (C)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Motivation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Binary Outcomes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Continuous Outcomes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing results</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (C)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (C)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex outcomes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (N)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polytomous and ordinal</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival analysis: NHANES</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Poisson</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (N)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (N)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Longitudinal data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (T)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixed effects models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GEE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (T)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (T)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Concepts (I)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Baron and Kenny</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Justification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mediation Example</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (I)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (I)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing tools</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Collaborative Writing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Formatting Tools</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#problem-statement" id="toc-problem-statement" class="nav-link active" data-scroll-target="#problem-statement">Problem Statement</a></li>
+  <li>
+<a href="#question-i-50-grade" id="toc-question-i-50-grade" class="nav-link" data-scroll-target="#question-i-50-grade">Question I: [50% grade]</a>
+  <ul class="collapse">
+<li><a href="#a-importing-dataset" id="toc-a-importing-dataset" class="nav-link" data-scroll-target="#a-importing-dataset">1(a) Importing dataset</a></li>
+  <li><a href="#b-merging-datasets" id="toc-b-merging-datasets" class="nav-link" data-scroll-target="#b-merging-datasets">1(b) Merging datasets</a></li>
+  <li><a href="#c-subsetting-according-to-eligibility" id="toc-c-subsetting-according-to-eligibility" class="nav-link" data-scroll-target="#c-subsetting-according-to-eligibility">1(c) Subsetting according to eligibility</a></li>
+  <li><a href="#d-creating-the-exposure-variable" id="toc-d-creating-the-exposure-variable" class="nav-link" data-scroll-target="#d-creating-the-exposure-variable">1(d) Creating the exposure variable</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#question-ii-30-grade" id="toc-question-ii-30-grade" class="nav-link" data-scroll-target="#question-ii-30-grade">Question II: [30% grade]</a>
+  <ul class="collapse">
+<li><a href="#a-recoding" id="toc-a-recoding" class="nav-link" data-scroll-target="#a-recoding">2(a) Recoding</a></li>
+  <li><a href="#b-table-1" id="toc-b-table-1" class="nav-link" data-scroll-target="#b-table-1">2(b) Table 1</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#question-iii-20-grade" id="toc-question-iii-20-grade" class="nav-link" data-scroll-target="#question-iii-20-grade">Question III: [20% grade]</a>
+  <ul class="collapse">
+<li><a href="#a-regression" id="toc-a-regression" class="nav-link" data-scroll-target="#a-regression">3(a) Regression</a></li>
+  <li><a href="#b-reporting-odds-ratio" id="toc-b-reporting-odds-ratio" class="nav-link" data-scroll-target="#b-reporting-odds-ratio">3(b) Reporting odds ratio</a></li>
+  </ul>
+</li>
+  <li><a href="#knit-your-file" id="toc-knit-your-file" class="nav-link" data-scroll-target="#knit-your-file">Knit your file</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./accessing.html">Accessing data</a></li><li class="breadcrumb-item"><a href="./accessingE2.html">Exercise 2 (A)</a></li></ol></nav><div class="quarto-title">
+<h1 class="title">Exercise 2 (A)</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You cannot input any codes on this website but need to download the exercise files on your computer. You can download all of the related files in a zip file <strong>accessingEx2.zip</strong> from <a href="https://github.com/ehsanx/EpiMethods/tree/main/LabExercises/">Github folder</a>, or just by clicking this link <a href="https://github.com/ehsanx/EpiMethods/raw/main/LabExercises/accessingE2.zip">directly</a>.</p>
+<ul>
+<li>Navigate to the GitHub folder (above link) where the ZIP file is located.</li>
+<li>Click on the file name (above zip file) to open its preview window.</li>
+<li>Click on the Download button to download the file. If you can’t see the Download button, click on “Download Raw File” link that should appear on the page.</li>
+</ul>
+</div>
+</div>
+<section id="problem-statement" class="level2"><h2 class="anchored" data-anchor-id="problem-statement">Problem Statement</h2>
+<p>We will use the following article:</p>
+<ul>
+<li>Xu KY, Hartz SM, Borodovsky JT, Bierut LJ, Grucza RA. Association between benzodiazepine use with or without opioid use and all-cause mortality in the United States, 1999-2015. JAMA Network Open. 2020;3(12):e2028557. DOI: <a href="https://pubmed.ncbi.nlm.nih.gov/33295972/">10.1001/jamanetworkopen.2020.28557</a>.</li>
+</ul>
+<p>The authors exposed the relationship between benzodiazepine use with or without opioid use (exposure) and all-cause mortality (outcome), adjusting for confounders. The exposure and confounders information was extracted from the <a href="https://wwwn.cdc.gov/nchs/nhanes/default.aspx">National Health and Nutrition Examination Surveys (NHANES)</a> 1999-2014 cycles, and public-use mortality data was downloaded from the <a href="https://ftp.cdc.gov/pub/Health_Statistics/NCHS/datalinkage/linked_mortality/">CDC website</a>. Our main tasks include merging the datasets, applying eligibility criteria, and creating Table 1. Please note that recreating the analytic dataset after applying eligibility criteria was difficult due to the level of detail provided by the authors in the main manuscript and supplemental materials. Therefore, the numbers in your Table 1 will differ from Table 1 of the paper. However, you should be able to reproduce the numbers for this exercise given by the instructor.</p>
+</section><section id="question-i-50-grade" class="level1"><h1>Question I: [50% grade]</h1>
+<section id="a-importing-dataset" class="level2"><h2 class="anchored" data-anchor-id="a-importing-dataset">1(a) Importing dataset</h2>
+<p>See previous tutorial for hints about <a href="accessing8.html">how the analytic data was created</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Importing dataset</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">load</span>(<span class="st">"Data/accessing/nhanes_mortality_1999_2014.RData"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">ls</span>()</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt;  [1] "dat.mortality01" "dat.mortality03" "dat.mortality05" "dat.mortality07"</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt;  [5] "dat.mortality09" "dat.mortality11" "dat.mortality13" "dat.mortality99"</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&gt;  [9] "dat.nhanes01"    "dat.nhanes03"    "dat.nhanes05"    "dat.nhanes07"   </span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co">#&gt; [13] "dat.nhanes09"    "dat.nhanes11"    "dat.nhanes13"    "dat.nhanes99"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are 16 datasets (8 NHANES, 8 mortality):</p>
+<ul>
+<li><p>dat.nhanes99: NHANES data for 1999-2000 cycle</p></li>
+<li><p>dat.nhanes01: NHANES data for 2001-2002 cycle</p></li>
+<li><p>dat.nhanes03: NHANES data for 2003-2004 cycle</p></li>
+<li><p>dat.nhanes05: NHANES data for 2005-2006 cycle</p></li>
+<li><p>dat.nhanes07: NHANES data for 2007-2008 cycle</p></li>
+<li><p>dat.nhanes09: NHANES data for 2009-2010 cycle</p></li>
+<li><p>dat.nhanes11: NHANES data for 2011-2012 cycle</p></li>
+<li><p>dat.nhanes13: NHANES data for 2013-2014 cycle</p></li>
+<li><p>dat.mortality99: Mortality data for 1999-2000 cycle</p></li>
+<li><p>dat.mortality01: Mortality data for 2001-2003 cycle</p></li>
+<li><p>dat.mortality03: Mortality data for 2003-2004 cycle</p></li>
+<li><p>dat.mortality05: Mortality data for 2005-2006 cycle</p></li>
+<li><p>dat.mortality07: Mortality data for 2007-2008 cycle</p></li>
+<li><p>dat.mortality09: Mortality data for 2009-2010 cycle</p></li>
+<li><p>dat.mortality11: Mortality data for 2010-2012 cycle</p></li>
+<li><p>dat.mortality13: Mortality data for 2011-2014 cycle</p></li>
+</ul>
+<p>The <code>mortality</code> datasets have the following variables:</p>
+<ul>
+<li>
+<code>SEQN</code>: Respondent sequence number. We will use the ‘SEQN’ variable to merge an NHANES cycle with its corresponding mortality data.</li>
+<li>
+<code>mortstat</code>: All-cause mortality status</li>
+<li>
+<code>permth_int</code>: Person-Months of Follow-up from NHANES Interview date</li>
+<li>
+<code>permth_exm</code>: Person-Months of Follow-up from NHANES Mobile Examination Center (MEC) Date</li>
+<li>
+<code>CYCLE</code>: Survey cycle</li>
+</ul>
+<p>The NHANES datasets have the following variables:</p>
+<ul>
+<li>
+<code>SEQN</code>: Respondent sequence number</li>
+<li>
+<code>CYCLE</code>: Survey cycle</li>
+<li>
+<code>SDMVSTRA</code>: Masked variance pseudo-stratum</li>
+<li>
+<code>SDMVPSU</code>: Masked variance pseudo-PSU</li>
+<li>
+<code>WTMEC2YR</code>: Full sample 2-year MEC exam weight</li>
+<li>
+<code>RIDSTATR</code>: Interview/examination status</li>
+<li>
+<code>RIDAGEYR</code>: Age in years at screening</li>
+<li>
+<code>RIAGENDR</code>: Gender</li>
+<li>
+<code>DMDEDUC2</code>: Education level (adults 20+)</li>
+<li>
+<code>INDFMPIR</code>: Family monthly poverty income ratio</li>
+<li>
+<code>RIDRETH1</code>: Race/ethnicity</li>
+<li>
+<code>DMDMARTL</code>: Marital status</li>
+<li>
+<code>SMOKING_HARMONIZED</code>: Harmonized smoking variable [SMQ020/SMQ040]</li>
+<li>
+<code>BPQ020</code>: Ever told had high blood pressure</li>
+<li>
+<code>LIPIDEM_HARMONIZED</code>: Lipidemia harmonized [BPQ060/BPQ080]</li>
+<li>
+<code>MCQ160F</code>: Ever told you had a stroke</li>
+<li>
+<code>MCQ160E</code>: Ever told you had a heart attack</li>
+<li>
+<code>DIQ010</code>: Doctor told you have diabetes</li>
+<li>
+<code>MCQ160B</code>: Ever told you had congestive heart failure</li>
+<li>
+<code>PULMOND_HARMONIZED</code>: Harmonized pulmonary condition variable [MCQ160G/MCQ160K/MCQ160O]</li>
+<li>
+<code>MCQ160L</code>: Ever told you had liver condition</li>
+<li>
+<code>MCQ160A</code>: Ever told you had arthritis</li>
+<li>
+<code>KIDNEYD_HARMONIZED</code>: Harmonized kidney disease variable [KIQ020/KIQ022]</li>
+<li>
+<code>MCQ220</code>: Ever told you had cancer or malignancy</li>
+<li>
+<code>ANYHOSP_INLASTYEAR</code>: Harmonized indicator of any hospital visit in last year [HUD070/HUQ070/HUQ071]</li>
+<li>
+<code>HUQ090</code>: Seen a mental health professional in past year</li>
+<li>
+<code>HUQ010</code>: General health condition [Excellent/Very Good/Good/Fair/Poor]</li>
+<li>
+<code>PFQ090</code>: Last 12 months, received care at emergency room</li>
+<li>
+<code>REGULAR_EDCARE</code>: Harmonized type or place most often go for healthcare [HUQ040/HUQ041]</li>
+<li>
+<code>HUQ020</code>: Health condition compared to a year ago</li>
+<li>
+<code>NUMHOSP_INLASTYEAR</code>: Harmonized number of hospitalizations in last year [HUD080/HUQ080]</li>
+<li>
+<code>TAKERX_INLASTMONTH</code>: Harmonized taken prescription/medicine in past month [RDX030/RDXUSE]</li>
+<li>
+<code>benzodiazepines</code>: Any benzodiazepines reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>opioids</code>: Any opioids reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>ssris</code>: Any ssris reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>antidepressants</code>: Any anti-depressants (SNRIs, MAOIs, or TCAs) reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>antidepres_othr</code>: Any other anti-depressants reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>antipsychotics</code>: Any anti-psychotics reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>analgesics</code>: Any analgesics reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>muscle_relax</code>: Any muscle relaxants reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>anticonvulsant</code>: Any anti-convulsants reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>hormonalagents</code>: Any hormonal agents reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>gastrointestin</code>: Any gastrointestinal agents reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>cardi_metab_ag</code>: Any cardiac or metabolic medications reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>resp_antihist</code>: Any respiratory medicators or antihistamines reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>cns_morethan2</code>: &gt; 2 CNS medications reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>ncns_lessthan5</code>: &lt; 5 NCNS medications reported, harmonized from RDX/RDX_DRUG data tables</li>
+<li>
+<code>REGULAR_DRINKING</code>: Harmonized regular drinker status [ALQ100/ALD100/ALQ110/ALQ120U/ALQ120Q]</li>
+</ul>
+<p>We refer this <a href="https://ehsanx.github.io/EpiMethods/accessing7.html">OER website</a> for guidance on downloading mortality data and linking to NHANES. You can also review the R script (<code>xu-et-al-2020-data-preparation.r</code>) to see how the variables listed above were downloaded and derived.</p>
+</section><section id="b-merging-datasets" class="level2"><h2 class="anchored" data-anchor-id="b-merging-datasets">1(b) Merging datasets</h2>
+<p>Merge the mortality datasets with the NHANES datasets.</p>
+<p><strong>Hint:</strong></p>
+<ul>
+<li>
+<code>SEQN</code> is the unique identifier in the datasets.</li>
+<li>Make sure that your merged dataset includes information for 82,091 individuals.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># your code here</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># Mortality data</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># dat.mort &lt;- rbind(..</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co"># NHANES</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># dat.nhanes &lt;- </span></span>
+<span id="cb2-8"><a href="#cb2-8"></a></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co"># Merging</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co"># dat &lt;- merge(..</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="c-subsetting-according-to-eligibility" class="level2"><h2 class="anchored" data-anchor-id="c-subsetting-according-to-eligibility">1(c) Subsetting according to eligibility</h2>
+<p>Subset the dataset according to the eligibility criteria / restriction specified in the paper (see Figure 1 of the paper). The authors dropped individuals:</p>
+<ul>
+<li>Aged less than 20 years</li>
+<li>Did not participate in mobile examination interviews</li>
+<li>Missing prescription medication data or refused to answer</li>
+<li>Missing data on other covariates (medical comorbidities, alcohol, smoking, blood pressure, and health care use)</li>
+<li>Died within 1 year of follow-up</li>
+<li>Were not taking SSRIs, benzodiazepines, or opioids</li>
+</ul>
+<p><strong>Hint 1:</strong> The following variables could be used to subset based on eligibility:</p>
+<ul>
+<li>
+<code>RIDAGEYR</code> for age</li>
+<li>
+<code>RIDSTATR</code> for mobile examination interviews</li>
+<li>
+<code>TAKERX_INLASTMONTH</code> for prescription medication</li>
+<li>The following for the missing covariate information: <code>BPQ020</code>, <code>LIPIDEM_HARMONIZED</code>, <code>MCQ160F</code>, <code>MCQ160E</code>, <code>DIQ010</code>, <code>MCQ160B</code>, <code>PULMOND_HARMONIZED</code>, <code>MCQ160L</code>, <code>MCQ160A</code>, <code>KIDNEYD_HARMONIZED</code>, <code>MCQ220</code>, <code>SMOKING_HARMONIZED</code>, <code>REGULAR_DRINKING</code>, <code>REGULAR_EDCARE</code><br>
+</li>
+<li>
+<code>mortstat</code> and <code>permth_int</code> for death within 1 year of follow-up</li>
+<li>
+<code>benzodiazepines</code>, <code>ssris</code>, <code>opioids</code> for Benzodiazepine use with or without opioid use</li>
+</ul>
+<p><strong>Hint 2:</strong> After subsetting, the analytic dataset contains information for 4,049 individuals (do not match with the paper)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># your code here</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co"># 20+</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># dat1 &lt;- subset(dat, ..</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co"># Did not participate in mobile examination interviews</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co"># dat2 &lt;- subset(dat1, ...</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co"># Missing prescription medication data or refused to answer</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co"># dat3 &lt;- subset(dat2, ...</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># Missing data on other covariates </span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co"># dat4 &lt;- ...</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co"># Died within 1 y of follow-up</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co"># dat5 &lt;- subset(dat4, ...</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co"># Were not taking SSRIs, benzodiazepines, or opioids</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co"># dat6 &lt;- subset(dat5, </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="d-creating-the-exposure-variable" class="level2"><h2 class="anchored" data-anchor-id="d-creating-the-exposure-variable">1(d) Creating the exposure variable</h2>
+<p>Create the exposure variable (Benzodiazepine Use With or Without Opioid Use).</p>
+<p><strong>Hint:</strong> It’s a categorical variable with four categories as shown in Figure 1 or Table 1 of the paper. If your analytic sample size is 4,049, you could have the following frequencies:</p>
+<table class="caption-top table">
+<thead><tr class="header">
+<th style="text-align: left;">exposure</th>
+<th style="text-align: left;">n</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BZDs plus opioids</td>
+<td style="text-align: left;">408</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BZDs only</td>
+<td style="text-align: left;">961</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Opioids only</td>
+<td style="text-align: left;">1,434</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Neither</td>
+<td style="text-align: left;">1,246</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># your code here</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co"># library(dplyr)</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># dat6 &lt;- dat6 %&gt;% </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#   mutate(exposure = case_when(...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="question-ii-30-grade" class="level1"><h1>Question II: [30% grade]</h1>
+<section id="a-recoding" class="level2"><h2 class="anchored" data-anchor-id="a-recoding">2(a) Recoding</h2>
+<p>Recode the confounders/covariates in shown in Table 1, except for the following:</p>
+<ul>
+<li>Antimicrobial drugs</li>
+<li>
+<span class="math inline">\(&lt;5\)</span> Non-CNS medications</li>
+<li>Disabled</li>
+</ul>
+<p>The main reason these four variables were not considered is that the authors provided insufficient detail in the main manuscript or supplemental materials to derive these variables. An example of recoding some of the variables is given below. But you can use other functions as well.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co"># Age</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#summary(dat6$RIDAGEYR)</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>dat6<span class="sc">$</span>age <span class="ot">&lt;-</span> dat6<span class="sc">$</span>RIDAGEYR</span>
+<span id="cb5-6"><a href="#cb5-6"></a>dat6<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>RIDAGEYR, <span class="st">" 60:70 = '60-70y'; else = 'Others' "</span>, </span>
+<span id="cb5-7"><a href="#cb5-7"></a>                            <span class="at">as.factor =</span> T)</span>
+<span id="cb5-8"><a href="#cb5-8"></a>dat6<span class="sc">$</span>age.cat <span class="ot">&lt;-</span> <span class="fu">relevel</span>(dat6<span class="sc">$</span>age.cat, <span class="at">ref =</span> <span class="st">"Others"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="fu">table</span>(dat6<span class="sc">$</span>age.cat, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  </span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co"># Male</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="fu">table</span>(dat6<span class="sc">$</span>RIAGENDR, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13"></a>dat6<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">relevel</span>(dat6<span class="sc">$</span>RIAGENDR, <span class="at">ref =</span> <span class="st">"Female"</span>)</span>
+<span id="cb5-14"><a href="#cb5-14"></a></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co"># College graduate </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#table(dat6$DMDEDUC2, useNA = "always")</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a>dat6<span class="sc">$</span>education <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>DMDEDUC2, <span class="st">" c('College Graduate or above', </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="st">                           'College graduate or above') = 'College graduate'; </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="st">                           c('Less Than 9th Grade', </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="st">                           '9-11th Grade (Includes 12th grade with no diploma)',</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="st">                           'High School Grad/GED or Equivalent', 'Less than 9th grade', </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="st">                           '9-11th grade (Includes 12th grade with no diploma)', </span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="st">                           'High school graduate/GED or equivalent',</span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="st">                           'Some College or AA degree', 'Some college or AA degree') = </span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="st">                           'Less than college'; else = NA "</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-26"><a href="#cb5-26"></a>dat6<span class="sc">$</span>education <span class="ot">&lt;-</span> <span class="fu">relevel</span>(dat6<span class="sc">$</span>education, <span class="at">ref =</span> <span class="st">"Less than college"</span>)</span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="fu">table</span>(dat6<span class="sc">$</span>education, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-28"><a href="#cb5-28"></a></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co"># Poverty to income ratio </span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co"># table(dat6$INDFMPIR, useNA = "always")</span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="do">## Your code here</span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co"># dat6$poverty.ratio &lt;- car::recode(dat6$INDFMPIR ...</span></span>
+<span id="cb5-33"><a href="#cb5-33"></a></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co"># White</span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co"># table(dat6$RIDRETH1, useNA = "always")</span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="do">## Your code here</span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co"># dat6$race &lt;- car::recode(dat6$RIDRETH1,...</span></span>
+<span id="cb5-38"><a href="#cb5-38"></a></span>
+<span id="cb5-39"><a href="#cb5-39"></a><span class="co"># Partnered</span></span>
+<span id="cb5-40"><a href="#cb5-40"></a><span class="co">#table(dat6$DMDMARTL, useNA = "always")</span></span>
+<span id="cb5-41"><a href="#cb5-41"></a><span class="do">## Your code here</span></span>
+<span id="cb5-42"><a href="#cb5-42"></a><span class="co"># dat6$marital &lt;- car::recode(dat6$DMDMARTL, ...</span></span>
+<span id="cb5-43"><a href="#cb5-43"></a><span class="fu">table</span>(dat6<span class="sc">$</span>marital, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-44"><a href="#cb5-44"></a></span>
+<span id="cb5-45"><a href="#cb5-45"></a><span class="co"># Smoking</span></span>
+<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#table(dat6$SMOKING_HARMONIZED, useNA = "always")</span></span>
+<span id="cb5-47"><a href="#cb5-47"></a>dat6<span class="sc">$</span>smoking <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>SMOKING_HARMONIZED, <span class="st">" c('Every day', 'Some days') = </span></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="st">                            'Yes'; c('LOGICAL SKIP', 'Not at all') = 'No';</span></span>
+<span id="cb5-49"><a href="#cb5-49"></a><span class="st">                            else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-50"><a href="#cb5-50"></a><span class="fu">table</span>(dat6<span class="sc">$</span>smoking, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-51"><a href="#cb5-51"></a></span>
+<span id="cb5-52"><a href="#cb5-52"></a><span class="co"># Hypertension</span></span>
+<span id="cb5-53"><a href="#cb5-53"></a><span class="co"># table(dat6$BPQ020, useNA = "always")</span></span>
+<span id="cb5-54"><a href="#cb5-54"></a><span class="do">## Your code here</span></span>
+<span id="cb5-55"><a href="#cb5-55"></a><span class="co"># dat6$hypertension &lt;- car::recode(dat6$BPQ020, ...</span></span>
+<span id="cb5-56"><a href="#cb5-56"></a><span class="fu">table</span>(dat6<span class="sc">$</span>hypertension, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-57"><a href="#cb5-57"></a></span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="co"># Hyperlipidemia</span></span>
+<span id="cb5-59"><a href="#cb5-59"></a><span class="co">#table(dat6$LIPIDEM_HARMONIZED, useNA = "always")</span></span>
+<span id="cb5-60"><a href="#cb5-60"></a>dat6<span class="sc">$</span>hyperlipidemia <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>LIPIDEM_HARMONIZED, <span class="st">" 'No' = 'No';</span></span>
+<span id="cb5-61"><a href="#cb5-61"></a><span class="st">                                   'Yes' = 'Yes'; else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-62"><a href="#cb5-62"></a><span class="fu">table</span>(dat6<span class="sc">$</span>hyperlipidemia, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-63"><a href="#cb5-63"></a></span>
+<span id="cb5-64"><a href="#cb5-64"></a><span class="co"># Stroke</span></span>
+<span id="cb5-65"><a href="#cb5-65"></a><span class="co">#table(dat6$MCQ160F, useNA = "always")</span></span>
+<span id="cb5-66"><a href="#cb5-66"></a>dat6<span class="sc">$</span>stroke <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>MCQ160F, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes'; else = NA"</span>, </span>
+<span id="cb5-67"><a href="#cb5-67"></a>                           <span class="at">as.factor =</span> T)</span>
+<span id="cb5-68"><a href="#cb5-68"></a><span class="fu">table</span>(dat6<span class="sc">$</span>stroke, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-69"><a href="#cb5-69"></a></span>
+<span id="cb5-70"><a href="#cb5-70"></a><span class="co"># Myocardial infarction</span></span>
+<span id="cb5-71"><a href="#cb5-71"></a><span class="co">#table(dat6$MCQ160E, useNA = "always")</span></span>
+<span id="cb5-72"><a href="#cb5-72"></a>dat6<span class="sc">$</span>heart.attack <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>MCQ160E, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes'; else = NA"</span>, </span>
+<span id="cb5-73"><a href="#cb5-73"></a>                                 <span class="at">as.factor =</span> T)</span>
+<span id="cb5-74"><a href="#cb5-74"></a><span class="fu">table</span>(dat6<span class="sc">$</span>heart.attack, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-75"><a href="#cb5-75"></a></span>
+<span id="cb5-76"><a href="#cb5-76"></a><span class="co"># Diabetes</span></span>
+<span id="cb5-77"><a href="#cb5-77"></a><span class="co">#table(dat6$DIQ010, useNA = "always")</span></span>
+<span id="cb5-78"><a href="#cb5-78"></a>dat6<span class="sc">$</span>diabetes <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>DIQ010, <span class="st">" c('No', 'Borderline') = 'No'; </span></span>
+<span id="cb5-79"><a href="#cb5-79"></a><span class="st">                             'Yes' = 'Yes'; else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-80"><a href="#cb5-80"></a><span class="fu">table</span>(dat6<span class="sc">$</span>diabetes, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-81"><a href="#cb5-81"></a></span>
+<span id="cb5-82"><a href="#cb5-82"></a><span class="co"># Congestive heart failure</span></span>
+<span id="cb5-83"><a href="#cb5-83"></a><span class="co">#table(dat6$MCQ160B, useNA = "always")</span></span>
+<span id="cb5-84"><a href="#cb5-84"></a>dat6<span class="sc">$</span>heart.failure <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>MCQ160B, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes';</span></span>
+<span id="cb5-85"><a href="#cb5-85"></a><span class="st">                                  else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-86"><a href="#cb5-86"></a><span class="fu">table</span>(dat6<span class="sc">$</span>heart.failure, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-87"><a href="#cb5-87"></a></span>
+<span id="cb5-88"><a href="#cb5-88"></a><span class="co"># Pulmonary disease </span></span>
+<span id="cb5-89"><a href="#cb5-89"></a><span class="co">#table(dat6$PULMOND_HARMONIZED, useNA = "always")</span></span>
+<span id="cb5-90"><a href="#cb5-90"></a>dat6<span class="sc">$</span>pulmonary.disease <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>PULMOND_HARMONIZED, <span class="st">" 'No' = 'No'; </span></span>
+<span id="cb5-91"><a href="#cb5-91"></a><span class="st">                                      'Yes' = 'Yes'; else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-92"><a href="#cb5-92"></a><span class="fu">table</span>(dat6<span class="sc">$</span>pulmonary.disease, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-93"><a href="#cb5-93"></a></span>
+<span id="cb5-94"><a href="#cb5-94"></a><span class="co"># Liver disease </span></span>
+<span id="cb5-95"><a href="#cb5-95"></a><span class="co">#table(dat6$MCQ160L, useNA = "always")</span></span>
+<span id="cb5-96"><a href="#cb5-96"></a>dat6<span class="sc">$</span>liver.disease <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>MCQ160L, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes'; </span></span>
+<span id="cb5-97"><a href="#cb5-97"></a><span class="st">                                  else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-98"><a href="#cb5-98"></a><span class="fu">table</span>(dat6<span class="sc">$</span>liver.disease, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-99"><a href="#cb5-99"></a></span>
+<span id="cb5-100"><a href="#cb5-100"></a><span class="co"># Arthritis     </span></span>
+<span id="cb5-101"><a href="#cb5-101"></a><span class="co">#table(dat6$MCQ160A, useNA = "always")</span></span>
+<span id="cb5-102"><a href="#cb5-102"></a>dat6<span class="sc">$</span>arthritis <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>MCQ160A, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes'; </span></span>
+<span id="cb5-103"><a href="#cb5-103"></a><span class="st">                              else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-104"><a href="#cb5-104"></a><span class="fu">table</span>(dat6<span class="sc">$</span>arthritis, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-105"><a href="#cb5-105"></a></span>
+<span id="cb5-106"><a href="#cb5-106"></a><span class="co"># Kidney    disease </span></span>
+<span id="cb5-107"><a href="#cb5-107"></a><span class="co">#table(dat6$KIDNEYD_HARMONIZED, useNA = "always")</span></span>
+<span id="cb5-108"><a href="#cb5-108"></a>dat6<span class="sc">$</span>kidney.disease <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>KIDNEYD_HARMONIZED, <span class="st">" 'No' = 'No'; </span></span>
+<span id="cb5-109"><a href="#cb5-109"></a><span class="st">                                   'Yes' = 'Yes'; else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-110"><a href="#cb5-110"></a><span class="fu">table</span>(dat6<span class="sc">$</span>kidney.disease, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-111"><a href="#cb5-111"></a></span>
+<span id="cb5-112"><a href="#cb5-112"></a><span class="co"># Cancer        </span></span>
+<span id="cb5-113"><a href="#cb5-113"></a><span class="co">#table(dat6$MCQ220, useNA = "always")</span></span>
+<span id="cb5-114"><a href="#cb5-114"></a>dat6<span class="sc">$</span>cancer <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>MCQ220, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes'; else = NA"</span>,</span>
+<span id="cb5-115"><a href="#cb5-115"></a>                           <span class="at">as.factor =</span> T)</span>
+<span id="cb5-116"><a href="#cb5-116"></a><span class="fu">table</span>(dat6<span class="sc">$</span>cancer, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-117"><a href="#cb5-117"></a></span>
+<span id="cb5-118"><a href="#cb5-118"></a><span class="co"># Regular   drinking    </span></span>
+<span id="cb5-119"><a href="#cb5-119"></a><span class="co">#table(dat6$REGULAR_DRINKING, useNA = "always")</span></span>
+<span id="cb5-120"><a href="#cb5-120"></a>dat6<span class="sc">$</span>regular.drinking <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>REGULAR_DRINKING, <span class="st">" 'No' = 'No'; </span></span>
+<span id="cb5-121"><a href="#cb5-121"></a><span class="st">                                     'Yes' = 'Yes'; else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-122"><a href="#cb5-122"></a><span class="fu">table</span>(dat6<span class="sc">$</span>regular.drinking, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-123"><a href="#cb5-123"></a></span>
+<span id="cb5-124"><a href="#cb5-124"></a><span class="co"># Antimicrobial drugs   - not available</span></span>
+<span id="cb5-125"><a href="#cb5-125"></a><span class="co"># table(dat6$antimicrobial.drugs, useNA = "always")</span></span>
+<span id="cb5-126"><a href="#cb5-126"></a></span>
+<span id="cb5-127"><a href="#cb5-127"></a><span class="co"># Hormonal  agents  </span></span>
+<span id="cb5-128"><a href="#cb5-128"></a><span class="fu">table</span>(dat6<span class="sc">$</span>hormonalagents, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-129"><a href="#cb5-129"></a></span>
+<span id="cb5-130"><a href="#cb5-130"></a><span class="co"># Anticonvulsants       </span></span>
+<span id="cb5-131"><a href="#cb5-131"></a><span class="fu">table</span>(dat6<span class="sc">$</span>anticonvulsant, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-132"><a href="#cb5-132"></a></span>
+<span id="cb5-133"><a href="#cb5-133"></a><span class="co"># Any   analgesics  </span></span>
+<span id="cb5-134"><a href="#cb5-134"></a><span class="fu">table</span>(dat6<span class="sc">$</span>analgesics, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-135"><a href="#cb5-135"></a></span>
+<span id="cb5-136"><a href="#cb5-136"></a><span class="co"># Muscle    relaxants   </span></span>
+<span id="cb5-137"><a href="#cb5-137"></a><span class="fu">table</span>(dat6<span class="sc">$</span>muscle_relax, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-138"><a href="#cb5-138"></a></span>
+<span id="cb5-139"><a href="#cb5-139"></a><span class="co"># Gastrointestinal  agents  </span></span>
+<span id="cb5-140"><a href="#cb5-140"></a><span class="fu">table</span>(dat6<span class="sc">$</span>gastrointestin, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-141"><a href="#cb5-141"></a></span>
+<span id="cb5-142"><a href="#cb5-142"></a><span class="co"># Cardiac   or  metabolic medications       </span></span>
+<span id="cb5-143"><a href="#cb5-143"></a><span class="fu">table</span>(dat6<span class="sc">$</span>cardi_metab_ag, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-144"><a href="#cb5-144"></a></span>
+<span id="cb5-145"><a href="#cb5-145"></a><span class="co"># Respiratory   medications or antihistamines       </span></span>
+<span id="cb5-146"><a href="#cb5-146"></a><span class="fu">table</span>(dat6<span class="sc">$</span>resp_antihist, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-147"><a href="#cb5-147"></a></span>
+<span id="cb5-148"><a href="#cb5-148"></a><span class="co"># &gt;2 CNS    medications</span></span>
+<span id="cb5-149"><a href="#cb5-149"></a><span class="fu">table</span>(dat6<span class="sc">$</span>cns_morethan2, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-150"><a href="#cb5-150"></a></span>
+<span id="cb5-151"><a href="#cb5-151"></a><span class="co"># &lt;5 Non-CNS    medications </span></span>
+<span id="cb5-152"><a href="#cb5-152"></a><span class="fu">table</span>(dat6<span class="sc">$</span>ncns_lessthan5, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-153"><a href="#cb5-153"></a></span>
+<span id="cb5-154"><a href="#cb5-154"></a><span class="co"># Antidepressants   (SNRIs, MAOIs,  or  TCAs)</span></span>
+<span id="cb5-155"><a href="#cb5-155"></a><span class="fu">table</span>(dat6<span class="sc">$</span>antidepressants, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-156"><a href="#cb5-156"></a></span>
+<span id="cb5-157"><a href="#cb5-157"></a><span class="co"># Other antidepressants </span></span>
+<span id="cb5-158"><a href="#cb5-158"></a><span class="fu">table</span>(dat6<span class="sc">$</span>antidepres_othr, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-159"><a href="#cb5-159"></a></span>
+<span id="cb5-160"><a href="#cb5-160"></a><span class="co"># Antipsychotics        </span></span>
+<span id="cb5-161"><a href="#cb5-161"></a><span class="fu">table</span>(dat6<span class="sc">$</span>antipsychotics, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-162"><a href="#cb5-162"></a></span>
+<span id="cb5-163"><a href="#cb5-163"></a><span class="co"># Any   hospitalization in &lt;1y</span></span>
+<span id="cb5-164"><a href="#cb5-164"></a><span class="co">#table(dat6$ANYHOSP_INLASTYEAR, useNA = "always")</span></span>
+<span id="cb5-165"><a href="#cb5-165"></a>dat6<span class="sc">$</span>hospitalization.any <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>ANYHOSP_INLASTYEAR, <span class="st">" 'No' = 'No'; </span></span>
+<span id="cb5-166"><a href="#cb5-166"></a><span class="st">                                     'Yes' = 'Yes'; else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-167"><a href="#cb5-167"></a><span class="fu">table</span>(dat6<span class="sc">$</span>hospitalization.any, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-168"><a href="#cb5-168"></a></span>
+<span id="cb5-169"><a href="#cb5-169"></a><span class="co"># Any   psychiatric visit in &lt;1y</span></span>
+<span id="cb5-170"><a href="#cb5-170"></a><span class="co">#table(dat6$HUQ090, useNA = "always")</span></span>
+<span id="cb5-171"><a href="#cb5-171"></a>dat6<span class="sc">$</span>hospitalization.psy <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>HUQ090, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes'; </span></span>
+<span id="cb5-172"><a href="#cb5-172"></a><span class="st">                                        else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-173"><a href="#cb5-173"></a><span class="fu">table</span>(dat6<span class="sc">$</span>hospitalization.psy, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-174"><a href="#cb5-174"></a></span>
+<span id="cb5-175"><a href="#cb5-175"></a><span class="co"># Good current  health</span></span>
+<span id="cb5-176"><a href="#cb5-176"></a><span class="co">#table(dat6$HUQ010, useNA = "always")</span></span>
+<span id="cb5-177"><a href="#cb5-177"></a>dat6<span class="sc">$</span>good.current.health <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>HUQ010, <span class="st">" c('Excellent,', 'Very good,',</span></span>
+<span id="cb5-178"><a href="#cb5-178"></a><span class="st">                                        'Good,') = 'Yes'; c('Fair, or', 'Poor?') = 'No';</span></span>
+<span id="cb5-179"><a href="#cb5-179"></a><span class="st">                                        else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-180"><a href="#cb5-180"></a><span class="fu">table</span>(dat6<span class="sc">$</span>good.current.health, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-181"><a href="#cb5-181"></a></span>
+<span id="cb5-182"><a href="#cb5-182"></a><span class="co"># Require   special health equipment        </span></span>
+<span id="cb5-183"><a href="#cb5-183"></a><span class="co">#table(dat6$PFQ090, useNA = "always")</span></span>
+<span id="cb5-184"><a href="#cb5-184"></a>dat6<span class="sc">$</span>special.health <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>PFQ090, <span class="st">" 'No' = 'No'; 'Yes' = 'Yes'; </span></span>
+<span id="cb5-185"><a href="#cb5-185"></a><span class="st">                                   else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-186"><a href="#cb5-186"></a><span class="fu">table</span>(dat6<span class="sc">$</span>special.health, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-187"><a href="#cb5-187"></a></span>
+<span id="cb5-188"><a href="#cb5-188"></a><span class="co"># Disabled - not available      </span></span>
+<span id="cb5-189"><a href="#cb5-189"></a><span class="co"># table(dat6$disabled, useNA = "always")</span></span>
+<span id="cb5-190"><a href="#cb5-190"></a></span>
+<span id="cb5-191"><a href="#cb5-191"></a><span class="co"># Regular   ED  care</span></span>
+<span id="cb5-192"><a href="#cb5-192"></a><span class="co">#table(dat6$REGULAR_EDCARE, useNA = "always")</span></span>
+<span id="cb5-193"><a href="#cb5-193"></a>dat6<span class="sc">$</span>regular.ED.care <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>REGULAR_EDCARE, <span class="st">" 'Hospital emergency room' = </span></span>
+<span id="cb5-194"><a href="#cb5-194"></a><span class="st">                                    'Yes'; else = 'No'"</span>,  <span class="at">as.factor =</span> T)</span>
+<span id="cb5-195"><a href="#cb5-195"></a><span class="fu">table</span>(dat6<span class="sc">$</span>regular.ED.care, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-196"><a href="#cb5-196"></a></span>
+<span id="cb5-197"><a href="#cb5-197"></a><span class="co"># Worsening health  </span></span>
+<span id="cb5-198"><a href="#cb5-198"></a><span class="co">#table(dat6$HUQ020, useNA = "always")</span></span>
+<span id="cb5-199"><a href="#cb5-199"></a>dat6<span class="sc">$</span>worsening.health <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>HUQ020, <span class="st">" c('Better,', 'About the same?') = 'No'; </span></span>
+<span id="cb5-200"><a href="#cb5-200"></a><span class="st">                                     'Worse, or' = 'Yes'; else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-201"><a href="#cb5-201"></a><span class="fu">table</span>(dat6<span class="sc">$</span>worsening.health, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb5-202"><a href="#cb5-202"></a></span>
+<span id="cb5-203"><a href="#cb5-203"></a><span class="co"># &gt;2 Overnight  hospitalizations in &lt;1y</span></span>
+<span id="cb5-204"><a href="#cb5-204"></a><span class="co">#table(dat6$NUMHOSP_INLASTYEAR, useNA = "always")</span></span>
+<span id="cb5-205"><a href="#cb5-205"></a>dat6<span class="sc">$</span>hospitalization<span class="fl">.3</span>plus <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(dat6<span class="sc">$</span>NUMHOSP_INLASTYEAR, <span class="st">" c('0', '1', '2') = 'No'; </span></span>
+<span id="cb5-206"><a href="#cb5-206"></a><span class="st">                                        c('3', '4', '5', '6 or more') = 'Yes';</span></span>
+<span id="cb5-207"><a href="#cb5-207"></a><span class="st">                                        else = NA"</span>, <span class="at">as.factor =</span> T)</span>
+<span id="cb5-208"><a href="#cb5-208"></a><span class="fu">table</span>(dat6<span class="sc">$</span>hospitalization<span class="fl">.3</span>plus, <span class="at">useNA =</span> <span class="st">"always"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="b-table-1" class="level2"><h2 class="anchored" data-anchor-id="b-table-1">2(b) Table 1</h2>
+<p>Reproduce Table 1 presented in the above paper. Please note that the numbers in your Table 1 will differ from Table 1 of the paper. But the numbers could look as follows:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+</colgroup>
+<thead><tr class="header">
+<th>Characteristic</th>
+<th>Overall</th>
+<th>BZDs plus opioids</th>
+<th>BZDs only</th>
+<th>Opioids only</th>
+<th>Neither</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>n</td>
+<td>4049</td>
+<td>408</td>
+<td>961</td>
+<td>1434</td>
+<td>1246</td>
+</tr>
+<tr class="even">
+<td>age (mean (SD))</td>
+<td>53.47 (17.06)</td>
+<td>55.13 (14.86)</td>
+<td>56.34 (17.06)</td>
+<td>51.54 (17.23)</td>
+<td>52.94 (17.21)</td>
+</tr>
+<tr class="odd">
+<td>age.cat = 60-70y (%)</td>
+<td>835 (20.6)</td>
+<td>84 (20.6)</td>
+<td>190 (19.8)</td>
+<td>306 (21.3)</td>
+<td>255 (20.5)</td>
+</tr>
+<tr class="even">
+<td>gender = Male (%)</td>
+<td>1423 (35.1)</td>
+<td>157 (38.5)</td>
+<td>311 (32.4)</td>
+<td>591 (41.2)</td>
+<td>364 (29.2)</td>
+</tr>
+<tr class="odd">
+<td>education = College graduate (%)</td>
+<td>749 (18.5)</td>
+<td>46 (11.3)</td>
+<td>193 (20.1)</td>
+<td>208 (14.5)</td>
+<td>302 (24.2)</td>
+</tr>
+<tr class="even">
+<td>poverty.ratio = More than 2 (%)</td>
+<td>1980 (51.9)</td>
+<td>154 (39.8)</td>
+<td>491 (54.3)</td>
+<td>626 (46.2)</td>
+<td>709 (60.7)</td>
+</tr>
+<tr class="odd">
+<td>race = White (%)</td>
+<td>2540 (62.7)</td>
+<td>280 (68.6)</td>
+<td>656 (68.3)</td>
+<td>735 (51.3)</td>
+<td>869 (69.7)</td>
+</tr>
+<tr class="even">
+<td>marital = Partnered (%)</td>
+<td>2240 (55.9)</td>
+<td>223 (54.9)</td>
+<td>517 (54.4)</td>
+<td>780 (55.1)</td>
+<td>720 (58.3)</td>
+</tr>
+<tr class="odd">
+<td>smoking = Yes (%)</td>
+<td>1066 (26.3)</td>
+<td>157 (38.5)</td>
+<td>227 (23.6)</td>
+<td>431 (30.1)</td>
+<td>251 (20.1)</td>
+</tr>
+<tr class="even">
+<td>hypertension = Yes (%)</td>
+<td>1954 (48.3)</td>
+<td>225 (55.1)</td>
+<td>457 (47.6)</td>
+<td>693 (48.3)</td>
+<td>579 (46.5)</td>
+</tr>
+<tr class="odd">
+<td>hyperlipidemia = Yes (%)</td>
+<td>1723 (42.6)</td>
+<td>191 (46.8)</td>
+<td>442 (46.0)</td>
+<td>540 (37.7)</td>
+<td>550 (44.1)</td>
+</tr>
+<tr class="even">
+<td>stroke = Yes (%)</td>
+<td>263 ( 6.5)</td>
+<td>39 ( 9.6)</td>
+<td>56 ( 5.8)</td>
+<td>82 ( 5.7)</td>
+<td>86 ( 6.9)</td>
+</tr>
+<tr class="odd">
+<td>heart.attack = Yes (%)</td>
+<td>279 ( 6.9)</td>
+<td>38 ( 9.3)</td>
+<td>64 ( 6.7)</td>
+<td>95 ( 6.6)</td>
+<td>82 ( 6.6)</td>
+</tr>
+<tr class="even">
+<td>diabetes = Yes (%)</td>
+<td>645 (15.9)</td>
+<td>63 (15.4)</td>
+<td>133 (13.8)</td>
+<td>252 (17.6)</td>
+<td>197 (15.8)</td>
+</tr>
+<tr class="odd">
+<td>heart.failure = Yes (%)</td>
+<td>232 ( 5.7)</td>
+<td>36 ( 8.8)</td>
+<td>53 ( 5.5)</td>
+<td>77 ( 5.4)</td>
+<td>66 ( 5.3)</td>
+</tr>
+<tr class="even">
+<td>pulmonary.disease = Yes (%)</td>
+<td>578 (14.3)</td>
+<td>95 (23.3)</td>
+<td>117 (12.2)</td>
+<td>214 (14.9)</td>
+<td>152 (12.2)</td>
+</tr>
+<tr class="odd">
+<td>liver.disease = Yes (%)</td>
+<td>242 ( 6.0)</td>
+<td>36 ( 8.8)</td>
+<td>59 ( 6.1)</td>
+<td>88 ( 6.1)</td>
+<td>59 ( 4.7)</td>
+</tr>
+<tr class="even">
+<td>arthritis = Yes (%)</td>
+<td>1989 (49.1)</td>
+<td>290 (71.1)</td>
+<td>417 (43.4)</td>
+<td>791 (55.2)</td>
+<td>491 (39.4)</td>
+</tr>
+<tr class="odd">
+<td>kidney.disease = Yes (%)</td>
+<td>191 ( 4.7)</td>
+<td>27 ( 6.6)</td>
+<td>44 ( 4.6)</td>
+<td>72 ( 5.0)</td>
+<td>48 ( 3.9)</td>
+</tr>
+<tr class="even">
+<td>cancer = Yes (%)</td>
+<td>571 (14.1)</td>
+<td>81 (19.9)</td>
+<td>154 (16.0)</td>
+<td>190 (13.2)</td>
+<td>146 (11.7)</td>
+</tr>
+<tr class="odd">
+<td>regular.drinking = Yes (%)</td>
+<td>1219 (30.1)</td>
+<td>109 (26.7)</td>
+<td>301 (31.3)</td>
+<td>395 (27.5)</td>
+<td>414 (33.2)</td>
+</tr>
+<tr class="even">
+<td>hormonalagents = Yes (%)</td>
+<td>1004 (24.8)</td>
+<td>116 (28.4)</td>
+<td>265 (27.6)</td>
+<td>282 (19.7)</td>
+<td>341 (27.4)</td>
+</tr>
+<tr class="odd">
+<td>anticonvulsant = Yes (%)</td>
+<td>822 (20.3)</td>
+<td>187 (45.8)</td>
+<td>399 (41.5)</td>
+<td>153 (10.7)</td>
+<td>83 ( 6.7)</td>
+</tr>
+<tr class="even">
+<td>analgesics = Yes (%)</td>
+<td>2167 (53.5)</td>
+<td>403 (98.8)</td>
+<td>176 (18.3)</td>
+<td>1388 (96.8)</td>
+<td>200 (16.1)</td>
+</tr>
+<tr class="odd">
+<td>muscle_relax = Yes (%)</td>
+<td>394 ( 9.7)</td>
+<td>96 (23.5)</td>
+<td>53 ( 5.5)</td>
+<td>206 (14.4)</td>
+<td>39 ( 3.1)</td>
+</tr>
+<tr class="even">
+<td>gastrointestin = Yes (%)</td>
+<td>1055 (26.1)</td>
+<td>163 (40.0)</td>
+<td>257 (26.7)</td>
+<td>352 (24.5)</td>
+<td>283 (22.7)</td>
+</tr>
+<tr class="odd">
+<td>cardi_metab_ag = Yes (%)</td>
+<td>2205 (54.5)</td>
+<td>259 (63.5)</td>
+<td>559 (58.2)</td>
+<td>716 (49.9)</td>
+<td>671 (53.9)</td>
+</tr>
+<tr class="even">
+<td>resp_antihist = Yes (%)</td>
+<td>952 (23.5)</td>
+<td>151 (37.0)</td>
+<td>150 (15.6)</td>
+<td>444 (31.0)</td>
+<td>207 (16.6)</td>
+</tr>
+<tr class="odd">
+<td>cns_morethan2 = Yes (%)</td>
+<td>635 (15.7)</td>
+<td>238 (58.3)</td>
+<td>127 (13.2)</td>
+<td>243 (16.9)</td>
+<td>27 ( 2.2)</td>
+</tr>
+<tr class="even">
+<td>antidepressants = Yes (%)</td>
+<td>208 ( 5.1)</td>
+<td>52 (12.7)</td>
+<td>88 ( 9.2)</td>
+<td>51 ( 3.6)</td>
+<td>17 ( 1.4)</td>
+</tr>
+<tr class="odd">
+<td>antidepres_othr = Yes (%)</td>
+<td>472 (11.7)</td>
+<td>71 (17.4)</td>
+<td>119 (12.4)</td>
+<td>135 ( 9.4)</td>
+<td>147 (11.8)</td>
+</tr>
+<tr class="even">
+<td>antipsychotics = Yes (%)</td>
+<td>193 ( 4.8)</td>
+<td>26 ( 6.4)</td>
+<td>68 ( 7.1)</td>
+<td>25 ( 1.7)</td>
+<td>74 ( 5.9)</td>
+</tr>
+<tr class="odd">
+<td>hospitalization.any = Yes (%)</td>
+<td>905 (22.4)</td>
+<td>121 (29.7)</td>
+<td>206 (21.4)</td>
+<td>376 (26.2)</td>
+<td>202 (16.2)</td>
+</tr>
+<tr class="even">
+<td>hospitalization.psy = Yes (%)</td>
+<td>856 (21.1)</td>
+<td>95 (23.3)</td>
+<td>271 (28.2)</td>
+<td>155 (10.8)</td>
+<td>335 (26.9)</td>
+</tr>
+<tr class="odd">
+<td>good.current.health = Yes (%)</td>
+<td>2527 (62.4)</td>
+<td>173 (42.4)</td>
+<td>627 (65.2)</td>
+<td>824 (57.5)</td>
+<td>903 (72.5)</td>
+</tr>
+<tr class="even">
+<td>special.health = Yes (%)</td>
+<td>793 (19.6)</td>
+<td>144 (35.3)</td>
+<td>139 (14.5)</td>
+<td>337 (23.5)</td>
+<td>173 (13.9)</td>
+</tr>
+<tr class="odd">
+<td>regular.ED.care = Yes (%)</td>
+<td>98 ( 2.4)</td>
+<td>13 ( 3.2)</td>
+<td>15 ( 1.6)</td>
+<td>57 ( 4.0)</td>
+<td>13 ( 1.0)</td>
+</tr>
+<tr class="even">
+<td>worsening.health = Yes (%)</td>
+<td>865 (21.4)</td>
+<td>131 (32.1)</td>
+<td>197 (20.5)</td>
+<td>359 (25.1)</td>
+<td>178 (14.3)</td>
+</tr>
+<tr class="odd">
+<td>hospitalization.3plus = Yes(%)</td>
+<td>124 ( 3.1)</td>
+<td>22 ( 5.4)</td>
+<td>21 ( 2.2)</td>
+<td>48 ( 3.3)</td>
+<td>33 ( 2.6)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># your code here</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">library</span>(tableone)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"age.cat"</span>, <span class="st">"gender"</span>, <span class="st">"education"</span>, <span class="st">"poverty.ratio"</span>, <span class="st">"race"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5"></a>          <span class="st">"marital"</span>, <span class="st">"smoking"</span>, <span class="st">"hypertension"</span>, <span class="st">"hyperlipidemia"</span>, <span class="st">"stroke"</span>, </span>
+<span id="cb6-6"><a href="#cb6-6"></a>          <span class="st">"heart.attack"</span>, <span class="st">"diabetes"</span>, <span class="st">"heart.failure"</span>, <span class="st">"pulmonary.disease"</span>, </span>
+<span id="cb6-7"><a href="#cb6-7"></a>          <span class="st">"liver.disease"</span>, <span class="st">"arthritis"</span>, <span class="st">"kidney.disease"</span>, <span class="st">"cancer"</span>, </span>
+<span id="cb6-8"><a href="#cb6-8"></a>          <span class="st">"regular.drinking"</span>, <span class="co">#"antimicrobial.drugs", </span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>          <span class="st">"hormonalagents"</span>, <span class="st">"anticonvulsant"</span>, <span class="st">"analgesics"</span>, <span class="st">"muscle_relax"</span>, </span>
+<span id="cb6-10"><a href="#cb6-10"></a>          <span class="st">"gastrointestin"</span>, <span class="st">"cardi_metab_ag"</span>, <span class="st">"resp_antihist"</span>, <span class="st">"cns_morethan2"</span>, </span>
+<span id="cb6-11"><a href="#cb6-11"></a>          <span class="co">#"ncns_lessthan5", </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>          <span class="st">"antidepressants"</span>, <span class="st">"antidepres_othr"</span>, <span class="st">"antipsychotics"</span>, </span>
+<span id="cb6-13"><a href="#cb6-13"></a>          <span class="st">"hospitalization.any"</span>, <span class="st">"hospitalization.psy"</span>, <span class="st">"good.current.health"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14"></a>          <span class="st">"special.health"</span>, <span class="co">#"disabled",</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>          <span class="st">"regular.ED.care"</span>, <span class="st">"worsening.health"</span>, <span class="st">"hospitalization.3plus"</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a>          )</span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co"># tab1 &lt;- CreateTableOne(...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="question-iii-20-grade" class="level1"><h1>Question III: [20% grade]</h1>
+<section id="a-regression" class="level2"><h2 class="anchored" data-anchor-id="a-regression">3(a) Regression</h2>
+<p>Consider all-cause mortality as a binary variable. Run logistic regression model for finding the association between Benzodiazepine Use With or Without Opioid Use (the exposure variable created in 1(d)) and all-cause mortality (the outcome variable). Adjust the model for three confounders: sex, age, and race/ethnicity. Also, use the <code>Neither</code> as the reference category for the exposure variable. Please note that we will not be using survey features (e.g., PSU, strata, weight) in this exercise. However, we will learn how to utilize these survey features in the <a href="https://ehsanx.github.io/EpiMethods/surveydata.html">Survey data analysis</a> lab.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># your code here</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co"># fit &lt;- glm(</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="b-reporting-odds-ratio" class="level2"><h2 class="anchored" data-anchor-id="b-reporting-odds-ratio">3(b) Reporting odds ratio</h2>
+<p>Report the odds ratios and associated confidence intervals.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># your code here</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co"># library(Publish)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="knit-your-file" class="level1"><h1>Knit your file</h1>
+<p>Please knit your file once you finished and submit the knitted PDF or doc file. Please also fill-up the following table:</p>
+<p><strong>Group name</strong>: ** xyz **</p>
+<table class="caption-top table">
+<thead><tr class="header">
+<th style="text-align: left;">Student initial</th>
+<th style="text-align: left;">% contribution</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Student 1 initial</td>
+<td style="text-align: left;">x%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Student 2 initial</td>
+<td style="text-align: left;">x%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Student 3 initial</td>
+<td style="text-align: left;">x%</td>
+</tr>
+</tbody>
+</table>
+
+
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./accessingEsolution.html" class="pagination-link" aria-label="Exercise 1 Solution (A)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Exercise 1 Solution (A)</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./exploring.html" class="pagination-link" aria-label="Exploratory Data Analysis">
+        <span class="nav-page-text">Exploratory Data Analysis</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

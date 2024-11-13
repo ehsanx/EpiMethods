@@ -1,0 +1,72 @@
+---
+title: "Quiz on missing data"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+# Load required packages
+library(learnr)
+library(xfun)
+```
+
+```{r missingdata_quiz1, echo=FALSE}
+question("Q1. Which function could be used to do the MCAR test?",
+  answer("naniar::mcar_test"),
+  answer("misty::na.test"),
+  answer("ALL three", correct = TRUE),
+  answer("None"),
+  answer("MissMech::TestMCARNormality"),
+  incorrect = "See the help menu for each function to understand better how they work.",
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r missingdata_quiz2, echo=FALSE}
+question("Q2. Which code could be used to impute 10 datasets using multiple imputation technique?",
+  answer("imputation <- mice(data = dat.analytic, method = 'mean', maxit = 0)", message = "Know the distinction between the number of imputed datasets and the number of iterations."),
+  answer("imputation <- mice(data = dat.analytic, method = 'mean', maxit = 10)", message = "Know the distinction between the number of imputed datasets and the number of iterations."),
+  answer("imputation <- mice(data = dat.analytic, method = 'pmm', m = 10)", correct = TRUE),
+  answer("imputation <- mice(data = dat.analytic, method = 'pmm', m = 1, maxit = 10)", message = "Know the distinction between the number of imputed datasets and the number of iterations."),
+  answer("imputation <- quickpred(data = dat.analytic, mincor = 0.1, minpuc = 0.1)", message = "You can use this quickpred function to set up your imputation model based on correlation alone."),
+  incorrect = "",
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r missingdata_quiz3, echo=FALSE}
+question("Q3. How could you extract all the 10 imputed datasets into one complete daatset from Q2?",
+  answer("impdata <- mice::complete(imputation, action = 1)"),
+  answer("impdata <- mice::complete(imputation, action = 10)"),
+  answer("impdata <- mice::complete(imputation, action = 'long')", correct = TRUE),
+  answer("impdata <- mice::complete(imputation, action = c(1, 10))"),
+  incorrect = "See the help menu to understand how the action argument works.",
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r missingdata_quiz4, echo=FALSE}
+question("Q4. You have datasets 'imputation' from Q2 and 'impdata' from Q3. Which code can be used for variable selection using the Stack approach?",
+  answer("fit4 <- with(imputation, expr), where expr includes unevaluated expressions of the initial model and the model chosen by the stepwise algorithm.", message = "We must use the stacked dataset for variable selection using the Stack approach."),
+  answer("fit4 <- step(fit0, scope = scope0, trace = FALSE), where fit0 is the inital model and scope0 includes the range of models examined in the stepwise search on the dataset named 'imputation'.", message = "We must use the stacked dataset for variable selection using the Stack approach."),
+  answer("fit4 <- step(fit0, scope = scope0, trace = FALSE), where fit0 is the inital model and scope0 includes the range of models examined in the stepwise search on the dataset named 'impdata'.", correct = TRUE),
+  answer("fit4 <- D1(fit0, fit1), where fit0 and fit1 are two models for comparison fitted on the dataset named 'imputation'.", message = "The D1-statistics is the multivariate Wald test."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+```{r missingdata_quiz5, echo=FALSE}
+question("Q5. Which function can be used to combine estimates from imputed datasets by pooling rules?",
+  answer("pool()", message = "There are many functions available that can combine estimates from imputed datasets."),
+  answer("pool_mi()", message = "There are many functions available that can combine estimates from imputed datasets."),
+  answer("ALL", correct = TRUE),
+  answer("None", message = "There are many functions available that can combine estimates from imputed datasets."),
+  answer("MIcombine()", message = "There are many functions available that can combine estimates from imputed datasets."),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
