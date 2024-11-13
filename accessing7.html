@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Advanced Epidemiological Methods - Linking mortality data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./accessing8.html" rel="next">
+<link href="./accessing5.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
+</script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<meta name="twitter:title" content="Advanced Epidemiological Methods - Linking mortality data">
+<meta name="twitter:description" content="This tutorial provides instructions on linking public-use US mortality data with the NHANES dataset. One can also follow the same steps to link the mortality data with the NHIS.">
+<meta name="twitter:card" content="summary">
+</head>
+<body class="nav-sidebar docked">
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Linking mortality data</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Advanced Epidemiological Methods</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link">R basics</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">App (W)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Accessing data</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">Concepts (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">Descriptions</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing NHANES results</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">Importing NHIS to R</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing7.html" class="sidebar-item-text sidebar-link active">Linking mortality data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">Replicate Data Creation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">App (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise 1 (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">Exercise 1 Solution (A)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">Exercise 2 (A)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./exploring.html" class="sidebar-item-text sidebar-link">Exploratory Data Analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring0.html" class="sidebar-item-text sidebar-link">Univariate</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring1.html" class="sidebar-item-text sidebar-link">Bivariate</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploring2.html" class="sidebar-item-text sidebar-link">Useful Packages</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">Concepts (Q)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">App (Q)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">Concepts (R)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">Simpson’s Paradox</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">Exercise 1 (R)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./confoundingE2.html" class="sidebar-item-text sidebar-link">Exercise 2 (R)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">Concepts (P)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data Splitting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">Concepts (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">App (D)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">Concepts (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">Imputation in NHANES</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">MCAR tests</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">App (M)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">Concepts (S)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">Exact Matching (CCHS)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (CCHS)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (US)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">PSM in BMI-diabetes</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">PSM with MI</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">PS Weighting (US)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">PSM with MI in subset</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">PSW with MI in subset</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">PSW with multiple tx</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">Quiz (S)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">App (S)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning (ML)</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">Concepts (L)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">Data spliting</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">Supervised learning</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">Unsupervised learning</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">NHIS Example</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">Replicate Results</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">Quiz (L)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningE.html" class="sidebar-item-text sidebar-link">Exercise (L)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">Concepts (C)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">Motivation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">SuperLearner</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">Binary Outcomes</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">Continuous Outcomes</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">Comparing results</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">Quiz (C)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">Complex outcomes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">Concepts (N)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">Polytomous and ordinal</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">Survival analysis</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">Survival analysis: NHANES</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">Poisson</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">R functions (N)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">Quiz (N)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">Longitudinal data</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">Concepts (T)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">Mixed effects models</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">GEE</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">R functions (T)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">Quiz (T)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">Mediation analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">Concepts (I)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">Baron and Kenny</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">Justification</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">Mediation Example</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">R functions (I)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">Quiz (I)</a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Writing tools</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">Collaborative Writing</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">Formatting Tools</a>
+  </div>
+</li>
+      </ul>
+</li>
+    </ul>
+</div>
+</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#download-mortality-data" id="toc-download-mortality-data" class="nav-link active" data-scroll-target="#download-mortality-data">Download mortality data</a></li>
+  <li><a href="#link-mortality-data-to-nhanes" id="toc-link-mortality-data-to-nhanes" class="nav-link" data-scroll-target="#link-mortality-data-to-nhanes">Link mortality data to NHANES</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title d-none d-lg-block">Linking mortality data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header><p>This tutorial provides instructions on linking public-use US mortality data with the <a href="https://www.cdc.gov/nchs/nhanes/index.htm">NHANES</a> dataset. One can also follow the same steps to link the mortality data with the <a href="https://www.cdc.gov/nchs/nhis/index.htm">NHIS</a>.</p>
+<section id="download-mortality-data" class="level3"><h3 class="anchored" data-anchor-id="download-mortality-data">Download mortality data</h3>
+<p>The public-use mortality data can be downloaded directly from the <a href="https://ftp.cdc.gov/pub/Health_Statistics/NCHS/datalinkage/linked_mortality/">CDC website</a>. Datasets are available in .dat format, separately for each cycle of NHANES and NHIS.</p>
+<div class="cell" data-hash="accessing7_cache/html/mort1_03ca8828de3301d4c6c71cd4ede419e4">
+<div class="cell-output-display">
+<p><img src="Images/accessing/mortality_link.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+<p>On the same website, CDC also provided R, SAS, and Stata codes with instructions on how to download the datasets directly from the website.</p>
+<div class="cell" data-hash="accessing7_cache/html/mort2_f44a27b0bb7e1bdbb59a74328bcd7c5b">
+<div class="cell-output-display">
+<p><img src="Images/accessing/codes.png" class="img-fluid" style="width:70.0%"></p>
+</div>
+</div>
+<p>We can click on the desired survey link to download and save the datasets on our own hard drive. The dataset will be directly downloaded to our specified download folder. Alternatively, we can right-click on the desired survey link and select <code>Save link as...</code></p>
+<div class="cell" data-hash="accessing7_cache/html/mort3_abe9314e3ebe91569e3afca98c2f6e56">
+<div class="cell-output-display">
+<p><img src="Images/accessing/mortSave.png" class="img-fluid" style="width:90.0%"></p>
+</div>
+</div>
+<p>Note that the data file is saved as <code>&lt;survey name&gt;_MORT_2019_PUBLIC.dat</code>. In our example, we downloaded mortality data for the NHANES 2013-14 participants. Hence, the name of the file should be <code>NHANES_2013_2014_MORT_2019_PUBLIC.dat</code>.</p>
+<div class="cell" data-hash="accessing7_cache/html/mort4_861726796a4062e50a4f86cfcedc0a85">
+<div class="cell-output-display">
+<p><img src="Images/accessing/mortSaveData.png" class="img-fluid" style="width:30.0%"></p>
+</div>
+</div>
+</section><section id="link-mortality-data-to-nhanes" class="level3"><h3 class="anchored" data-anchor-id="link-mortality-data-to-nhanes">Link mortality data to NHANES</h3>
+<p>Let us link the mortality data to the NHANES 2013-14 cycle. The steps are as follows:</p>
+<ul>
+<li>Download morality data for the NHANES 2013-14 cycle</li>
+<li>Load the morality data on the R environment</li>
+<li>Load NHANES 2013-14 cycle</li>
+<li>Merge two datasets using the unique identifier</li>
+</ul>
+<section id="download-morality-data" class="level4"><h4 class="anchored" data-anchor-id="download-morality-data">Download morality data</h4>
+<p>We can follow the steps described above to download the mortality dataset directly from the CDC website.</p>
+</section><section id="load-the-morality-data-on-the-r-environment" class="level4"><h4 class="anchored" data-anchor-id="load-the-morality-data-on-the-r-environment">Load the morality data on the R environment</h4>
+<p>To load the dataset, we can use the <code>read_fwf</code> function from the <code>readr</code> package.</p>
+<div class="cell" data-hash="accessing7_cache/html/mortdataload_badc6ad0ccd73e065154767895a2afb4">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>dat.mort <span class="ot">&lt;-</span> <span class="fu">read_fwf</span>(</span>
+<span id="cb1-5"><a href="#cb1-5"></a>  <span class="at">file =</span> <span class="st">"Data/accessing/NHANES_2013_2014_MORT_2019_PUBLIC.dat"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6"></a>  <span class="at">col_types =</span> <span class="st">"iiiiiiii"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  <span class="fu">fwf_cols</span>(<span class="at">SEQN =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">6</span>), </span>
+<span id="cb1-8"><a href="#cb1-8"></a>           <span class="at">eligstat =</span> <span class="fu">c</span>(<span class="dv">15</span>,<span class="dv">15</span>),</span>
+<span id="cb1-9"><a href="#cb1-9"></a>           <span class="at">mortstat =</span> <span class="fu">c</span>(<span class="dv">16</span>,<span class="dv">16</span>),</span>
+<span id="cb1-10"><a href="#cb1-10"></a>           <span class="at">ucod_leading =</span> <span class="fu">c</span>(<span class="dv">17</span>,<span class="dv">19</span>),</span>
+<span id="cb1-11"><a href="#cb1-11"></a>           <span class="at">diabetes =</span> <span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">20</span>),</span>
+<span id="cb1-12"><a href="#cb1-12"></a>           <span class="at">hyperten =</span> <span class="fu">c</span>(<span class="dv">21</span>,<span class="dv">21</span>),</span>
+<span id="cb1-13"><a href="#cb1-13"></a>           <span class="at">permth_int =</span> <span class="fu">c</span>(<span class="dv">43</span>,<span class="dv">45</span>),</span>
+<span id="cb1-14"><a href="#cb1-14"></a>           <span class="at">permth_exm =</span> <span class="fu">c</span>(<span class="dv">46</span>,<span class="dv">48</span>)),</span>
+<span id="cb1-15"><a href="#cb1-15"></a>  <span class="at">na =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"."</span>))</span>
+<span id="cb1-16"><a href="#cb1-16"></a></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="fu">head</span>(dat.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["SEQN"],"name":[1],"type":["int"],"align":["right"]},{"label":["eligstat"],"name":[2],"type":["int"],"align":["right"]},{"label":["mortstat"],"name":[3],"type":["int"],"align":["right"]},{"label":["ucod_leading"],"name":[4],"type":["int"],"align":["right"]},{"label":["diabetes"],"name":[5],"type":["int"],"align":["right"]},{"label":["hyperten"],"name":[6],"type":["int"],"align":["right"]},{"label":["permth_int"],"name":[7],"type":["int"],"align":["right"]},{"label":["permth_exm"],"name":[8],"type":["int"],"align":["right"]}],"data":[{"1":"73557","2":"1","3":"0","4":"NA","5":"NA","6":"NA","7":"78","8":"78"},{"1":"73558","2":"1","3":"1","4":"7","5":"1","6":"0","7":"58","8":"58"},{"1":"73559","2":"1","3":"0","4":"NA","5":"NA","6":"NA","7":"83","8":"82"},{"1":"73560","2":"2","3":"NA","4":"NA","5":"NA","6":"NA","7":"NA","8":"NA"},{"1":"73561","2":"1","3":"1","4":"10","5":"0","6":"0","7":"10","8":"9"},{"1":"73562","2":"1","3":"0","4":"NA","5":"NA","6":"NA","7":"68","8":"68"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>In the code chuck above,</p>
+<ul>
+<li><p>SEQN: unique identifier for NHANES</p></li>
+<li>
+<p>eligstat: Eligibility Status for Mortality Follow-up</p>
+<ul>
+<li>1 = Eligible</li>
+<li>2 = Under age 18, not available for public release</li>
+<li>3 = Ineligible</li>
+</ul>
+</li>
+<li>
+<p>mortstat: Mortality Status</p>
+<ul>
+<li>0 = Assumed alive</li>
+<li>1 = Assumed deceased</li>
+<li>NA = Ineligible or under age 18</li>
+</ul>
+</li>
+<li>
+<p>ucod_leading: Underlying Cause of Death</p>
+<ul>
+<li>1 = Diseases of heart (I00-I09, I11, I13, I20-I51)</li>
+<li>2 = Malignant neoplasms (C00-C97)</li>
+<li>3 = Chronic lower respiratory diseases (J40-J47)</li>
+<li>4 = Accidents (unintentional injuries) (V01-X59, Y85-Y86)</li>
+<li>5 = Cerebrovascular diseases (I60-I69)</li>
+<li>6 = Alzheimer’s disease (G30)</li>
+<li>7 = Diabetes mellitus (E10-E14)</li>
+<li>8 = Influenza and pneumonia (J09-J18)</li>
+<li>9 = Nephritis, nephrotic syndrome and nephrosis (N00-N07, N17-N19, N25-N27)</li>
+<li>10 = All other causes</li>
+<li>NA = Ineligible, under age 18, assumed alive, or no cause of death data available</li>
+</ul>
+</li>
+<li>
+<p>diabetes: Diabetes Flag from Multiple Cause of Death (MCOD)</p>
+<ul>
+<li>0 = No - Condition not listed as a multiple cause of death</li>
+<li>1 = Yes - Condition listed as a multiple cause of death</li>
+<li>NA = Assumed alive, under age 18, ineligible for mortality follow-up, or MCOD not available</li>
+</ul>
+</li>
+<li>
+<p>hyperten: Hypertension Flag from Multiple Cause of Death (MCOD)</p>
+<ul>
+<li>0 = No - Condition not listed as a multiple cause of death</li>
+<li>1 = Yes - Condition listed as a multiple cause of death</li>
+<li>NA = Assumed alive, under age 18, ineligible for mortality follow-up, or MCOD not available</li>
+</ul>
+</li>
+<li><p>permth_int: Person-Months of Follow-up from NHANES Interview date</p></li>
+<li><p>permth_exm: Person-Months of Follow-up from NHANES Mobile Examination Center (MEC) Date</p></li>
+</ul>
+<p>Let us see the basic summary statistics of some variables:</p>
+<div class="cell" data-hash="accessing7_cache/html/mortdatastat_90142a08a50c263fb0a9068f6d44a496">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Mortality Status</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">table</span>(dat.mort<span class="sc">$</span>mortstat, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; </span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt;    0    1 &lt;NA&gt; </span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 5633  467 4075</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># Person-Months of Follow-up from NHANES Interview date</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">summary</span>(dat.mort<span class="sc">$</span>permth_int)</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;    1.00   65.00   72.00   70.34   79.00   85.00    4075</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co"># Underlying Cause of Death</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="fu">table</span>(dat.mort<span class="sc">$</span>ucod_leading, <span class="at">useNA =</span> <span class="st">"always"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; </span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt;    1    2    3    4    5    6    7    8    9   10 &lt;NA&gt; </span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt;  136   99   24   14   28   17   21    9   16  103 9708</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="load-nhanes-2013-14-cycle" class="level4"><h4 class="anchored" data-anchor-id="load-nhanes-2013-14-cycle">Load NHANES 2013-14 cycle</h4>
+<p>Let the open the NHANES 2013-14 dataset we created in the previous chapter on <a href="accessing4.html">Reproducing results</a>.</p>
+<div class="cell" data-hash="accessing7_cache/html/openNHANES_50377a1bd7468f5f3a6a138dbe997686">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Load data</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">load</span>(<span class="st">"Data/accessing/analyticNHANES2013.RData"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="fu">ls</span>()</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; [1] "analytic.data3" "dat.mort"       "merged.data"</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co"># NHANES 2013-14</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="fu">head</span>(analytic.data3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["SEQN"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["RIDEXPRG"],"name":[2],"type":["fct"],"align":["left"]},{"label":["RIAGENDR"],"name":[3],"type":["fct"],"align":["left"]},{"label":["RIDAGEYR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["RIDRETH3"],"name":[5],"type":["fct"],"align":["left"]},{"label":["WTINT2YR"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["SDMVPSU"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["SDMVSTRA"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["BMXBMI"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["AgeCat"],"name":[10],"type":["fct"],"align":["left"]},{"label":["Gender"],"name":[11],"type":["fct"],"align":["left"]},{"label":["Race"],"name":[12],"type":["fct"],"align":["left"]},{"label":["psu"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["strata"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["survey.weight"],"name":[15],"type":["dbl"],"align":["right"]}],"data":[{"1":"73557","2":"NA","3":"Male","4":"69","5":"Non-Hispanic Black","6":"13281.24","7":"1","8":"112","9":"26.7","10":"[60,Inf)","11":"Male","12":"Black","13":"1","14":"112","15":"13281.24","_rn_":"1"},{"1":"73558","2":"NA","3":"Male","4":"54","5":"Non-Hispanic White","6":"23682.06","7":"1","8":"108","9":"28.6","10":"[40,60)","11":"Male","12":"White","13":"1","14":"108","15":"23682.06","_rn_":"2"},{"1":"73559","2":"NA","3":"Male","4":"72","5":"Non-Hispanic White","6":"57214.80","7":"1","8":"109","9":"28.9","10":"[60,Inf)","11":"Male","12":"White","13":"1","14":"109","15":"57214.80","_rn_":"3"},{"1":"73561","2":"NA","3":"Female","4":"73","5":"Non-Hispanic White","6":"63709.67","7":"2","8":"116","9":"19.7","10":"[60,Inf)","11":"Female","12":"White","13":"2","14":"116","15":"63709.67","_rn_":"5"},{"1":"73562","2":"NA","3":"Male","4":"56","5":"Mexican American","6":"24978.14","7":"1","8":"111","9":"41.7","10":"[40,60)","11":"Male","12":"Hispanic","13":"1","14":"111","15":"24978.14","_rn_":"6"},{"1":"73564","2":"NA","3":"Female","4":"61","5":"Non-Hispanic White","6":"60325.10","7":"1","8":"114","9":"35.7","10":"[60,Inf)","11":"Female","12":"White","13":"1","14":"114","15":"60325.10","_rn_":"8"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">dim</span>(analytic.data3)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; [1] 5455   15</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="merge-mortality-data-and-nhanes-2013-14-using-unique-identifier" class="level4"><h4 class="anchored" data-anchor-id="merge-mortality-data-and-nhanes-2013-14-using-unique-identifier">Merge mortality data and NHANES 2013-14 using unique identifier</h4>
+<p>Let us merge the mortality and NHANES datasets using the <code>SEQN</code> variable.</p>
+<div class="cell" data-hash="accessing7_cache/html/joinNHANES_174a4f6b16cb83e2d274ce3d889a7130">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Merge datasets</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>dat.nhanes <span class="ot">&lt;-</span> <span class="fu">merge</span>(analytic.data3, dat.mort, <span class="at">by =</span> <span class="st">"SEQN"</span>, <span class="at">all.x =</span> T)</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="fu">dim</span>(dat.nhanes)</span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; [1] 5455   22</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="fu">head</span>(dat.nhanes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["SEQN"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["RIDEXPRG"],"name":[2],"type":["fct"],"align":["left"]},{"label":["RIAGENDR"],"name":[3],"type":["fct"],"align":["left"]},{"label":["RIDAGEYR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["RIDRETH3"],"name":[5],"type":["fct"],"align":["left"]},{"label":["WTINT2YR"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["SDMVPSU"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["SDMVSTRA"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["BMXBMI"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["AgeCat"],"name":[10],"type":["fct"],"align":["left"]},{"label":["Gender"],"name":[11],"type":["fct"],"align":["left"]},{"label":["Race"],"name":[12],"type":["fct"],"align":["left"]},{"label":["psu"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["strata"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["survey.weight"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["eligstat"],"name":[16],"type":["int"],"align":["right"]},{"label":["mortstat"],"name":[17],"type":["int"],"align":["right"]},{"label":["ucod_leading"],"name":[18],"type":["int"],"align":["right"]},{"label":["diabetes"],"name":[19],"type":["int"],"align":["right"]},{"label":["hyperten"],"name":[20],"type":["int"],"align":["right"]},{"label":["permth_int"],"name":[21],"type":["int"],"align":["right"]},{"label":["permth_exm"],"name":[22],"type":["int"],"align":["right"]}],"data":[{"1":"73557","2":"NA","3":"Male","4":"69","5":"Non-Hispanic Black","6":"13281.24","7":"1","8":"112","9":"26.7","10":"[60,Inf)","11":"Male","12":"Black","13":"1","14":"112","15":"13281.24","16":"1","17":"0","18":"NA","19":"NA","20":"NA","21":"78","22":"78","_rn_":"1"},{"1":"73558","2":"NA","3":"Male","4":"54","5":"Non-Hispanic White","6":"23682.06","7":"1","8":"108","9":"28.6","10":"[40,60)","11":"Male","12":"White","13":"1","14":"108","15":"23682.06","16":"1","17":"1","18":"7","19":"1","20":"0","21":"58","22":"58","_rn_":"2"},{"1":"73559","2":"NA","3":"Male","4":"72","5":"Non-Hispanic White","6":"57214.80","7":"1","8":"109","9":"28.9","10":"[60,Inf)","11":"Male","12":"White","13":"1","14":"109","15":"57214.80","16":"1","17":"0","18":"NA","19":"NA","20":"NA","21":"83","22":"82","_rn_":"3"},{"1":"73561","2":"NA","3":"Female","4":"73","5":"Non-Hispanic White","6":"63709.67","7":"2","8":"116","9":"19.7","10":"[60,Inf)","11":"Female","12":"White","13":"2","14":"116","15":"63709.67","16":"1","17":"1","18":"10","19":"0","20":"0","21":"10","22":"9","_rn_":"4"},{"1":"73562","2":"NA","3":"Male","4":"56","5":"Mexican American","6":"24978.14","7":"1","8":"111","9":"41.7","10":"[40,60)","11":"Male","12":"Hispanic","13":"1","14":"111","15":"24978.14","16":"1","17":"0","18":"NA","19":"NA","20":"NA","21":"68","22":"68","_rn_":"5"},{"1":"73564","2":"NA","3":"Female","4":"61","5":"Non-Hispanic White","6":"60325.10","7":"1","8":"114","9":"35.7","10":"[60,Inf)","11":"Female","12":"White","13":"1","14":"114","15":"60325.10","16":"1","17":"0","18":"NA","19":"NA","20":"NA","21":"63","22":"62","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section><section id="table-1" class="level4"><h4 class="anchored" data-anchor-id="table-1">Table 1</h4>
+<p>Now we will use the <code>dat.nhanes</code> dataset to create Table 1 with utilizing survey features (i.e., psu, strata, and survey weights). First, we will create the survey design. Second, we will report Table 1 with age, sex, race, eligibility, all-cause mortality status, diabetes-related death, hypertension-related death, and follow-up times.</p>
+<div class="cell" data-hash="accessing7_cache/html/tab1_377488200870cc7f3d4f6e9284deaa23">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">library</span>(tableone)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">library</span>(survey)</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># Make eligibility and mortality status as factor variable</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>factor.vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"eligstat"</span>, <span class="st">"mortstat"</span>, <span class="st">"diabetes"</span>, <span class="st">"hyperten"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>dat.nhanes[,factor.vars] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(dat.nhanes[,factor.vars] , factor)</span>
+<span id="cb6-7"><a href="#cb6-7"></a></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co"># Survey design</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>w.design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id =</span> <span class="sc">~</span>psu, <span class="at">strata =</span> <span class="sc">~</span>strata, <span class="at">weights =</span> <span class="sc">~</span>survey.weight, </span>
+<span id="cb6-10"><a href="#cb6-10"></a>                      <span class="at">data =</span> dat.nhanes, <span class="at">nest =</span> T)</span>
+<span id="cb6-11"><a href="#cb6-11"></a></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co"># Table 1 - unweighted frequency or mean</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a>tab1a <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">var =</span> <span class="fu">c</span>(<span class="st">"AgeCat"</span>, <span class="st">"Gender"</span>, <span class="st">"Race"</span>, <span class="st">"eligstat"</span>, <span class="st">"mortstat"</span>, </span>
+<span id="cb6-14"><a href="#cb6-14"></a>                                <span class="st">"diabetes"</span>, <span class="st">"hyperten"</span>, <span class="st">"permth_int"</span>, <span class="st">"permth_exm"</span>),</span>
+<span id="cb6-15"><a href="#cb6-15"></a>                        <span class="at">data =</span> dat.nhanes, <span class="at">includeNA =</span> T)</span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="fu">print</span>(tab1a, <span class="at">showAllLevels =</span> T, <span class="at">format =</span> <span class="st">"f"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;                         </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt;                          level    Overall      </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt;   n                                5455        </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt;   AgeCat                 [0,20)       0        </span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt;                          [20,40)   1810        </span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt;                          [40,60)   1896        </span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt;                          [60,Inf)  1749        </span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt;   Gender                 Female    2817        </span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt;                          Male      2638        </span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt;   Race                   White     2343        </span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="co">#&gt;                          Black     1115        </span></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt;                          Asian      623        </span></span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt;                          Hispanic  1214        </span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt;                          &lt;NA&gt;       160        </span></span>
+<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;   eligstat               1         5445        </span></span>
+<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt;                          3           10        </span></span>
+<span id="cb6-33"><a href="#cb6-33"></a><span class="co">#&gt;   mortstat               0         5030        </span></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="co">#&gt;                          1          415        </span></span>
+<span id="cb6-35"><a href="#cb6-35"></a><span class="co">#&gt;                          &lt;NA&gt;        10        </span></span>
+<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt;   diabetes               0          374        </span></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt;                          1           41        </span></span>
+<span id="cb6-38"><a href="#cb6-38"></a><span class="co">#&gt;                          &lt;NA&gt;      5040        </span></span>
+<span id="cb6-39"><a href="#cb6-39"></a><span class="co">#&gt;   hyperten               0          344        </span></span>
+<span id="cb6-40"><a href="#cb6-40"></a><span class="co">#&gt;                          1           71        </span></span>
+<span id="cb6-41"><a href="#cb6-41"></a><span class="co">#&gt;                          &lt;NA&gt;      5040        </span></span>
+<span id="cb6-42"><a href="#cb6-42"></a><span class="co">#&gt;   permth_int (mean (SD))          70.40 (12.18)</span></span>
+<span id="cb6-43"><a href="#cb6-43"></a><span class="co">#&gt;   permth_exm (mean (SD))          69.49 (12.20)</span></span>
+<span id="cb6-44"><a href="#cb6-44"></a></span>
+<span id="cb6-45"><a href="#cb6-45"></a><span class="co"># Table 1 - weighted percentage or mean</span></span>
+<span id="cb6-46"><a href="#cb6-46"></a>tab1b <span class="ot">&lt;-</span> <span class="fu">svyCreateTableOne</span>(<span class="at">var =</span> <span class="fu">c</span>(<span class="st">"AgeCat"</span>, <span class="st">"Gender"</span>, <span class="st">"Race"</span>, <span class="st">"eligstat"</span>, <span class="st">"mortstat"</span>, </span>
+<span id="cb6-47"><a href="#cb6-47"></a>                                <span class="st">"diabetes"</span>, <span class="st">"hyperten"</span>, <span class="st">"permth_int"</span>, <span class="st">"permth_exm"</span>), </span>
+<span id="cb6-48"><a href="#cb6-48"></a>                           <span class="at">data =</span> w.design, <span class="at">includeNA =</span> T)</span>
+<span id="cb6-49"><a href="#cb6-49"></a><span class="fu">print</span>(tab1b, <span class="at">showAllLevels =</span> T, <span class="at">format =</span> <span class="st">"p"</span>)</span>
+<span id="cb6-50"><a href="#cb6-50"></a><span class="co">#&gt;                         </span></span>
+<span id="cb6-51"><a href="#cb6-51"></a><span class="co">#&gt;                          level    Overall             </span></span>
+<span id="cb6-52"><a href="#cb6-52"></a><span class="co">#&gt;   n                                217464332.1        </span></span>
+<span id="cb6-53"><a href="#cb6-53"></a><span class="co">#&gt;   AgeCat (%)             [0,20)            0.0        </span></span>
+<span id="cb6-54"><a href="#cb6-54"></a><span class="co">#&gt;                          [20,40)          35.5        </span></span>
+<span id="cb6-55"><a href="#cb6-55"></a><span class="co">#&gt;                          [40,60)          37.5        </span></span>
+<span id="cb6-56"><a href="#cb6-56"></a><span class="co">#&gt;                          [60,Inf)         27.0        </span></span>
+<span id="cb6-57"><a href="#cb6-57"></a><span class="co">#&gt;   Gender (%)             Female           51.4        </span></span>
+<span id="cb6-58"><a href="#cb6-58"></a><span class="co">#&gt;                          Male             48.6        </span></span>
+<span id="cb6-59"><a href="#cb6-59"></a><span class="co">#&gt;   Race (%)               White            66.1        </span></span>
+<span id="cb6-60"><a href="#cb6-60"></a><span class="co">#&gt;                          Black            11.4        </span></span>
+<span id="cb6-61"><a href="#cb6-61"></a><span class="co">#&gt;                          Asian             5.2        </span></span>
+<span id="cb6-62"><a href="#cb6-62"></a><span class="co">#&gt;                          Hispanic         14.7        </span></span>
+<span id="cb6-63"><a href="#cb6-63"></a><span class="co">#&gt;                          &lt;NA&gt;              2.7        </span></span>
+<span id="cb6-64"><a href="#cb6-64"></a><span class="co">#&gt;   eligstat (%)           1                99.9        </span></span>
+<span id="cb6-65"><a href="#cb6-65"></a><span class="co">#&gt;                          3                 0.1        </span></span>
+<span id="cb6-66"><a href="#cb6-66"></a><span class="co">#&gt;   mortstat (%)           0                93.6        </span></span>
+<span id="cb6-67"><a href="#cb6-67"></a><span class="co">#&gt;                          1                 6.2        </span></span>
+<span id="cb6-68"><a href="#cb6-68"></a><span class="co">#&gt;                          &lt;NA&gt;              0.1        </span></span>
+<span id="cb6-69"><a href="#cb6-69"></a><span class="co">#&gt;   diabetes (%)           0                 5.5        </span></span>
+<span id="cb6-70"><a href="#cb6-70"></a><span class="co">#&gt;                          1                 0.7        </span></span>
+<span id="cb6-71"><a href="#cb6-71"></a><span class="co">#&gt;                          &lt;NA&gt;             93.8        </span></span>
+<span id="cb6-72"><a href="#cb6-72"></a><span class="co">#&gt;   hyperten (%)           0                 5.2        </span></span>
+<span id="cb6-73"><a href="#cb6-73"></a><span class="co">#&gt;                          1                 1.0        </span></span>
+<span id="cb6-74"><a href="#cb6-74"></a><span class="co">#&gt;                          &lt;NA&gt;             93.8        </span></span>
+<span id="cb6-75"><a href="#cb6-75"></a><span class="co">#&gt;   permth_int (mean (SD))                 70.71 (11.28)</span></span>
+<span id="cb6-76"><a href="#cb6-76"></a><span class="co">#&gt;   permth_exm (mean (SD))                 69.80 (11.31)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./accessing5.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Importing NHIS to R</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./accessing8.html" class="pagination-link">
+        <span class="nav-page-text">Replicate Data Creation</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

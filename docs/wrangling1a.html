@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.555">
+<meta name="generator" content="quarto-1.2.335">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Advanced Epidemiological Methods - R basics</title>
 <style>
@@ -14,12 +14,11 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -44,13 +43,43 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
+    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -76,13 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
+  "limit": 20,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -91,10 +114,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-CVBPG0RQMY"></script><script type="text/javascript">
 
@@ -105,30 +126,26 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 <meta name="twitter:title" content="Advanced Epidemiological Methods - R basics">
-<meta name="twitter:description" content="">
+<meta name="twitter:description" content="To get started with R, follow these steps:">
 <meta name="twitter:card" content="summary">
 </head>
 <body class="nav-sidebar docked">
 
+
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./wrangling.html">Data wrangling</a></li><li class="breadcrumb-item"><a href="./wrangling1a.html">R basics</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }"><div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">R basics</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
       </button>
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Advanced Epidemiological Methods</a> 
         <div class="sidebar-tools-main">
-  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
   <i class="bi"></i>
   </div>
@@ -136,1029 +153,871 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
     </div>
       </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
+      <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-        </div>
+      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Project</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">The Project</a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data wrangling</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <a href="./wrangling.html" class="sidebar-item-text sidebar-link">Data wrangling</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">R basics</span></a>
+  <a href="./wrangling1a.html" class="sidebar-item-text sidebar-link active">R basics</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data types</span></a>
+  <a href="./wrangling1b.html" class="sidebar-item-text sidebar-link">Data types</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Automating tasks</span></a>
+  <a href="./wrangling1c.html" class="sidebar-item-text sidebar-link">Automating tasks</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing dataset</span></a>
+  <a href="./wrangling2.html" class="sidebar-item-text sidebar-link">Importing dataset</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data manipulation</span></a>
+  <a href="./wrangling3.html" class="sidebar-item-text sidebar-link">Data manipulation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Import external data</span></a>
+  <a href="./wrangling4.html" class="sidebar-item-text sidebar-link">Import external data</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Summary tables</span></a>
+  <a href="./wrangling5.html" class="sidebar-item-text sidebar-link">Summary tables</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R Markdown</span></a>
+  <a href="./wrangling6.html" class="sidebar-item-text sidebar-link">R Markdown</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R Functions (W)</span></a>
+  <a href="./wranglingF.html" class="sidebar-item-text sidebar-link">R Functions (W)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (W)</span></a>
+  <a href="./wranglingQ.html" class="sidebar-item-text sidebar-link">Quiz (W)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">App (W)</span></a>
+  <a href="./wranglingS.html" class="sidebar-item-text sidebar-link">App (W)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (W)</span></a>
+  <a href="./wranglingE.html" class="sidebar-item-text sidebar-link">Exercise (W)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./accessing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accessing data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <a href="./accessing.html" class="sidebar-item-text sidebar-link">Accessing data</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (A)</span></a>
+  <a href="./accessing0.html" class="sidebar-item-text sidebar-link">Concepts (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Survey data sources</span></a>
+  <a href="./accessing1.html" class="sidebar-item-text sidebar-link">Survey data sources</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Descriptions</span></a>
+  <a href="./accessing1i.html" class="sidebar-item-text sidebar-link">Descriptions</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing CCHS to R</span></a>
+  <a href="./accessing2.html" class="sidebar-item-text sidebar-link">Importing CCHS to R</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing NHANES to R</span></a>
+  <a href="./accessing3.html" class="sidebar-item-text sidebar-link">Importing NHANES to R</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Reproducing NHANES results</span></a>
+  <a href="./accessing4.html" class="sidebar-item-text sidebar-link">Reproducing NHANES results</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Importing NHIS to R</span></a>
+  <a href="./accessing5.html" class="sidebar-item-text sidebar-link">Importing NHIS to R</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Linking mortality data</span></a>
+  <a href="./accessing7.html" class="sidebar-item-text sidebar-link">Linking mortality data</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Replicate Data Creation</span></a>
+  <a href="./accessing8.html" class="sidebar-item-text sidebar-link">Replicate Data Creation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R Functions (A)</span></a>
+  <a href="./accessingF.html" class="sidebar-item-text sidebar-link">R Functions (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (A)</span></a>
+  <a href="./accessingQ.html" class="sidebar-item-text sidebar-link">Quiz (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">App (A)</span></a>
+  <a href="./accessingS.html" class="sidebar-item-text sidebar-link">App (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise 1 (A)</span></a>
+  <a href="./accessingE.html" class="sidebar-item-text sidebar-link">Exercise 1 (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise 1 Solution (A)</span></a>
+  <a href="./accessingEsolution.html" class="sidebar-item-text sidebar-link">Exercise 1 Solution (A)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise 2 (A)</span></a>
+  <a href="./accessingE2.html" class="sidebar-item-text sidebar-link">Exercise 2 (A)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./exploring.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exploratory Data Analysis</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <a href="./exploring.html" class="sidebar-item-text sidebar-link">Exploratory Data Analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./exploring0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Univariate</span></a>
+  <a href="./exploring0.html" class="sidebar-item-text sidebar-link">Univariate</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./exploring1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bivariate</span></a>
+  <a href="./exploring1.html" class="sidebar-item-text sidebar-link">Bivariate</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./exploring2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Useful Packages</span></a>
+  <a href="./exploring2.html" class="sidebar-item-text sidebar-link">Useful Packages</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Research questions</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <a href="./researchquestion.html" class="sidebar-item-text sidebar-link">Research questions</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (Q)</span></a>
+  <a href="./researchquestion0.html" class="sidebar-item-text sidebar-link">Concepts (Q)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Predictive question-1</span></a>
+  <a href="./researchquestion1.html" class="sidebar-item-text sidebar-link">Predictive question-1</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Predictive question-2a</span></a>
+  <a href="./researchquestion2a.html" class="sidebar-item-text sidebar-link">Predictive question-2a</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Predictive question-2b</span></a>
+  <a href="./researchquestion2b.html" class="sidebar-item-text sidebar-link">Predictive question-2b</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Causal question-1</span></a>
+  <a href="./researchquestion3.html" class="sidebar-item-text sidebar-link">Causal question-1</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Causal question-2</span></a>
+  <a href="./researchquestion4.html" class="sidebar-item-text sidebar-link">Causal question-2</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (Q)</span></a>
+  <a href="./researchquestionF.html" class="sidebar-item-text sidebar-link">R functions (Q)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (Q)</span></a>
+  <a href="./researchquestionQ.html" class="sidebar-item-text sidebar-link">Quiz (Q)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">App (Q)</span></a>
+  <a href="./researchquestionS.html" class="sidebar-item-text sidebar-link">App (Q)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./confounding.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Causal roles</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+            <a href="./confounding.html" class="sidebar-item-text sidebar-link">Causal roles</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (R)</span></a>
+  <a href="./confounding0.html" class="sidebar-item-text sidebar-link">Concepts (R)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Confounding</span></a>
+  <a href="./confounding1.html" class="sidebar-item-text sidebar-link">Confounding</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mediator</span></a>
+  <a href="./confounding2.html" class="sidebar-item-text sidebar-link">Mediator</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collider</span></a>
+  <a href="./confounding3.html" class="sidebar-item-text sidebar-link">Collider</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Simpson’s Paradox</span></a>
+  <a href="./confounding3b.html" class="sidebar-item-text sidebar-link">Simpson’s Paradox</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Z-bias</span></a>
+  <a href="./confounding4.html" class="sidebar-item-text sidebar-link">Z-bias</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collapsibility</span></a>
+  <a href="./confounding5.html" class="sidebar-item-text sidebar-link">Collapsibility</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Change-in-estimate</span></a>
+  <a href="./confounding6.html" class="sidebar-item-text sidebar-link">Change-in-estimate</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (R)</span></a>
+  <a href="./confoundingF.html" class="sidebar-item-text sidebar-link">R functions (R)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (R)</span></a>
+  <a href="./confoundingQ.html" class="sidebar-item-text sidebar-link">Quiz (R)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise 1 (R)</span></a>
+  <a href="./confoundingE.html" class="sidebar-item-text sidebar-link">Exercise 1 (R)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./confoundingE2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise 2 (R)</span></a>
+  <a href="./confoundingE2.html" class="sidebar-item-text sidebar-link">Exercise 2 (R)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Prediction ideas</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <a href="./predictivefactors.html" class="sidebar-item-text sidebar-link">Prediction ideas</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (P)</span></a>
+  <a href="./predictivefactors0.html" class="sidebar-item-text sidebar-link">Concepts (P)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collinear predictors</span></a>
+  <a href="./predictivefactors1.html" class="sidebar-item-text sidebar-link">Collinear predictors</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Continuous outcome</span></a>
+  <a href="./predictivefactors2.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Binary outcome</span></a>
+  <a href="./predictivefactors3.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Overfitting and performance</span></a>
+  <a href="./predictivefactors4.html" class="sidebar-item-text sidebar-link">Overfitting and performance</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data Splitting</span></a>
+  <a href="./predictivefactors5.html" class="sidebar-item-text sidebar-link">Data Splitting</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Cross-validation</span></a>
+  <a href="./predictivefactors6.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bootstrap</span></a>
+  <a href="./predictivefactors7.html" class="sidebar-item-text sidebar-link">Bootstrap</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (P)</span></a>
+  <a href="./predictivefactorsF.html" class="sidebar-item-text sidebar-link">R functions (P)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (P)</span></a>
+  <a href="./predictivefactorsQ.html" class="sidebar-item-text sidebar-link">Quiz (P)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Survey data analysis</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <a href="./surveydata.html" class="sidebar-item-text sidebar-link">Survey data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (D)</span></a>
+  <a href="./surveydata0.html" class="sidebar-item-text sidebar-link">Concepts (D)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Revisiting PICOT</span></a>
+  <a href="./surveydata1.html" class="sidebar-item-text sidebar-link">CCHS: Revisiting PICOT</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Assessing data</span></a>
+  <a href="./surveydata2.html" class="sidebar-item-text sidebar-link">CCHS: Assessing data</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Bivariate analysis</span></a>
+  <a href="./surveydata3.html" class="sidebar-item-text sidebar-link">CCHS: Bivariate analysis</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Regression</span></a>
+  <a href="./surveydata4.html" class="sidebar-item-text sidebar-link">CCHS: Regression</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CCHS: Performance</span></a>
+  <a href="./surveydata5.html" class="sidebar-item-text sidebar-link">CCHS: Performance</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHANES: Blood Pressure</span></a>
+  <a href="./surveydata6.html" class="sidebar-item-text sidebar-link">NHANES: Blood Pressure</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHANES: Cholesterol</span></a>
+  <a href="./surveydata7.html" class="sidebar-item-text sidebar-link">NHANES: Cholesterol</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHANES: Subsetting</span></a>
+  <a href="./surveydata8.html" class="sidebar-item-text sidebar-link">NHANES: Subsetting</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (D)</span></a>
+  <a href="./surveydataF.html" class="sidebar-item-text sidebar-link">R functions (D)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (D)</span></a>
+  <a href="./surveydataQ.html" class="sidebar-item-text sidebar-link">Quiz (D)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">App (D)</span></a>
+  <a href="./surveydataS.html" class="sidebar-item-text sidebar-link">App (D)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (D)</span></a>
+  <a href="./surveydataE.html" class="sidebar-item-text sidebar-link">Exercise (D)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Missing data analysis</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
+            <a href="./missingdata.html" class="sidebar-item-text sidebar-link">Missing data analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (M)</span></a>
+  <a href="./missingdata0.html" class="sidebar-item-text sidebar-link">Concepts (M)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Imputation</span></a>
+  <a href="./missingdata1.html" class="sidebar-item-text sidebar-link">Imputation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Imputation in NHANES</span></a>
+  <a href="./missingdata2.html" class="sidebar-item-text sidebar-link">Imputation in NHANES</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Missing in outcome</span></a>
+  <a href="./missingdata3.html" class="sidebar-item-text sidebar-link">Missing in outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Performance with NA</span></a>
+  <a href="./missingdata4.html" class="sidebar-item-text sidebar-link">Performance with NA</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Subpopulations</span></a>
+  <a href="./missingdata5.html" class="sidebar-item-text sidebar-link">Subpopulations</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">MCAR tests</span></a>
+  <a href="./missingdata6.html" class="sidebar-item-text sidebar-link">MCAR tests</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Effect modification</span></a>
+  <a href="./missingdata7.html" class="sidebar-item-text sidebar-link">Effect modification</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (M)</span></a>
+  <a href="./missingdataF.html" class="sidebar-item-text sidebar-link">R functions (M)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (M)</span></a>
+  <a href="./missingdataQ.html" class="sidebar-item-text sidebar-link">Quiz (M)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">App (M)</span></a>
+  <a href="./missingdataS.html" class="sidebar-item-text sidebar-link">App (M)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (M)</span></a>
+  <a href="./missingdataE.html" class="sidebar-item-text sidebar-link">Exercise (M)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Propensity score</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true" aria-label="Toggle section">
+            <a href="./propensityscore.html" class="sidebar-item-text sidebar-link">Propensity score</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (S)</span></a>
+  <a href="./propensityscore0.html" class="sidebar-item-text sidebar-link">Concepts (S)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exact Matching (CCHS)</span></a>
+  <a href="./propensityscore1.html" class="sidebar-item-text sidebar-link">Exact Matching (CCHS)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM in OA-CVD (CCHS)</span></a>
+  <a href="./propensityscore2.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (CCHS)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM in OA-CVD (US)</span></a>
+  <a href="./propensityscore3.html" class="sidebar-item-text sidebar-link">PSM in OA-CVD (US)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM in BMI-diabetes</span></a>
+  <a href="./propensityscore4.html" class="sidebar-item-text sidebar-link">PSM in BMI-diabetes</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM with MI</span></a>
+  <a href="./propensityscore5.html" class="sidebar-item-text sidebar-link">PSM with MI</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PS Weighting (US)</span></a>
+  <a href="./propensityscore6.html" class="sidebar-item-text sidebar-link">PS Weighting (US)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSM with MI in subset</span></a>
+  <a href="./propensityscore7.html" class="sidebar-item-text sidebar-link">PSM with MI in subset</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSW with MI in subset</span></a>
+  <a href="./propensityscore8.html" class="sidebar-item-text sidebar-link">PSW with MI in subset</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PSW with multiple tx</span></a>
+  <a href="./propensityscore9.html" class="sidebar-item-text sidebar-link">PSW with multiple tx</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (S)</span></a>
+  <a href="./propensityscoreF.html" class="sidebar-item-text sidebar-link">R functions (S)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (S)</span></a>
+  <a href="./propensityscoreQ.html" class="sidebar-item-text sidebar-link">Quiz (S)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">App (S)</span></a>
+  <a href="./propensityscoreS.html" class="sidebar-item-text sidebar-link">App (S)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (S)</span></a>
+  <a href="./propensityscoreE.html" class="sidebar-item-text sidebar-link">Exercise (S)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Machine learning (ML)</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true" aria-label="Toggle section">
+            <a href="./machinelearning.html" class="sidebar-item-text sidebar-link">Machine learning (ML)</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (L)</span></a>
+  <a href="./machinelearning0.html" class="sidebar-item-text sidebar-link">Concepts (L)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Continuous outcome</span></a>
+  <a href="./machinelearning1.html" class="sidebar-item-text sidebar-link">Continuous outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data spliting</span></a>
+  <a href="./machinelearning2.html" class="sidebar-item-text sidebar-link">Data spliting</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Cross-validation</span></a>
+  <a href="./machinelearning3.html" class="sidebar-item-text sidebar-link">Cross-validation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Binary outcome</span></a>
+  <a href="./machinelearning4.html" class="sidebar-item-text sidebar-link">Binary outcome</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Supervised learning</span></a>
+  <a href="./machinelearning5.html" class="sidebar-item-text sidebar-link">Supervised learning</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Unsupervised learning</span></a>
+  <a href="./machinelearning6.html" class="sidebar-item-text sidebar-link">Unsupervised learning</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NHIS Example</span></a>
+  <a href="./machinelearning6a.html" class="sidebar-item-text sidebar-link">NHIS Example</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Replicate Results</span></a>
+  <a href="./machinelearning6b.html" class="sidebar-item-text sidebar-link">Replicate Results</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">Quiz (L)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">R functions (L)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exercise (L)</span></a>
+  <a href="./machinelearningE.html" class="sidebar-item-text sidebar-link">Exercise (L)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ML in causal inference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true" aria-label="Toggle section">
+            <a href="./machinelearningCausal.html" class="sidebar-item-text sidebar-link">ML in causal inference</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (C)</span></a>
+  <a href="./machinelearningCausal0.html" class="sidebar-item-text sidebar-link">Concepts (C)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Motivation</span></a>
+  <a href="./machinelearningCausal1.html" class="sidebar-item-text sidebar-link">Motivation</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SuperLearner</span></a>
+  <a href="./machinelearningCausal2.html" class="sidebar-item-text sidebar-link">SuperLearner</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Binary Outcomes</span></a>
+  <a href="./machinelearningCausal3.html" class="sidebar-item-text sidebar-link">Binary Outcomes</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Continuous Outcomes</span></a>
+  <a href="./machinelearningCausal4.html" class="sidebar-item-text sidebar-link">Continuous Outcomes</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Comparing results</span></a>
+  <a href="./machinelearningCausal5.html" class="sidebar-item-text sidebar-link">Comparing results</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (C)</span></a>
+  <a href="./machinelearningCausalQ.html" class="sidebar-item-text sidebar-link">Quiz (C)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (C)</span></a>
+  <a href="./machinelearningCausalF.html" class="sidebar-item-text sidebar-link">R functions (C)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Complex outcomes</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true" aria-label="Toggle section">
+            <a href="./nonbinary.html" class="sidebar-item-text sidebar-link">Complex outcomes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (N)</span></a>
+  <a href="./nonbinary0.html" class="sidebar-item-text sidebar-link">Concepts (N)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Polytomous and ordinal</span></a>
+  <a href="./nonbinary1.html" class="sidebar-item-text sidebar-link">Polytomous and ordinal</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Survival analysis</span></a>
+  <a href="./nonbinary2.html" class="sidebar-item-text sidebar-link">Survival analysis</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Survival analysis: NHANES</span></a>
+  <a href="./nonbinary2a.html" class="sidebar-item-text sidebar-link">Survival analysis: NHANES</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Poisson</span></a>
+  <a href="./nonbinary3.html" class="sidebar-item-text sidebar-link">Poisson</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (N)</span></a>
+  <a href="./nonbinaryF.html" class="sidebar-item-text sidebar-link">R functions (N)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (N)</span></a>
+  <a href="./nonbinaryQ.html" class="sidebar-item-text sidebar-link">Quiz (N)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Longitudinal data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true" aria-label="Toggle section">
+            <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">Longitudinal data</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (T)</span></a>
+  <a href="./longitudinal0.html" class="sidebar-item-text sidebar-link">Concepts (T)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mixed effects models</span></a>
+  <a href="./longitudinal1.html" class="sidebar-item-text sidebar-link">Mixed effects models</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">GEE</span></a>
+  <a href="./longitudinal2.html" class="sidebar-item-text sidebar-link">GEE</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (T)</span></a>
+  <a href="./longitudinalF.html" class="sidebar-item-text sidebar-link">R functions (T)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (T)</span></a>
+  <a href="./longitudinalQ.html" class="sidebar-item-text sidebar-link">Quiz (T)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./mediation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mediation analysis</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true" aria-label="Toggle section">
+            <a href="./mediation.html" class="sidebar-item-text sidebar-link">Mediation analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Concepts (I)</span></a>
+  <a href="./mediation0.html" class="sidebar-item-text sidebar-link">Concepts (I)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Baron and Kenny</span></a>
+  <a href="./mediation1.html" class="sidebar-item-text sidebar-link">Baron and Kenny</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Justification</span></a>
+  <a href="./mediation2.html" class="sidebar-item-text sidebar-link">Justification</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mediation Example</span></a>
+  <a href="./mediation3.html" class="sidebar-item-text sidebar-link">Mediation Example</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (I)</span></a>
+  <a href="./mediationF.html" class="sidebar-item-text sidebar-link">R functions (I)</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (I)</span></a>
+  <a href="./mediationQ.html" class="sidebar-item-text sidebar-link">Quiz (I)</a>
   </div>
 </li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reporting.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing tools</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" aria-expanded="true" aria-label="Toggle section">
+            <a href="./reporting.html" class="sidebar-item-text sidebar-link">Writing tools</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Collaborative Writing</span></a>
+  <a href="./reporting1.html" class="sidebar-item-text sidebar-link">Collaborative Writing</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Formatting Tools</span></a>
+  <a href="./reporting2.html" class="sidebar-item-text sidebar-link">Formatting Tools</a>
   </div>
 </li>
       </ul>
 </li>
     </ul>
 </div>
-</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</nav><!-- margin-sidebar --><div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
@@ -1169,8 +1028,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./wrangling.html">Data wrangling</a></li><li class="breadcrumb-item"><a href="./wrangling1a.html">R basics</a></li></ol></nav><div class="quarto-title">
-<h1 class="title">R basics</h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title d-none d-lg-block">R basics</h1>
 </div>
 
 
@@ -1182,7 +1041,6 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
     
   </div>
   
-
 
 </header><!---
 ::: callout-important
@@ -1197,12 +1055,12 @@ On every page, at the top, you'll find a `</>` button. Click it to toggle the vi
 <li><p>Download and Install RStudio: You can get it from <a href="https://posit.co/download/rstudio-desktop/">this link</a>. &gt; <em>Note: RStudio serves as an Integrated Development Environment (IDE) offering a user-friendly interface. It facilitates operations such as executing R commands, preserving scripts, inspecting results, managing data, and more.</em></p></li>
 <li><p>Begin with RStudio: Once you open RStudio, delve into using R. For starters, employ the R syntax for script preservation, allowing future code adjustments and additions.</p></li>
 </ul></section><section id="basic-syntax" class="level3"><h3 class="anchored" data-anchor-id="basic-syntax">Basic syntax</h3>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
+<div class="callout-caption-container flex-fill">
 Tip
 </div>
 </div>
@@ -1214,14 +1072,14 @@ Tip
 <li>Using R as a Calculator</li>
 </ol>
 <p>Similar to how you’d use a traditional calculator for basic arithmetic operations, R can perform these functions with ease. For instance:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic1_6483b4465918119c4d444b95ccefa3d5">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Simple arithmetic</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; [1] 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This is a basic addition, resulting in 2.</p>
 <p>A more intricate calculation:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic2_7f49befc7e58856385222a04d0ff8565">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Complex calculation involving </span></span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="co"># multiplication, subtraction, division, powers, and square root</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="dv">20</span> <span class="sc">*</span> <span class="dv">5</span> <span class="sc">-</span> <span class="dv">10</span> <span class="sc">*</span> (<span class="dv">3</span><span class="sc">/</span><span class="dv">4</span>) <span class="sc">*</span> (<span class="dv">2</span><span class="sc">^</span><span class="dv">3</span>) <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">25</span>)</span>
@@ -1232,14 +1090,14 @@ Tip
 <li>Variable Assignment in R</li>
 </ol>
 <p>R allows you to store values in variables, acting like labeled containers that can be recalled and manipulated later. For example,</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic3_8ad1d527a3aa25e7f9aa3cd62e31a2e2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Assigning a value of 2 to variable x1</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>x1 <span class="ot">&lt;-</span> <span class="dv">2</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="fu">print</span>(x1)</span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; [1] 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Similarly:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic4_d6e5a9c85e253772b9de08bdb69de111">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>x2 <span class="ot">&lt;-</span> <span class="dv">9</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>x2</span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; [1] 9</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1248,7 +1106,7 @@ Tip
 <li>Creating New Variables Using Existing Ones</li>
 </ol>
 <p>You can combine and manipulate previously assigned variables to create new ones.</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic5_efb9c095843759d88fd4a0fc86804bae">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Using variable x1 </span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co"># to compute its square and assign to y1</span></span>
 <span id="cb5-3"><a href="#cb5-3"></a>y1 <span class="ot">&lt;-</span> x1<span class="sc">^</span><span class="dv">2</span></span>
@@ -1256,7 +1114,7 @@ Tip
 <span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; [1] 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can also use multiple variables in a single expression:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic6_50940bf0810cb5b573193555adc41a9c">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>y2 <span class="ot">&lt;-</span> <span class="dv">310</span> <span class="sc">-</span> x1 <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>x2 <span class="sc">-</span> <span class="dv">5</span><span class="sc">*</span>y1<span class="sc">^</span><span class="dv">3</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>y2</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; [1] 6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1265,11 +1123,11 @@ Tip
 <li>Creating Functions</li>
 </ol>
 <p>Functions act as reusable blocks of code. Once defined, they can be called multiple times with different arguments. Here’s how to define a function that squares a number:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic7_d4a072aacacb74a56b8460aeda6cdbf1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>z <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {x<span class="sc">^</span><span class="dv">2</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Call the function</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic7xx_1e94fd5c1d88061234277a442a812df0">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">z</span>(<span class="at">x =</span> <span class="fl">0.5</span>)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt; [1] 0.25</span></span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="fu">z</span>(<span class="at">x =</span> <span class="dv">2</span>)</span>
@@ -1280,7 +1138,7 @@ Tip
 <li>Utilizing Built-In Functions</li>
 </ol>
 <p>For instance, using the exponential function:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic8_d81df5a691320d6ae54f378c6475515b">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Calling functions</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a><span class="fu">exp</span>(x1)</span>
 <span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt; [1] 7.389056</span></span>
@@ -1288,27 +1146,27 @@ Tip
 <span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt; [1] 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>rnorm</code> function can generate random samples from a normal distribution: below we are generating 10 random sampling from the normal distribution with mean 0 and standard deviation 1:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic9_4f15b13f9f6562fdd50da4a694bc726f">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt;  [1]  0.23406545 -1.79269849 -0.26929364 -1.49408921 -2.14169389  0.07622333</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;  [7] -0.78488318  0.64724185 -0.84362636 -0.78757025</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt;  [1]  0.8577059  0.3369662  0.2092308 -1.1240788 -0.3784354 -0.1874502</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;  [7] -0.2279474  1.6954915  0.9165137 -0.3260466</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>As random number generation relies on algorithms, results will differ with each execution.</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/basic10_2cd22a4d1a67ee68a406b8bc54f52739">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Random sampling (again)</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a><span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
-<span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt;  [1]  0.75933341 -1.44848277 -0.19160369 -0.38687395  0.82705285 -0.74398417</span></span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt;  [7]  0.52944491 -0.05776242 -1.00536427  0.78652102</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt;  [1]  0.445643482  0.065075838  1.585730120 -0.679250883  1.016176752</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt;  [6]  0.734134441  0.588519388  0.002947632 -1.283441009  0.063943206</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>However, by setting a <code>seed</code>, we can reproduce identical random results:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/seed_0df55e2234d6194227980a68c1fd2518">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Random sampling (again, but with a seed)</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
 <span id="cb12-3"><a href="#cb12-3"></a><span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
 <span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt;  [1] -0.59103110  0.02659437 -1.51655310 -1.36265335  1.17848916 -0.93415132</span></span>
 <span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt;  [7]  1.32360565  0.62491779 -0.04572296 -1.00412058</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/seed1_ed5883799b70ba3cd9e8399dc8d23e0c">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># random sampling (reproducing the same numbers)</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
@@ -1319,12 +1177,12 @@ Tip
 <ol start="6" type="1">
 <li>Seeking Help in R</li>
 </ol>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
+<div class="callout-caption-container flex-fill">
 Tip
 </div>
 </div>
@@ -1332,29 +1190,26 @@ Tip
 <p>R’s help function, invoked with <code>?function_name</code>, provides detailed documentation on functions, assisting users with unclear or forgotten arguments:</p>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/curve1_e518aa90aa8267ef5651ac2ac49b405d">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Searching for help if you know </span></span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="co"># the exact name of the function with a question mark</span></span>
 <span id="cb14-3"><a href="#cb14-3"></a>?curve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Below is an example of using the pre-exiting function for plotting a curve ranging from -10 to 10.</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/curve_53d946c868f19ffc4e76eefda5c315ae">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Plotting a function</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a><span class="fu">curve</span>(z, <span class="at">from =</span> <span class="sc">-</span><span class="dv">10</span>, <span class="at">to =</span> <span class="dv">10</span>, <span class="at">xlab =</span> <span class="st">"x"</span>, <span class="at">ylab =</span> <span class="st">"Squared x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure"><p><img src="wrangling1a_files/figure-html/curve-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="wrangling1a_files/figure-html/curve-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>If some of the arguments are difficult to remember or what else could be done with that function, we could use the <code>help</code> function. For example, we can simply type <code><a href="https://rdrr.io/r/graphics/curve.html">help(curve)</a></code> or <code><a href="https://rdrr.io/r/graphics/curve.html">?curve</a></code> to get help on the <code>curve</code> function:</p>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
+<div class="callout-caption-container flex-fill">
 Tip
 </div>
 </div>
@@ -1362,7 +1217,7 @@ Tip
 <p>If you’re uncertain about a function’s precise name, two question marks can assist in the search:</p>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/boxplot_207933c6408ce745cfb5d866191fbe13">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Searching for help if don't know </span></span>
 <span id="cb16-2"><a href="#cb16-2"></a><span class="co"># the exact name of the function</span></span>
 <span id="cb16-3"><a href="#cb16-3"></a>??boxplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1371,7 +1226,7 @@ Tip
 <li>Creating Vectors</li>
 </ol>
 <p>Vectors are sequences of data elements of the same basic type. Here are some methods to create them:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/vector_e2188f7ac1d1a8d11bd90b47ffed2448">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Creating vectors in different ways</span></span>
 <span id="cb17-2"><a href="#cb17-2"></a>x3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)</span>
 <span id="cb17-3"><a href="#cb17-3"></a><span class="fu">print</span>(x3)</span>
@@ -1393,37 +1248,31 @@ Tip
 <li>Plotting in R</li>
 </ol>
 <p>R provides numerous plotting capabilities. For instance, the plot function can create scatter plots and line graphs:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/plot2_e34b9b22aba105a9ca8d4c7903fb265d">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Scatter plot</span></span>
 <span id="cb18-2"><a href="#cb18-2"></a><span class="fu">plot</span>(x5, <span class="at">type =</span> <span class="st">"p"</span>, <span class="at">main =</span> <span class="st">"Scatter plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure"><p><img src="wrangling1a_files/figure-html/plot2-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<p><img src="wrangling1a_files/figure-html/plot2-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</div>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/plot3_bc7211abcaed88f32b9627ae601e0555">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Line graph</span></span>
 <span id="cb19-2"><a href="#cb19-2"></a><span class="fu">plot</span>(<span class="at">x =</span> x6, <span class="at">y =</span> x6<span class="sc">^</span><span class="dv">2</span>, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Line graph"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure"><p><img src="wrangling1a_files/figure-html/plot3-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="wrangling1a_files/figure-html/plot3-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <ol start="9" type="1">
 <li>Character Vectors Apart from numeric values, R also allows for character vectors. For example, we can create a <code>sex</code> variable coded as females, males and other.</li>
 </ol>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/character_fd158396ba65199f4662dfcb2ccc3f57">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Character vector</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a>sex <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"females"</span>, <span class="st">"males"</span>, <span class="st">"other"</span>)</span>
 <span id="cb20-3"><a href="#cb20-3"></a>sex</span>
 <span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt; [1] "females" "males"   "other"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To determine a variable’s type, use the mode function:</p>
-<div class="cell">
+<div class="cell" data-hash="wrangling1a_cache/html/mode_b00f8b00c9e26ecd790a49be629a3f52">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Check data type</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a><span class="fu">mode</span>(sex)</span>
 <span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; [1] "character"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1488,12 +1337,12 @@ Tip
 </div>
 <p>When you are working on a project, it’s a good practice to list and install required packages at the beginning of your R script.</p>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
+<div class="callout-caption-container flex-fill">
 Tip
 </div>
 </div>
@@ -1534,23 +1383,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
+    target: function(trigger) {
+      return trigger.previousElementSibling;
     }
   });
   clipboard.on('success', function(e) {
@@ -1637,27 +1472,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1667,17 +1485,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1689,245 +1498,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
+      return note.innerHTML;
     });
   }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
-          }
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
-        }
-        return container.innerHTML
-      } else {
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
-          }
-        } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
-            if (note !== null) {
-              const html = processXRef(id, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
-        }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1967,12 +1540,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="./wrangling.html" class="pagination-link" aria-label="Data wrangling">
+      <a href="./wrangling.html" class="pagination-link">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Data wrangling</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./wrangling1b.html" class="pagination-link" aria-label="Data types">
+      <a href="./wrangling1b.html" class="pagination-link">
         <span class="nav-page-text">Data types</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
