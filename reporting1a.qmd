@@ -1,0 +1,73 @@
+## Configure Git in RStudio {.unnumbered}
+
+After creating a GitHub account, you must configure Git on your local machine to enable authentication. This process, known as "configuring Git," ensures that Git operations (e.g., initialize, commit, push, pull) can securely interact with GitHub’s API. Enabling two-factor authentication (2FA) is strongly recommended for added security.
+
+This section walks you through setting up Git in RStudio using the [**usethis**](https://usethis.r-lib.org/articles/usethis-setup.html) package, a user-friendly interface for configuring Git. Every `usethis` function corresponds to an underlying Git command. For more detail, refer to the [usethis documentation](https://usethis.r-lib.org/articles/usethis-setup.html) and UBC’s [Git and GitHub workshop](https://ubc-library-rc.github.io/intro-git/).
+
+All example files are available [here](https://github.com/ehsanx/EpiMethods/tree/main/Data/reporting). If you’re new to R Markdown, review the [introductory tutorial](wrangling6.html).
+
+### Requirements and Necessary Software
+
+-   [GitHub Account](https://github.com/): Click "Sign up" and follow the instructions.
+-   R and RStudio ([see previous chapter](wrangling1a.html))
+-   [GitHub Desktop](https://desktop.github.com/): Install and sign in.
+
+### Configure Git in RStudio
+
+1.  Open **Tools** \> **Global Options** in RStudio.
+
+    -   Navigate to the “Git/SVN” section on the left panel.
+    -   Confirm that the “Git executable” field correctly identifies the Git installation path.
+
+    ![](Images/reporting/git_executable_location.png)
+
+2.  Install required packages:
+
+    ``` r
+    install.packages("devtools")
+    install.packages("usethis")
+    ```
+
+3.  Set your Git identity:
+
+    ``` r
+    usethis::use_git_config(
+      user.name = "Jane",           # Replace with your full name
+      user.email = "jane@example.com"  # Use your GitHub email
+    )
+    ```
+
+4.  Verify your configuration:
+
+    ``` r
+    usethis::git_sitrep()
+    ```
+
+> Your Git name doesn’t need to match your GitHub username. Use your full name for clarity. If you use multiple computers, consider including the device name for easier identification.
+
+5.  Authenticate GitHub with a Personal Access Token (PAT). PATs are GitHub's secure alternative to passwords.
+
+    -   Generate a token:
+
+        ``` r
+        usethis::create_github_token()
+        ```
+
+        This opens a GitHub page in your browser with recommended scopes pre-selected. Describe the token's purpose clearly (e.g., “SPPH VM” or “Personal Laptop”).
+
+    -   Click **Generate token**, copy the token, and keep the tab open.
+
+    -   Store the token:
+
+        ``` r
+        gitcreds::gitcreds_set()
+        ```
+
+        If a previous PAT exists, this command allows you to inspect and update it.
+
+### Useful Resources
+
+-   [usethis setup guide](https://usethis.r-lib.org/articles/usethis-setup.html)
+-   [UBC Git & GitHub workshop](https://ubc-library-rc.github.io/intro-git/)
+-   [Managing PATs securely](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+-   [Git command-line setup](https://librarycarpentry.org/lc-git/02-getting-started.html)
