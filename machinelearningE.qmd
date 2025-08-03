@@ -1,4 +1,4 @@
-## Exercise (L) {.unnumbered}
+## Exercise 1 (L) {.unnumbered}
 
 ```{r chunkSetup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -21,25 +21,26 @@ You can download all of the related files in a zip file **machinelearningEx.zip*
 
 ## Problem Statement
 
-We will revisit the article by [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639). We will use the same dataset as in the previous lab exercise on [survey data analysis](https://ehsanx.github.io/EpiMethods/surveydataE.html), with some additional predictors in predicting obesity. 
+We will revisit the article by [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639). We will use the same dataset as in the previous lab exercise on [survey data analysis](https://ehsanx.github.io/EpiMethods/surveydataE.html), with some additional predictors in predicting obesity.
 
 Our primary aim is to predict **grade 3 obesity** with the following predictors:
 
-  - Age: Age in years at screening
-  - Gender
-  - Race: Race/ethnicity
-  - Education: Education level
-  - Smoking: Smoking status
-  - Physical activity: Level of vigorous work activity
-  - Sleep: Hours of sleep
-  - High blood pressure: Ever doctor told a high blood pressure
-  - General health: General health condition
+-   Age: Age in years at screening
+-   Gender
+-   Race: Race/ethnicity
+-   Education: Education level
+-   Smoking: Smoking status
+-   Physical activity: Level of vigorous work activity
+-   Sleep: Hours of sleep
+-   High blood pressure: Ever doctor told a high blood pressure
+-   General health: General health condition
 
 ## Question 1: Creating data
 
 ### 1(a) Downloading the datasets
+
 You can see how datasets are downloaded and merged:
-  
+
 ```{r, eval=FALSE}
 library(nhanesA)
 library(SASxport)
@@ -109,6 +110,7 @@ dim(dat.full) # N = 10,175
 ```
 
 ### 1(b) Recoding
+
 Let us recode the outcome and predictors to make them suitable for analysis:
 
 ```{r, eval=FALSE}
@@ -205,6 +207,7 @@ table(dat.full$general.health, useNA = "always")
 ```
 
 ### 1(c) Keep relevant variables
+
 Let's keep only the relevant variables for this exercise:
 
 ```{r, eval=FALSE}
@@ -230,7 +233,8 @@ dat.full2 <- dat.full[,vars]
 ```
 
 ### 1(d) Weight normalization
-Large weights can cause issues when evaluating model performance. Let's normalize the survey weights to address this problem: 
+
+Large weights can cause issues when evaluating model performance. Let's normalize the survey weights to address this problem:
 
 ```{r, eval=FALSE}
 dat.full2$wgt <- dat.full2$survey.weight * nrow(dat.full2)/sum(dat.full2$survey.weight)
@@ -239,10 +243,7 @@ summary(dat.full2$wgt)
 
 ### 1(e) Analytic dataset
 
-The authors restricted their study to 
-  - adults aged 20 years and more, 
-  - non-missing body mass index, and 
-  - non-pregnant
+The authors restricted their study to - adults aged 20 years and more, - non-missing body mass index, and - non-pregnant
 
 ```{r, eval=FALSE}
 # Aged 20 years or more
@@ -262,6 +263,7 @@ dat.analytic$RIDAGEYR <- dat.analytic$BMXBMI <- dat.analytic$RIDEXPRG <- NULL
 ```
 
 ### 1(f) Complete case data
+
 Below is the code for creating the complete case dataset (no missing for the outcome or predictors):
 
 ```{r, eval=FALSE}
@@ -270,6 +272,7 @@ dat.complete <- dat.analytic[complete.cases(dat.analytic),] # N = 5,433
 ```
 
 ### 1(g) Save daatsets
+
 ```{r, eval=FALSE}
 save(dat.full, dat.full2, dat.analytic, dat.complete, file = "Data/machinelearning/Flegal2016_v2.RData")
 ```
@@ -277,7 +280,9 @@ save(dat.full, dat.full2, dat.analytic, dat.complete, file = "Data/machinelearni
 ## Question 2: Importing data and creating Table 1
 
 ### 2(a) Importing dataset
+
 Let's load the dataset:
+
 ```{r}
 load("Data/machinelearning/Flegal2016_v2.RData")
 ls()
@@ -285,17 +290,18 @@ ls()
 
 Here,
 
-  - dat.full: the full dataset with all variables
-  - dat.full2: the full dataset with only relevant variables for this exercise
-  - dat.analytic: the analytic dataset with only adults aged 20 years and more, non-missing BMI, and non-pregnant
-  - dat.complete: the complete case dataset without missing values in the outcome and predictors
+-   dat.full: the full dataset with all variables
+-   dat.full2: the full dataset with only relevant variables for this exercise
+-   dat.analytic: the analytic dataset with only adults aged 20 years and more, non-missing BMI, and non-pregnant
+-   dat.complete: the complete case dataset without missing values in the outcome and predictors
 
 ```{r}
 names(dat.full2)
 ```
 
-### 2(b) Creating Table 1 
-Let's create Table 1 for the complete case dataset with unweighted frequencies: 
+### 2(b) Creating Table 1
+
+Let's create Table 1 for the complete case dataset with unweighted frequencies:
 
 ```{r}
 library(tableone)
@@ -307,14 +313,16 @@ tab1 <- CreateTableOne(vars = predictors, strata = "obesity",
 print(tab1, format="f") # Showing only frequencies 
 ```
 
-## Question 3: Prediction using split sample approach 
+## Question 3: Prediction using split sample approach
+
 In this exercise, we will use the split-sample approach to predict obesity. We will create our training and test data using a 60-40 split for the training and test data. We will use the following two methods to predict obesity:
 
-  - Design-adjusted logistic with all survey features (psu, strata, and survey weights)
-  - LASSO with survey weights
+-   Design-adjusted logistic with all survey features (psu, strata, and survey weights)
+-   LASSO with survey weights
 
 ### 3(a) Split the data into training and test
-Let us create our training and test data using the split-sample approach: 
+
+Let us create our training and test data using the split-sample approach:
 
 ```{r}
 set.seed(900)
@@ -332,23 +340,23 @@ dim(dat.test)
 
 ### 3(b) Prediction with design-adjusted logistic
 
-We will use the design-adjusted logistic regression to predict obesity with the following predictors: 
+We will use the design-adjusted logistic regression to predict obesity with the following predictors:
 
-  - age.cat, gender, race, high.blood.pressure, general.health
+-   age.cat, gender, race, high.blood.pressure, general.health
 
 Instructions:
 
-  - 1: Create the survey design on the full data and subset the design for those individuals in the training data.
-  - 2: Use the **training data design** created in step 1 to fit the model 
-  - 3: Use the test data to predict the probability of obesity.
-  - 4: Calculate AUC on the test data.
-  - 5: Calculate calibration slope with 95\% confidence interval on the test data.
-  
+-   1: Create the survey design on the full data and subset the design for those individuals in the training data.
+-   2: Use the **training data design** created in step 1 to fit the model
+-   3: Use the test data to predict the probability of obesity.
+-   4: Calculate AUC on the test data.
+-   5: Calculate calibration slope with 95% confidence interval on the test data.
+
 Hints:
- 
-  - `WeightedAUC` and `WeightedROC` are helpful functions in calculating AUC.
-  - The `Logit` function from the `DescTools` package is helpful in calculating the logit of predicted probabilities for calculating calibration slope.
-  - Use the **normalized weight** variable to calculate the AUC and calibration slope.
+
+-   `WeightedAUC` and `WeightedROC` are helpful functions in calculating AUC.
+-   The `Logit` function from the `DescTools` package is helpful in calculating the logit of predicted probabilities for calculating calibration slope.
+-   Use the **normalized weight** variable to calculate the AUC and calibration slope.
 
 #### Simpler Model
 
@@ -416,12 +424,11 @@ brier_score <- mean(brierscore(dat.test$obesity ~ dat.test$pred.glm,
 brier_score
 ```
 
-
-### 3(c) Prediction with design-adjusted logistic with added covariates [90% grade]
+### 3(c) Prediction with design-adjusted logistic with added covariates \[90% grade\]
 
 Add the following variables in the existing model, and assess the model performance in terms of the same 3 performance measures:
 
-  - education, smoking, physical.activity, sleep
+-   education, smoking, physical.activity, sleep
 
 #### Model with more variables
 
@@ -453,52 +460,50 @@ Add the following variables in the existing model, and assess the model performa
 # brier_score2 <- ...
 ```
 
-### 3(d) Interpretation [10%]
+### 3(d) Interpretation \[10%\]
+
 Interpret the AUC, calibration slope and Brier Score based on the following criteria, and suggest which model you would choose:
 
-|AUC       |Interpretation                     |
-|--------- |---------------------------------- |
-|0.50      |No better than a random chance     |
-|0.51-0.70 |Poor discrimination ability        |
-|0.71-0.80 |Acceptable discrimination ability  |
-|0.81-0.90 |Excellent discrimination ability   |
-|0.90-1.00 |Outstanding discrimination ability |
+| AUC       | Interpretation                     |
+|-----------|------------------------------------|
+| 0.50      | No better than a random chance     |
+| 0.51-0.70 | Poor discrimination ability        |
+| 0.71-0.80 | Acceptable discrimination ability  |
+| 0.81-0.90 | Excellent discrimination ability   |
+| 0.90-1.00 | Outstanding discrimination ability |
 
+| Calibration slope            | Interpretation   |
+|------------------------------|------------------|
+| 1 and 95% CI includes 1      | Well-calibration |
+| Significantly less than 1    | Overfitting      |
+| Significantly greater than 1 | Underfitting     |
 
-|Calibration slope            |Interpretation   |
-|---------------------------- |---------------- |
-|1 and 95\% CI includes 1     |Well-calibration |
-|Significantly less than 1    |Overfitting      |
-|Significantly greater than 1 |Underfitting     |
+| Brier Score | Interpretation                         |
+|-------------|----------------------------------------|
+| 0           | Perfect prediction                     |
+| 0.01-0.1    | Very good model performance            |
+| 0.11-0.2    | Good model performance                 |
+| 0.21-0.3    | Fair model performance                 |
+| 0.31-0.5    | Poor model performance                 |
+| \> 0.5      | Very poor model performance (no skill) |
 
-| Brier Score  | Interpretation                                |
-|--------------|-----------------------------------------------|
-| 0            | Perfect prediction                            |
-| 0.01-0.1     | Very good model performance                   |
-| 0.11-0.2     | Good model performance                        |
-| 0.21-0.3     | Fair model performance                        |
-| 0.31-0.5     | Poor model performance                        |
-| > 0.5        | Very poor model performance (no skill)        |
-
-- AUC: Higher is better (closer to 1).
-- Calibration Slope: Closer to 1 is better.
-- Brier Score: Lower is better (closer to 0).
+-   AUC: Higher is better (closer to 1).
+-   Calibration Slope: Closer to 1 is better.
+-   Brier Score: Lower is better (closer to 0).
 
 **Response**:
 
+### 3(e) Prediction with LASSO \[Optional\]
 
-
-
-### 3(e) Prediction with LASSO [Optional]
 Now we will use the LASSO method to predict obesity. We will incorporate sampling weights in the model to account for survey data (no psu or strata). Note that we are not interested in the statistical significance of the beta coefficients. Hence, not utilizing psu and strata should not be an issue in this prediction problem.
 
 Instructions:
 
-  - 1: Use the training data with normalized weight to fit the model.
-  - 2: Find the optimum lambda using 5-fold cross-validation. Consider the lambda value that gives the minimum prediction error. 
-  - 3: Predict the probability of obesity on the test set
-  - 3: Calculate AUC on the test data.
-  - 4: Calculate calibration slope with 95\% confidence interval on the test data.
+-   1: Use the training data with normalized weight to fit the model.
+-   2: Find the optimum lambda using 5-fold cross-validation. Consider the lambda value that gives the minimum prediction error.
+-   3: Predict the probability of obesity on the test set
+-   3: Calculate AUC on the test data.
+-   4: Calculate calibration slope with 95% confidence interval on the test data.
 
 #### Model
 
@@ -535,12 +540,13 @@ slope.lasso <- glm(obesity ~ pred.lasso.logit, data = dat.test,
 publish(slope.lasso)
 ```
 
-#### Interpretation [optional]
+#### Interpretation \[optional\]
+
 Interpret the AUC and calibration slope.
 
+## Question 4: Prediction using croos-validation approach \[optional\]
 
-## Question 4: Prediction using croos-validation approach [optional]
-Use LASSO with 5-fold cross-validation to predict obesity with the same set of predictors (from larger model) used in Question 2. Report the average AUC and average calibration slope with 95\% confidence interval over 5 folds.
+Use LASSO with 5-fold cross-validation to predict obesity with the same set of predictors (from larger model) used in Question 2. Report the average AUC and average calibration slope with 95% confidence interval over 5 folds.
 
 ```{r, eval=T, warning=FALSE, message=FALSE, eval = FALSE}
 library(glmnet)
@@ -595,15 +601,14 @@ cbind(mean(cal.slope.lasso) - 1.96 * mean(cal.slope.se.lasso),
       mean(cal.slope.lasso) + 1.96 * mean(cal.slope.se.lasso))
 ```
 
-
 ## Knit your file
 
 Please knit your file once you finished and submit the knitted PDF or doc file. Please also fill-up the following table:
 
 **Group name**: **Put the group name here**
 
-| Student initial | % contribution  |
-|:------|:-----|
-| Put Student 1 initial here | Put % contribution for Student 1 here |  
+| Student initial            | \% contribution                       |
+|:---------------------------|:--------------------------------------|
+| Put Student 1 initial here | Put % contribution for Student 1 here |
 | Put Student 2 initial here | Put % contribution for Student 2 here |
-| Put Student 3 initial here | Put % contribution for Student 3 here |  
+| Put Student 3 initial here | Put % contribution for Student 3 here |

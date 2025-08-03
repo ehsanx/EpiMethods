@@ -1,0 +1,356 @@
+## Exercise 2 Solution (R) {.unnumbered}
+
+```{r chunkSetup, include=FALSE}
+library(dplyr)
+# Setting the RMD chunk options
+knitr::opts_chunk$set(echo = TRUE,          # Chunk code included in output
+                      warning = FALSE,      # Warnings suppressed from output
+                      message = FALSE)      # Messages suppressed from output
+```
+
+## About the data
+
+The following lab builds upon the `RHC` data used previously.
+
+```{r, eval = FALSE}
+# Create nested directories if they don't exist
+if (!dir.exists("data/confounding")) {
+  dir.create("data/confounding", recursive = TRUE)
+}
+
+# Importing and transforming RHC data
+rhc_data <- 
+  read.csv("https://hbiostat.org/data/repo/rhc.csv", header = TRUE) |>
+
+  # Generating `age_category`
+  transform(age_category = cut(age,
+                          breaks = c(0, 50, 60, 70, 80, Inf),
+                          include.lowest = TRUE, right = FALSE)) |>
+  
+  # Factoring `race`
+  transform(race = factor(race,
+                          levels = c('white', 'black', 'other'),
+                          labels = c('White', 'Black', 'Other'))) |>
+  
+  # Factoring `sex`
+  transform(sex = factor(sex, levels = c('Male', 'Female'))) |>
+  
+  # Factoring `primary_diagnosis`
+  transform(primary_diagnosis = factor(cat1)) |>
+  within(levels(primary_diagnosis) <- list(ARF = 'ARF',
+                                           CHF = 'CHF',
+                                           MOSF = c('MOSF w/Malignancy', 'MOSF w/Sepsis'),
+                                           Other = c('Cirrhosis', 'Colon Cancer', 'Coma', 
+                                                     'COPD', 'Lung Cancer'))) |>
+  
+  # Factoring `cancer_status`
+  transform(cancer_status = factor(ca,
+                                   levels = c('No', 'Yes', 'Metastatic'),
+                                   labels = c('None', 'Localized (Yes)', 'Metastatic'))) |>
+  
+  # Generating `num_comorbidities`
+  {\(.x) transform(.x, num_comorbidities = rowSums(subset(.x, select = 
+                                                            cardiohx:amihx)))}() |>
+  
+  # Factoring `rhc_status`
+  transform(rhc_status = factor(swang1, levels = c('No RHC', 'RHC'))) |>
+  
+  # Converting `death` to logical
+  transform(death_status = ifelse(death == 'Yes', TRUE, FALSE)) |>
+  
+  # Renaming other variables to be more meaningful
+  rename(dnr_status = dnr1,
+         aps_score = aps1,
+         two_month_survival_probability = surv2md1,
+         activities_of_daily_living = adld3p,
+         duke_activity_status_index = das2d3pc,
+         temperature = temp1,
+         heart_rate = hrt1,
+         mean_blood_pressure = meanbp1,
+         respiratory_rate = resp1,
+         white_blood_cell_count = wblc1,
+         pafi_ratio = pafi1,
+         partial_pressure_of_co2 = paco21,
+         blood_ph = ph1,
+         creatinine = crea1,
+         albumin = alb1,
+         glasgow_coma_scale = scoma1) |>
+  
+  # Subsetting relevant columns
+  subset(select = c(age_category, sex, race, primary_diagnosis, 
+                    cancer_status, dnr_status, aps_score, 
+                    two_month_survival_probability, activities_of_daily_living, 
+                    duke_activity_status_index, temperature, heart_rate, 
+                    mean_blood_pressure, respiratory_rate, white_blood_cell_count, 
+                    pafi_ratio, partial_pressure_of_co2, blood_ph, creatinine, 
+                    albumin, glasgow_coma_scale, 
+                    rhc_status, death_status, num_comorbidities)) |>
+  
+  # Subsetting complete case observations
+  na.omit()
+
+# Save the transformed dataset
+saveRDS(rhc_data, "data/confounding/rhc_data.rds")
+```
+
+We begin by importing the `RHC` data, which has already been prepared for this assignment. What is different in this exercise is that we are changing the reference levels of RHC and DNR variables to `No RHC` and `No`, respectively.
+
+```{r}
+# Loading the RHC data
+rhc_data <- readRDS("data/confounding/rhc_data.rds")
+# Convert 'rhc_status' to binary (1 for 'No RHC', 0 for 'RHC')
+rhc_data$no_rhc_status <- ifelse(rhc_data$rhc_status == "No RHC", 1, 0)
+# Convert 'dnr_status' to binary (1 for 'No', 0 for 'Yes')
+rhc_data$no_dnr_status <- ifelse(rhc_data$dnr_status == "No", 1, 0)
+```
+
+The variables included within this data extract are:
+
+```{r}
+str(rhc_data)
+```
+
+For information regarding the variables included in the data, review the variable descriptions [here](https://hbiostat.org/data/repo/rhc) and [here](https://pubmed.ncbi.nlm.nih.gov/8782638/).
+
+The Duke Activity Status Index (DASI) is a self-administered questionnaire that measures a patient's functional capacity or physical activity level. It is commonly used in cardiology to assess a patient's ability to perform daily activities and is predictive of cardiovascular outcomes. The DASI score ranges from 0 to 58.2, with higher scores indicating better physical functioning and higher activity levels. The DASI score in this dataset ranges from 11 to 33. The median value of 19 and the mean value of 20.36 suggest that the typical person in this dataset has a moderate activity level. In this exercise, we will only work with the subset of the data where the DASI score is greater than 20.
+
+```{r}
+# Subset the data
+high_dasi_data <- rhc_data[rhc_data$duke_activity_status_index > 20, ]
+```
+
+## About the assignment
+
+**Effect Modification** refers to how the effect of an exposure on an outcome differs across levels of a third variable (the effect modifier). It focuses on how the association between the exposure and the outcome changes based on this modifying factor. This lab adapts exercises from the following tutorial on ["Interaction in Epidemiology"](https://ehsanx.github.io/interaction/interaction-1.html).
+
+For **Problem Set #1**, we will explore in the `high_dasi_data` dataset whether the association between right-heart-catheterization (`no_rhc_status`; treatment or exposure) on mortality (`death_status`; outcome) is modified by whether a participant signed a do-not-resuscitate order (`no_dnr_status`; potential effect modifier).
+
+Note that we will assume that confounders for RHC and Mortality are the following:
+
+-   Age Category (`age_category`)
+-   APS Score (`aps_score`)
+-   Cancer Status (`cancer_status`)
+-   Number of Comorbidities (`num_comorbidities`)
+-   Glasgow Coma Scale (`glasgow_coma_scale`)
+-   Heart Rate (`heart_rate`)
+-   Mean Blood Pressure (`mean_blood_pressure`)
+-   Primary Diagnosis (`primary_diagnosis`)
+-   Sex (`sex`)
+-   Respiratory Rate (`respiratory_rate`)
+-   White Blood Cell Count (`white_blood_cell_count`)
+
+**Interaction**, particularly in the statistical context, often refers to a departure from multiplicativity when using models like logistic regression. It examines how the combined effect of two exposures differs from what would be expected if their effects were simply multiplied. Interaction is typically tested on a multiplicative scale (e.g., odds ratios) and is interpreted through synergy (super-multiplicative) or antagonism (sub-multiplicative).
+
+For **Problem Set #2**, we will explore in the `high_dasi_data` dataset whether binary DNR status ("Do Not Resuscitate": `no_dnr_status`) interacts with right-heart-catheterization (`no_rhc_status`) in its association with mortality (`death_status`).
+
+Note that we will assume that confounders for DNR Status and Mortality are the following:
+
+-   Age Category (`age_category`)
+-   APS Score (`aps_score`)
+-   Cancer Status (`cancer_status`)
+-   Number of Comorbidities (`num_comorbidities`)
+-   Glasgow Coma Scale (`glasgow_coma_scale`)
+-   Heart Rate (`heart_rate`)
+-   Mean Blood Pressure (`mean_blood_pressure`)
+-   Primary Diagnosis (`primary_diagnosis`)
+-   White Blood Cell Count (`white_blood_cell_count`)
+-   Activities of Daily Living (`activities_of_daily_living`)
+
+## Problem #1: Exploring Effect Modification
+
+### 1(a) Fit the effect modification model
+
+Generate a multivariable logistic regression model (`effect_modification_model`), adhering to the following specifications:
+
+-   Set the outcome as death.
+-   Set the exposure as no RHC.
+-   Include a multiplicative interaction term of the exposure by no DNR status.
+-   Adjust for the stated confounders in the relationship (no RHC vs death) in the model.
+
+```{r}
+# Logistic regression with interaction between no_rhc_status and no_dnr_status in the subset data
+effect_modification_model <- glm(death_status ~ no_rhc_status * no_dnr_status + 
+                                  age_category + aps_score + cancer_status +
+                                  num_comorbidities + glasgow_coma_scale + 
+                                  heart_rate + mean_blood_pressure + 
+                                  primary_diagnosis + sex + 
+                                  respiratory_rate + white_blood_cell_count, 
+                                data = high_dasi_data, 
+                                family = binomial)
+summary(effect_modification_model)
+```
+
+### 1(b) Calculate Relative Excess Risk due to Interaction (RERI)
+
+Effect modification looks at how the effect of one exposure on an outcome changes based on the level of another exposure or factor (the effect modifier). RERI is useful in this context because it quantifies the additive interaction (whether the combined effect is larger or smaller than expected based on individual effects).
+
+```{r}
+# Extract the coefficients
+beta_rhc <- as.numeric(effect_modification_model$coefficients['no_rhc_status'])   # Coefficient for no_rhc_status
+beta_dnr <- as.numeric(effect_modification_model$coefficients['no_dnr_status'])   # Coefficient for no_dnr_status
+beta_interaction <- as.numeric(effect_modification_model$coefficients['no_rhc_status:no_dnr_status'])  # Interaction term
+
+# Calculate the Odds Ratios
+OR_rhc_only <- exp(beta_rhc)         # OR when no_rhc_status = 1, no_dnr_status = 0
+OR_dnr_only <- exp(beta_dnr)         # OR when no_rhc_status = 0, no_dnr_status = 1
+OR_both <- exp(beta_rhc + beta_dnr + beta_interaction)  
+# OR when both no_rhc_status and no_dnr_status are 1
+
+# Calculate RERI (Relative Excess Risk due to Interaction)
+RERI <- OR_both - OR_rhc_only - OR_dnr_only + 1
+
+# Output the results
+cat("OR for no RHC only (no_rhc_status = 1, no_dnr_status = 0):", OR_rhc_only, "\n")
+cat("OR for no DNR only (no_rhc_status = 0, no_dnr_status = 1):", OR_dnr_only, "\n")
+cat("OR for both no RHC and no DNR (no_rhc_status = 1, no_dnr_status = 1):", OR_both, "\n")
+cat("Relative Excess Risk due to Interaction (RERI):", RERI, "\n")
+```
+
+**Interpretation of RERI in Effect Modification:**
+
+-   **RERI \> 0**: Indicates a positive additive interaction, meaning the combined effect of two exposures (e.g., no RHC and no DNR) is greater than the sum of their individual effects. In other words, there is an excess risk attributable to the interaction between the two exposures.
+-   **RERI = 0**: Indicates no additive interaction. The combined effect of the two exposures is equal to the sum of their individual effects. There is no additional risk due to their interaction.
+-   **RERI \< 0**: Indicates a negative additive interaction (also known as antagonism), meaning the combined effect of the two exposures is less than the sum of their individual effects. This suggests that the exposures may be protective when combined, compared to when considered separately.
+
+### 1(c) Exploring Effect Modification using `interactionR` \[15%\] and `Publish` (optional)
+
+Based on the output of the above regression, implement the following:
+
+-   Use `interactionR::interactionR()` to obtain a complete reporting of effect modification estimates.
+
+```{r}
+# Load the necessary package
+library(interactionR)
+
+# Obtain the interaction effect modification estimates
+interaction_result <- interactionR(effect_modification_model, 
+                                   exposure_names = c("no_rhc_status", "no_dnr_status"), 
+                                   ci.type = "delta",  # Confidence interval method
+                                   em = TRUE,          # Effect modification estimates
+                                   recode = FALSE)     # Do not recode the exposure variables
+# Display the complete effect modification report
+interaction_result$dframe
+```
+
+-   Use `Publish::publish()` to obtain stratum-specific estimates of the main effect. **NOTE**: Only return those quantities requested (i.e., not the full regression table).
+
+```{r}
+# Load the necessary package
+library(Publish)
+
+# Recode variables for better interpretation
+high_dasi_data$no_dnr_factor <- factor(high_dasi_data$no_dnr_status, levels = c(1, 0), labels = c("No", "Yes"))
+high_dasi_data$no_dnr_factor <- relevel(high_dasi_data$no_dnr_factor, ref = "Yes")
+high_dasi_data$no_rhc_factor <- factor(high_dasi_data$no_rhc_status, levels = c(1, 0), labels = c("No RHC", "RHC"))
+high_dasi_data$no_rhc_factor <- relevel(high_dasi_data$no_rhc_factor, ref = "RHC")
+
+# Fit the model with recoded factors
+effect_modification_model2 <- glm(death_status ~ no_rhc_factor * no_dnr_factor + 
+                                  age_category + aps_score + cancer_status +
+                                  num_comorbidities + glasgow_coma_scale + 
+                                  heart_rate + mean_blood_pressure + 
+                                  primary_diagnosis + sex + 
+                                  respiratory_rate + white_blood_cell_count, 
+                                data = high_dasi_data, 
+                                family = binomial)
+
+# Obtain stratum-specific estimates from the model
+stratum_estimates <- publish(effect_modification_model2)
+
+# Print only the relevant stratum-specific estimates (for no_rhc_status and no_dnr_status)
+tail(stratum_estimates$rawTable,2)
+```
+
+**Note**: Effect modification occurs when the effect of an exposure on an outcome differs across levels of a third variable (the effect modifier). It does not require the interaction term (`no_rhc_status:no_dnr_status`) to be statistically significant; rather, we are looking at whether the association between the primary exposure (RHC) and the outcome (death) changes depending on the level of the effect modifier (DNR).
+
+## Problem #2: Exploring Interaction
+
+### 2(a) Interaction Model
+
+Generate a multivariable logistic regression model, adhering to the following specifications:
+
+-   Set the outcome as death.
+-   Set two exposures as RHC and DNR status.
+-   Include a multiplicative interaction term of the exposures.
+-   Adjust for the stated confounders in the relationship (no RHC vs death, as well as no DNR vs death) in the model. That means the union of the two confounder sets.
+
+```{r}
+# Logistic regression with interaction between no_rhc_status and no_dnr_status in the subset data
+interaction_model <- glm(death_status ~ no_rhc_status * no_dnr_status + 
+                         age_category + aps_score + cancer_status +
+                         num_comorbidities + glasgow_coma_scale + 
+                         heart_rate + mean_blood_pressure + 
+                         primary_diagnosis + sex + 
+                         respiratory_rate + white_blood_cell_count + 
+                         activities_of_daily_living, 
+                       data = high_dasi_data, 
+                       family = binomial)
+summary(interaction_model)
+```
+
+**Note**: Check if the interaction term (`no_rhc_status:no_dnr_status`) has a low p-value. If this p-value is below the acceptable cutpoint (commonly used significance threshold of 0.05 or something reasonable/justifiable), we could conclude that the interaction between RHC and DNR status on the outcome (death) is statistically significant. This could suggest that the association between RHC status and death depends on DNR status.
+
+### 2(b) Exploring Interaction using `interactionR`
+
+Based on the output of the above regression, implement the following:
+
+-   Use `interactionR::interactionR()` to obtain a complete reporting of interaction estimates.
+
+```{r}
+# Load the necessary package
+library(interactionR)
+
+# Obtain the interaction estimates
+interaction_result <- interactionR(interaction_model, 
+                                   exposure_names = c("no_rhc_status", "no_dnr_status"), 
+                                   ci.type = "delta",  # Confidence interval method
+                                   em = FALSE,         # Interaction estimates
+                                   recode = FALSE)     # Do not recode the exposure variables
+# Display the complete interaction report
+interaction_result$dframe
+```
+
+### 2(c) Calculate RERI, AP, and SI
+
+Based on the output of the above regression, calculate RERI, the attributable proportion due to interaction (AP), and the synergy index (SI).
+
+```{r}
+# Extract the coefficients
+beta_rhc <- coef(interaction_model)["no_rhc_status"]
+beta_dnr <- coef(interaction_model)["no_dnr_status"]
+beta_interaction <- coef(interaction_model)["no_rhc_status:no_dnr_status"]
+
+# Calculate the odds ratios
+OR_rhc_only <- exp(beta_rhc)  # OR when no_rhc_status = 1, no_dnr_status = 0
+OR_dnr_only <- exp(beta_dnr)  # OR when no_rhc_status = 0, no_dnr_status = 1
+OR_both <- exp(beta_rhc + beta_dnr + beta_interaction)  
+# OR when both no_rhc_status and no_dnr_status are 1
+
+# Calculate RERI
+RERI <- OR_both - OR_rhc_only - OR_dnr_only + 1
+
+# Calculate AP
+AP <- RERI / OR_both
+
+# Calculate SI
+SI <- (OR_both - 1) / ((OR_rhc_only - 1) + (OR_dnr_only - 1))
+
+# Output the results
+cat("Relative Excess Risk due to Interaction (RERI):", RERI, "\n")
+cat("Attributable Proportion (AP):", AP, "\n")
+cat("Synergy Index (SI):", SI, "\n")
+```
+
+**Interpretation of Results:**
+
+-   **RERI**: A positive RERI indicates an excess risk due to the interaction between RHC and DNR. A negative RERI suggests antagonism.
+-   **AP**: Represents the proportion of the risk due to the interaction.
+    -   AP\>0: A positive proportion of the risk is due to the interaction.
+    -   AP=0: No additional risk is due to the interaction.
+    -   AP\<0: A negative interaction, indicating antagonism between the two exposures.
+-   **SI**: A synergy index greater than 1 indicates a synergistic effect, while an SI less than 1 indicates antagonism.
+    -   SI\>1: Synergistic effect. The combined effect of the two exposures is greater than expected based on multiplicative effects.
+    -   SI=1: No multiplicative interaction.
+    -   SI\<1: Antagonism. The combined effect of the two exposures is less than expected based on multiplicative effects.
+
+**Note**: If the p-values for the interaction term, RERI, AP, and SI are all greater than a reasonable cut-point (e.g., 0.05 is one example), that indicates no statistically significant interaction. In that case, this would mean we do not have strong evidence to claim that the combined effects of RHC and DNR on mortality are significantly different from their individual effects.

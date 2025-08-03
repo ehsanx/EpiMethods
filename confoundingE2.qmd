@@ -127,17 +127,17 @@ For **Problem Set #1**, we will explore in the `high_dasi_data` dataset whether 
 
 Note that we will assume that confounders for RHC and Mortality are the following:
 
-- Age Category (`age_category`)
-- APS Score (`aps_score`)
-- Cancer Status (`cancer_status`)
-- Number of Comorbidities (`num_comorbidities`)
-- Glasgow Coma Scale (`glasgow_coma_scale`)
-- Heart Rate (`heart_rate`)
-- Mean Blood Pressure (`mean_blood_pressure`)
-- Primary Diagnosis (`primary_diagnosis`)
-- Sex (`sex`)
-- Respiratory Rate (`respiratory_rate`)
-- White Blood Cell Count (`white_blood_cell_count`)
+-   Age Category (`age_category`)
+-   APS Score (`aps_score`)
+-   Cancer Status (`cancer_status`)
+-   Number of Comorbidities (`num_comorbidities`)
+-   Glasgow Coma Scale (`glasgow_coma_scale`)
+-   Heart Rate (`heart_rate`)
+-   Mean Blood Pressure (`mean_blood_pressure`)
+-   Primary Diagnosis (`primary_diagnosis`)
+-   Sex (`sex`)
+-   Respiratory Rate (`respiratory_rate`)
+-   White Blood Cell Count (`white_blood_cell_count`)
 
 **Interaction**, particularly in the statistical context, often refers to a departure from multiplicativity when using models like logistic regression. It examines how the combined effect of two exposures differs from what would be expected if their effects were simply multiplied. Interaction is typically tested on a multiplicative scale (e.g., odds ratios) and is interpreted through synergy (super-multiplicative) or antagonism (sub-multiplicative).
 
@@ -145,34 +145,34 @@ For **Problem Set #2**, we will explore in the `high_dasi_data` dataset whether 
 
 Note that we will assume that confounders for DNR Status and Mortality are the following:
 
-- Age Category (`age_category`)
-- APS Score (`aps_score`)
-- Cancer Status (`cancer_status`)
-- Number of Comorbidities (`num_comorbidities`)
-- Glasgow Coma Scale (`glasgow_coma_scale`)
-- Heart Rate (`heart_rate`)
-- Mean Blood Pressure (`mean_blood_pressure`)
-- Primary Diagnosis (`primary_diagnosis`)
-- White Blood Cell Count (`white_blood_cell_count`)
-- Activities of Daily Living (`activities_of_daily_living`)
+-   Age Category (`age_category`)
+-   APS Score (`aps_score`)
+-   Cancer Status (`cancer_status`)
+-   Number of Comorbidities (`num_comorbidities`)
+-   Glasgow Coma Scale (`glasgow_coma_scale`)
+-   Heart Rate (`heart_rate`)
+-   Mean Blood Pressure (`mean_blood_pressure`)
+-   Primary Diagnosis (`primary_diagnosis`)
+-   White Blood Cell Count (`white_blood_cell_count`)
+-   Activities of Daily Living (`activities_of_daily_living`)
 
-## Problem #1: Exploring Effect Modification [50%]
+## Problem #1: Exploring Effect Modification \[50%\]
 
-### 1(a) Fit the effect modification model [15%]
+### 1(a) Fit the effect modification model \[15%\]
 
 Generate a multivariable logistic regression model (`effect_modification_model`), adhering to the following specifications:
 
-- Set the outcome as death.
-- Set the exposure as no RHC.
-- Include a multiplicative interaction term of the exposure by no DNR status.
-- Adjust for the stated confounders in the relationship (no RHC vs death) in the model.
+-   Set the outcome as death.
+-   Set the exposure as no RHC.
+-   Include a multiplicative interaction term of the exposure by no DNR status.
+-   Adjust for the stated confounders in the relationship (no RHC vs death) in the model.
 
 ```{r}
 # Logistic regression with interaction between no_rhc_status and no_dnr_status in the subset data
 # effect_modification_model <- glm(...
 ```
 
-### 1(b) Calculate Relative Excess Risk due to Interaction (RERI) [20%]
+### 1(b) Calculate Relative Excess Risk due to Interaction (RERI) \[20%\]
 
 Effect modification looks at how the effect of one exposure on an outcome changes based on the level of another exposure or factor (the effect modifier). RERI is useful in this context because it quantifies the additive interaction (whether the combined effect is larger or smaller than expected based on individual effects).
 
@@ -189,15 +189,15 @@ Effect modification looks at how the effect of one exposure on an outcome change
 
 **Interpretation of RERI in Effect Modification:**
 
-- **RERI > 0**: Indicates a positive additive interaction, meaning the combined effect of two exposures (e.g., no RHC and no DNR) is greater than the sum of their individual effects. In other words, there is an excess risk attributable to the interaction between the two exposures.
-- **RERI = 0**: Indicates no additive interaction. The combined effect of the two exposures is equal to the sum of their individual effects. There is no additional risk due to their interaction.
-- **RERI < 0**: Indicates a negative additive interaction (also known as antagonism), meaning the combined effect of the two exposures is less than the sum of their individual effects. This suggests that the exposures may be protective when combined, compared to when considered separately.
+-   **RERI \> 0**: Indicates a positive additive interaction, meaning the combined effect of two exposures (e.g., no RHC and no DNR) is greater than the sum of their individual effects. In other words, there is an excess risk attributable to the interaction between the two exposures.
+-   **RERI = 0**: Indicates no additive interaction. The combined effect of the two exposures is equal to the sum of their individual effects. There is no additional risk due to their interaction.
+-   **RERI \< 0**: Indicates a negative additive interaction (also known as antagonism), meaning the combined effect of the two exposures is less than the sum of their individual effects. This suggests that the exposures may be protective when combined, compared to when considered separately.
 
-### 1(c) Exploring Effect Modification using `interactionR` [15%] and `Publish` (optional)
+### 1(c) Exploring Effect Modification using `interactionR` \[15%\] and `Publish` (optional)
 
 Based on the output of the above regression, implement the following:
 
-- Use `interactionR::interactionR()` to obtain a complete reporting of effect modification estimates.
+-   Use `interactionR::interactionR()` to obtain a complete reporting of effect modification estimates.
 
 ```{r}
 # Load the necessary package
@@ -210,7 +210,7 @@ library(interactionR)
 # interaction_result$...
 ```
 
-- Use `Publish::publish()` to obtain stratum-specific estimates of the main effect. **NOTE**: Only return those quantities requested (i.e., not the full regression table).
+-   Use `Publish::publish()` to obtain stratum-specific estimates of the main effect. **NOTE**: Only return those quantities requested (i.e., not the full regression table).
 
 ```{r}
 # # Load the necessary package
@@ -234,17 +234,16 @@ library(interactionR)
 
 **Note**: Effect modification occurs when the effect of an exposure on an outcome differs across levels of a third variable (the effect modifier). It does not require the interaction term (`no_rhc_status:no_dnr_status` or the multiplicative scale p-value) to be statistically significant; rather, we are looking at whether the association between the primary exposure (RHC) and the outcome (death) changes depending on the level of the effect modifier (DNR).
 
+## Problem #2: Exploring Interaction \[50%\]
 
-## Problem #2: Exploring Interaction [50%]
-
-### 2(a) Interaction Model [15%]
+### 2(a) Interaction Model \[15%\]
 
 Generate a multivariable logistic regression model, adhering to the following specifications:
 
-- Set the outcome as death.
-- Set two exposures as RHC and DNR status.
-- Include a multiplicative interaction term of the exposures.
-- Adjust for the stated confounders in the relationship (no RHC vs death, as well as no DNR vs death) in the model. That means the union of the two confounder sets.
+-   Set the outcome as death.
+-   Set two exposures as RHC and DNR status.
+-   Include a multiplicative interaction term of the exposures.
+-   Adjust for the stated confounders in the relationship (no RHC vs death, as well as no DNR vs death) in the model. That means the union of the two confounder sets.
 
 ```{r}
 # Logistic regression with interaction between no_rhc_status and no_dnr_status in the subset data
@@ -253,11 +252,11 @@ Generate a multivariable logistic regression model, adhering to the following sp
 
 **Note**: Check if the interaction term (`no_rhc_status:no_dnr_status`) has a low p-value. If this p-value is below the acceptable cutpoint (commonly used significance threshold of 0.05 or something reasonable/justifiable), we could conclude that the interaction between RHC and DNR status on the outcome (death) is statistically significant. This could suggest that the association between RHC status and death depends on DNR status.
 
-### 2(b) Exploring Interaction using `interactionR` [15%]
+### 2(b) Exploring Interaction using `interactionR` \[15%\]
 
 Based on the output of the above regression, implement the following:
 
-- Use `interactionR::interactionR()` to obtain a complete reporting of interaction estimates.
+-   Use `interactionR::interactionR()` to obtain a complete reporting of interaction estimates.
 
 ```{r}
 # Load the necessary package
@@ -267,7 +266,7 @@ library(interactionR)
 # interaction_result <- ...
 ```
 
-### 2(c) Calculate RERI, AP, and SI [20%]
+### 2(c) Calculate RERI, AP, and SI \[20%\]
 
 Based on the output of the above regression, calculate RERI, the attributable proportion due to interaction (AP), and the synergy index (SI).
 
@@ -293,18 +292,17 @@ Based on the output of the above regression, calculate RERI, the attributable pr
 
 **Interpretation of Results:**
 
-- **RERI**: A positive RERI indicates an excess risk due to the interaction between RHC and DNR. A negative RERI suggests antagonism.
-- **AP**: Represents the proportion of the risk due to the interaction.
-  - AP>0: A positive proportion of the risk is due to the interaction.
-  - AP=0: No additional risk is due to the interaction.
-  - AP<0: A negative interaction, indicating antagonism between the two exposures.
-- **SI**: A synergy index greater than 1 indicates a synergistic effect, while an SI less than 1 indicates antagonism.
-  - SI>1: Synergistic effect. The combined effect of the two exposures is greater than expected based on multiplicative effects.
-  - SI=1: No multiplicative interaction.
-  - SI<1: Antagonism. The combined effect of the two exposures is less than expected based on multiplicative effects.
-  
-**Note**: If the p-values for the interaction term (or the multiplicative scale), RERI, AP, and SI are all greater than a reasonable cut-point (e.g., 0.05 is one example), that indicates no statistically significant interaction. In that case, this would mean we do not have strong evidence to claim that the combined effects of RHC and DNR on mortality are significantly different from their individual effects.  
+-   **RERI**: A positive RERI indicates an excess risk due to the interaction between RHC and DNR. A negative RERI suggests antagonism.
+-   **AP**: Represents the proportion of the risk due to the interaction.
+    -   AP\>0: A positive proportion of the risk is due to the interaction.
+    -   AP=0: No additional risk is due to the interaction.
+    -   AP\<0: A negative interaction, indicating antagonism between the two exposures.
+-   **SI**: A synergy index greater than 1 indicates a synergistic effect, while an SI less than 1 indicates antagonism.
+    -   SI\>1: Synergistic effect. The combined effect of the two exposures is greater than expected based on multiplicative effects.
+    -   SI=1: No multiplicative interaction.
+    -   SI\<1: Antagonism. The combined effect of the two exposures is less than expected based on multiplicative effects.
 
+**Note**: If the p-values for the interaction term (or the multiplicative scale), RERI, AP, and SI are all greater than a reasonable cut-point (e.g., 0.05 is one example), that indicates no statistically significant interaction. In that case, this would mean we do not have strong evidence to claim that the combined effects of RHC and DNR on mortality are significantly different from their individual effects.
 
 ## Knit your file
 
