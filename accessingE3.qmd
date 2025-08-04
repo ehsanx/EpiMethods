@@ -1,0 +1,141 @@
+## Exercise 2 (A) {.unnumbered}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = FALSE)
+```
+
+### **Exercise: Phased Multi-Year NHANES Data Wrangling**
+
+**Instructions:**
+Use the R programming language and functions from the `tidyverse`, `nhanesA`, `tableone`, and `naniar` packages to complete this exercise. We will build up our dataset in phases, starting with a single year and expanding to multiple survey cycles.
+
+Please knit your final R Markdown file and submit the knitted HTML or PDF document ONLY.
+
+---
+
+#### **Setup: Load Packages**
+First, run the following code block to ensure the required packages are installed and loaded into your R session.
+
+```{r load-packages, message=FALSE, warning=FALSE}
+# Load required packages
+
+```
+
+---
+
+### **Problem 1: Import and Translate Single-Year Data**
+
+Download the **Demographic (`DEMO`)** data for the 2013-2014 NHANES cycle, using `translated = TRUE` to automatically convert coded values into text labels.
+
+```{r import-demo-single}
+# Download and translate the 2013-2014 demographic data
+
+# Check the first few rows to see the translated values
+
+```
+
+---
+
+### **Problem 2: Add Body Measures Data for a Single Year**
+
+Download the **Body Measures (`BMX`)** data for the same 2013-2014 cycle and merge it with the demographic data from Problem 1.
+
+```{r import-bmx-single}
+# Download the 2013-2014 body measures data
+
+# Merge the BMX data with the DEMO data from Problem 1
+
+# Check the dimensions of the merged dataset
+
+```
+
+---
+
+### **Problem 3: Import and Merge Multi-Cycle Data with Translation**
+
+Expand to multiple years, using `translated = TRUE` for all downloads. Merge both the **Demographic (`DEMO`)** and **Body Measures (`BMX`)** data for all three NHANES cycles: 2013-2014 (`H`), 2015-2016 (`I`), and 2017-2018 (`J`). Combine them into a single dataframe named `nhanes_raw`.
+
+```{r import-data-multi}
+# Define the cycles to download
+
+# Create a list to store data from each cycle
+
+# Loop through each cycle, download with translation, and merge the data
+
+# Combine the data from all cycles into one dataframe
+
+# Check the dimensions of the final raw dataset
+
+```
+
+---
+
+### **Problem 4: Data Cleaning and Filtering**
+
+Using the `nhanes_raw` dataset, we will now create our clean dataset. This involves filtering our population to adults and then creating our analysis variables.
+
+1.  **Filter for Adults:** Keep only participants aged 20 years or older.
+2.  **Rename Variables:** `RIAGENDR` to `Sex`, `RIDAGEYR` to `Age`, `RIDRETH3` to `RaceEthnicity`, `BMXBMI` to `BMI`.
+3.  **Group `RaceEthnicity`:** Combine "Mexican American" and "Other Hispanic" into a single "Hispanic" category.
+4.  **Create `AgeGroup`:** Categorize `Age` into "20-39", "40-59", and "60+".
+5.  **Create `BMICat`:** Categorize `BMI` into "Underweight", "Normal weight", "Overweight", and "Obese".
+
+```{r clean-data}
+# nhanes_clean <- ..
+  # Step 1: Filter the data to include only adults
+   
+  # Step 2: Rename variables
+   
+  # Create new variables
+   
+    # Convert the new character RaceEthnicity to a factor with the desired level order
+     
+    
+    # Step 4: Create AgeGroup (now without NAs because we filtered)
+     
+                   
+    # Step 5: Create BMICat
+     
+
+# Check the structure to confirm variables are correct
+
+```
+
+---
+
+### **Problem 5: Create Final Analytic Dataset**
+
+Create a final, analysis-ready dataset named `nhanes_analysis` that includes only the key variables.
+
+```{r create-analytic-data}
+
+# Display the structure of the final analytic dataset
+```
+
+---
+
+### **Problem 6: Investigate Missing Data**
+
+Now that our data is correctly filtered and processed, let's re-examine the missing data patterns. The missingness should be much lower.
+
+```{r missing-data-investigation}
+# 1. Count missing values for each column
+
+# 2. Visualize the missing data
+
+```
+
+---
+
+### **Problem 7: Create a Descriptive Table**
+
+Finally, with the data correctly loaded and cleaned for our adult population, create the summary table of sample characteristics, stratified by `Sex`.
+
+```{r create-table-one}
+# Define the variables for the table
+
+# Create the table, stratified by Sex
+
+# Print the table, showing all levels and missing data counts
+
+```

@@ -1,0 +1,174 @@
+## Exercise 2 Solution (A) {.unnumbered}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = FALSE)
+```
+
+### **Exercise: Phased Multi-Year NHANES Data Wrangling**
+
+**Instructions:**
+Use the R programming language and functions from the `tidyverse`, `nhanesA`, `tableone`, and `naniar` packages to complete this exercise. We will build up our dataset in phases, starting with a single year and expanding to multiple survey cycles.
+
+Please knit your final R Markdown file and submit the knitted HTML or PDF document ONLY.
+
+---
+
+#### **Setup: Load Packages**
+First, run the following code block to ensure the required packages are installed and loaded into your R session.
+
+```{r load-packages, message=FALSE, warning=FALSE}
+# Load required packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, nhanesA, tableone, naniar)
+```
+
+---
+
+### **Problem 1: Import and Translate Single-Year Data**
+
+Download the **Demographic (`DEMO`)** data for the 2013-2014 NHANES cycle, using `translated = TRUE` to automatically convert coded values into text labels.
+
+```{r import-demo-single, cache=TRUE}
+# Download and translate the 2013-2014 demographic data
+nhanes_demo_1314 <- nhanes("DEMO_H", translated = TRUE)
+# Check the first few rows to see the translated values
+head(nhanes_demo_1314[, c("SEQN", "RIAGENDR", "RIDAGEYR", "RIDRETH3")])
+```
+
+---
+
+### **Problem 2: Add Body Measures Data for a Single Year**
+
+Download the **Body Measures (`BMX`)** data for the same 2013-2014 cycle and merge it with the demographic data from Problem 1.
+
+```{r import-bmx-single, cache=TRUE}
+# Download the 2013-2014 body measures data
+nhanes_bmx_1314 <- nhanes("BMX_H", translated = TRUE)
+# Merge the BMX data with the DEMO data from Problem 1
+nhanes_1314_complete <- full_join(nhanes_demo_1314, nhanes_bmx_1314, by = "SEQN")
+# Check the dimensions of the merged dataset
+dim(nhanes_1314_complete)
+```
+
+---
+
+### **Problem 3: Import and Merge Multi-Cycle Data with Translation**
+
+Expand to multiple years, using `translated = TRUE` for all downloads. Merge both the **Demographic (`DEMO`)** and **Body Measures (`BMX`)** data for all three NHANES cycles: 2013-2014 (`H`), 2015-2016 (`I`), and 2017-2018 (`J`). Combine them into a single dataframe named `nhanes_raw`.
+
+```{r import-data-multi, cache=TRUE}
+# Define the cycles to download
+cycles <- c("H", "I", "J")
+# Create a list to store data from each cycle
+all_cycles_data <- list()
+# Loop through each cycle, download with translation, and merge the data
+for (cycle_code in cycles) {
+  demo_data <- nhanes(paste0("DEMO_", cycle_code), translated = TRUE)
+  bmx_data <- nhanes(paste0("BMX_", cycle_code), translated = TRUE)
+  all_cycles_data[[cycle_code]] <- full_join(demo_data, bmx_data, by = "SEQN")
+}
+# Combine the data from all cycles into one dataframe
+nhanes_raw <- bind_rows(all_cycles_data)
+# Check the dimensions of the final raw dataset
+dim(nhanes_raw)
+```
+
+---
+
+### **Problem 4: Data Cleaning and Filtering**
+
+Using the `nhanes_raw` dataset, we will now create our clean dataset. This involves filtering our population to adults and then creating our analysis variables.
+
+1.  **Filter for Adults:** Keep only participants aged 20 years or older.
+2.  **Rename Variables:** `RIAGENDR` to `Sex`, `RIDAGEYR` to `Age`, `RIDRETH3` to `RaceEthnicity`, `BMXBMI` to `BMI`.
+3.  **Group `RaceEthnicity`:** Combine "Mexican American" and "Other Hispanic" into a single "Hispanic" category.
+4.  **Create `AgeGroup`:** Categorize `Age` into "20-39", "40-59", and "60+".
+5.  **Create `BMICat`:** Categorize `BMI` into "Underweight", "Normal weight", "Overweight", and "Obese".
+
+```{r clean-data, cache=TRUE}
+nhanes_clean <- nhanes_raw %>%
+  # Step 1: Filter the data to include only adults
+  filter(RIDAGEYR >= 20) %>%
+  # Step 2: Rename variables
+  rename(
+    Sex = RIAGENDR,
+    Age = RIDAGEYR,
+    RaceEthnicity = RIDRETH3,
+    BMI = BMXBMI
+  ) %>%
+  # Create new variables
+  mutate(
+    # Step 3: Group the detailed race categories into broader ones
+    RaceEthnicity = case_when(
+      RaceEthnicity %in% c("Mexican American", "Other Hispanic") ~ "Hispanic",
+      RaceEthnicity == "Non-Hispanic White" ~ "Non-Hispanic White",
+      RaceEthnicity == "Non-Hispanic Black" ~ "Non-Hispanic Black",
+      RaceEthnicity == "Non-Hispanic Asian" ~ "Non-Hispanic Asian",
+      TRUE ~ "Other" # Groups "Other Race - Including Multi-Racial" and any NAs
+    ),
+    # Convert the new character RaceEthnicity to a factor with the desired level order
+    RaceEthnicity = factor(RaceEthnicity,
+                           levels = c("Non-Hispanic White", "Non-Hispanic Black", "Hispanic", "Non-Hispanic Asian", "Other")),
+    
+    # Step 4: Create AgeGroup (now without NAs because we filtered)
+    AgeGroup = cut(Age,
+                   breaks = c(19, 39, 59, Inf),
+                   labels = c("20-39", "40-59", "60+"),
+                   right = TRUE),
+                   
+    # Step 5: Create BMICat
+    BMICat = cut(BMI,
+                 breaks = c(0, 18.5, 25, 30, Inf),
+                 labels = c("Underweight", "Normal weight", "Overweight", "Obese"),
+                 right = FALSE)
+  )
+
+# Check the structure to confirm variables are correct
+str(nhanes_clean[, c("SEQN", "Sex", "Age", "AgeGroup", "RaceEthnicity", "BMI")])
+```
+
+---
+
+### **Problem 5: Create Final Analytic Dataset**
+
+Create a final, analysis-ready dataset named `nhanes_analysis` that includes only the key variables.
+
+```{r create-analytic-data, cache=TRUE}
+nhanes_analysis <- select(nhanes_clean, SEQN, Sex, Age, AgeGroup, RaceEthnicity, BMI, BMICat)
+
+# Display the structure of the final analytic dataset
+str(nhanes_analysis)
+```
+
+---
+
+### **Problem 6: Investigate Missing Data**
+
+Now that our data is correctly filtered and processed, let's re-examine the missing data patterns. The missingness should be much lower.
+
+```{r missing-data-investigation, cache=TRUE}
+# 1. Count missing values for each column
+missing_counts <- colSums(is.na(nhanes_analysis))
+print(missing_counts)
+
+# 2. Visualize the missing data
+gg_miss_var(nhanes_analysis, show_pct = TRUE) +
+  labs(title = "Missing Data in NHANES Adult Participants (2013-2018)")
+```
+
+---
+
+### **Problem 7: Create a Descriptive Table**
+
+Finally, with the data correctly loaded and cleaned for our adult population, create the summary table of sample characteristics, stratified by `Sex`.
+
+```{r create-table-one, cache=TRUE}
+# Define the variables for the table
+vars <- c("Age", "AgeGroup", "RaceEthnicity", "BMI", "BMICat")
+
+# Create the table, stratified by Sex
+tab1 <- CreateTableOne(vars = vars, data = nhanes_analysis, strata = "Sex", addOverall = TRUE, test = FALSE)
+
+# Print the table, showing all levels and missing data counts
+print(tab1, smd = FALSE, showAllLevels = TRUE, missing = TRUE)
+```
