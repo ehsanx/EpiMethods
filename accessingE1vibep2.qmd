@@ -1,0 +1,276 @@
+## Exercise 1 (A) Vibe Part 2 {.unnumbered}
+
+In this tutorial, we will be going through the following exercise [(found here)](https://ehsanx.github.io/EpiMethods/accessingE.html).
+
+This exercise replicates the analysis done in this article:
+
+Palis, Marchand & Oviedo-Joekes (2020). The relationship between sense of community belonging and self-rated mental health among Canadians with mental or substance use disorders. Journal of Mental Health, 29(2): 168–175. DOI: 10.1080/09638237.2018.1437602
+
+We will go through the exercise questions and evaluate how well Gemini performs on each task. These tasks include applying eligibility criteria, subsetting the data in terms of variables and retaining those necessary for analysis, creating an analytic dataset, creating a Table 1, and building a logistic regression model, and presenting odds ratios with 95% confidence intervals. Additionally, we will use what we learned from the previous tutorial [(found here)](.) to streamline these exercises.
+
+In this part of the tutorial, we will go through the second set of tasks, which includes creating a Table 1, performing logistic regression and producing odds ratios and confidence intervals. These tutorials were completed in RStudio [@rstudio] using R version 4.3.2 [@r], with the following packages: dplyr [@dplyr], car [@car], tableone [@tableone], and Publish [@publish].
+
+For this tutorial, I used Gemini’s free 2.5 Flash model.
+
+------------------------------------------------------------------------
+
+### Load data and required packages
+
+Load the data saved in the previous tutorial. If you just completed the last tutorial and still have the data loaded in your environment, you can skip this step.
+
+```{r, message=FALSE, warning=FALSE, results='hide', cache=TRUE}
+packages <- c("dplyr", "car", "tableone", "Publish")
+
+lapply(packages, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) install.packages(pkg, dependencies = TRUE)
+  library(pkg, character.only = TRUE)
+})
+
+
+directory <- "Data/accessing"  # Enter the path to your working directory here
+
+load(paste0(directory, "/analytic_data.RData"))
+
+```
+
+## References
+
+------------------------------------------------------------------------
+
+\
+
+### Exercise 2a: Recode
+
+For this first exercise, we need to recreate the Table 1 from the article. However, we need to omit the ‘Main source of income’ variable from the table.
+
+Let's send Gemini the following prompt:
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Reproduce **Table 1** from the article using the **`tableone`** package in **RStudio**, based on the cleaned analytic dataset.
+
+-   **Stratify** the table by the variable **`srmh`** (this will be used for the columns).
+
+    Include the following variables in the table:
+
+    -   `community`
+
+    -   `sex`
+
+    -   `age`
+
+    -   `race`
+
+-   **Exclude** the variable *‘Main source of income’ (`income`*) from the table.
+
+-   Display **counts and percentages** for categorical variables, and **means with standard deviations** for continuous variables.
+
+-   Ensure that the **frequencies and percentages match** those reported in the published Table 1.
+
+-   Use the `kableone` function to print the table.
+:::
+
+\
+**Gemini's response:**
+
+Here is the code to create a Table 1 using the `tableone` packages:
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Define the variables to be included in Table 1
+myVars <- c("community", "sex", "age", "race")
+
+# Define the stratifying variable (self-rated mental health)
+strata <- "srmh"
+
+# Create Table 1 object with specified options
+tableOne <- CreateTableOne(
+  vars = myVars,
+  data = analytic_data,
+  strata = strata,
+  includeNA = FALSE, # Do not include NA counts/percentages
+  test = FALSE,      # Do not perform or display statistical tests (p-values)
+  addOverall = TRUE  # Add an overall column
+)
+
+# Print the table using kableone with desired formatting options
+print(
+  kableone(
+    tableOne,
+    showAllLevels = TRUE,  # Show all levels for categorical variables
+    padColnames = TRUE,    # Pad column names for alignment
+    insertLevel = TRUE     # Insert a level column for hierarchical variables
+  )
+)
+
+```
+:::
+
+\
+That matches the table presented in the paper exactly! Gemini was able to create the table using the `tableone` package and printed it cleanly with the `kableone` function.
+
+------------------------------------------------------------------------
+
+\
+
+### Exercise 3a: Regression
+
+For this next exercise, we need to subset the dataset such that it excludes individuals who responded either "Very good", or "Excellent" on the self-rated mental health variables. Then following this we need to recode this variable and make it binary: 'Good' vs. 'Poor'. We then want to convert this variable to a factor with 'Poor' as the reference level.
+
+Let's send Gemini the following prompt:
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Subset the dataset in RStudio, excluding individuals who responded "Very good" or "Excellent" on the self-rated mental health variable.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Subset the dataset to exclude individuals with "Very good or excellent" self-rated mental health
+subset_data <- analytic_data %>%
+  filter(srmh != "Very good or excellent")
+
+# You can check the table of srmh in the new dataset
+table(subset_data$srmh)
+```
+:::
+
+\
+That worked as intended. Now let's send the prompt to recode the variable as a binary factor.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Recode self-rated mental health variable and make it a binary variable: ‘Good’ vs. ‘Poor’ (simplifying category labels only). Convert that variable to a factor variable with ‘Poor’ being the reference level.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+Here's the R code to recode the srmh variable in your subset_data into a binary factor variable with 'Good' and 'Poor' categories, setting 'Poor' as the reference level.
+
+```{r, cache=TRUE}
+# Recode the 'srmh' variable into a binary 'Good' vs. 'Poor' factor
+subset_data <- subset_data %>%
+  mutate(
+    srmh_binary = car::recode(srmh,
+                              "'Good' = 'Good';
+                               'Poor or Fair' = 'Poor'"
+                              # Any other values (like NA from previous steps) would remain NA
+    ) %>%
+      factor(levels = c("Poor", "Good")) # Set 'Poor' as the reference level
+  )
+
+# You can now check the levels and a table of the new binary variable
+levels(subset_data$srmh_binary)
+table(subset_data$srmh_binary, useNA = "always")
+```
+:::
+
+\
+That worked great. The self-rated mental health variable was correctly recoded into a binary factor with 'Poor' as the reference level. The code Gemini provided also included checks to confirm the recoding was done correctly
+
+------------------------------------------------------------------------
+
+\
+
+### Exercise 3b: Reporting odds ratio
+
+For this next exercise, we need to construct a logistic regression model to examine the relationship between community belonging and self-rated mental health among respondents with mental or substance use disorders. The model should be adjusted for three confounders: sex, age, and race/ethnicity.
+
+Once the model is constructed, report the odds ratios and their associated confidence intervals. To do so we will use the `publish` package.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Construct a logistic regression model to examine the relationship between community belonging (explanatory variable) and self-rated mental health (outcome variable) among respondents with mental or substance use disorders.
+
+Adjust the model for three confounders:
+
+-   Sex
+
+-   Age
+
+-   Race/ethnicity
+
+After fitting the model:
+
+-   Report the odds ratios and their 95% confidence intervals
+
+-   Use the publish package to present the results in a clear and interpretable format
+
+-   Provide the R code to complete this task
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+model <- glm(srmh_binary ~ community + sex + age + race,
+             data = subset_data,
+             family = binomial(link = "logit"))
+
+results_table <- publish(model, level = 0.95)
+
+print(results_table)
+```
+:::
+
+That worked well. Gemini successfully built the logistic regression model, adjusted for the correct confounders, and presented the odds ratios with confidence intervals using the `publish` package. The code ran smoothly and the output was clear and interpretable.
+
+------------------------------------------------------------------------
+
+\
+
+### Summary
+
+Using Gemini, we were able to complete the second set of tasks. In all instances, Gemini was able to complete the tasks without error, including identifying the correct variables to use when creating the table one, when subsetting the data, and constructing the logistic regression model. It also was successful and printing the table and regression results in in a markdown friendly manner
+
+In this set of exercises, Gemini again performed well and returned accurate results. Still, it’s important to approach each step with care. Even when outputs look correct, reviewing them closely ensures the work aligns with the intended analysis and avoids potential oversights.
+
+------------------------------------------------------------------------
+
+\
+
+[**Step-by-Step Plan for Using Generative AI in Data Analysis**]{.underline}
+
+1.  **Be clear and specific**\
+    Define the task directly and avoid vague instructions.
+
+2.  **Provide starter code or examples**\
+    Help the model understand your expectations and structure.
+
+3.  **Include variable structure**\
+    Share the output of `str()` or a data dictionary so the model knows variable types.
+
+4.  **State factor levels explicitly**\
+    List how variables should be recoded or grouped rather than relying on inference.
+
+5.  **Reference sources directly**\
+    If you're asking the model to replicate something (e.g., a published Table 1), summarize it clearly instead of assuming it can interpret the reference alone.
+
+6.  **Review the output**\
+    Check that the generated code and results match your goals and are statistically valid.
+
+7.  **Be prepared to troubleshoot**\
+    If the model's response is incomplete or incorrect, use your understanding and available documentation to fix it.
+
+8.  **Use AI as a guide, not a replacement**\
+    Generative AI can streamline your work, but knowledge and software familiarity are still essential.
+
+9.  (**NEW**) **Double Check any work produced by AI**\
+    While some AI models may perform well and produce exactly what you ask for, it’s still important to carry out thorough checks to ensure the output works as intended.
+
+
+## References

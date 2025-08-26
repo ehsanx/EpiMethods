@@ -1,0 +1,453 @@
+## Exercise 3 (A) Vibe {.unnumbered}
+
+In this tutorial, we will be going through the following exercise [(found here)](https://ehsanx.github.io/EpiMethods/accessingE3.html).
+
+We will go through the exercise problems and evaluate how well Gemini performs on each task. These tasks include importing and merging data, cleaning and filtering observations, and once the final dataset is completed, examining missing data, and displaying the data in a table.
+
+In this part of the tutorial, we will go through the first set of tasks, which includes loading, subsetting the data according to eligibility criteria and necessary variables, creating an analytic dataset, and reporting the number of columns and variable names in this dataset. These tutorials were completed in RStudio [@rstudio] using R version 4.3.2 [@r], with the following packages: tidyverse [@tidyverse], and nhanesA [@nhanesA], tableone [@tableone], and naniar [@naniar]
+
+For this tutorial, I used Gemini’s free 2.5 Flash model.
+
+------------------------------------------------------------------------
+
+\
+
+### Load Required Packages
+
+First, we'll run the following code to install and load all required packages into our R session.
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+packages <- c("tidyverse", "nhanesA", "tableone", "naniar")
+lapply(packages, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) install.packages(pkg, dependencies = TRUE)
+  library(pkg, character.only = TRUE)
+})
+
+
+```
+
+------------------------------------------------------------------------
+
+\
+
+### Problem 1: Import and Translate Single-Year Data
+
+For this first problem, we want to download the Demographic (`DEMO`) data from the 2013-2014 NHANES cycle using the `nhanes` package. We will also want `translate = TRUE` to automatically convert coded values into text labels.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Download the **Demographic (DEMO)** data for the **2013–2014 NHANES cycle** using the **`nhanes()`** function.
+
+-   Set `translated = TRUE` so that coded values are automatically converted into text labels.
+
+-   Print the first few rows of the variables translated (`SEQN`, `RIAGENDR`, `RIDAGEYR`, and `RIDRETH3`)
+
+-   Provide the R code to complete this task.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Download the Demographic (DEMO) data for the 2013–2014 NHANES cycle
+demo_2013_2014 <- nhanes( 'DEMO_H', translated = TRUE )
+
+# Select the specified variables and print the first few rows
+head(demo_2013_2014[, c("SEQN", "RIAGENDR", "RIDAGEYR", "RIDRETH3")])
+```
+:::
+
+\
+
+No issues were observed. Gemini successfully downloaded and translated the 2013–2014 demographic data, and printed the head of the dataset to display the translated values.
+
+------------------------------------------------------------------------
+
+\
+
+### Problem 2: Add Body Measures Data for a Single Year
+
+Using our newly created dataset for 2013-2014 Demographic data, we want to download the Body Measures (`BMX`) data for the same 2013-2014 cycle and merge it to the demographic data from Problem 1.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Download the **Body Measures (BMX)** data for the **2013–2014 NHANES cycle**.
+
+-   Merge it with the **Demographic (DEMO)** data from Problem 1 using the participant identifier (`SEQN`) and the **`full_join()`** function.
+
+-   After merging, check the dimensions of the completed dataset (`nhanes_1314_complete`). The dimensions should be **10175 rows and 72 columns**.
+
+-   Provide the R code to complete this task.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Download the Body Measures (BMX) data for the 2013–2014 NHANES cycle
+bmx_2013_2014 <- nhanes( 'BMX_H', translated = TRUE )
+
+# Merge the DEMO and BMX data frames using the participant identifier (SEQN)
+nhanes_1314_complete <- full_join(demo_2013_2014, bmx_2013_2014, by = "SEQN")
+
+# Check the dimensions of the merged dataset
+dim(nhanes_1314_complete)
+
+```
+:::
+
+\
+
+That successfully performed a full merge. Gemini was able to load the correct Body Measures data for 2013–2014 and successfully performed a full join with the previously loaded Demographic data from the same year.
+
+------------------------------------------------------------------------
+
+\
+
+### Problem 3: Import and Merge Multi-Cycle Data with Translation
+
+Now that we have both the Demographic (`DEMO`) and Body Measures (`BMX`) data for the 2013–2014 cycle, we want to extend this by loading the same data for the 2015–2016 and 2017–2018 cycles. Once all cycles are loaded, we will combine them into a single dataframe named `nhanes_raw`.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Download the **Demographic (DEMO)** and **Body Measures (BMX)** data for the three NHANES cycles — **2013–2014 (H)**, **2015–2016 (I)**, and **2017–2018 (J)** — using `translated = TRUE` for all downloads.
+
+-   For each cycle, merge the DEMO and BMX datasets by the participant identifier (`SEQN`) using the **`full_join()`** function.
+
+-   Combine the merged datasets from all three cycles into a single dataframe named **`nhanes_raw`**.
+
+-   After combining, check the dimensions of `nhanes_raw`. The dimensions should be **29400 rows and 78 columns**.
+
+-   Provide the R code to complete this task.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# --- Cycle 2013-2014 (H) ---
+# Download DEMO and BMX data
+demo_H <- nhanes('DEMO_H', translated = TRUE)
+bmx_H <- nhanes('BMX_H', translated = TRUE)
+# Merge the datasets for this cycle
+nhanes_H <- full_join(demo_H, bmx_H, by = "SEQN")
+
+# --- Cycle 2015-2016 (I) ---
+# Download DEMO and BMX data
+demo_I <- nhanes('DEMO_I', translated = TRUE)
+bmx_I <- nhanes('BMX_I', translated = TRUE)
+# Merge the datasets for this cycle
+nhanes_I <- full_join(demo_I, bmx_I, by = "SEQN")
+
+# --- Cycle 2017-2018 (J) ---
+# Download DEMO and BMX data
+demo_J <- nhanes('DEMO_J', translated = TRUE)
+bmx_J <- nhanes('BMX_J', translated = TRUE)
+# Merge the datasets for this cycle
+nhanes_J <- full_join(demo_J, bmx_J, by = "SEQN")
+
+# --- Combine all three cycles ---
+# Use bind_rows to combine the merged datasets into a single dataframe
+nhanes_raw <- bind_rows(nhanes_H, nhanes_I, nhanes_J)
+
+# Check the dimensions of the final combined dataset
+dim(nhanes_raw)
+```
+:::
+
+\
+
+Based on the dimensions of Gemini’s final combined dataset, the code worked as intended. Gemini successfully loaded and translated the data for each specified cycle and combined them into a single dataframe.
+
+------------------------------------------------------------------------
+
+\
+
+### Problem 4: Data Cleaning and Filtering
+
+We now have a dataframe containing demographic and body measure data for the 2013–2014, 2015–2016, and 2017–2018 NHANES cycles. Using this combined dataset (`nhanes_raw`), we will begin the process of cleaning and preparing the data for analysis. This includes filtering the population to include only adults and creating new variables based on existing columns.
+
+**The steps include:**
+
+-   Filtering for adults aged 20 years or older
+
+-   Renaming key variables for clarity (`RIAGENDR` to `Sex`, `RIDAGEYR` to `Age`, `RIDRETH3` to `RaceEthnicity`, and `BMXBMI` to `BMI`)
+
+-   Grouping race/ethnicity by combining “Mexican American” and “Other Hispanic” into a single “Hispanic” category
+
+-   Creating an `AgeGroup` variable with categories: “20–39”, “40–59”, and “60+”
+
+-   Creating a `BMICat` variable to classify BMI as “Underweight”, “Normal weight”, “Overweight”, or “Obese”
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Using the **`nhanes_raw`** dataset, create a cleaned dataset suitable for analysis:
+
+-   **Filter for adults:** keep only participants aged **20 years or older**.
+
+-   **Rename variables:**
+
+    -   `RIAGENDR` → `Sex`
+
+    -   `RIDAGEYR` → `Age`
+
+    -   `RIDRETH3` → `RaceEthnicity`
+
+    -   `BMXBMI` → `BMI`
+
+-   **Group Race/Ethnicity:**
+
+    -   Combine `"Mexican American"` and `"Other Hispanic"` into `"Hispanic"`
+
+    -   Keep `"Non-Hispanic White"`, `"Non-Hispanic Black"`, and `"Non-Hispanic Asian"` as they are
+
+    -   Recode all other categories (including NA) as `"Other"`
+
+-   **Create `AgeGroup`:** categorize `Age` into `"20-39"`, `"40-59"`, and `"60+"`.
+
+-   **Create `BMICat`:** categorize `BMI` into `"Underweight"`, `"Normal weight"`, `"Overweight"`, and `"Obese"`.
+
+Use **tidyverse** syntax and provide the **R code** to complete this task.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Create the cleaned dataset suitable for analysis
+nhanes_adult <- nhanes_raw %>%
+  # Filter for adults aged 20 years or older
+  filter(RIDAGEYR >= 20) %>%
+  # Rename variables for clarity
+  rename(
+    Sex = RIAGENDR,
+    Age = RIDAGEYR,
+    RaceEthnicity = RIDRETH3,
+    BMI = BMXBMI
+  ) %>%
+  # Group Mexican American and Other Hispanic into a single Hispanic category
+  # and recode all other categories (including NA) as "Other"
+  mutate(RaceEthnicity = case_when(
+    RaceEthnicity %in% c("Mexican American", "Other Hispanic") ~ "Hispanic",
+    RaceEthnicity == "Non-Hispanic White" ~ "Non-Hispanic White",
+    RaceEthnicity == "Non-Hispanic Black" ~ "Non-Hispanic Black",
+    RaceEthnicity == "Non-Hispanic Asian" ~ "Non-Hispanic Asian",
+    TRUE ~ "Other"
+  )) %>%
+  # Create AgeGroup categories
+  mutate(AgeGroup = case_when(
+    Age >= 60 ~ "60+",
+    Age >= 40 ~ "40-59",
+    Age >= 20 ~ "20-39"
+  )) %>%
+  # Create BMI categories
+  mutate(BMICat = case_when(
+    BMI < 18.5 ~ "Underweight",
+    BMI >= 18.5 & BMI < 25 ~ "Normal weight",
+    BMI >= 25 & BMI < 30 ~ "Overweight",
+    BMI >= 30 ~ "Obese"
+  ))
+
+str(nhanes_adult[, c("SEQN", "Sex", "Age", "AgeGroup", "RaceEthnicity", "BMI")])
+```
+:::
+
+\
+
+Everything looks correct. Gemini successfully filtered the dataset, renamed the variables, and created the new grouped and categorized variables as expected.
+
+------------------------------------------------------------------------
+
+\
+
+### Problem 5: Create Final Analytic Dataset
+
+Now that the data has been correctly cleaned and filtered, the next step is to create a final, analysis-ready dataset named nhanes_analysis that includes only the key variables needed for analysis.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+From the cleaned dataset, create a final **analysis-ready dataset** named **`nhanes_analysis`**.
+
+-   Keep **only the key variables** needed for analysis:
+
+    -   `SEQN`
+
+    -   `Sex`
+
+    -   `Age`
+
+    -   `AgeGroup`
+
+    -   `RaceEthnicity`
+
+    -   `BMI`
+
+    -   `BMICat`
+
+-   Ensure the dataset is tidy, with variables properly labeled and ready for statistical analysis.
+
+-   Provide the **R code** to complete this task.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Create the final analysis-ready dataset by selecting key variables
+nhanes_analysis <- nhanes_adult %>%
+  select(
+    SEQN,
+    Sex,
+    Age,
+    AgeGroup,
+    RaceEthnicity,
+    BMI,
+    BMICat
+  )
+
+# Print the internal structure of the final dataset
+str(nhanes_analysis)
+
+# Print the first few rows of the final dataset to verify
+print(head(nhanes_analysis))
+
+# Print the dimensions of the final dataset
+print(dim(nhanes_analysis))
+```
+:::
+
+\
+
+The final dataset has been successfully created. `nhanes_analysis` now contains the cleaned and formatted variables ready for analysis.
+
+------------------------------------------------------------------------
+
+\
+
+### Problem 6: Investigating Missing Data
+
+Now that our data has been properly filtered and processed, we can re-examine patterns of missingness. We’ll start by checking the number of missing values in each variable, then use the `naniar` package to visualize the extent of missing data in the `nhanes_analysis` dataset.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Now that the data has been filtered and processed, re-examine **patterns of missingness** in the **`nhanes_analysis`** dataset.
+
+-   Check the **number of missing values** in each variable.
+
+-   Use the **`naniar`** package and `gg_miss_var` function to **visualize the extent of missing data** across the dataset. Title the plot "Missing Data in NHANES Adult Participants (2013-2018)"
+
+-   Provide the **R code** to complete this task.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Check the number of missing values in each variable
+colSums(is.na(nhanes_analysis))
+
+# Create a bar plot of missing data by variable, showing percentages
+gg_miss_var(nhanes_analysis, show_pct = TRUE) +
+  labs(title = "Missing Data in NHANES Adult Participants (2013-2018)")
+```
+:::
+
+\
+
+Gemini was able to perform the missingness check successfully. It provided the correct code using the `gg_miss_var` function to visualize missing values, and the output clearly showed that missingness is limited to the BMI-related variables.
+
+------------------------------------------------------------------------
+
+\
+
+### Problem 7: Investigating Missing Data
+
+Finally, with the data correctly loaded and cleaned for our adult population, we’ll create a summary table of sample characteristics, stratified by Sex, using the `tableone` package.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+With the data correctly loaded and cleaned for the adult population, create a **summary table of sample characteristics** using the **`tableone`** package.
+
+-   Use the **`nhanes_analysis`** dataset.
+
+-   Stratify the table by **Sex**.
+
+-   Include the key variables: `Age`, `AgeGroup`, `RaceEthnicity`, `BMI`, and `BMICat`.
+
+-   Report **means and standard deviations** for continuous variables, and **counts and percentages** for categorical variables.
+
+-   Provide the **R code** to complete this task.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Define the variables to be included in the table
+vars <- c("Age", "AgeGroup", "RaceEthnicity", "BMI", "BMICat")
+
+# Define the variables to be stratified by (Sex)
+strata <- "Sex"
+
+# Create the summary table
+table_one <- CreateTableOne(
+  vars = vars,
+  strata = strata,
+  data = nhanes_analysis,
+  factorVars = c("AgeGroup", "RaceEthnicity", "BMICat"), addOverall = TRUE, test = FALSE
+)
+
+# Print the table with both mean/SD for continuous variables
+# and counts/percentages for categorical variables.
+print(table_one, , smd = FALSE, showAllLevels = TRUE, missing = TRUE)
+
+```
+:::
+
+\
+
+Gemini successfully generated the summary table using the tableone package. The table is correctly stratified by Sex and includes the key variables, providing a clear overview of the sample characteristics.
+
+------------------------------------------------------------------------
+
+\
+
+### Summary
+
+Throughout this tutorial, Gemini consistently performed well in executing each step of the data processing workflow. It correctly loaded and translated NHANES data across multiple cycles, successfully merged datasets, and applied the necessary cleaning and filtering steps. Gemini also handled variable recoding, missingness checks, and descriptive summarization with accuracy and appropriate use of R packages.
+
+\
+[**What Worked Well**]{.underline}
+
+-   Accurately loaded, translated, and merged NHANES data across multiple cycles
+
+-   Correctly filtered for the adult population and applied exclusion criteria
+
+-   Successfully renamed and recoded variables to match analysis specifications
+
+-   Appropriately checked for missingness using the `naniar` package
+
+-   Generated a clear and complete summary table using the `tableone` package, stratified by Sex
+
+## References

@@ -1,0 +1,435 @@
+## Exercise 1 (A) Vibe Part 1 {.unnumbered}
+
+In this tutorial, we will be going through the following exercise [(found here)](https://ehsanx.github.io/EpiMethods/accessingE.html).
+
+This exercise replicates the analysis done in this article:
+
+Palis, Marchand & Oviedo-Joekes (2020). The relationship between sense of community belonging and self-rated mental health among Canadians with mental or substance use disorders. Journal of Mental Health, 29(2): 168–175. DOI: 10.1080/09638237.2018.1437602
+
+We will go through the exercise questions and evaluate how well Gemini performs on each task. These tasks include applying eligibility criteria, subsetting the data in terms of variables and retaining those necessary for analysis, creating an analytic dataset, creating a Table 1, and building a logistic regression model, and presenting odds ratios with 95% confidence intervals. Additionally, we will use what we learned from the previous tutorial [(found here)](.) to streamline these exercises.
+
+In this part of the tutorial, we will go through the first set of tasks, which includes loading, subsetting the data according to eligibility criteria and necessary variables, creating an analytic dataset, and reporting the number of columns and variable names in this dataset. These tutorials were completed in RStudio [@rstudio] using R version 4.3.2 [@r], with the following packages: dplyr [@dplyr], car [@car], and forcats [@forecats].
+
+For this tutorial, I used Gemini’s free 2.5 Flash model.
+
+------------------------------------------------------------------------
+
+\
+
+### Load data and required packages
+
+The data used in this exercise can be found [here](https://github.com/ehsanx/EpiMethods/tree/main/LabExercises/accessingEx/Data/accessing).
+
+```{r, message=FALSE, warning=FALSE, results='hide', cache=TRUE}
+packages <- c("dplyr", "car", "forcats")
+
+lapply(packages, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) install.packages(pkg, dependencies = TRUE)
+  library(pkg, character.only = TRUE)
+})
+
+directory <- "Data/accessing"  # Enter the path to your working directory here
+
+load(paste0(directory, "/cchsMH.RData"))
+
+```
+
+The data dictionary for this dataset can be found [here](https://datalib.usask.ca/dli/health/cchs/2012-mh/doc/cchs_mh_datadictionary.pdf). Download this, as we will need to send it to Gemini.
+
+(Note that in the exercise, exercise 1a is for loading the dataset. We will start at 1b as we have already loaded the data)
+
+------------------------------------------------------------------------
+
+\
+
+### Exercise 1b: Subsetting according to eligibility
+
+For the second exercise, we will subset the data based on the eligibility criteria outlined in the article. We'll send the following prompt, along with the article, to see if Gemini can identify the correct eligibility criteria. In addition to the article, we will also provide the data dictionary.
+
+To ensure Gemini has access to the necessary information, we will begin by sending this prompt to ask what the eligibility criteria are in the paper.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+In the paper *"The relationship between sense of community belonging and self-rated mental health among Canadians with mental or substance use disorders"* by **Palis, Marchand & Oviedo-Joekes**, what **eligibility criteria** were applied to define the analytic sample?
+
+-   Refer to the **first paragraph of the "Analytic sample" section** on **page 2** of the paper.
+
+-   Based on the criteria described there, identify the **specific variable** from the **data dictionary** that should be used to subset the dataset in R.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+The eligibility criteria applied to define the analytic sample in the paper "The relationship between sense of community belonging and self-rated mental health among Canadians with mental or substance use disorders" were restricted to respondents who reported experiencing at least one of the following mental or substance use disorders (MSUDs) in the previous 12 months: a mood disorder (such as a major depressive episode, bipolar disorder, or mania), generalized anxiety disorder, or substance abuse or dependence (involving alcohol, cannabis, or other drugs).\
+\
+Based on these criteria, the specific variable from the data dictionary that should be used to subset the dataset in R is **MHPFY**. You should select observations where `MHPFY` has a code of **1** (indicating "YES" for having any selected disorder in the past 12 months).
+:::
+
+\
+
+Based on the data dictionary, this variable fits the description of the eligibility criteria. Gemini successfully identified the correct variable to use. Now, let's ask Gemini for the R code to subset the data based on this eligibility criteria.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Using **RStudio**, apply the eligibility criteria to the `cmh` dataset by subsetting the data to include only respondents who meet the condition specified in the **Analytic sample** section of the paper.
+
+-   Retain only those coded as **"YES"** on the eligibility variable.
+
+-   Provide the R code to complete this task.
+
+-   The `dplyr` package has already been loaded
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+```{r, cache=TRUE}
+# Subset the cmh dataset to include only respondents who meet the eligibility criteria (MHPFY == 1)
+cmh_analytic_sample <- cmh %>%
+  filter(MHPFY == "YES")
+```
+:::
+
+\
+Great, the code provided by Gemini successfully filtered the dataset to include only eligible respondents.
+
+------------------------------------------------------------------------
+
+\
+
+### Exercise 1c: Retaining necessary variables
+
+For the second task, we will be keeping only the variables we need for the analysis. Specifically, retain only the variables associated with the outcome measure, explanatory variable, potential confounders, and survey weight. There should be eight variables (one outcome, one exposure, five confounders, and one survey weight).
+
+We need to:
+
+-   Identify the outcome variable
+
+-   Identify the explanatory variable
+
+-   Identify the potential confounders
+
+-   Identify the survey weight variable
+
+The study variables are mentioned in the paper. Specifically, the first and second paragraphs of the study variables section mentions the outcome, explanatory and confounding variables, and the third paragraph of the statistical analyses section mentions the survey weights variable.
+
+I will send the following prompt to Gemini for this task. All previous information that we have sent should help Gemini choose the correct variables.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Retain only the variables associated with the **outcome**, **explanatory variable**, **potential confounders**, and **survey weight** from the dataset. There should be **eight variables total**:
+
+-   1 outcome variable
+
+-   1 explanatory variable
+
+-   5 confounders
+
+-   1 survey weight variable
+
+Follow these steps:
+
+-   Identify the **outcome variable**
+
+-   Identify the **explanatory variable**
+
+-   Identify the **five potential confounders**
+
+-   Identify the **survey weight variable**
+
+**Hint:**
+
+-   Refer to the **first and second paragraphs** of the *Study variables* section for the outcome, explanatory, and confounding variables.
+
+-   Refer to the **third paragraph** of the *Statistical analyses* section to determine the survey weight variable.
+
+Once you have established the variables, subset the data and rename the variables for simplicity.
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+To subset your cmh dataset and retain only the variables associated with the outcome, explanatory variable, potential confounders, and the survey weight, follow the R code below.
+
+Here are the identified variables:
+
+-   **Outcome Variable:** `SCR_082` (Self-perceived mental health)
+
+    -   *Reference:* Page 16 of the CCHS-MH Data Dictionary
+
+-   **Explanatory Variable:** `GEN_10` (Sense of belonging to local community)
+
+    -   *Reference:* Page 14 of the CCHS-MH Data Dictionary
+
+-   **Confounders (5 variables):**
+
+    -   Age: `DHHGAGE` (Age grouped variable)
+
+        -   *Reference:* Page 4 of the CCHS-MH Data Dictionary
+
+    -   Sex: `DHH_SEX` (Sex)
+
+        -   *Reference:* Page 5 of the CCHS-MH Data Dictionary
+
+    -   Cultural or Racial Identity: `SDCGCGT` (Grouped visible minority). This variable is derived to classify respondents as visible minority or non-visible minority, aligning with the "non-white" versus "white" distinction in the paper.
+
+        -   *Reference:* Page 335 of the CCHS-MH Data Dictionary
+
+    -   Main Source of Income: `INCG7` (Main source of household income - 7 groups)
+
+        -   *Reference:* Page 330 of the CCHS-MH Data Dictionary
+
+    -   Received Help for Mental Health/Substance Use: `PNC_01A` (Received help for problems with emotions, mental health or use of alcohol/drugs in the past 12 months)
+
+        -   *Reference:* Page 223 of the CCHS-MH Data Dictionary
+
+-   **Survey Weight Variable:** `WTS_M` (Master weight for respondents)
+
+    -   *Reference:* Page 338 of the CCHS-MH Data Dictionary
+
+**R Code to Subset and Rename Variables:**
+
+Using the `dplyr` package, you can select these variables from your `analytic_sample` dataset (which is the dataset after applying eligibility criteria) and rename them for simplicity:
+
+```{r, cache=TRUE}
+# Select and rename the specified variables from your analytic_sample dataset
+subsetted_data <- cmh_analytic_sample %>%
+  select(
+    srmh = SCR_082,        # Outcome: Self-perceived mental health
+    community = GEN_10,    # Explanatory: Sense of belonging to local community
+    sex = DHH_SEX,         # Confounder: Sex
+    age = DHHGAGE,         # Confounder: Age grouped
+    race = SDCGCGT,        # Confounder: Grouped visible minority
+    income = INCG7,        # Confounder: Main source of household income
+    help = PNC_01A,        # Confounder: Received help for mental health/substance use
+    weight = WTS_M         # Survey weight
+  )
+
+
+# You can now view the structure or a summary of your new dataset:
+str(subsetted_data)
+summary(subsetted_data)
+```
+:::
+
+That worked well. Gemini correctly identified the appropriate variables based on the data dictionary and provided code that executed successfully, along with functions to verify the output.
+
+\
+
+------------------------------------------------------------------------
+
+\
+
+### Exercise 1d: Creating analytic dataset
+
+For the third task, we will be creating an analytic dataset.
+
+The outcome variable has a category ‘NOT STATED’, but for our analysis, we will omit anyone associated with this category. Similarly, for the explanatory variable, we have categories such as DON’T KNOW, REFUSAL, and NOT STATED. We will omit anyone with these categories.
+
+What we want to do is:
+
+-   Assign missing values for categories such as DON’T KNOW, REFUSAL, and NOT STATED.
+-   Recode the variables as shown in Table 1 in the article. You can use any function/package of your choice. Here is an example (but feel free to use other functions. In R, there are many other ways to do this same task.
+
+I will send the following prompt, along with the levels for each of the updated variables. Additionally, I will send the Table 1.
+
+\
+**Prompt Sent to Gemini:**
+
+::: {.callout-note title="User Prompt"}
+Create an analytic dataset.
+
+-   The outcome variable contains a "NOT STATED" category. For our analysis, we want to omit any respondents with this value.
+
+-   The explanatory variable contains the categories "DON'T KNOW", "REFUSAL", and "NOT STATED". These should also be excluded from the analysis.
+
+Please do the following:
+
+-   Assign missing values (NA) to all of the above non-informative response categories.
+
+-   Recode the outcome and explanatory variables according to how they are presented in Table 1 of the article.
+
+-   Ensure that the recoded variables are properly labeled and formatted as factors, and that any excluded values are treated as NA and omitted from the final dataset.
+
+```{r, cache=TRUE}
+levels(subsetted_data$srmh)
+levels(subsetted_data$community)
+levels(subsetted_data$age)
+levels(subsetted_data$sex)
+levels(subsetted_data$race)
+levels(subsetted_data$income)
+levels(subsetted_data$help)
+
+```
+:::
+
+\
+**Gemini's response:**
+
+::: {.callout-tip title="Gemini Response"}
+Here's the R code to create your analytic dataset, addressing the handling of missing values and recoding the outcome and explanatory variables as presented in Table 1 of the article. This code also ensures proper labeling and factor formatting, with excluded values treated as `NA` and then omitted from the final dataset.
+
+```{r, cache=TRUE}
+# Start with original data
+cleaned_data <- subsetted_data %>%
+  
+  # 1. Recode self-rated mental health
+  mutate(
+    srmh = car::recode(
+      srmh,
+      "c('FAIR','POOR') = 'Poor or Fair';
+       'GOOD' = 'Good';
+       c('EXCELLENT','VERY GOOD') = 'Very good or excellent';
+       else = NA"
+    ),
+    srmh = factor(
+      srmh,
+      levels = c("Poor or Fair", "Good", "Very good or excellent"),
+      ordered = TRUE
+    )
+  ) %>%
+  
+  # 2. Recode sense of community
+  mutate(
+    community = car::recode(
+      community,
+      "'VERY STRONG' = 'Very strong';
+       'SOMEWHAT STRONG' = 'Somewhat strong';
+       'SOMEWHAT WEAK' = 'Somewhat weak';
+       'VERY WEAK' = 'Very weak';
+       else = NA"
+    ),
+    community = factor(
+      community,
+      levels = c("Very weak", "Somewhat weak", "Somewhat strong", "Very strong")
+    )
+  ) %>%
+  
+  # 3. Recode sex
+  mutate(
+    sex = car::recode(
+      sex,
+      "'MALE' = 'Males';
+       'FEMALE' = 'Females';
+       else = NA"
+    )
+  ) %>%
+  
+  { 
+    levels(.$age) <- list(
+      "15 to 24 years" = c("15 TO 19 YEARS", "20 TO 24 YEARS"),
+      "25 to 34 years" = c("25 TO 29 YEARS", "30 TO 34 YEARS"),
+      "35 to 44 years" = c("35 TO 39 YEARS", "40 TO 44 YEARS"),
+      "45 to 54 years" = c("45 TO 49 YEARS", "50 TO 54 YEARS"),
+      "55 to 64 years" = c("55 TO 59 YEARS", "60 TO 64 YEARS"),
+      "65 years or older" = c("65 TO 69 YEARS", "70 TO 74 YEARS", "75 TO 79 YEARS", "80 YEARS OR MORE")
+    )
+    .
+  } %>%
+  
+  # 5. Recode race
+  mutate(
+    race = car::recode(
+      race,
+      "'WHITE' = 'White';
+       'NON-WHITE' = 'Non-white';
+       else = NA"
+    )
+  ) %>%
+  
+  # 6. Recode income
+  mutate(
+    income = case_when(
+      income == "EMPLOYMENT INC." ~ "Employment Income",
+      income == "EI/WORKER'S COMP" ~ "Worker's Compensation",
+      income == "SENIOR BENEFITS" ~ "Senior Benefits",
+      income == "OTHER" ~ "Other",
+      income == "NOT APPLICABLE" ~ "Not applicable",
+      TRUE ~ NA_character_
+    ),
+    income = factor(income, levels = c(
+      "Employment Income", "Worker's Compensation",
+      "Senior Benefits", "Other", "Not applicable"
+    ))
+  ) %>%
+  
+  # 7. Recode help received
+  mutate(
+    help = car::recode(
+      help,
+      "'YES' = 'Yes';
+       'NO' = 'No';
+       else = NA"
+    ),
+    help = factor(help, levels = c("No", "Yes"))
+  ) %>%
+  
+  select(-c(income, help)) %>%
+  
+  as.data.frame() %>%
+  
+  na.omit()
+
+
+# Final dataset
+analytic_data <- cleaned_data
+```
+:::
+
+\
+I will run the following code to confirm if Gemini's code worked:
+
+```{r, cache=TRUE}
+table(analytic_data$srmh, useNA = "always")
+table(analytic_data$community, useNA = "always")
+table(analytic_data$age, useNA = "always")
+table(analytic_data$sex, useNA = "always")
+table(analytic_data$race, useNA = "always")
+table(analytic_data$income, useNA = "always")
+table(analytic_data$help, useNA = "always")
+```
+
+\
+
+Using this code, it seems the analytic dataset was created successfully.
+
+------------------------------------------------------------------------
+
+\
+
+### Summary
+
+Using Gemini, we were able to complete the first set of tasks. In all instances, Gemini accurately identified the correct variables based on the data dictionary. It also successfully created the analytic dataset using the exclusion criteria and correctly recoded the variables.
+
+\
+[**What Worked Well**]{.underline}
+
+-   Successfully created the analytic dataset when it understood which variables to use.
+
+\
+
+While Gemini was successful during these exercises, it's important not to assume that AI tools will always produce correct results. They are prone to errors and can sometimes fill in gaps when information is missing, which may lead to inaccurate outputs. Always review, validate, and test results before relying on them, especially in cases where precision is critical.
+
+------------------------------------------------------------------------
+
+\
+
+### In the Next Tutorial
+
+In the next tutorial, we will evaluate how well Gemini performs in generating a Table 1, performing logistic regression, and producing odds ratios and confidence intervals. We will save the data we have created to our working directory so we can load it for the next tutorial.
+
+```{r, cache=TRUE}
+save(analytic_data, file = paste0(directory, "/analytic_data.RData"))
+
+```
+
+## References

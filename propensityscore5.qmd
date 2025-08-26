@@ -2,7 +2,6 @@
 
 The tutorial provides a detailed walkthrough of implementing Propensity Score Matching (PSM) combined with Multiple Imputation (MI) in a statistical analysis, focusing on handling missing data and mitigating bias in observational studies.
 
-
 The initial chunk is dedicated to loading various R packages that will be utilized throughout the tutorial. These libraries provide functions and tools that facilitate data manipulation, statistical modeling, visualization, and more.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
@@ -43,8 +42,7 @@ library(mice)
 **Predictive Mean Matching**:
 
 The "Predictive Mean Matching" (PMM) method in Multiple Imputation (MI) is a widely used technique to handle missing data, particularly well-suited for continuous variables. PMM operates by first creating a predictive model for the variable with missing data, using observed values from other variables in the dataset. For each missing value, PMM identifies a set of observed values with predicted scores that are close to the predicted score for the missing value, derived from the predictive model. Then, instead of imputing a predicted score directly, PMM randomly selects one of the observed values from this set and assigns it as the imputed value. This method retains the original distribution of the imputed variable since it only uses observed values for imputation, and it also tends to preserve relationships between variables. PMM is particularly advantageous when the normality assumption of the imputed variable is questionable, providing a robust and practical approach to managing missing data in various research contexts.
-::: 
-
+:::
 
 #### Propensity score matching (Zanutto, 2006)
 
@@ -78,7 +76,7 @@ Variables under consideration:
 
 #### Pre-processing
 
-The data is loaded and variables of interest are identified. 
+The data is loaded and variables of interest are identified.
 
 ```{r data, cache=TRUE}
 load(file="Data/propensityscore/NHANES17.RData") # read data
@@ -93,7 +91,7 @@ vars <- c("ID", # ID
 
 #### Subset the dataset
 
-The dataset is then subsetted to retain only the relevant variables, ensuring that subsequent analyses are focused and computationally efficient. 
+The dataset is then subsetted to retain only the relevant variables, ensuring that subsequent analyses are focused and computationally efficient.
 
 ```{r subset, cache=TRUE}
 dat.with.miss <- analytic.with.miss[,vars]
@@ -101,7 +99,6 @@ dim(analytic.with.miss)
 ```
 
 #### Inspect weights
-
 
 The weights of the observations are inspected and adjusted to avoid issues in subsequent analyses.
 
@@ -147,7 +144,7 @@ Note that, **multiple imputation then delete** (MID) approach can be applied if 
 **Multiple imputation then delete (MID)**:
 
 MID is a specific approach used in the context of multiple imputation (MI) when dealing with missing outcome data. All missing values, including those in the outcome variable, are imputed to create several complete datasets. In subsequent analyses, the imputed values for the outcome variable are deleted, so that only observed outcome values are analyzed. Each dataset (with observed outcome values and imputed predictor values) is analyzed separately, and results are pooled to provide a single estimate.
-::: 
+:::
 
 ### Logistic regression
 
@@ -260,11 +257,11 @@ allImputations <- imputationList(lapply(1:m,
 ::: callout-tip
 An iterative process is performed within each imputed dataset, which involves:
 
-1. Estimating propensity scores.
-2. Matching treated and untreated subjects based on these scores.
-3. Extracting matched data and checking the balance of covariates across matched groups.
-4. Fitting outcome models to the survey weighted matched data and estimating treatment effects.
-::: 
+1.  Estimating propensity scores.
+2.  Matching treated and untreated subjects based on these scores.
+3.  Extracting matched data and checking the balance of covariates across matched groups.
+4.  Fitting outcome models to the survey weighted matched data and estimating treatment effects.
+:::
 
 Notice that we are performing multi-step process within MI
 
