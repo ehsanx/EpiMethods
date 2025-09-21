@@ -1131,8 +1131,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   <li><a href="#birth-weight-paradox" id="toc-birth-weight-paradox" class="nav-link" data-scroll-target="#birth-weight-paradox">Birth Weight Paradox</a></li>
   <li><a href="#data-generation" id="toc-data-generation" class="nav-link" data-scroll-target="#data-generation">Data Generation</a></li>
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
-  <li><a href="#simpsons-paradox-in-the-current-example" id="toc-simpsons-paradox-in-the-current-example" class="nav-link" data-scroll-target="#simpsons-paradox-in-the-current-example">Simpson’s Paradox in the Current Example</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#clarifying-the-target-total-effect-vs.-direct-effect" id="toc-clarifying-the-target-total-effect-vs.-direct-effect" class="nav-link" data-scroll-target="#clarifying-the-target-total-effect-vs.-direct-effect">Clarifying the Target: Total Effect vs.&nbsp;Direct Effect</a></li>
+  <li><a href="#causal-questions-dictate-correct-methods" id="toc-causal-questions-dictate-correct-methods" class="nav-link" data-scroll-target="#causal-questions-dictate-correct-methods">Causal Questions Dictate Correct Methods</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -1154,8 +1154,9 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p>In this tutorial, we will use <strong>simcausal</strong> in R to simulate data and demonstrate how <strong>Simpson’s Paradox</strong> arises in a birthweight example similar to the “Birthweight Paradox” discussed by <a href="https://doi.org/10.1093/aje/kwj275">Hernández-Díaz et al.&nbsp;(2006)</a>. The paradox arises when adjusting for birthweight, leading to misleading conclusions about the relationship between maternal smoking and infant mortality. We will show how improper adjustment for birthweight, a collider in this context, can lead to biased estimates, and how to correct for this.</p>
 </section><section id="birth-weight-paradox" class="level3"><h3 class="anchored" data-anchor-id="birth-weight-paradox">Birth Weight Paradox</h3>
 <p>Studies showed that while maternal smoking increased the risk of low birth weight (LBW) and infant mortality, among LBW infants, <a href="https://doi.org/10.1093/oxfordjournals.aje.a121278">those born to smokers had lower infant mortality than LBW infants born to non-smokers</a>. This seemingly paradoxical finding suggests that smoking could be “protective” for LBW infants, contradicting the established harmful effects of smoking during pregnancy.</p>
-<p>This paradox is a classic example of <strong>Simpson’s Paradox</strong>, where stratifying by or conditioning on a variable (in this case, birthweight) can lead to paradoxical conclusions if the variable is a collider.</p>
+<p>This is a classic example of Simpson’s Paradox. The statistical reversal happens upon stratification, and the reason in this specific causal structure is that birthweight acts as a collider. Understanding this causal role is the only way to determine whether the stratified or unstratified result is the correct one for our research question.</p>
 </section><section id="data-generation" class="level3"><h3 class="anchored" data-anchor-id="data-generation">Data Generation</h3>
+<p>A Directed Acyclic Graph (DAG) is more than a mere illustration; it is a formal representation of a set of non-parametric causal assumptions about the data-generating process. The DAG provided in the tutorial encapsulates the hypothesized relationships between maternal smoking, an unmeasured factor, low birthweight, and infant mortality.</p>
 <section id="setup" class="level4"><h4 class="anchored" data-anchor-id="setup">Setup</h4>
 <p>We will use the following R packages:</p>
 <div class="cell">
@@ -1202,17 +1203,13 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p></p><figcaption class="figure-caption">DAG Plot</figcaption><p></p>
 </figure>
 </div>
-</section><section id="understanding-collider-role" class="level4"><h4 class="anchored" data-anchor-id="understanding-collider-role">Understanding Collider Role</h4>
-<p>A <a href="confounding3.html">collider</a> is a variable that has two or more incoming arrows from other variables in a DAG. In simpler terms, a collider is influenced by two or more variables. When you condition on a collider (by adjusting for it in your analysis), you can introduce bias known as collider bias because you open a path between the variables that influence the collider, which might otherwise be independent.</p>
-<p>A variable is a collider if it has two or more incoming arrows. In your DAG, low birth weight has two incoming arrows:</p>
+</section><section id="the-dual-role-of-low-birthweight-mediator-and-collider" class="level4"><h4 class="anchored" data-anchor-id="the-dual-role-of-low-birthweight-mediator-and-collider">The Dual Role of Low Birthweight: Mediator and Collider</h4>
+<p>The key to this puzzle is that LowBirthweight plays two different and conflicting roles depending on which causal path you examine.</p>
 <ul>
-<li>One from Smoking.</li>
-<li>One from Unmeasured factors (e.g., birth defects).</li>
+<li><p><strong>Mediator:</strong> On the path Smoking → LowBirthweight → Mortality, LBW is a mediator. It is a mechanism through which smoking causes death. Smoking leads to LBW, which in turn leads to mortality. The purpose of mediation analysis is often to isolate the direct effect from this indirect, mediated path.</p></li>
+<li><p><strong>Collider:</strong> On the path Smoking → LowBirthweight ← Unmeasured, LBW is a collider. A collider is a variable that is a common effect of two other variables (arrows “collide” into it). The fundamental rule of DAGs concerning colliders is that one must not condition on them or their descendants. Conditioning on a collider opens the non-causal path between its parents, inducing a spurious statistical association where none may have existed before. Conditioning on a collider (by adjusting for it in a model or stratifying by it) is a major analytical error.</p></li>
 </ul>
-<p>Therefore, low birth weight is a collider in this DAG. Specifically, it is a collider between Smoking and Unmeasured factors.</p>
-</section><section id="understanding-mediating-role" class="level4"><h4 class="anchored" data-anchor-id="understanding-mediating-role">Understanding Mediating Role</h4>
-<p>A <a href="confounding2.html">mediator</a> is a variable that lies on the causal path between two other variables (a topic for a different <a href="mediation.html">chapter</a>). It transmits the effect of an independent variable on a dependent variable. Mediators are important because they explain part of the causal relationship between the independent and dependent variables. Adjusting for mediators can help understand indirect effects.</p>
-<p>In this pathway, LowBirthweight is a mediator because it transmits the effect of Smoking on Mortality. In this context, LowBirthweight explains part of the mechanism by which Smoking increases the risk of Mortality (through its effect on birthweight). However, we would not be able to fully decompose the direct and indirect effects of Smoking on Mortality in the presence of the unmeasured variable (e.g., birth defects or another unobserved confounder), because this unmeasured variable creates confounding that affects both LowBirthweight and Mortality.</p>
+<p>This dual role creates an analytical trap. The statistical act of adjusting for LowBirthweight—which you might do to block its mediating effect—simultaneously conditions on it as a collider. This opens a spurious “backdoor” path between Smoking and the Unmeasured factors, introducing severe bias and leading to the paradoxical conclusion.</p>
 </section><section id="simulate-data" class="level4"><h4 class="anchored" data-anchor-id="simulate-data">Simulate Data</h4>
 <p>We now simulate data based on the DAG structure.</p>
 <div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-4_58a43446a9bcf09ca123821e7abdfa08">
@@ -1364,7 +1361,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </table>
 </div>
 </div>
-</section><section id="incorrect-adjustment-conditioning-on-a-collider" class="level4"><h4 class="anchored" data-anchor-id="incorrect-adjustment-conditioning-on-a-collider">Incorrect Adjustment: Conditioning on a Collider</h4>
+</section><section id="analysis-part-1-attempting-to-estimate-the-direct-effect" class="level4"><h4 class="anchored" data-anchor-id="analysis-part-1-attempting-to-estimate-the-direct-effect">Analysis Part 1: Attempting to Estimate the Direct Effect</h4>
 <p>We now show what happens when we adjust for <strong>LowBirthweight</strong>, which acts as a collider.</p>
 <div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-7_704d9abecafc2abf020a407fb7d195d0">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Model adjusted for LowBirthweight (incorrect adjustment)</span></span>
@@ -1418,7 +1415,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </table>
 </div>
 </div>
-<p><strong>Explanation</strong>: Adjusting for the collider (Low Birthweight) leads to biased estimates of the effect of smoking on mortality. By conditioning on this collider, we are introducing a spurious association between <strong>Smoking</strong> and <strong>Birth Defect (Unmeasured)</strong>.</p>
+<p><strong>Explanation</strong>: To estimate the direct effect of smoking (the effect not mediated through birthweight), the standard approach would be to adjust for the mediator, <code>LowBirthweight</code>. However, in this causal structure, this adjustment is incorrect because it simultaneously conditions on a collider. This opens a spurious backdoor path between <code>Smoking</code> and <code>Unmeasured</code>, introducing collider bias. The resulting odds ratio of 0.73 is not a valid estimate of the direct effect; it is a hopelessly biased number.</p>
 </section><section id="stratification" class="level4"><h4 class="anchored" data-anchor-id="stratification">Stratification</h4>
 <p>We will now stratify the data by <strong>Low Birthweight</strong> and calculate the effect of smoking on mortality separately for <strong>low birthweight</strong> and <strong>normal birthweight</strong> infants.</p>
 <div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-8_ce0065b800155f58824c14cf26e9dbd5">
@@ -1550,7 +1547,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </div>
 </div>
 </section><section id="correct-approach-no-adjustment-for-lowbirthweight" class="level4"><h4 class="anchored" data-anchor-id="correct-approach-no-adjustment-for-lowbirthweight">Correct Approach: No Adjustment for LowBirthweight</h4>
-<p>Here, we show the correct approach, which is to avoid adjusting for the collider (<strong>LowBirthweight</strong>). This avoids the introduction of collider bias.</p>
+<p>To estimate the total causal effect of smoking on mortality (the net effect through all pathways), we must not adjust for the mediator, <code>LowBirthweight</code>. Our DAG shows no other open backdoor paths that need blocking. Therefore, the unadjusted model correctly estimates the total causal effect.</p>
 <div class="cell" data-hash="confounding3b_cache/html/unnamed-chunk-10_42c2cc54e0da49b051aede467290355f">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Correct model (no adjustment for LowBirthweight)</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>fit_correct <span class="ot">&lt;-</span> <span class="fu">glm</span>(Mortality <span class="sc">~</span> Smoking, <span class="at">family =</span> <span class="fu">binomial</span>(), <span class="at">data =</span> sim_data)</span>
@@ -1706,22 +1703,41 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <p><img src="confounding3b_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</section></section><section id="simpsons-paradox-in-the-current-example" class="level3"><h3 class="anchored" data-anchor-id="simpsons-paradox-in-the-current-example">Simpson’s Paradox in the Current Example</h3>
-<p>Simpson’s Paradox occurs when the relationship between two variables changes direction when data is stratified by a third variable. In our case, we observe this paradox when examining the effect of maternal smoking on infant mortality, particularly in relation to birth weight.</p>
+</section></section><section id="clarifying-the-target-total-effect-vs.-direct-effect" class="level3"><h3 class="anchored" data-anchor-id="clarifying-the-target-total-effect-vs.-direct-effect">Clarifying the Target: Total Effect vs.&nbsp;Direct Effect</h3>
+<p>A frequent source of confusion in causal analysis is the failure to distinguish between different causal questions, or “estimands.” The tutorial correctly demonstrates how to estimate the total causal effect of smoking, while the user’s query focuses on the direct effect. These are distinct quantities that require different analytical strategies.</p>
 <ul>
-<li>Initially, the crude analysis shows that smoking increases the overall risk of mortality.</li>
-<li>However, when we stratify by birth weight, a seemingly paradoxical result emerges: among low birthweight (LBW) infants, those born to smokers appear to have lower mortality than those born to non-smokers.</li>
+<li><p><strong>Total Causal Effect</strong>: This estimand represents the overall impact of the exposure on the outcome, encompassing all causal pathways. It answers the question: “What is the net effect of a mother smoking versus not smoking on the risk of infant mortality?” To estimate the TCE, an analyst must block all non-causal “back-door” paths between the exposure and outcome. In the provided DAG, there are no open back-door paths from <code>Smoking</code> to <code>Mortality</code>. The path through <code>LowBirthweight</code> is a front-door (causal) path, and the path involving the <code>Unmeasured</code> variable is blocked by the collider <code>LowBirthweight</code>. Therefore, as the tutorial’s “Correct Approach” shows, the total causal effect is correctly estimated by a simple unadjusted regression of <code>Mortality</code> on <code>Smoking</code>, which yields an Odds Ratio (OR) of 2.31.</p></li>
+<li><p><strong>Direct Effect</strong>: This estimand represents the effect of the exposure on the outcome that does not operate through a specific mediator. It answers the question: “What is the effect of a mother smoking on infant mortality, independent of its effect on the baby’s birth weight?” As noted above, the conventional (though in this case, incorrect) approach to isolating this effect is to include the mediator as a covariate in a regression model. The tutorial’s “Incorrect Adjustment” section performs exactly this, regressing <code>Mortality</code> on both <code>Smoking</code> and <code>LowBirthweight</code>.</p></li>
+</ul></section><section id="causal-questions-dictate-correct-methods" class="level3"><h3 class="anchored" data-anchor-id="causal-questions-dictate-correct-methods">Causal Questions Dictate Correct Methods</h3>
+<p>The Birthweight Paradox is a powerful lesson in causal inference. It demonstrates that a naive statistical adjustment, without regard for the underlying causal structure, can produce results that are not just wrong, but dangerously misleading.</p>
+<ul>
+<li><p><strong>The “paradox” is resolved by causal reasoning</strong>: The reversal is caused by conditioning on <code>LowBirthweight</code>, a variable that is simultaneously a mediator of the effect we want to study and a collider that introduces bias from an unmeasured variable.</p></li>
+<li>
+<p><strong>The analysis must match the question</strong>:</p>
+<ul>
+<li><p>To estimate the <strong>total effect</strong> of smoking, we must <em>not</em> adjust for the mediator/collider. The unadjusted OR of 2.31 is the correct estimate for this question.</p></li>
+<li><p>Estimating the <strong>direct effect</strong> is not possible with simple adjustment in this scenario. The adjusted OR of 0.73 is a biased artifact and does not represent a real causal effect.</p></li>
 </ul>
-<p>This misleading association suggests that smoking is “protective” for LBW infants, which contradicts well-established evidence that smoking during pregnancy is harmful.</p>
-<p>The reason for this paradox is that birth weight acts as a <strong>collider</strong> in this causal pathway. Both smoking and unmeasured factors (such as birth defects) influence birth weight, and birth weight itself is a strong predictor of mortality. By conditioning on or adjusting for birth weight, we introduce bias that distorts the true relationship between smoking and infant mortality. This paradox demonstrates the importance of using causal diagrams, such as DAGs, to avoid improper adjustment and accurately infer causal relationships.</p>
-</section><section id="conclusion" class="level3"><h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+</li>
+</ul>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+The Quest for the Direct Effect: A Fundamental Problem of Identifiability
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Estimating the direct effect (“What is the effect of smoking on mortality that is not mediated by birthweight?”) is “not possible with simple adjustment” because the necessary information to disentangle the direct effect from the confounding effect of the Unmeasured variable is simply not present in the observable data (<code>Smoking</code>, <code>LowBirthweight</code>, <code>Mortality</code>). No matter how sophisticated a regression model one fits using only these observed variables, it cannot recover an unbiased estimate of the (natural) direct effect. The problem is not with the statistical tool, but with the fundamental limits of what the data can reveal given the causal reality depicted by the DAG. The language of potential outcomes makes this challenge explicit, as it requires estimating “cross-world” counterfactuals (e.g., the outcome under smoking with the mediator at its non-smoking level), which is impossible when an unmeasured confounder links the worlds of the mediator and the outcome.</p>
+<p>Advanced methods such as instrumental variable analysis represents a powerful theoretical alternative for achieving identification in the face of unmeasured confounding. However, it should not be seen as a simple or universally applicable solution. It requires a fundamental shift in the “burden of belief” from the assumption of no unmeasured confounding (sequential ignorability) to a different, and often more stringent, set of untestable assumptions about the existence of a valid instrument. The choice between these analytical frameworks is not a statistical one, but a scientific one, based on which set of assumptions is most defensible in a specific research context.</p>
+</div>
+</div>
 <ul>
 <li>
-<strong>Key Insight</strong>: Avoid adjusting for colliders when estimating causal effects. Use tools like <strong>DAGs</strong> to identify colliders and confounders in your model.</li>
-<li>
-<strong>Correct Approach</strong>: When analyzing the effect of <strong>Smoking</strong> on <strong>Mortality</strong>, do not adjust for <strong>Low Birthweight</strong> as it is a collider.</li>
+<strong>Key Insight</strong>: The most important step in an analysis is to draw a DAG based on subject-matter knowledge. This causal map is essential for identifying which variables to adjust for and which to leave alone to answer your specific research question correctly.</li>
 </ul>
-<p>By avoiding collider bias, we ensure accurate causal inferences.</p>
 
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
