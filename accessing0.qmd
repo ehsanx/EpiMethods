@@ -25,6 +25,14 @@ Optional reading:
 ::: callout-tip
 ### Model-based approach
 
+In statistical inference, one of the primary frameworks is the model-based approach. This method assumes that the data we have collected is a realization of a larger, underlying random process that can be described by a statistical model.
+
+*   **Population:** The population is considered infinite and governed by a reasonable probability distribution.
+*   **Sample:** The sample is assumed to be a random sample, with each observation selected with equal probability and being independent of the others.
+*   **Generalization:** The goal is to make inferences about the parameters of the underlying model or the data-generating process, not just the specific finite population from which the sample was drawn.
+
+---
+
 Review materials from pre-requisite statistics courses (optional)
 :::
 
@@ -35,7 +43,67 @@ Review materials from pre-requisite statistics courses (optional)
 :::
 
 ::: callout-tip
-### Design-based approach
+
+
+
+## Design-Based Approach
+
+The analysis of complex survey data is almost always conducted within the design-based framework. This approach is fundamentally different from the model-based approach in its assumptions and goals.
+
+*   **Population:** The population is viewed as a fixed and finite collection of units (e.g., all non-institutionalized adults in the U.S. at a specific time).
+*   **Sample:** The sample is drawn using a known probability mechanism, where the probability of selection is known for every individual. Crucially, observations may be dependent on one another due to the sampling design.
+*   **Generalization:** Inference is made about the parameters of the specific finite population from which the sample was drawn. The results are not intended to be generalized to other populations or an abstract data-generating process.
+
+The key distinction between the two frameworks is the population to which the results can be generalized.
+
+| Feature | Model-Based Inference | Design-Based Inference |
+|---|---|---|
+| **Population Assumption** | Infinite; a realization of an underlying random process. | Fixed and finite (e.g., the population of a country). |
+| **Source of Randomness** | The assumed statistical model that generates the data. | The known, probabilistic sampling mechanism. |
+| **Target of Inference** | Parameters of the superpopulation model. | Parameters of the finite population. |
+
+## Complex surveys 
+
+Complex surveys do not use a simple random sample (SRS). Instead, they employ sophisticated, multi-stage sample designs to increase logistical convenience and ensure that specific groups of interest are adequately represented. The main pillars of these designs are :
+
+*   **Stratification:** The process of dividing the population into distinct subgroups, or "strata," before sampling begins (e.g., by geography or urban/rural status). This is done to ensure that key groups are represented with reasonable precision and generally works to decrease the standard error of estimates.
+*   **Clustering:** A technique where natural groupings of individuals (e.g., counties, city blocks) are sampled first. Subsequent sampling then occurs within the selected clusters. This is done primarily for convenience and to reduce data collection costs, but it tends to increase the standard error of estimates because individuals within a cluster are often more similar to each other than to the general population.
+*   **Weighting:** A survey weight is assigned to each participant in a complex survey to ensure that the sample is representative of the target population. Conceptually, a respondent's weight is the number of people in the population that they represent.
+
+In NHANES, the final interview weight is constructed in a three-step process to account for the complex design: (a) Base Weight (Probability of Selection), (b) Nonresponse Adjustment, (c) Post-stratification. We will learn more about them [later](surveydata0.html).
+
+## Statistical Inference
+
+Statistical inference is the process of drawing conclusions about a population from a sample. As reviewed above, this can be done through a model-based or design-based framework. When complex sampling designs are used, the observations are no longer independent and identically distributed (I.I.D.), which is a core assumption of standard statistical methods. Failure to account for the survey design invalidates these methods, rendering the resulting coefficients, p-values, and confidence intervals useless for making valid inferences about the population. Therefore, all analyses must be conducted using specialized, design-based methods that properly account for the survey's structure.
+
+## NHANES
+
+The National Health and Nutrition Examination Survey (NHANES) is a major program of the National Center for Health Statistics (NCHS) and serves as a primary example throughout this course.
+
+*   **Purpose:** NHANES is designed to assess the health and nutritional status of the adult and child population in the United States. It is unique in that it combines in-home interviews with comprehensive physical examinations and laboratory tests conducted in Mobile Examination Centers (MECs).
+*   **History:** Early surveys were conducted periodically (NHANES I, II, III). Since 1999, NHANES has been a continuous survey, with data released in two-year cycles to ensure stable and reliable estimates.
+
+## NHANES Sampling Design
+
+The NHANES sample is **not** a simple random sample. It uses a complex, four-stage probability sampling design:
+
+*   **Stage 1: Primary Sampling Units (PSUs):** The U.S. is divided into PSUs, which are typically counties. These PSUs are grouped into strata, and a sample of PSUs is selected from each stratum.
+*   **Stage 2: Segments:** Each selected PSU is further divided into smaller geographic areas called segments (e.g., city blocks), and a sample of these segments is drawn.
+*   **Stage 3: Households:** Within each selected segment, a list of all housing units is compiled, and a sample of households is randomly selected.
+*   **Stage 4: Individuals:** Finally, within each selected household, individuals are randomly chosen from a list of all household members based on specific screening criteria.
+
+For public-use data files, the true PSU and strata identifiers are masked to protect participant confidentiality. Instead, NHANES provides masked variance pseudo-stratum (`SDMVSTRA`) and pseudo-PSU (`SDMVPSU`) variables, which must be used for correct variance estimation.
+
+## How to Find NHANES Data from the CDC Website
+
+While the course provides curated datasets, it is also important to know how to find data directly from the source. To find NHANES data on the official Centers for Disease Control and Prevention (CDC) website, follow these steps:
+
+1.  Navigate to the main NHANES page on the CDC website.
+2.  Look for a section titled **"Questionnaires, Datasets, and Related Documentation"**.
+3.  On this page, you will find a **variable search tool**. You can use this tool to search for specific variables by keyword across all survey cycles.
+4.  Each survey cycle (e.g., "NHANES 2017-2018") will have its own page with links to data files organized by component (Demographics, Dietary, Examination, Laboratory, Questionnaire).
+
+---
 
 What is included in this Video Lesson:
 

@@ -1,6 +1,5 @@
 ## Exercise 1 Solution (M) {.unnumbered}
 
-
 ```{r chunkSetup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
@@ -120,7 +119,7 @@ tab1 <- CreateTableOne(vars = vars_for_table1, data = dat.with.miss, includeNA =
 print(tab1, format = "f")
 ```
 
-## Question 2: Dealing with missing values in confoudners 
+## Question 2: Dealing with missing values in confoudners
 
 ### 2(a) Check missingness using a plot
 
@@ -210,8 +209,11 @@ dat_for_imputation <- dat.with.miss %>%
 # m = 5: Creates 5 imputed datasets.
 # maxit = 10: Runs 10 iterations for the Gibbs sampler to converge.
 # meth = c(bmi = "pmm"): Specifies predictive mean matching for imputing BMI.
+meth <- make.method(dat_for_imputation)
+meth["bmi"] <- "pmm"
+meth["comorbidity"] <- "pmm"
 imputation_q2 <- mice(dat_for_imputation, m = 5, maxit = 10, seed = 123, print = FALSE,
-                      meth = c(bmi = "pmm"))
+                      meth = meth)
 
 # Extract the 5 imputed datasets into a single "long" format data frame.
 impdata_q2 <- complete(imputation_q2, "long", include = FALSE)
@@ -273,7 +275,7 @@ fit_q2 <- with(design_analytic,
 pool_and_format_results(fit_q2)
 ```
 
-## Question 3: Dealing with missing values in outcome, predictor, and confoudners 
+## Question 3: Dealing with missing values in outcome, predictor, and confoudners
 
 Perform multiple imputations to deal with missing values only in outcome, predictor, confounders. Use the Multiple Imputation then deletion (MID) approach. Use the dataset created in Subsetting according to eligibility (`dat.with.miss`). Consider 5 imputed datasets, 5 iterations, and fit the design-adjusted logistic regression in all of the 5 imputed datasets. Obtain the pooled adjusted odds ratio with the 95% confidence intervals. In this case, consider only one outcome and one predictor that are related to reduce fat/calories, i.e., create only the **fourth column of Table 3**.
 
@@ -325,7 +327,7 @@ dat_for_imputation_q3 <- dat_q3_prepped %>%
 # STEP 4: Perform multiple imputation on the prepared dataset.
 # This will impute missing values in outcomes, predictors, and confounders.
 imputation_q3 <- mice(dat_for_imputation_q3, m = 5, maxit = 5, seed = 123, print = FALSE,
-                     meth = c(bmi = "pmm")) # Use predictive mean matching for BMI.
+                     meth = meth) # Use predictive mean matching for BMI.
 
 # Extract the 5 complete datasets into a single "long" data frame.
 impdata_q3 <- complete(imputation_q3, "long", include = FALSE)
@@ -378,4 +380,3 @@ fit_q3 <- with(design_analytic_q3,
 # Use our helper function to pool the results and display the final formatted table.
 pool_and_format_results(fit_q3)
 ```
-
