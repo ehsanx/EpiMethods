@@ -94,13 +94,13 @@ analytic_design <- subset(svy.design.full, SEQN %in% dat.analytic$SEQN)
 
 This section reproduces the unweighted sample sizes shown in Flegal et al.'s Table 1. The code first generates separate summary tables for all participants, men, and women. It then performs several formatting steps to combine these into a single table.
 
-## What `svytable1` Does
+### What `svytable1` Does
 
-The `svytable1` function creates a descriptive summary table—commonly referred to as a **“Table 1”**—from complex survey data. It is specifically designed to produce publication-ready results that align with **NCHS Data Presentation Standards** for reliability.
+The `svytable1` function creates a descriptive summary table—commonly referred to as a **“Table 1”**—from complex survey data. It is specifically designed to produce publication-ready results that align with [NCHS Data Presentation Standards for reliability](https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx).
 
-### Key Operations
+### Key `svytable1` Operations
 
-When you call `svytable1`, it performs the following steps for each analysis (for example, for all participants, men, and women):
+When you call `svytable1` ([link](https://github.com/ehsanx/svyTable1)), it performs the following steps for each analysis (for example, for all participants, men, and women):
 
 1.  **Calculates Proportions**\
     It summarizes categorical variables (like `Age`) by calculating the proportion of participants in each category (e.g., 20–39, 40–59, ≥60).
@@ -121,7 +121,9 @@ When you call `svytable1`, it performs the following steps for each analysis (fo
 
 An asterisk (`*`) in these tables output indicate **suppression**: the estimate was determined to be statistically unreliable. The function hides the unreliable value to avoid misinterpretation.
 
-### Estimates are suppressed if they fail one or more NCHS reliability rules (for proportions):
+### NCHS reliability rules (for proportions)
+
+Estimates are suppressed if they fail one or more NCHS reliability rules (for proportions):
 
 -   **fail_n_30:** The unweighted sample size (n) is fewer than 30 participants.\
 -   **fail_eff_n_30:** The *effective sample size* (adjusted for design effects) is less than 30.\
@@ -292,24 +294,44 @@ knitr::kable(
 )
 ```
 
-Generally, the model shows limited reliability and predictive power. Most of the predictor variables, such as Age and smoking status, are not statistically significant (their p.value is high). This indicates that, for men in this dataset, these factors don't have a clear, reliable association with obesity.
+Generally, the model shows limited reliability and predictive power. Most of the predictor variables, such as `Age` and `smoking status`, are not statistically significant (their `p.value` is high). This indicates that, for men in this dataset, these factors don't have a clear, reliable association with obesity.
 
-The few significant predictors are raceNon-Hispanic Asian and education\<High school. These coefficients are considered stable and reliable. The unreliability of the other terms is not caused by the variables being correlated with each other, as the multicollinearity check shows.
+The few significant predictors are `raceNon-Hispanic Asian` and `education\<High school`. These coefficients are considered stable and reliable. The unreliability of the other terms is not caused by the variables being correlated with each other, as the multicollinearity check shows.
 
-**The RSE Can Be Misleading for Regression**: Notice that some statistically insignificant coefficients (like Age40-59 and raceHispanic) have high RSEs, which is expected. However, the education\>High school coefficient is highly insignificant, but its RSE is flagged as "TRUE" for being unreliable. This is a great example of why RSE isn't a primary tool for regression coefficients—it can be inflated by estimates close to zero, regardless of their precision.
+**The RSE Can Be Misleading for Regression**: Notice that some statistically insignificant coefficients (like `Age40-59` and `raceHispanic`) have high RSEs, which is expected. However, the `education\>High school` coefficient is highly insignificant: p-value of 0.932 correctly tells you that this coefficient is not statistically significant and is not reliably different from zero. However its RSE is flagged as "TRUE" for being unreliable. The RSE is calculated as (0.147 / -0.013) * 100 = 1109%. Here, the extremely high RSE here is not a result of a large standard error, but of the coefficient estimate being very close to zero. An inflated RSE doesn't provide any new or more accurate information than the p-value; it simply reflects that the coefficient itself is minuscule. This is a great example of why RSE isn't a primary tool for regression coefficients: it can be inflated by estimates close to zero, regardless of their precision.
 
 ### Check for Multicollinearity
 
-Multicollinearity occurs when predictor variables in a model are highly correlated with each other. This can inflate the standard errors and make your coefficient estimates unstable. The Variance Inflation Factor (VIF) is used to detect this issue.
+Multicollinearity occurs when predictor variables in a model are highly correlated with each other. This can inflate the standard errors and make your coefficient estimates unstable. The VIF is used to detect this issue.
 
-For categorical predictors such as Age, race, smoking, and education, we look at the Generalized VIF (GVIF). To make it comparable to a standard VIF, we look at the GVIF\^(1/(2\*Df)) value.
+`GVIF^(1/(2*Df))` is a scaled version of the Generalized Variance Inflation Factor (GVIF) used to assess multicollinearity in regression models with categorical predictors. It adjusts for the number of dummy variables created for a categorical variable, making its value directly comparable to the traditional VIF used for continuous predictors within the same model.
+
+#### Why GVIF<sup>1/(2×Df)</sup> is Necessary for Categorical Variables
+
+A categorical variable with \(k\) levels (e.g., *race*) is typically represented in a regression model by \(k - 1\) **dummy variables**.  Dummy variables are inherently correlated because they all describe the same categorical feature. This intrinsic relationship would lead to very high — but misleading — **GVIF** scores if the overall GVIF were interpreted directly.
+
+The adjustment GVIF<sup>1/(2×Df)</sup> standardizes the GVIF value. It reduces the measure from a *hypervolume* of confidence for multiple coefficients down to a linear measure,  making it comparable to the single VIF value used for continuous predictors. Here, **Df** is the degrees of freedom for the categorical term, which equals \(k - 1\),  the number of dummy variables.
+
+##### Acceptable Ranges and Interpretation
+
+The interpretation of GVIF<sup>1/(2×Df)</sup> follows the same guidelines as the standard VIF:
+
+| GVIF<sup>1/(2×Df)</sup> Range | Interpretation |
+|--------|-----------------------|
+| **1**                         | No correlation among predictors. |
+| **1 – 2.5**                   | Low to moderate correlation — generally acceptable (typical for most well-specified models). |
+| **2.5 – 5**                   | Moderate to high correlation — may warrant further investigation. |
+| **> 5**                       | Potentially severe multicollinearity. The predictor may have a strong overlap with others, obscuring its effect on the outcome. A more conservative cutoff of **4** is sometimes used. |
+
+
+
 
 ```{r vif-check, cache=TRUE}
 vif_values <- vif(fit_men_obese)
 print(vif_values)
 ```
 
-The key values in the GVIF\^(1/(2\*Df)) column are all low (below 2.5). This confirms that your predictor variables are independent enough from one another and are not artificially inflating each other's standard errors. The lack of precision in the model comes from other sources, not from multicollinearity.
+The key values in the `GVIF\^(1/(2\*Df))` column are all low (below 2.5). This confirms that your predictor variables are independent enough from one another and are not artificially inflating each other's standard errors. The lack of precision in the model comes from other sources, not from multicollinearity.
 
 ### Formatting the Table
 
