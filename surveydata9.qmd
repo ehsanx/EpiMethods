@@ -1,0 +1,361 @@
+## NHANES: Reliability Standards {.unnumbered}
+
+## Introduction
+
+This tutorial reproduces the key tables from the [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639) article. The analysis uses the same NHANES data and aims to replicate the unweighted sample size counts from Table 1 and the weighted logistic regression models from Table 3. We incorporate NCHS/CDC reliability standards to ensure estimates are statistically defensible. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Setup and Data Preparation
+
+This first section prepares the data for analysis. The key steps are:
+
+-   **Load Data:** The `Flegal2016.RData` file containing the necessary NHANES data is loaded.
+-   **Define Analytic Sample:** An `analytic_design` object is created. This sample of N=5,455 matches the total number of participants reported in the paper for the 2013–2014 cycle.
+-   **Recode Variables:** All variables needed for the analysis (e.g., Age, race, obese, smoking, education) are created and categorized to match the definitions used by Flegal et al.
+-   **Create Survey Design Object:** A `svydesign` object is created to account for survey design (weights, strata, clusters).
+
+```{r data-prep, cache=TRUE}
+# --- Load Libraries ---
+library(survey)
+library(dplyr)
+library(knitr)
+library(car)
+library(tidyr)
+library(Publish)
+library(stringr)
+library(kableExtra) 
+# install.packages("devtools")
+# devtools::install_github("ehsanx/svyTable1", 
+#                          build_vignettes = TRUE)
+library(svyTable1)
+
+# --- Load Data ---
+load("Data/surveydata/Flegal2016.RData")
+
+# --- Create Analytic Sample (N=5,455) ---
+dat.analytic <- subset(dat.full, RIDAGEYR >= 20)
+dat.analytic <- subset(dat.analytic, !is.na(BMXBMI))
+dat.analytic <- subset(dat.analytic, is.na(RIDEXPRG) | RIDEXPRG != "Yes, positive lab pregnancy test")
+
+# --- Create ALL Analysis Variables in the Full Dataset ---
+dat.full <- dat.full %>%
+  mutate(
+    Age = cut(RIDAGEYR,
+              breaks = c(20, 40, 60, Inf),
+              right = FALSE,
+              labels = c("20-39", "40-59", ">=60")),
+    
+    race = case_when(
+      RIDRETH3 == "Non-Hispanic White" ~ "Non-Hispanic white",
+      RIDRETH3 == "Non-Hispanic Black" ~ "Non-Hispanic black",
+      RIDRETH3 == "Non-Hispanic Asian" ~ "Non-Hispanic Asian",
+      RIDRETH3 %in% c("Mexican American", "Other Hispanic") ~ "Hispanic",
+      RIDRETH3 == "Other Race - Including Multi-Rac" ~ "Other",
+      TRUE ~ NA_character_
+    ),
+    race = factor(race, levels = c("Non-Hispanic white", "Non-Hispanic black", "Non-Hispanic Asian", "Hispanic", "Other")),
+    
+    gender = factor(RIAGENDR, labels = c("Male", "Female")),
+    
+    obese = factor(ifelse(BMXBMI >= 30, "Yes", "No"), levels = c("No", "Yes")),
+    obese_class3 = factor(ifelse(BMXBMI >= 40, "Yes", "No"), levels = c("No", "Yes")),
+    
+    smoking = case_when(
+      SMQ020 == "No" ~ "Never smoker",
+      SMQ020 == "Yes" & SMQ040 == "Not at all" ~ "Former smoker",
+      SMQ020 == "Yes" ~ "Current smoker",
+      TRUE ~ NA_character_
+    ),
+    smoking = factor(smoking, levels = c("Never smoker", "Former smoker", "Current smoker")),
+
+    education = case_when(
+        DMDEDUC2 %in% c("Less than 9th grade", "9-11th grade (Includes 12th grad)") ~ "<High school",
+        DMDEDUC2 == "High school graduate/GED or equi" ~ "High school",
+        DMDEDUC2 %in% c("Some college or AA degree", "College graduate or above") ~ ">High school",
+        TRUE ~ NA_character_
+    ),
+    education = factor(education, levels = c("High school", "<High school", ">High school"))
+  )
+
+# --- Create Survey Design Object ---
+options(survey.lonely.psu = "adjust")
+svy.design.full <- svydesign(id = ~SDMVPSU, 
+                             strata = ~SDMVSTRA, 
+                             weights = ~WTINT2YR, 
+                             nest = TRUE, 
+                             data = dat.full)
+analytic_design <- subset(svy.design.full, SEQN %in% dat.analytic$SEQN)
+```
+
+## Reproducing Table 1
+
+This section reproduces the unweighted sample sizes shown in Flegal et al.'s Table 1. The code first generates separate summary tables for all participants, men, and women. It then performs several formatting steps to combine these into a single table.
+
+## What `svytable1` Does
+
+The `svytable1` function creates a descriptive summary table—commonly referred to as a **“Table 1”**—from complex survey data. It is specifically designed to produce publication-ready results that align with **NCHS Data Presentation Standards** for reliability.
+
+### Key Operations
+
+When you call `svytable1`, it performs the following steps for each analysis (for example, for all participants, men, and women):
+
+1.  **Calculates Proportions**\
+    It summarizes categorical variables (like `Age`) by calculating the proportion of participants in each category (e.g., 20–39, 40–59, ≥60).
+
+2.  **Stratifies by a Grouping Variable**\
+    Results are calculated separately by levels of the `strata_var` (for example, `race`), creating side-by-side columns.
+
+3.  **Displays Mixed Mode Results**\
+    Because `mode = "mixed"`, each cell shows both:
+
+    -   The **unweighted sample count (N)**\
+    -   The **weighted percentage (%)**, which represents the population estimate.
+
+4.  **Performs Reliability Checks**\
+    When `reliability_checks = TRUE`, the function evaluates each estimate against NCHS Data Presentation Standards. These checks prevent publication of unstable or statistically unreliable estimates.
+
+### What the Asterisk (\*) Means
+
+An asterisk (`*`) in these tables output indicate **suppression**: the estimate was determined to be statistically unreliable. The function hides the unreliable value to avoid misinterpretation.
+
+### Estimates are suppressed if they fail one or more NCHS reliability rules (for proportions):
+
+-   **fail_n_30:** The unweighted sample size (n) is fewer than 30 participants.\
+-   **fail_eff_n_30:** The *effective sample size* (adjusted for design effects) is less than 30.\
+-   **fail_df_8:** The design degrees of freedom (df) are fewer than 8.\
+-   **fail_ciw_30:** The absolute confidence interval width is ≥ 30 percentage points.\
+-   **fail_rciw_130:** The relative CI width is greater than 130%.\
+    Each of these flags indicates limited precision or instability in the estimate.
+
+In the output, the asterisks appear in the **“Other” race** column for certain age groups (such as “40–59” and “≥60”).\
+This happens because the **number of participants** in those cells is very small, producing unstable or wide confidence intervals. Thus, the function correctly replaces the unreliable estimates with `*`, ensuring your published results remain statistically defensible and transparent.
+
+### Reliability Metrics Table
+
+In addition to the detailed checks for proportions, the `svytable1` function also assesses the reliability of means for numeric variables. For these estimates, it applies the standard NCHS recommendation, which uses the Relative Standard Error (RSE). If a mean's RSE is 30% or greater, it is considered statistically unreliable and will be suppressed with an asterisk (\*) in the formatted table.
+
+The `$reliability_metrics` table will be printed with the output if you select `return_metrics = TRUE` which will include rows for each mean, reporting the calculated RSE and the outcome of this check in the `fail_rse_30` column.
+
+```{r reproduce-table1-perfect-format, cache=TRUE}
+# View reliability_metrics
+table1_svy <- svytable1(
+  design = analytic_design, strata_var = "race", 
+  table_vars = "Age", mode = "mixed",
+  reliability_checks = TRUE,
+  return_metrics = TRUE
+)
+table1_svy$reliability_metrics[table1_svy$reliability_metrics$suppressed == TRUE, ]
+```
+
+#### Summary tables for each group
+
+```{r reproduce-table1-perfect-formatx, cache=TRUE}
+# --- Create the summary tables for each group ---
+table1_svy_all <- svytable1(
+  design = analytic_design, strata_var = "race", 
+  table_vars = "Age", mode = "mixed",
+  reliability_checks = TRUE
+) %>%
+  mutate(Variable = dplyr::recode(Variable, "Age" = "Age Groups"))
+kable(table1_svy_all)
+
+male_design <- subset(analytic_design, gender == "Male")
+table1_svy_men <- svytable1(
+  design = male_design, strata_var = "race", 
+  table_vars = "Age", mode = "mixed",
+  reliability_checks = TRUE
+) %>%
+  mutate(Variable = dplyr::recode(Variable, "Age" = "Age group"))
+kable(table1_svy_men)
+
+female_design <- subset(analytic_design, gender == "Female")
+table1_svy_women <- svytable1(
+  design = female_design, strata_var = "race", 
+  table_vars = "Age", mode = "mixed",
+  reliability_checks = TRUE
+) %>%
+  mutate(Variable = dplyr::recode(Variable, "Age" = "Age group"))
+kable(table1_svy_women)
+```
+
+### Format and combine the tables
+
+```{r reproduce-table1-perfect-formatx2, cache=TRUE}
+# --- Format and combine the tables ---
+table_all_formatted <- table1_svy_all %>%
+  select(
+    `Age Groups,y` = Level, `All Groups` = Overall,
+    `White` = `Non-Hispanic white`, `Black` = `Non-Hispanic black`,
+    `Asian` = `Non-Hispanic Asian`, `Hispanic`
+  ) %>%
+  slice(3:5) 
+
+table_men_formatted <- table1_svy_men %>%
+  select(
+    `Age Groups,y` = Level, `All Groups` = Overall,
+    `White` = `Non-Hispanic white`, `Black` = `Non-Hispanic black`,
+    `Asian` = `Non-Hispanic Asian`, `Hispanic`
+  ) %>%
+  slice(3:5)
+
+table_women_formatted <- table1_svy_women %>%
+  select(
+    `Age Groups,y` = Level, `All Groups` = Overall,
+    `White` = `Non-Hispanic white`, `Black` = `Non-Hispanic black`,
+    `Asian` = `Non-Hispanic Asian`, `Hispanic`
+  ) %>%
+  slice(3:5) 
+
+final_table_data <- bind_rows(
+  table_all_formatted,
+  table_men_formatted,
+  table_women_formatted
+)
+
+# --- Render the final, publication-quality table ---
+final_table_data %>%
+  kable(caption = "Characteristics by Group and Race/Hispanic Origin", align = "lrrrrr") %>%
+  kable_styling(bootstrap_options = c("striped", "bordered"), full_width = FALSE) %>%
+  add_header_above(c(" " = 1, "All Groups" = 1, "Race/Ethnicity" = 4)) %>%
+  kableExtra::group_rows(index = c("All participants" = 3,
+                                   "Men" = 3,
+                                   "Women" = 3))
+```
+
+## Reproducing Table 3
+
+This section reproduces the weighted logistic regression models from Flegal et al.'s Table 3. Four separate models are fit: one for obesity and one for class 3 obesity, each stratified by gender. We extend the replication by incorporating NCHS/CDC reliability checks using relative standard error (RSE) for regression coefficients. Per NCHS practices, coefficients with RSE ≥ 30% are considered unreliable and flagged with an asterisk (\*).
+
+```{r reproduce-table3, cache=TRUE}
+# --- Helper function to format the output of publish() ---
+format_publish_output <- function(publish_object, new_col_name) {
+  
+  # Extract the clean regression table from the publish object
+  df <- publish_object$regressionTable
+  
+  # Combine OR and CI into one string, handling reference groups
+  df$result <- ifelse(
+    df$OddsRatio == "Ref", 
+    "1 [Reference]",
+    # Combine the OR and CI, removing the brackets from the CI string and replacing the semicolon
+    paste0(df$OddsRatio, " (", str_replace(str_remove_all(df$CI.95, "\\[|\\]"), ";", "-"), ")")
+  )
+  
+  # Return a clean tibble with just the variable level and the formatted result
+  tibble(term = df$Units, !!new_col_name := df$result)
+}
+
+# --- Create complete-case survey designs for each gender ---
+male_design_complete <- subset(analytic_design, gender == "Male" & !is.na(smoking) & !is.na(education))
+female_design_complete <- subset(analytic_design, gender == "Female" & !is.na(smoking) & !is.na(education))
+```
+
+### Fit the Models
+
+```{r reproduce-table3c, cache=TRUE}
+# --- Fit all four models ---
+fit_men_obese <- svyglm(I(obese == "Yes") ~ Age + race + smoking + education, design = male_design_complete, family = binomial())
+# print(summary(fit_men_obese))
+fit_men_obese3 <- svyglm(I(obese_class3 == "Yes") ~ Age + race + smoking + education, design = male_design_complete, family = binomial())
+fit_women_obese <- svyglm(I(obese == "Yes") ~ Age + race + smoking + education, design = female_design_complete, family = binomial())
+fit_women_obese3 <- svyglm(I(obese_class3 == "Yes") ~ Age + race + smoking + education, design = female_design_complete, family = binomial())
+```
+
+### Reliability check for regression coefficients
+
+The National Center for Health Statistics (NCHS) and the Centers for Disease Control and Prevention (CDC) do not recommend using the relative standard error (RSE) as a primary reliability check for regression coefficients. Their guidelines focus on other types of estimates.
+
+-   For means and totals, the RSE is a commonly used metric.
+-   For proportions, while the RSE was used in the past, the NCHS has transitioned to a more sophisticated, multi-step approach. This newer method considers a minimum number of events or a minimum denominator sample size, and the width of the confidence interval around the proportion. This change was made because the RSE can be misleading for proportions, especially those close to 0% or 100%.
+-   There are no well-established NCHS or CDC guidelines that advocate for the use of RSE to determine the reliability of regression coefficients. The statistical properties of regression coefficients are more complex than those of means or proportions. The reliability of a regression coefficient is influenced by a variety of factors, including the sample size, the variance of the independent variable, and the overall fit of the model. Given this complexity, a simple RSE threshold is not considered an adequate measure of reliability for regression coefficients. Instead, we assess reliability by examining several key metrics that, taken together, give us a complete picture of a coefficient's stability and precision. The main tool for this is the `svyglmdiag()` functions in `svyTable1` package, which we'll use to look at:
+
+1.  **The Standard Error (SE)**: A direct measure of the coefficient's precision. A smaller SE relative to its coefficient suggests a more reliable estimate.
+
+2.  **The p-value**: Tells you if the coefficient is statistically distinguishable from zero. A non-significant p-value (e.g., p \> 0.05) means we cannot be confident the predictor has any association with the outcome.
+
+3.  **The Confidence Interval (CI)**: Provides a plausible range for the true value of the coefficient. A very wide CI indicates a high degree of uncertainty and, therefore, low reliability. For logistic regression, if the CI for the odds ratio contains 1.0, the result is not statistically significant.
+
+We will also calculate the RSE to demonstrate why it can be misleading. Finally, we'll run a quick check for multicollinearity using the Variance Inflation Factor (VIF), as this is a common cause of unstable (unreliable) coefficients.
+
+```{r rel-reg-check, cache=TRUE}
+# Let's examine one model in detail: fit_men_obese
+# The same process applies to the other three models.
+# Get the standard model summary and confidence intervals
+diagnostics_table <- svyglmdiag(fit_men_obese)
+knitr::kable(
+  diagnostics_table,
+  caption = "Table 3: Reliability Diagnostics for Obesity Model Coefficients",
+  digits = 3
+)
+```
+
+Generally, the model shows limited reliability and predictive power. Most of the predictor variables, such as Age and smoking status, are not statistically significant (their p.value is high). This indicates that, for men in this dataset, these factors don't have a clear, reliable association with obesity.
+
+The few significant predictors are raceNon-Hispanic Asian and education\<High school. These coefficients are considered stable and reliable. The unreliability of the other terms is not caused by the variables being correlated with each other, as the multicollinearity check shows.
+
+**The RSE Can Be Misleading for Regression**: Notice that some statistically insignificant coefficients (like Age40-59 and raceHispanic) have high RSEs, which is expected. However, the education\>High school coefficient is highly insignificant, but its RSE is flagged as "TRUE" for being unreliable. This is a great example of why RSE isn't a primary tool for regression coefficients—it can be inflated by estimates close to zero, regardless of their precision.
+
+### Check for Multicollinearity
+
+Multicollinearity occurs when predictor variables in a model are highly correlated with each other. This can inflate the standard errors and make your coefficient estimates unstable. The Variance Inflation Factor (VIF) is used to detect this issue.
+
+For categorical predictors such as Age, race, smoking, and education, we look at the Generalized VIF (GVIF). To make it comparable to a standard VIF, we look at the GVIF\^(1/(2\*Df)) value.
+
+```{r vif-check, cache=TRUE}
+vif_values <- vif(fit_men_obese)
+print(vif_values)
+```
+
+The key values in the GVIF\^(1/(2\*Df)) column are all low (below 2.5). This confirms that your predictor variables are independent enough from one another and are not artificially inflating each other's standard errors. The lack of precision in the model comes from other sources, not from multicollinearity.
+
+### Formatting the Table
+
+```{r reproduce-table3d, cache=TRUE}
+# --- Use the helper function to format results from each model ---
+men_obese_res <- format_publish_output(publish(fit_men_obese),
+                                       "Men, Obese, All Grades")
+men_obese3_res <- format_publish_output(publish(fit_men_obese3),
+                                        "Men, Class 3 Obesity")
+women_obese_res <- format_publish_output(publish(fit_women_obese), 
+                                         "Women, Obese, All Grades")
+women_obese3_res <- format_publish_output(publish(fit_women_obese3), 
+                                          "Women, Class 3 Obesity")
+
+# --- Create a template for the final table structure ---
+final_table_structure <- tibble(
+  Group = c(
+    "Age, y", "", "",
+    "Race", "", "", "", "",
+    "Smoking", "", "",
+    "Education", "", ""
+  ),
+  term = c(
+    "20-39", "40-59", ">=60",
+    "Non-Hispanic white", "Non-Hispanic black", "Non-Hispanic Asian", "Hispanic", "Other",
+    "Never smoker", "Former smoker", "Current smoker",
+    "High school", "<High school", ">High school"
+  )
+)
+
+# --- Join all formatted results onto the template ---
+final_table <- final_table_structure %>%
+  left_join(men_obese_res, by = "term") %>%
+  left_join(men_obese3_res, by = "term") %>%
+  left_join(women_obese_res, by = "term") %>%
+  left_join(women_obese3_res, by = "term")
+
+# --- Display the final, publication-quality table ---
+kable(final_table, caption = "Weighted Logistic Regression Models for Obesity", 
+      col.names = c("", "", 
+                    "Men, Obese, All Grades", 
+                    "Men, Class 3 Obesity", 
+                    "Women, Obese, All Grades", 
+                    "Women, Class 3 Obesity"))
+```
+
+### Differences from the Original Paper
+
+While the 'Statistical Analyses' section of Flegal et al. (2016) details their models, it does not explicitly state the method used to handle missing data for covariates. Our replication employs a complete-case analysis, which excludes participants with missing smoking or education data from the models. This difference is the most likely reason for the minor discrepancies between our results and those published in the original paper.
