@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This tutorial reproduces the key tables from the [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639) article. The analysis uses the same NHANES data and aims to replicate the unweighted sample size counts from Table 1 and the weighted logistic regression models from Table 3. We incorporate [NCHS/CDC reliability standards](https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx) to ensure estimates are statistically defensible.
+This tutorial reproduces the key tables from the [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639) article. The analysis uses the same NHANES data and aims to replicate the unweighted sample size counts from Table 1 and the weighted logistic regression models from Table 3. We incorporate [NCHS/CDC reliability standards](https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx) to ensure estimates are statistically defensible [@nhanes_reliability_estimates].
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
@@ -97,7 +97,7 @@ This section reproduces the unweighted sample sizes shown in Flegal et al.'s Tab
 
 ### What `svytable1` Does
 
-The `svytable1` function creates a descriptive summary table—commonly referred to as a **“Table 1”**—from complex survey data. It is specifically designed to produce publication-ready results that align with [NCHS Data Presentation Standards for reliability](https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx).
+The `svytable1` function creates a descriptive summary table—commonly referred to as a **“Table 1”**—from complex survey data [@svyTable1]. It is specifically designed to produce publication-ready results that align with [NCHS Data Presentation Standards for reliability](https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx).
 
 ### Key `svytable1` Operations
 
@@ -305,7 +305,7 @@ The few significant predictors are `raceNon-Hispanic Asian` and `education\<High
 
 Multicollinearity occurs when predictor variables in a model are highly correlated with each other. This can inflate the standard errors and make your coefficient estimates unstable. The VIF is used to detect this issue.
 
-`GVIF^(1/(2*Df))` is a scaled version of the Generalized Variance Inflation Factor (GVIF) used to assess multicollinearity in regression models with categorical predictors. It adjusts for the number of dummy variables created for a categorical variable, making its value directly comparable to the traditional VIF used for continuous predictors within the same model.
+`GVIF^(1/(2*Df))` is a scaled version of the Generalized Variance Inflation Factor (GVIF) used to assess multicollinearity in regression models with categorical predictors [@fox1992generalized]. It adjusts for the number of dummy variables created for a categorical variable, making its value directly comparable to the traditional VIF used for continuous predictors within the same model.
 
 #### Why GVIF<sup>1/(2×Df)</sup> is Necessary for Categorical Variables
 
@@ -322,7 +322,9 @@ The interpretation of GVIF<sup>1/(2×Df)</sup> follows the same guidelines as th
 | **1** | No correlation among predictors. |
 | **1 – 2.5** | Low to moderate correlation — generally acceptable (typical for most well-specified models). |
 | **2.5 – 5** | Moderate to high correlation — may warrant further investigation. |
-| **\> 5** | Potentially severe multicollinearity. The predictor may have a strong overlap with others, obscuring its effect on the outcome. A more conservative cutoff of **4** is sometimes used. |
+| **\> 5** | Potentially severe multicollinearity. The predictor may have a strong overlap with others, obscuring its effect on the outcome. |
+
+A more conservative cutoff of *3** is sometimes used. The scaled GVIF, \(GVIF^{1/(2·df)}\), is designed to be comparable to the square root of the VIF, which explains the use of cutoffs like \(\sqrt{5}\) (≈ 2.24) and \(\sqrt{10}\) (≈ 3.16) [@nahhas2024introduction]. Larger than \(\sqrt{20}\) (≈ 4.47) is therefore the case of severe multicollinearity.
 
 ```{r vif-check, cache=TRUE}
 vif_values <- vif(fit_men_obese)
@@ -379,3 +381,5 @@ kable(final_table, caption = "Weighted Logistic Regression Models for Obesity",
 ### Differences from the Original Paper
 
 While the 'Statistical Analyses' section of Flegal et al. (2016) details their models, it does not explicitly state the method used to handle missing data for covariates. Our replication employs a complete-case analysis, which excludes participants with missing smoking or education data from the models. This difference is the most likely reason for the minor discrepancies between our results and those published in the original paper.
+
+## References
