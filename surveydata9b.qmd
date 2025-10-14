@@ -1,0 +1,169 @@
+## NHANES: Performance {.unnumbered}
+
+This tutorial outlines how to evaluate the performance of a logistic regression model fitted to complex survey data using R, focusing on the NHANES dataset.
+
+We will assess the model's predictive accuracy using a design-correct **Area Under the Curve (AUC)** and evaluate its fit with the **Archer-Lemeshow** test.
+
+------------------------------------------------------------------------
+
+## 1. Data Preparation ⚙️
+
+First, we need to load the necessary R packages and prepare the NHANES data.
+
+We'll use data for adults (age 20+) and create a binary outcome variable for obesity status.
+
+### Load Packages
+
+We'll need `svyTable1`, `survey`, and `dplyr` for data manipulation, and `NHANES` for the dataset.
+
+```{r, Warnings=FALSE, message=FALSE}
+library(svyTable1)
+library(survey)
+library(dplyr)
+library(NHANES)
+```
+
+### Prepare Data
+
+We load the raw NHANES data, filter for adults, and create an `ObeseStatus` factor.
+
+For this modeling example, we'll create a "complete case" dataset by removing rows with missing values for simplicity.
+
+```{r, cache=TRUE}
+# Load the raw NHANES data (2009-2012)
+data(NHANESraw)
+
+# Prepare data for adults
+nhanes_adults_with_na <- NHANESraw %>%
+  dplyr::filter(Age >= 20) %>%
+  mutate(
+    ObeseStatus = factor(ifelse(BMI >= 30, "Obese", "Not Obese"),
+                         levels = c("Not Obese", "Obese"))
+  )
+
+# Define variables for a complete-case analysis
+vars_for_complete_table <- c("Age", "Gender", "Race1", "ObeseStatus")
+
+# Create complete-case data frame
+nhanes_adults_complete <- nhanes_adults_with_na %>%
+  tidyr::drop_na(all_of(vars_for_complete_table))
+```
+
+### Create Survey Design Object
+
+We now create a `svydesign` object, which accounts for the complex survey design (PSU, strata, and weights).
+
+This step ensures accurate variance estimation and population inference.
+
+```{r, cache=TRUE}
+# Create a survey design object
+adult_design_complete <- svydesign(
+  id = ~SDMVPSU,
+  strata = ~SDMVSTRA,
+  weights = ~WTMEC2YR,
+  nest = TRUE,
+  data = nhanes_adults_complete
+)
+```
+
+------------------------------------------------------------------------
+
+## 2. Fitting a Logistic Regression Model 📊
+
+Next, we fit a **survey-weighted logistic regression** model using `svyglm()`.
+
+Our goal is to predict obesity status (`ObeseStatus`) based on **Age**, **Gender**, and **Race1**.
+
+```{r, cache=TRUE}
+# Fit the survey-weighted logistic regression model
+fit_obesity <- svyglm(
+  ObeseStatus ~ Age + Gender + Race1,
+  design = adult_design_complete,
+  family = quasibinomial()
+)
+```
+
+------------------------------------------------------------------------
+
+## 3. Model Performance: ROC Curve and AUC 📈
+
+We calculate the **Area Under the ROC Curve (AUC)** to measure predictive performance.
+
+The `svyAUC()` function from `svyTable1` computes a *design-corrected* AUC and confidence interval.
+
+### Create Replicate Design & Refit Model
+
+```{r, cache=TRUE}
+# svyAUC() requires a replicate-weights design object
+rep_design <- as.svrepdesign(adult_design_complete)
+
+# Refit the model using replicate design
+fit_obesity_rep <- svyglm(
+  ObeseStatus ~ Age + Gender + Race1,
+  design = rep_design,
+  family = quasibinomial()
+)
+```
+
+### Calculate AUC
+
+```{r, cache=TRUE}
+# Calculate design-correct AUC
+auc_results_list <- svyAUC(fit_obesity_rep, rep_design, plot = TRUE)
+
+# Display AUC summary
+knitr::kable(auc_results_list$summary)
+```
+
+**Interpretation:**
+An AUC of **0.587** indicates weak discrimination — the model performs only slightly better than random chance (AUC = 0.5).
+
+This suggests that *Age*, *Gender*, and *Race1* alone are insufficient to accurately predict obesity.
+
+### Visualize the ROC Curve
+
+```{r, cache=TRUE}
+library(ggplot2)
+
+ggplot(auc_results_list$roc_data, aes(x = FPR, y = TPR)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_abline(linetype = "dashed") +
+  labs(
+    title = "Survey-Weighted ROC Curve",
+    subtitle = paste0("AUC = ", auc_results_list$summary$AUC),
+    x = "1 - Specificity (FPR)",
+    y = "Sensitivity (TPR)"
+  ) +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+## 4. Goodness-of-Fit: Archer and Lemeshow Test ✅
+
+We now assess how well the model's predictions match observed data using the **Archer-Lemeshow test**, an extension of the traditional Hosmer-Lemeshow test for complex surveys.
+
+A non-significant p-value (p \> 0.05) suggests a good model fit.
+
+```{r, cache=TRUE}
+# Run the goodness-of-fit test
+gof_results <- svygof(fit_obesity, adult_design_complete)
+
+# Display the results
+knitr::kable(gof_results)
+```
+
+
+
+**Interpretation:**
+The p-value (0.0012) is **less than 0.05**, indicating that the model does **not** fit the data well. 
+
+This suggests that it may be missing important predictors or interactions that explain obesity risk more accurately.
+
+------------------------------------------------------------------------
+
+### Summary
+
+-   The **AUC** shows weak discriminatory power (≈ 0.59).
+-   The **Archer-Lemeshow** test indicates **poor model fit** (p \< 0.05).
+-   To improve, consider adding predictors such as *education*, *income*, or *smoking* and testing interaction effects.

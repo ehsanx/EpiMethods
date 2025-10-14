@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This tutorial reproduces the key tables from the [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639) article. The analysis uses the same NHANES data and aims to replicate the unweighted sample size counts from Table 1 and the weighted logistic regression models from Table 3. We incorporate NCHS/CDC reliability standards to ensure estimates are statistically defensible. 
+This tutorial reproduces the key tables from the [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639) article. The analysis uses the same NHANES data and aims to replicate the unweighted sample size counts from Table 1 and the weighted logistic regression models from Table 3. We incorporate [NCHS/CDC reliability standards](https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx) to ensure estimates are statistically defensible.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
@@ -29,7 +29,8 @@ library(stringr)
 library(kableExtra) 
 # install.packages("devtools")
 # devtools::install_github("ehsanx/svyTable1", 
-#                          build_vignettes = TRUE)
+#                          build_vignettes = TRUE, 
+#                          dependencies = TRUE)
 library(svyTable1)
 
 # --- Load Data ---
@@ -272,7 +273,7 @@ The National Center for Health Statistics (NCHS) and the Centers for Disease Con
 
 -   For means and totals, the RSE is a commonly used metric.
 -   For proportions, while the RSE was used in the past, the NCHS has transitioned to a more sophisticated, multi-step approach. This newer method considers a minimum number of events or a minimum denominator sample size, and the width of the confidence interval around the proportion. This change was made because the RSE can be misleading for proportions, especially those close to 0% or 100%.
--   There are no well-established NCHS or CDC guidelines that advocate for the use of RSE to determine the reliability of regression coefficients. The statistical properties of regression coefficients are more complex than those of means or proportions. The reliability of a regression coefficient is influenced by a variety of factors, including the sample size, the variance of the independent variable, and the overall fit of the model. Given this complexity, a simple RSE threshold is not considered an adequate measure of reliability for regression coefficients. Instead, we assess reliability by examining several key metrics that, taken together, give us a complete picture of a coefficient's stability and precision. The main tool for this is the `svyglmdiag()` functions in `svyTable1` package, which we'll use to look at:
+-   There are no well-established NCHS or CDC guidelines that advocate for the use of RSE to determine the reliability of regression coefficients. The statistical properties of regression coefficients are more complex than those of means or proportions. The reliability of a regression coefficient is influenced by a variety of factors, including the sample size, the variance of the independent variable, and the overall fit of the model. Given this complexity, a simple RSE threshold is not considered an adequate measure of reliability for regression coefficients. Instead, we assess reliability by examining several key metrics that, taken together, give us a complete picture of a coefficient's stability and precision. The main tool for this is the `svydiag()` functions in `svyTable1` package, which we'll use to look at:
 
 1.  **The Standard Error (SE)**: A direct measure of the coefficient's precision. A smaller SE relative to its coefficient suggests a more reliable estimate.
 
@@ -286,7 +287,7 @@ We will also calculate the RSE to demonstrate why it can be misleading. Finally,
 # Let's examine one model in detail: fit_men_obese
 # The same process applies to the other three models.
 # Get the standard model summary and confidence intervals
-diagnostics_table <- svyglmdiag(fit_men_obese)
+diagnostics_table <- svydiag(fit_men_obese)
 knitr::kable(
   diagnostics_table,
   caption = "Table 3: Reliability Diagnostics for Obesity Model Coefficients",
@@ -298,7 +299,7 @@ Generally, the model shows limited reliability and predictive power. Most of the
 
 The few significant predictors are `raceNon-Hispanic Asian` and `education\<High school`. These coefficients are considered stable and reliable. The unreliability of the other terms is not caused by the variables being correlated with each other, as the multicollinearity check shows.
 
-**The RSE Can Be Misleading for Regression**: Notice that some statistically insignificant coefficients (like `Age40-59` and `raceHispanic`) have high RSEs, which is expected. However, the `education\>High school` coefficient is highly insignificant: p-value of 0.932 correctly tells you that this coefficient is not statistically significant and is not reliably different from zero. However its RSE is flagged as "TRUE" for being unreliable. The RSE is calculated as (0.147 / -0.013) * 100 = 1109%. Here, the extremely high RSE here is not a result of a large standard error, but of the coefficient estimate being very close to zero. An inflated RSE doesn't provide any new or more accurate information than the p-value; it simply reflects that the coefficient itself is minuscule. This is a great example of why RSE isn't a primary tool for regression coefficients: it can be inflated by estimates close to zero, regardless of their precision.
+**The RSE Can Be Misleading for Regression**: Notice that some statistically insignificant coefficients (like `Age40-59` and `raceHispanic`) have high RSEs, which is expected. However, the `education\>High school` coefficient is highly insignificant: p-value of 0.932 correctly tells you that this coefficient is not statistically significant and is not reliably different from zero. However its RSE is flagged as "TRUE" for being unreliable. The RSE is calculated as (0.147 / -0.013) \* 100 = 1109%. Here, the extremely high RSE here is not a result of a large standard error, but of the coefficient estimate being very close to zero. An inflated RSE doesn't provide any new or more accurate information than the p-value; it simply reflects that the coefficient itself is minuscule. This is a great example of why RSE isn't a primary tool for regression coefficients: it can be inflated by estimates close to zero, regardless of their precision.
 
 ### Check for Multicollinearity
 
@@ -308,23 +309,20 @@ Multicollinearity occurs when predictor variables in a model are highly correlat
 
 #### Why GVIF<sup>1/(2×Df)</sup> is Necessary for Categorical Variables
 
-A categorical variable with \(k\) levels (e.g., *race*) is typically represented in a regression model by \(k - 1\) **dummy variables**.  Dummy variables are inherently correlated because they all describe the same categorical feature. This intrinsic relationship would lead to very high — but misleading — **GVIF** scores if the overall GVIF were interpreted directly.
+A categorical variable with (k) levels (e.g., *race*) is typically represented in a regression model by (k - 1) **dummy variables**. Dummy variables are inherently correlated because they all describe the same categorical feature. This intrinsic relationship would lead to very high — but misleading — **GVIF** scores if the overall GVIF were interpreted directly.
 
-The adjustment GVIF<sup>1/(2×Df)</sup> standardizes the GVIF value. It reduces the measure from a *hypervolume* of confidence for multiple coefficients down to a linear measure,  making it comparable to the single VIF value used for continuous predictors. Here, **Df** is the degrees of freedom for the categorical term, which equals \(k - 1\),  the number of dummy variables.
+The adjustment GVIF<sup>1/(2×Df)</sup> standardizes the GVIF value. It reduces the measure from a *hypervolume* of confidence for multiple coefficients down to a linear measure, making it comparable to the single VIF value used for continuous predictors. Here, **Df** is the degrees of freedom for the categorical term, which equals (k - 1), the number of dummy variables.
 
 ##### Acceptable Ranges and Interpretation
 
 The interpretation of GVIF<sup>1/(2×Df)</sup> follows the same guidelines as the standard VIF:
 
 | GVIF<sup>1/(2×Df)</sup> Range | Interpretation |
-|--------|-----------------------|
-| **1**                         | No correlation among predictors. |
-| **1 – 2.5**                   | Low to moderate correlation — generally acceptable (typical for most well-specified models). |
-| **2.5 – 5**                   | Moderate to high correlation — may warrant further investigation. |
-| **> 5**                       | Potentially severe multicollinearity. The predictor may have a strong overlap with others, obscuring its effect on the outcome. A more conservative cutoff of **4** is sometimes used. |
-
-
-
+|-------------------|-----------------------------------------------------|
+| **1** | No correlation among predictors. |
+| **1 – 2.5** | Low to moderate correlation — generally acceptable (typical for most well-specified models). |
+| **2.5 – 5** | Moderate to high correlation — may warrant further investigation. |
+| **\> 5** | Potentially severe multicollinearity. The predictor may have a strong overlap with others, obscuring its effect on the outcome. A more conservative cutoff of **4** is sometimes used. |
 
 ```{r vif-check, cache=TRUE}
 vif_values <- vif(fit_men_obese)
