@@ -126,7 +126,32 @@ gtag('js', new Date());
 gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><script src="site_libs/kePrint-0.0.1/kePrint.js"></script><link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
-<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 <meta name="twitter:title" content="NHANES: Reliability Standards – Advanced Epidemiological Methods">
 <meta name="twitter:description" content="">
 <meta name="twitter:card" content="summary">
@@ -1365,7 +1390,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 
 
 </header><section id="introduction" class="level2"><h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This tutorial reproduces the key tables from the <a href="https://jamanetwork.com/journals/jama/article-abstract/2526639">Flegal et al.&nbsp;(2016)</a> article. The analysis uses the same NHANES data and aims to replicate the unweighted sample size counts from Table 1 and the weighted logistic regression models from Table 3. We incorporate <a href="https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx">NCHS/CDC reliability standards</a> to ensure estimates are statistically defensible <span class="citation" data-cites="nhanes_reliability_estimates">(<a href="#ref-nhanes_reliability_estimates" role="doc-biblioref">Disease Control and Prevention 2025</a>)</span>.</p>
+<p>This tutorial reproduces the key tables from the <a href="https://jamanetwork.com/journals/jama/article-abstract/2526639">Flegal et al.&nbsp;(2016)</a> article <span class="citation" data-cites="flegal2016trends">(<a href="#ref-flegal2016trends" role="doc-biblioref">Flegal et al. 2016</a>)</span>. The analysis uses the same NHANES data and aims to replicate the unweighted sample size counts from Table 1 and the weighted logistic regression models from Table 3. We incorporate <a href="https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx">NCHS/CDC reliability standards</a> to ensure estimates are statistically defensible <span class="citation" data-cites="nhanes_reliability_estimates">(<a href="#ref-nhanes_reliability_estimates" role="doc-biblioref">Disease Control and Prevention 2025</a>)</span>.</p>
 </section><section id="setup-and-data-preparation" class="level2"><h2 class="anchored" data-anchor-id="setup-and-data-preparation">Setup and Data Preparation</h2>
 <p>This first section prepares the data for analysis. The key steps are:</p>
 <ul>
@@ -1456,7 +1481,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <section id="what-svytable1-does" class="level3"><h3 class="anchored" data-anchor-id="what-svytable1-does">What <code>svytable1</code> Does</h3>
 <p>The <code>svytable1</code> function creates a descriptive summary table—commonly referred to as a <strong>“Table 1”</strong>—from complex survey data <span class="citation" data-cites="svyTable1">(<a href="#ref-svyTable1" role="doc-biblioref">Karim 2025</a>)</span>. It is specifically designed to produce publication-ready results that align with <a href="https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx">NCHS Data Presentation Standards for reliability</a>.</p>
 </section><section id="key-svytable1-operations" class="level3"><h3 class="anchored" data-anchor-id="key-svytable1-operations">Key <code>svytable1</code> Operations</h3>
-<p>When you call <code>svytable1</code> (<a href="https://github.com/ehsanx/svyTable1">link</a>), it performs the following steps for each analysis (for example, for all participants, men, and women):</p>
+<p>When we call <code>svytable1</code> (<a href="https://github.com/ehsanx/svyTable1">link</a>), it performs the following steps for each analysis (for example, for all participants, men, and women):</p>
 <ol type="1">
 <li><p><strong>Calculates Proportions</strong><br>
 It summarizes categorical variables (like <code>Age</code>) by calculating the proportion of participants in each category (e.g., 20–39, 40–59, ≥60).</p></li>
@@ -1495,10 +1520,10 @@ When <code>reliability_checks = TRUE</code>, the function evaluates each estimat
 Each of these flags indicates limited precision or instability in the estimate.</li>
 </ul>
 <p>In the output, the asterisks appear in the <strong>“Other” race</strong> column for certain age groups (such as “40–59” and “≥60”).<br>
-This happens because the <strong>number of participants</strong> in those cells is very small, producing unstable or wide confidence intervals. Thus, the function correctly replaces the unreliable estimates with <code>*</code>, ensuring your published results remain statistically defensible and transparent.</p>
+This happens because the <strong>number of participants</strong> in those cells is very small, producing unstable or wide confidence intervals. Thus, the function correctly replaces the unreliable estimates with <code>*</code>, ensuring the published results remain statistically defensible and transparent.</p>
 </section><section id="reliability-metrics-table" class="level3"><h3 class="anchored" data-anchor-id="reliability-metrics-table">Reliability Metrics Table</h3>
 <p>In addition to the detailed checks for proportions, the <code>svytable1</code> function also assesses the reliability of means for numeric variables. For these estimates, it applies the standard NCHS recommendation, which uses the Relative Standard Error (RSE). If a mean’s RSE is 30% or greater, it is considered statistically unreliable and will be suppressed with an asterisk (*) in the formatted table.</p>
-<p>The <code>$reliability_metrics</code> table will be printed with the output if you select <code>return_metrics = TRUE</code> which will include rows for each mean, reporting the calculated RSE and the outcome of this check in the <code>fail_rse_30</code> column.</p>
+<p>The <code>$reliability_metrics</code> table will be printed with the output if we select <code>return_metrics = TRUE</code> which will include rows for each mean, reporting the calculated RSE and the outcome of this check in the <code>fail_rse_30</code> column.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># View reliability_metrics</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>table1_svy <span class="ot">&lt;-</span> <span class="fu">svytable1</span>(</span>
@@ -1973,7 +1998,7 @@ Race/Ethnicity
 </ul>
 <ol type="1">
 <li><p><strong>The Standard Error (SE)</strong>: A direct measure of the coefficient’s precision. A smaller SE relative to its coefficient suggests a more reliable estimate.</p></li>
-<li><p><strong>The p-value</strong>: Tells you if the coefficient is statistically distinguishable from zero. A non-significant p-value (e.g., p &gt; 0.05) means we cannot be confident the predictor has any association with the outcome.</p></li>
+<li><p><strong>The p-value</strong>: Tells if the coefficient is statistically distinguishable from zero. A non-significant p-value (e.g., p &gt; 0.05) means we cannot be confident the predictor has any association with the outcome.</p></li>
 <li><p><strong>The Confidence Interval (CI)</strong>: Provides a plausible range for the true value of the coefficient. A very wide CI indicates a high degree of uncertainty and, therefore, low reliability. For logistic regression, if the CI for the odds ratio contains 1.0, the result is not statistically significant.</p></li>
 </ol>
 <p>We will also calculate the RSE to demonstrate why it can be misleading. Finally, we’ll run a quick check for multicollinearity using the Variance Inflation Factor (VIF), as this is a common cause of unstable (unreliable) coefficients.</p>
@@ -2153,9 +2178,9 @@ Race/Ethnicity
 </div>
 <p>Generally, the model shows limited reliability and predictive power. Most of the predictor variables, such as <code>Age</code> and <code>smoking status</code>, are not statistically significant (their <code>p.value</code> is high). This indicates that, for men in this dataset, these factors don’t have a clear, reliable association with obesity.</p>
 <p>The few significant predictors are <code>raceNon-Hispanic Asian</code> and <code>education\&lt;High school</code>. These coefficients are considered stable and reliable. The unreliability of the other terms is not caused by the variables being correlated with each other, as the multicollinearity check shows.</p>
-<p><strong>The RSE Can Be Misleading for Regression</strong>: Notice that some statistically insignificant coefficients (like <code>Age40-59</code> and <code>raceHispanic</code>) have high RSEs, which is expected. However, the <code>education\&gt;High school</code> coefficient is highly insignificant: p-value of 0.932 correctly tells you that this coefficient is not statistically significant and is not reliably different from zero. However its RSE is flagged as “TRUE” for being unreliable. The RSE is calculated as (0.147 / -0.013) * 100 = 1109%. Here, the extremely high RSE here is not a result of a large standard error, but of the coefficient estimate being very close to zero. An inflated RSE doesn’t provide any new or more accurate information than the p-value; it simply reflects that the coefficient itself is minuscule. This is a great example of why RSE isn’t a primary tool for regression coefficients: it can be inflated by estimates close to zero, regardless of their precision.</p>
+<p><strong>The RSE Can Be Misleading for Regression</strong>: Notice that some statistically insignificant coefficients (like <code>Age40-59</code> and <code>raceHispanic</code>) have high RSEs, which is expected. However, the <code>education\&gt;High school</code> coefficient is highly insignificant: p-value of 0.932 correctly tells that this coefficient is not statistically significant and is not reliably different from zero. However its RSE is flagged as “TRUE” for being unreliable. The RSE is calculated as (0.147 / -0.013) * 100 = 1109%. Here, the extremely high RSE here is not a result of a large standard error, but of the coefficient estimate being very close to zero. An inflated RSE doesn’t provide any new or more accurate information than the p-value; it simply reflects that the coefficient itself is minuscule. This is a great example of why RSE isn’t a primary tool for regression coefficients: it can be inflated by estimates close to zero, regardless of their precision.</p>
 </section><section id="check-for-multicollinearity" class="level3"><h3 class="anchored" data-anchor-id="check-for-multicollinearity">Check for Multicollinearity</h3>
-<p>Multicollinearity occurs when predictor variables in a model are highly correlated with each other. This can inflate the standard errors and make your coefficient estimates unstable. The VIF is used to detect this issue.</p>
+<p>Multicollinearity occurs when predictor variables in a model are highly correlated with each other. This can inflate the standard errors and make the coefficient estimates unstable. The VIF is used to detect this issue.</p>
 <p><code>GVIF^(1/(2*Df))</code> is a scaled version of the Generalized Variance Inflation Factor (GVIF) used to assess multicollinearity in regression models with categorical predictors <span class="citation" data-cites="fox1992generalized">(<a href="#ref-fox1992generalized" role="doc-biblioref">Fox and Monette 1992</a>)</span>. It adjusts for the number of dummy variables created for a categorical variable, making its value directly comparable to the traditional VIF used for continuous predictors within the same model.</p>
 <section id="why-gvif12df-is-necessary-for-categorical-variables" class="level4"><h4 class="anchored" data-anchor-id="why-gvif12df-is-necessary-for-categorical-variables">Why GVIF<sup>1/(2×Df)</sup> is Necessary for Categorical Variables</h4>
 <p>A categorical variable with (k) levels (e.g., <em>race</em>) is typically represented in a regression model by (k - 1) <strong>dummy variables</strong>. Dummy variables are inherently correlated because they all describe the same categorical feature. This intrinsic relationship would lead to very high — but misleading — <strong>GVIF</strong> scores if the overall GVIF were interpreted directly.</p>
@@ -2190,7 +2215,7 @@ Race/Ethnicity
 </tr>
 </tbody>
 </table>
-<p>A more conservative cutoff of *3** is sometimes used. The scaled GVIF, (GVIF^{1/(2·df)}), is designed to be comparable to the square root of the VIF, which explains the use of cutoffs like () (≈ 2.24) and () (≈ 3.16) <span class="citation" data-cites="nahhas2024introduction">(<a href="#ref-nahhas2024introduction" role="doc-biblioref">Nahhas 2024</a>)</span>. Larger than () (≈ 4.47) is therefore the case of severe multicollinearity.</p>
+<p>A more conservative cutoff of <strong>3</strong> is sometimes used. The scaled GVIF, <span class="math inline">\(GVIF^{1/(2·df)}\)</span>, is designed to be comparable to the square root of the VIF, which explains the use of cutoffs like <span class="math inline">\(\sqrt{5}\)</span> (≈ 2.24) and <span class="math inline">\(\sqrt{10}\)</span> (≈ 3.16) <span class="citation" data-cites="nahhas2024introduction">(<a href="#ref-nahhas2024introduction" role="doc-biblioref">Nahhas 2024</a>)</span>. Larger than <span class="math inline">\(\sqrt{20}\)</span> (≈ 4.47) is therefore the case of severe multicollinearity.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>vif_values <span class="ot">&lt;-</span> <span class="fu">vif</span>(fit_men_obese)</span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">print</span>(vif_values)</span>
@@ -2200,7 +2225,7 @@ Race/Ethnicity
 <span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt; smoking    3.435829  2        1.361469</span></span>
 <span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; education  6.381028  2        1.589361</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The key values in the <code>GVIF\^(1/(2\*Df))</code> column are all low (below 2.5). This confirms that your predictor variables are independent enough from one another and are not artificially inflating each other’s standard errors. The lack of precision in the model comes from other sources, not from multicollinearity.</p>
+<p>The key values in the <code>GVIF\^(1/(2\*Df))</code> column are all low (below 2.5). This confirms that the predictor variables are independent enough from one another and are not artificially inflating each other’s standard errors. The lack of precision in the model comes from other sources, not from multicollinearity.</p>
 </section></section></section><section id="formatting-the-table" class="level3"><h3 class="anchored" data-anchor-id="formatting-the-table">Formatting the Table</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># --- Use the helper function to format results from each model ---</span></span>
@@ -2447,6 +2472,9 @@ Race/Ethnicity
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-nhanes_reliability_estimates" class="csl-entry" role="listitem">
 Disease Control, Centers for, and Prevention. 2025. <span>“NHANES Tutorials: Reliability of Estimates Module.”</span> National Center for Health Statistics. <a href="https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx">https://wwwn.cdc.gov/nchs/nhanes/tutorials/reliabilityofestimates.aspx</a>.
+</div>
+<div id="ref-flegal2016trends" class="csl-entry" role="listitem">
+Flegal, Katherine M, Deanna Kruszon-Moran, Margaret D Carroll, Cheryl D Fryar, and Cynthia L Ogden. 2016. <span>“Trends in Obesity Among Adults in the United States, 2005 to 2014.”</span> <em>Jama</em> 315 (21): 2284–91.
 </div>
 <div id="ref-fox1992generalized" class="csl-entry" role="listitem">
 Fox, John, and Georges Monette. 1992. <span>“Generalized Collinearity Diagnostics.”</span> <em>Journal of the American Statistical Association</em> 87 (417): 178–83.
