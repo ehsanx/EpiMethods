@@ -10,7 +10,7 @@ knitr::opts_chunk$set(results = "asis")
 
 This section is about understanding, categorizing, and addressing missing data in clinical and epidemiological research. It highlights the prevalence of missing data in these fields, the common use of complete case analysis without considering the implications, and the types of missingness: Missing Completely at Random (MCAR), Missing at Random (MAR), and Not Missing at Random (NMAR), each requiring different approaches and considerations. The consequences of not properly addressing missing data are detailed as bias, incorrect standard errors/precision, and a substantial loss of power.
 
-This section also delves into strategies for addressing missing data, focusing on ad-hoc approaches and imputation methods. Ad-hoc approaches, such as ignoring missing data or using a missing category indicator, are generally dismissed as statistically invalid. In contrast, imputation, particularly multiple imputation (MI), is presented as a more robust and statistically sound method. Multiple imputation involves creating multiple complete datasets by predicting missing values and pooling the results to address the uncertainty associated with missing data. The section further discusses the types of imputation, the necessity of including a sufficient number of predictive variables, and the use of subject-area knowledge in building imputation models, providing a nuanced understanding of the challenges and solutions associated with missing data in research.
+This section also delves into strategies for addressing missing data, focusing on ad-hoc approaches and imputation methods. Ad-hoc approaches, such as ignoring missing data or using a missing category indicator, are generally dismissed as statistically invalid. In contrast, imputation, particularly MI, is presented as a more robust and statistically sound method. Multiple imputation involves creating multiple complete datasets by predicting missing values and pooling the results to address the uncertainty associated with missing data. The section further discusses the types of imputation, the necessity of including a sufficient number of predictive variables, and the use of subject-area knowledge in building imputation models, providing a nuanced understanding of the challenges and solutions associated with missing data in research.
 
 Reporting Guideline section delves into the complexities of handling missing data in statistical analysis, primarily through MI methods, especially Multiple Imputation by Chained Equations (MICE). It lays out the assumptions necessary for these methods (MCAR, MAR, MNAR). The guide also details how MICE works, using sequential regression imputation to create multiple imputed datasets, thereby allowing for more accurate and robust statistical inferences. Additionally, it provides comprehensive instructions on reporting MICE analysis, including detailing the missingness rates, the reasons for missing data, the assumptions made, and the specifics of the imputation and pooling methods used, ensuring transparency and reproducibility in research.
 
@@ -125,7 +125,7 @@ Despite their increasing sophistication, all single imputation methods share a c
 
 ### Multiple Imputation (MI): The Gold Standard
 
-**Multiple Imputation (MI)** was developed specifically to solve this uncertainty problem. Instead of creating one "complete" dataset, MI creates *multiple* (e.g., $m=20$ or $m=40$) complete datasets. Each dataset is generated using a similar process to stochastic imputation, but because of the random component, the imputed values are slightly different in each of the *m* datasets. This collection of datasets explicitly represents our uncertainty about what the true missing values might have been.
+**MI** was developed specifically to solve this uncertainty problem. Instead of creating one "complete" dataset, MI creates *multiple* (e.g., $m=20$ or $m=40$) complete datasets. Each dataset is generated using a similar process to stochastic imputation, but because of the random component, the imputed values are slightly different in each of the *m* datasets. This collection of datasets explicitly represents our uncertainty about what the true missing values might have been.
 
 By analyzing all *m* datasets and then formally combining the results, MI provides a single final estimate that correctly incorporates both the normal sampling uncertainty (from having a finite sample) and the additional uncertainty that arises from the missing data. This makes it the gold standard approach for handling missing data under the MAR assumption.
 
@@ -147,7 +147,7 @@ The goal of this phase is to generate *m* complete datasets where the imputed va
 -   **Practical Considerations for the Imputation Model**:
     -   **Number of Imputations (m)**: A common rule of thumb suggests that the number of imputations, *m*, should be at least as large as the percentage of subjects with any missing data [@austin2021missing]. Modern recommendations often suggest between 20 and 100 imputations.
     -   **Number of Iterations**: MICE is an iterative algorithm. In each cycle, it updates the imputed values based on the progressively improved predictions from the other variables. The algorithm is run for a set number of iterations to allow the imputed values to stabilize, a state known as convergence.
-    -   **Handling Non-Normal Data**: For continuous variables that are not normally distributed (e.g., skewed), one approach is to transform the variable before imputation and transform it back afterward. However, this can distort relationships and complicate interpretation. A more robust and often preferred strategy within MICE is to use Predictive Mean Matching (PMM), which is well-suited for non-normal data because it imputes values directly from the observed data, thereby preserving the original distribution.
+    -   **Handling Non-Normal Data**: For continuous variables that are not normally distributed (e.g., skewed), one approach is to transform the variable before imputation and transform it back afterward. However, this can distort relationships and complicate interpretation. A more robust and often preferred strategy within MICE is to use PMM, which is well-suited for non-normal data because it imputes values directly from the observed data, thereby preserving the original distribution.
 
 A common point of confusion is why the outcome variable should be included as a predictor in the imputation model [@white2011multiple]. This seems circular or like "cheating." However, this stems from a misunderstanding of the imputation model's goal. The goal is not merely to predict a missing covariate $X$, but to impute $X$ in a way that *preserves its true relationship with the outcome Y*. The outcome $Y$ is often the single best predictor of $X$. Excluding it from the imputation model would cause the imputed values of $X$ to have a weaker relationship with $Y$ than the observed values of $X$ do, biasing any estimated association between $X$ and $Y$ towards zero. The imputation model's purpose is structural preservation, which enables the subsequent analysis model to accurately test a specific hypothesis.
 
@@ -233,6 +233,35 @@ Since the NMAR assumption cannot be formally tested against MAR, the recommended
 ------------------------------------------------------------------------
 :::
 
+### Imputation vs. Pooling: How Non-Normality Affects Inference
+
+When you use MI to handle missing data, you combine the results from several imputed datasets using a set of formulas called Rubin's rules [@rubin1988overview]. A key assumption behind these rules is that the estimates you're combining, e.g., ORs or HRs, follow a roughly bell-shaped (normal) distribution. If this assumption is violated, the validity of your final confidence intervals and p-values can be compromised. The problem is worse in small samples or with high rates of missingness because the Central Limit Theorem is less effective.
+
+This issue, known as, non-normality, can arise from two distinct sources: problems with the (1) imputation process itself, or the (2) inherent nature of the statistic (HR, OR) you are estimating.
+
+**(1) Imputation-Induced Skewness: Garbage In, Garbage Out**: This happens when your imputation model is a poor fit for the variable with missing data. The model then generates imputed values that are implausible, which distorts the variable's distribution and, in turn, skews the results of your analysis model.
+
+For example, consider the scenario when you are missing data on patient income, a variable that is almost always right-skewed. If you use a standard imputation method that assumes normality (e.g., simple linear regression), it might generate negative or unrealistically high income values. When you then run a regression model using these flawed imputed datasets, the resulting odds ratios can become skewed or spread out unnaturally. This increases the between-imputation variance (the measure of uncertainty from the missing data), often leading to overly wide confidence intervals and a loss of statistical power. The fix here is to improve the imputation model. Use methods that respect the natural distribution of your data, such as PMM (`pmm`), or apply a transformation (e.g., a log transform) to the variable before imputing it.
+
+**(2) Parameter-Inherent Skewness: It's Not the Imputation, It's the Ratio**: Sometimes, the imputation model is perfect, but the statistic you are trying to estimate is naturally skewed. Ratios, such as HRs or ORs, and bounded measures such as correlation coefficients, are prime examples of parameters with inherently non-normal sampling distributions. An HR, for instance, cannot be less than zero but can be very large, leading to a right-skewed distribution.
+
+When you directly pool HRs or ORs from your imputed datasets, their inherent skew can make the standard error calculation from Rubin's rules less accurate. The t-distribution used to construct the confidence interval doesn't quite fit, which can lead to confidence intervals that are too narrow (inflating your Type I error rate) or too wide.
+
+The standard and recommended approach is to transform the estimate before pooling [@van2018flexible]:
+
+1. For each imputed dataset, calculate the log(HR) or log(OR) and its standard error.  
+2. Use Rubin's rules to pool the log-transformed estimates and their standard errors.  
+3. Back-transform the final pooled estimate and its confidence interval limits (by exponentiating them) to get your result back on the original HR or OR scale.
+
+**Practical Steps and Diagnostics**:
+
+A simple diagnostic is to plot a histogram or density plot of your estimates (e.g., the 20+ odds ratios from your imputed datasets).
+
+- If the plot shows a few extreme outliers and is widely spread, it suggests an imputation problem. You should revisit your imputation model.  
+- If the plot is consistently skewed in one direction across all imputations, it likely points to parameter-inherent skewness. You should use the transform–pool–backtransform approach.
+
+By correctly diagnosing the source of non-normality, you can ensure your final results are both valid and reliable, preserving the statistical power that multiple imputation is designed to provide. Increasing the number of imputations (`m`) does not solve either of these fundamental non-normality problems. While increasing `m` does not fix non-normality, it can stabilize the Monte Carlo error of pooled estimates: so increasing `m` helps precision but not distributional validity. Better methods, not more imputations, are the key.
+
 ::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
 <iframe src="https://www.youtube.com/embed/Wnw5sssW8LI" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
 
@@ -265,7 +294,7 @@ By following this blueprint, researchers can provide the necessary information f
 
 ### Checklist: RAISE-MI (Reproducible Analysis and Imputation Standards for Epidemiology – Multiple Imputation)
 
-RAISE-MI is a structured reporting framework developed to promote transparency, reproducibility, and methodological rigor in epidemiologic analyses that use Multiple Imputation (MI): particularly when working with complex survey data such as NHANES. The guideline organizes reporting expectations across five domains, guiding researchers from conceptual justification to interpretation. It is designed for both manuscript preparation and instructional use, ensuring that analytic workflows are well-documented, assumptions are explicitly justified, and reproducibility is verifiable through software, code, and diagnostic reporting.
+RAISE-MI is a structured reporting framework developed to promote transparency, reproducibility, and methodological rigor in epidemiologic analyses that use MI: particularly when working with complex survey data such as NHANES. The guideline organizes reporting expectations across five domains, guiding researchers from conceptual justification to interpretation. It is designed for both manuscript preparation and instructional use, ensuring that analytic workflows are well-documented, assumptions are explicitly justified, and reproducibility is verifiable through software, code, and diagnostic reporting.
 
 **Explanation of the Five Sections**
 
@@ -330,7 +359,7 @@ kbl(
 
 ### Assessment of Missing Data Analysis Reporting though RAISE-MI Checklist
 
-We take an example article to assess adherence to the above checklist [@hossain2022association]. In this article, however, complete-case analysis was treated as the primary analysis (implicitly assuming MCAR). Multiple imputation (MI) was performed as a sensitivity analysis under a MAR assumption to verify whether conclusions were robust to missing data treatment. The article is accompanied by additional information through an [Appendix](https://www.researchgate.net/publication/362125046_Supplemental_Material_The_association_between_rheumatoid_arthritis_and_cardiovascular_disease_among_adults_in_the_United_States_during_1999-2018_and_age-related_effect_modification_in_relative_and_abs).
+We take an example article to assess adherence to the above checklist [@hossain2022association]. In this article, however, complete-case analysis was treated as the primary analysis (implicitly assuming MCAR). MI was performed as a sensitivity analysis under a MAR assumption to verify whether conclusions were robust to missing data treatment. The article is accompanied by additional information through an [Appendix](https://www.researchgate.net/publication/362125046_Supplemental_Material_The_association_between_rheumatoid_arthritis_and_cardiovascular_disease_among_adults_in_the_United_States_during_1999-2018_and_age-related_effect_modification_in_relative_and_abs).
 
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}

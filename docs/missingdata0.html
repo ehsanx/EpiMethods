@@ -1317,7 +1317,8 @@ window.Quarto = {
   <li>
 <a href="#video-lessons" id="toc-video-lessons" class="nav-link" data-scroll-target="#video-lessons">Video Lessons</a>
   <ul class="collapse">
-<li><a href="#checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation" id="toc-checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation" class="nav-link" data-scroll-target="#checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation">Checklist: RAISE-MI (Reproducible Analysis and Imputation Standards for Epidemiology – Multiple Imputation)</a></li>
+<li><a href="#imputation-vs.-pooling-how-non-normality-affects-inference" id="toc-imputation-vs.-pooling-how-non-normality-affects-inference" class="nav-link" data-scroll-target="#imputation-vs.-pooling-how-non-normality-affects-inference">Imputation vs.&nbsp;Pooling: How Non-Normality Affects Inference</a></li>
+  <li><a href="#checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation" id="toc-checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation" class="nav-link" data-scroll-target="#checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation">Checklist: RAISE-MI (Reproducible Analysis and Imputation Standards for Epidemiology – Multiple Imputation)</a></li>
   <li><a href="#assessment-of-missing-data-analysis-reporting-though-raise-mi-checklist" id="toc-assessment-of-missing-data-analysis-reporting-though-raise-mi-checklist" class="nav-link" data-scroll-target="#assessment-of-missing-data-analysis-reporting-though-raise-mi-checklist">Assessment of Missing Data Analysis Reporting though RAISE-MI Checklist</a></li>
   </ul>
 </li>
@@ -1344,11 +1345,11 @@ window.Quarto = {
 
 </header><section id="missing-data-analysis" class="level2"><h2 class="anchored" data-anchor-id="missing-data-analysis">Missing Data Analysis</h2>
 <p>This section is about understanding, categorizing, and addressing missing data in clinical and epidemiological research. It highlights the prevalence of missing data in these fields, the common use of complete case analysis without considering the implications, and the types of missingness: Missing Completely at Random (MCAR), Missing at Random (MAR), and Not Missing at Random (NMAR), each requiring different approaches and considerations. The consequences of not properly addressing missing data are detailed as bias, incorrect standard errors/precision, and a substantial loss of power.</p>
-<p>This section also delves into strategies for addressing missing data, focusing on ad-hoc approaches and imputation methods. Ad-hoc approaches, such as ignoring missing data or using a missing category indicator, are generally dismissed as statistically invalid. In contrast, imputation, particularly multiple imputation (MI), is presented as a more robust and statistically sound method. Multiple imputation involves creating multiple complete datasets by predicting missing values and pooling the results to address the uncertainty associated with missing data. The section further discusses the types of imputation, the necessity of including a sufficient number of predictive variables, and the use of subject-area knowledge in building imputation models, providing a nuanced understanding of the challenges and solutions associated with missing data in research.</p>
+<p>This section also delves into strategies for addressing missing data, focusing on ad-hoc approaches and imputation methods. Ad-hoc approaches, such as ignoring missing data or using a missing category indicator, are generally dismissed as statistically invalid. In contrast, imputation, particularly MI, is presented as a more robust and statistically sound method. Multiple imputation involves creating multiple complete datasets by predicting missing values and pooling the results to address the uncertainty associated with missing data. The section further discusses the types of imputation, the necessity of including a sufficient number of predictive variables, and the use of subject-area knowledge in building imputation models, providing a nuanced understanding of the challenges and solutions associated with missing data in research.</p>
 <p>Reporting Guideline section delves into the complexities of handling missing data in statistical analysis, primarily through MI methods, especially Multiple Imputation by Chained Equations (MICE). It lays out the assumptions necessary for these methods (MCAR, MAR, MNAR). The guide also details how MICE works, using sequential regression imputation to create multiple imputed datasets, thereby allowing for more accurate and robust statistical inferences. Additionally, it provides comprehensive instructions on reporting MICE analysis, including detailing the missingness rates, the reasons for missing data, the assumptions made, and the specifics of the imputation and pooling methods used, ensuring transparency and reproducibility in research.</p>
 </section><section id="reading-list" class="level2"><h2 class="anchored" data-anchor-id="reading-list">Reading list</h2>
 <p>Key reference: <span class="citation" data-cites="sterne2009multiple">(<a href="#ref-sterne2009multiple" role="doc-biblioref">Sterne and al. 2009</a>)</span></p>
-<p>Optional reading: <span class="citation" data-cites="vanbuuren2018flexible">(<a href="#ref-vanbuuren2018flexible" role="doc-biblioref">Van Buuren 2018</a>)</span></p>
+<p>Optional reading: <span class="citation" data-cites="vanbuuren2018flexible">(<a href="#ref-vanbuuren2018flexible" role="doc-biblioref">Van Buuren 2018a</a>)</span></p>
 <p>Further optional readings: <span class="citation" data-cites="lumley2011complex granger2019avoiding hughes2019accounting">(<a href="#ref-lumley2011complex" role="doc-biblioref">Lumley 2011</a>; <a href="#ref-granger2019avoiding" role="doc-biblioref">Granger, Sergeant, and Lunt 2019</a>; <a href="#ref-hughes2019accounting" role="doc-biblioref">Hughes et al. 2019</a>)</span></p>
 </section><section id="video-lessons" class="level2"><h2 class="anchored" data-anchor-id="video-lessons">Video Lessons</h2>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -1473,7 +1474,7 @@ Missing Data Analysis
 </ul></section><section id="the-unifying-flaw-of-single-imputation" class="level3"><h3 class="anchored" data-anchor-id="the-unifying-flaw-of-single-imputation">The Unifying Flaw of Single Imputation</h3>
 <p>Despite their increasing sophistication, all single imputation methods share a critical, unifying flaw: the subsequent statistical analysis treats the imputed values as if they were real, observed data. This failure to acknowledge the <em>uncertainty</em> of the imputation process—the fact that we do not know the true missing value and have only made an educated guess—leads to standard errors that are too small, confidence intervals that are too narrow, and p-values that are artificially significant. The analysis becomes overly precise and overly optimistic.</p>
 </section><section id="multiple-imputation-mi-the-gold-standard" class="level3"><h3 class="anchored" data-anchor-id="multiple-imputation-mi-the-gold-standard">Multiple Imputation (MI): The Gold Standard</h3>
-<p><strong>Multiple Imputation (MI)</strong> was developed specifically to solve this uncertainty problem. Instead of creating one “complete” dataset, MI creates <em>multiple</em> (e.g., <span class="math inline">\(m=20\)</span> or <span class="math inline">\(m=40\)</span>) complete datasets. Each dataset is generated using a similar process to stochastic imputation, but because of the random component, the imputed values are slightly different in each of the <em>m</em> datasets. This collection of datasets explicitly represents our uncertainty about what the true missing values might have been.</p>
+<p><strong>MI</strong> was developed specifically to solve this uncertainty problem. Instead of creating one “complete” dataset, MI creates <em>multiple</em> (e.g., <span class="math inline">\(m=20\)</span> or <span class="math inline">\(m=40\)</span>) complete datasets. Each dataset is generated using a similar process to stochastic imputation, but because of the random component, the imputed values are slightly different in each of the <em>m</em> datasets. This collection of datasets explicitly represents our uncertainty about what the true missing values might have been.</p>
 <p>By analyzing all <em>m</em> datasets and then formally combining the results, MI provides a single final estimate that correctly incorporates both the normal sampling uncertainty (from having a finite sample) and the additional uncertainty that arises from the missing data. This makes it the gold standard approach for handling missing data under the MAR assumption.</p>
 <hr></section></section><section id="the-multiple-imputation-workflow-in-detail" class="level2"><h2 class="anchored" data-anchor-id="the-multiple-imputation-workflow-in-detail">The Multiple Imputation Workflow in Detail</h2>
 <p>The MI process can be demystified by breaking it down into three conceptual steps: Impute, Analyze, and Pool. This workflow provides a flexible and powerful framework for obtaining valid statistical inferences in the presence of missing data.</p>
@@ -1499,7 +1500,7 @@ Missing Data Analysis
 <li>
 <strong>Number of Iterations</strong>: MICE is an iterative algorithm. In each cycle, it updates the imputed values based on the progressively improved predictions from the other variables. The algorithm is run for a set number of iterations to allow the imputed values to stabilize, a state known as convergence.</li>
 <li>
-<strong>Handling Non-Normal Data</strong>: For continuous variables that are not normally distributed (e.g., skewed), one approach is to transform the variable before imputation and transform it back afterward. However, this can distort relationships and complicate interpretation. A more robust and often preferred strategy within MICE is to use Predictive Mean Matching (PMM), which is well-suited for non-normal data because it imputes values directly from the observed data, thereby preserving the original distribution.</li>
+<strong>Handling Non-Normal Data</strong>: For continuous variables that are not normally distributed (e.g., skewed), one approach is to transform the variable before imputation and transform it back afterward. However, this can distort relationships and complicate interpretation. A more robust and often preferred strategy within MICE is to use PMM, which is well-suited for non-normal data because it imputes values directly from the observed data, thereby preserving the original distribution.</li>
 </ul>
 </li>
 </ul>
@@ -1571,6 +1572,29 @@ Missing Data Analysis
 <hr></section></section>
 </div>
 </div>
+<section id="imputation-vs.-pooling-how-non-normality-affects-inference" class="level3"><h3 class="anchored" data-anchor-id="imputation-vs.-pooling-how-non-normality-affects-inference">Imputation vs.&nbsp;Pooling: How Non-Normality Affects Inference</h3>
+<p>When you use MI to handle missing data, you combine the results from several imputed datasets using a set of formulas called Rubin’s rules <span class="citation" data-cites="rubin1988overview">(<a href="#ref-rubin1988overview" role="doc-biblioref">Rubin 1988</a>)</span>. A key assumption behind these rules is that the estimates you’re combining, e.g., ORs or HRs, follow a roughly bell-shaped (normal) distribution. If this assumption is violated, the validity of your final confidence intervals and p-values can be compromised. The problem is worse in small samples or with high rates of missingness because the Central Limit Theorem is less effective.</p>
+<p>This issue, known as, non-normality, can arise from two distinct sources: problems with the (1) imputation process itself, or the (2) inherent nature of the statistic (HR, OR) you are estimating.</p>
+<p><strong>(1) Imputation-Induced Skewness: Garbage In, Garbage Out</strong>: This happens when your imputation model is a poor fit for the variable with missing data. The model then generates imputed values that are implausible, which distorts the variable’s distribution and, in turn, skews the results of your analysis model.</p>
+<p>For example, consider the scenario when you are missing data on patient income, a variable that is almost always right-skewed. If you use a standard imputation method that assumes normality (e.g., simple linear regression), it might generate negative or unrealistically high income values. When you then run a regression model using these flawed imputed datasets, the resulting odds ratios can become skewed or spread out unnaturally. This increases the between-imputation variance (the measure of uncertainty from the missing data), often leading to overly wide confidence intervals and a loss of statistical power. The fix here is to improve the imputation model. Use methods that respect the natural distribution of your data, such as PMM (<code>pmm</code>), or apply a transformation (e.g., a log transform) to the variable before imputing it.</p>
+<p><strong>(2) Parameter-Inherent Skewness: It’s Not the Imputation, It’s the Ratio</strong>: Sometimes, the imputation model is perfect, but the statistic you are trying to estimate is naturally skewed. Ratios, such as HRs or ORs, and bounded measures such as correlation coefficients, are prime examples of parameters with inherently non-normal sampling distributions. An HR, for instance, cannot be less than zero but can be very large, leading to a right-skewed distribution.</p>
+<p>When you directly pool HRs or ORs from your imputed datasets, their inherent skew can make the standard error calculation from Rubin’s rules less accurate. The t-distribution used to construct the confidence interval doesn’t quite fit, which can lead to confidence intervals that are too narrow (inflating your Type I error rate) or too wide.</p>
+<p>The standard and recommended approach is to transform the estimate before pooling <span class="citation" data-cites="van2018flexible">(<a href="#ref-van2018flexible" role="doc-biblioref">Van Buuren 2018b</a>)</span>:</p>
+<ol type="1">
+<li>For each imputed dataset, calculate the log(HR) or log(OR) and its standard error.<br>
+</li>
+<li>Use Rubin’s rules to pool the log-transformed estimates and their standard errors.<br>
+</li>
+<li>Back-transform the final pooled estimate and its confidence interval limits (by exponentiating them) to get your result back on the original HR or OR scale.</li>
+</ol>
+<p><strong>Practical Steps and Diagnostics</strong>:</p>
+<p>A simple diagnostic is to plot a histogram or density plot of your estimates (e.g., the 20+ odds ratios from your imputed datasets).</p>
+<ul>
+<li>If the plot shows a few extreme outliers and is widely spread, it suggests an imputation problem. You should revisit your imputation model.<br>
+</li>
+<li>If the plot is consistently skewed in one direction across all imputations, it likely points to parameter-inherent skewness. You should use the transform–pool–backtransform approach.</li>
+</ul>
+<p>By correctly diagnosing the source of non-normality, you can ensure your final results are both valid and reliable, preserving the statistical power that multiple imputation is designed to provide. Increasing the number of imputations (<code>m</code>) does not solve either of these fundamental non-normality problems. While increasing <code>m</code> does not fix non-normality, it can stabilize the Monte Carlo error of pooled estimates: so increasing <code>m</code> helps precision but not distributional validity. Better methods, not more imputations, are the key.</p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
 <iframe src="https://www.youtube.com/embed/Wnw5sssW8LI" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen="">
 </iframe>
@@ -1610,8 +1634,8 @@ Reporting guidelines when missing data is present
 </section>
 </div>
 </div>
-<section id="checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation" class="level3"><h3 class="anchored" data-anchor-id="checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation">Checklist: RAISE-MI (Reproducible Analysis and Imputation Standards for Epidemiology – Multiple Imputation)</h3>
-<p>RAISE-MI is a structured reporting framework developed to promote transparency, reproducibility, and methodological rigor in epidemiologic analyses that use Multiple Imputation (MI): particularly when working with complex survey data such as NHANES. The guideline organizes reporting expectations across five domains, guiding researchers from conceptual justification to interpretation. It is designed for both manuscript preparation and instructional use, ensuring that analytic workflows are well-documented, assumptions are explicitly justified, and reproducibility is verifiable through software, code, and diagnostic reporting.</p>
+</section><section id="checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation" class="level3"><h3 class="anchored" data-anchor-id="checklist-raise-mi-reproducible-analysis-and-imputation-standards-for-epidemiology-multiple-imputation">Checklist: RAISE-MI (Reproducible Analysis and Imputation Standards for Epidemiology – Multiple Imputation)</h3>
+<p>RAISE-MI is a structured reporting framework developed to promote transparency, reproducibility, and methodological rigor in epidemiologic analyses that use MI: particularly when working with complex survey data such as NHANES. The guideline organizes reporting expectations across five domains, guiding researchers from conceptual justification to interpretation. It is designed for both manuscript preparation and instructional use, ensuring that analytic workflows are well-documented, assumptions are explicitly justified, and reproducibility is verifiable through software, code, and diagnostic reporting.</p>
 <p><strong>Explanation of the Five Sections</strong></p>
 <ol type="1">
 <li>
@@ -1681,7 +1705,7 @@ Reporting guidelines when missing data is present
 </table>
 </div>
 </section><section id="assessment-of-missing-data-analysis-reporting-though-raise-mi-checklist" class="level3"><h3 class="anchored" data-anchor-id="assessment-of-missing-data-analysis-reporting-though-raise-mi-checklist">Assessment of Missing Data Analysis Reporting though RAISE-MI Checklist</h3>
-<p>We take an example article to assess adherence to the above checklist <span class="citation" data-cites="hossain2022association">(<a href="#ref-hossain2022association" role="doc-biblioref">Hossain et al. 2022</a>)</span>. In this article, however, complete-case analysis was treated as the primary analysis (implicitly assuming MCAR). Multiple imputation (MI) was performed as a sensitivity analysis under a MAR assumption to verify whether conclusions were robust to missing data treatment. The article is accompanied by additional information through an <a href="https://www.researchgate.net/publication/362125046_Supplemental_Material_The_association_between_rheumatoid_arthritis_and_cardiovascular_disease_among_adults_in_the_United_States_during_1999-2018_and_age-related_effect_modification_in_relative_and_abs">Appendix</a>.</p>
+<p>We take an example article to assess adherence to the above checklist <span class="citation" data-cites="hossain2022association">(<a href="#ref-hossain2022association" role="doc-biblioref">Hossain et al. 2022</a>)</span>. In this article, however, complete-case analysis was treated as the primary analysis (implicitly assuming MCAR). MI was performed as a sensitivity analysis under a MAR assumption to verify whether conclusions were robust to missing data treatment. The article is accompanied by additional information through an <a href="https://www.researchgate.net/publication/362125046_Supplemental_Material_The_association_between_rheumatoid_arthritis_and_cardiovascular_disease_among_adults_in_the_United_States_during_1999-2018_and_age-related_effect_modification_in_relative_and_abs">Appendix</a>.</p>
 <div class="table-responsive">
 <table class="table table-striped table-hover table-condensed caption-top" data-quarto-postprocess="true">
 <caption>RAISE-MI Checklist assessing Hossain et al. (2022) (with Appendix)</caption>
@@ -1814,14 +1838,20 @@ Hughes, Rachael A., Jon Heron, Jonathan A. Sterne, and Kate Tilling. 2019. <span
 <div id="ref-lumley2011complex" class="csl-entry" role="listitem">
 Lumley, Thomas. 2011. <em>Complex Surveys: A Guide to Analysis Using r</em>. Vol. 565. John Wiley &amp; Sons.
 </div>
+<div id="ref-rubin1988overview" class="csl-entry" role="listitem">
+Rubin, Donald B. 1988. <span>“An Overview of Multiple Imputation.”</span> In <em>Proceedings of the Survey Research Methods Section of the American Statistical Association</em>, 79:84.
+</div>
 <div id="ref-sterne2009multiple" class="csl-entry" role="listitem">
 Sterne, Jonathan A., and et al. 2009. <span>“Multiple Imputation for Missing Data in Epidemiological and Clinical Research: Potential and Pitfalls.”</span> <em>BMJ</em> 338: b2393.
 </div>
 <div id="ref-vach1991biased" class="csl-entry" role="listitem">
 Vach, Werner, and Mana Blettner. 1991. <span>“Biased Estimation of the Odds Ratio in Case-Control Studies Due to the Use of Ad Hoc Methods of Correcting for Missing Values for Confounding Variables.”</span> <em>American Journal of Epidemiology</em> 134 (8): 895–907.
 </div>
+<div id="ref-van2018flexible" class="csl-entry" role="listitem">
+Van Buuren, Stef. 2018b. <em>Flexible Imputation of Missing Data</em>. Chapman; Hall/CRC.
+</div>
 <div id="ref-vanbuuren2018flexible" class="csl-entry" role="listitem">
-Van Buuren, Stef. 2018. <em>Flexible Imputation of Missing Data</em>. Chapman; Hall/CRC.
+———. 2018a. <em>Flexible Imputation of Missing Data</em>. Chapman; Hall/CRC.
 </div>
 <div id="ref-white2011multiple" class="csl-entry" role="listitem">
 White, Ian R, Patrick Royston, and Angela M Wood. 2011. <span>“Multiple Imputation Using Chained Equations: Issues and Guidance for Practice.”</span> <em>Statistics in Medicine</em> 30 (4): 377–99.
