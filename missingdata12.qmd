@@ -45,7 +45,7 @@ dat.full.with.mortality <- readRDS("Data/missingdata/dat.full.with.mortality.RDS
 
 ***
 
-## 3. Data Preparation and Cleaning
+## Data Preparation and Cleaning
 
 Before imputation, we must create the final analytic variables and clean the dataset. This includes creating the exposure, survival time, and status variables, and then dropping all unnecessary raw or intermediate columns.
 
@@ -124,7 +124,7 @@ table(dat.analytic$status_all)
 hist(dat.analytic$nelson_aalen)
 ```
 
-### 4.2 Configuring the Predictor Matrix
+### Configuring the Predictor Matrix
 
 The `predictorMatrix` tells `mice` what to do. Here’s the logic for our setup:
 
@@ -173,7 +173,12 @@ imputed_data <- mice(
 
 ***
 
-## 5. Survival Analysis on Imputed Data 📊
+```{r pred_matrix, cache=TRUE}
+kable(pred_matrix)
+```
+
+
+## Survival Analysis on Imputed Data 📊
 
 With our `m=2` complete datasets, we follow the "analyze then pool" procedure:
 
@@ -267,7 +272,7 @@ svypooled(
 ```
 
 
-## 6. Conclusion
+## Conclusion
 
 This tutorial demonstrated how to replace a complete-case analysis with a multiple imputation workflow for a survey-weighted survival analysis. By correctly preparing the data, configuring `mice` with survival-specific information, and pooling the final results, we can generate valid estimates that properly account for missing data.
 

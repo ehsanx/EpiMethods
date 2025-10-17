@@ -1330,16 +1330,16 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
    
   <ul>
 <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
-  <li><a href="#data-preparation-and-cleaning" id="toc-data-preparation-and-cleaning" class="nav-link" data-scroll-target="#data-preparation-and-cleaning">3. Data Preparation and Cleaning</a></li>
+  <li><a href="#data-preparation-and-cleaning" id="toc-data-preparation-and-cleaning" class="nav-link" data-scroll-target="#data-preparation-and-cleaning">Data Preparation and Cleaning</a></li>
   <li>
 <a href="#multiple-imputation-with-mice" id="toc-multiple-imputation-with-mice" class="nav-link" data-scroll-target="#multiple-imputation-with-mice">Multiple Imputation with <code>mice</code> 🪄</a>
   <ul class="collapse">
 <li><a href="#preparing-for-imputation" id="toc-preparing-for-imputation" class="nav-link" data-scroll-target="#preparing-for-imputation">Preparing for Imputation</a></li>
-  <li><a href="#configuring-the-predictor-matrix" id="toc-configuring-the-predictor-matrix" class="nav-link" data-scroll-target="#configuring-the-predictor-matrix">4.2 Configuring the Predictor Matrix</a></li>
+  <li><a href="#configuring-the-predictor-matrix" id="toc-configuring-the-predictor-matrix" class="nav-link" data-scroll-target="#configuring-the-predictor-matrix">Configuring the Predictor Matrix</a></li>
   </ul>
 </li>
-  <li><a href="#survival-analysis-on-imputed-data" id="toc-survival-analysis-on-imputed-data" class="nav-link" data-scroll-target="#survival-analysis-on-imputed-data">5. Survival Analysis on Imputed Data 📊</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">6. Conclusion</a></li>
+  <li><a href="#survival-analysis-on-imputed-data" id="toc-survival-analysis-on-imputed-data" class="nav-link" data-scroll-target="#survival-analysis-on-imputed-data">Survival Analysis on Imputed Data 📊</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></nav>
     </div>
@@ -1407,7 +1407,7 @@ Tip
 <span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Load the full, merged dataset with mortality information</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a>dat.full.with.mortality <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"Data/missingdata/dat.full.with.mortality.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<hr></section><section id="data-preparation-and-cleaning" class="level2"><h2 class="anchored" data-anchor-id="data-preparation-and-cleaning">3. Data Preparation and Cleaning</h2>
+<hr></section><section id="data-preparation-and-cleaning" class="level2"><h2 class="anchored" data-anchor-id="data-preparation-and-cleaning">Data Preparation and Cleaning</h2>
 <p>Before imputation, we must create the final analytic variables and clean the dataset. This includes creating the exposure, survival time, and status variables, and then dropping all unnecessary raw or intermediate columns.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># --- Create Analytic Variables ---</span></span>
@@ -1513,7 +1513,7 @@ Tip
 </div>
 </div>
 </div>
-</section><section id="configuring-the-predictor-matrix" class="level3"><h3 class="anchored" data-anchor-id="configuring-the-predictor-matrix">4.2 Configuring the Predictor Matrix</h3>
+</section><section id="configuring-the-predictor-matrix" class="level3"><h3 class="anchored" data-anchor-id="configuring-the-predictor-matrix">Configuring the Predictor Matrix</h3>
 <p>The <code>predictorMatrix</code> tells <code>mice</code> what to do. Here’s the logic for our setup:</p>
 <ul>
 <li>
@@ -1584,7 +1584,199 @@ Tip
 <span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt;   2   2  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
 <span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt; Warning: Number of logged events: 8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<hr></section></section><section id="survival-analysis-on-imputed-data" class="level2"><h2 class="anchored" data-anchor-id="survival-analysis-on-imputed-data">5. Survival Analysis on Imputed Data 📊</h2>
+<hr>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">kable</span>(pred_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 2%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 14%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 10%">
+</colgroup>
+<thead><tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">id</th>
+<th style="text-align: right;">sex</th>
+<th style="text-align: right;">race</th>
+<th style="text-align: right;">psu</th>
+<th style="text-align: right;">strata</th>
+<th style="text-align: right;">survey.weight.new</th>
+<th style="text-align: right;">exposure.cat</th>
+<th style="text-align: right;">stime.since.birth</th>
+<th style="text-align: right;">status_all</th>
+<th style="text-align: right;">year.cat</th>
+<th style="text-align: right;">nelson_aalen</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">id</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sex</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">race</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">psu</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">strata</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">survey.weight.new</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">exposure.cat</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">stime.since.birth</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">status_all</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">year.cat</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">nelson_aalen</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section></section><section id="survival-analysis-on-imputed-data" class="level2"><h2 class="anchored" data-anchor-id="survival-analysis-on-imputed-data">Survival Analysis on Imputed Data 📊</h2>
 <p>With our <code>m=2</code> complete datasets, we follow the “analyze then pool” procedure:</p>
 <ol type="1">
 <li>
@@ -1593,87 +1785,87 @@ Tip
 <strong>Pool</strong>: Combine the 2 sets of results into a single, final estimate using <code>pool()</code>.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># --- 5. Survival Analysis on Imputed Data  ---</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="co"># --- Step 5.1: Re-integrate Ineligible Subjects for Correct Survey Variance ---</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="co"># First, extract the 'm' imputed datasets into a single long-format data frame.</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="co"># Add a flag to identify this group as our analytic/eligible sample.</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a>imputed_analytic_data <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data, <span class="st">"long"</span>, <span class="at">include =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-8"><a href="#cb7-8"></a>imputed_analytic_data<span class="sc">$</span>eligible <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a></span>
-<span id="cb7-10"><a href="#cb7-10"></a><span class="co"># Next, identify the subjects from the original full dataset who were NOT in our analytic sample.</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="co"># The analytic sample was defined as age &gt;= 20 &amp; age &lt; 80.</span></span>
-<span id="cb7-12"><a href="#cb7-12"></a>dat_ineligible <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full.with.mortality, <span class="sc">!</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">80</span>))</span>
-<span id="cb7-13"><a href="#cb7-13"></a></span>
-<span id="cb7-14"><a href="#cb7-14"></a><span class="co"># Replicate this ineligible dataset 'm' times, once for each imputation.</span></span>
-<span id="cb7-15"><a href="#cb7-15"></a>ineligible_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>imputed_data<span class="sc">$</span>m, <span class="cf">function</span>(i) {</span>
-<span id="cb7-16"><a href="#cb7-16"></a>  df <span class="ot">&lt;-</span> dat_ineligible</span>
-<span id="cb7-17"><a href="#cb7-17"></a>  df<span class="sc">$</span>.imp <span class="ot">&lt;-</span> i <span class="co"># Add the imputation number</span></span>
-<span id="cb7-18"><a href="#cb7-18"></a>  <span class="fu">return</span>(df)</span>
-<span id="cb7-19"><a href="#cb7-19"></a>})</span>
-<span id="cb7-20"><a href="#cb7-20"></a>ineligible_stacked <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, ineligible_list)</span>
-<span id="cb7-21"><a href="#cb7-21"></a></span>
-<span id="cb7-22"><a href="#cb7-22"></a><span class="co"># Now, align the columns. Add columns that exist in the imputed data (like 'nelson_aalen')</span></span>
-<span id="cb7-23"><a href="#cb7-23"></a><span class="co"># to the ineligible data, filling them with NA.</span></span>
-<span id="cb7-24"><a href="#cb7-24"></a>cols_to_add <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(imputed_analytic_data), <span class="fu">names</span>(ineligible_stacked))</span>
-<span id="cb7-25"><a href="#cb7-25"></a>ineligible_stacked[, cols_to_add] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb7-26"><a href="#cb7-26"></a></span>
-<span id="cb7-27"><a href="#cb7-27"></a><span class="co"># Set the eligibility flag for this group to 0.</span></span>
-<span id="cb7-28"><a href="#cb7-28"></a>ineligible_stacked<span class="sc">$</span>eligible <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb7-29"><a href="#cb7-29"></a></span>
-<span id="cb7-30"><a href="#cb7-30"></a><span class="co"># CRITICAL: Ensure the column order is identical before row-binding.</span></span>
-<span id="cb7-31"><a href="#cb7-31"></a>ineligible_final <span class="ot">&lt;-</span> ineligible_stacked[, <span class="fu">names</span>(imputed_analytic_data)]</span>
-<span id="cb7-32"><a href="#cb7-32"></a></span>
-<span id="cb7-33"><a href="#cb7-33"></a><span class="co"># Finally, combine the imputed analytic data with the prepared ineligible data.</span></span>
-<span id="cb7-34"><a href="#cb7-34"></a>imputed_full_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(imputed_analytic_data, ineligible_final)</span>
-<span id="cb7-35"><a href="#cb7-35"></a></span>
-<span id="cb7-36"><a href="#cb7-36"></a></span>
-<span id="cb7-37"><a href="#cb7-37"></a><span class="co"># --- Step 5.2: Create Survey Design and Run Pooled Analysis ---</span></span>
-<span id="cb7-38"><a href="#cb7-38"></a></span>
-<span id="cb7-39"><a href="#cb7-39"></a><span class="co"># Create the complex survey design object using an `imputationList`.</span></span>
-<span id="cb7-40"><a href="#cb7-40"></a><span class="co"># This tells the survey package how to handle the 'm' imputed datasets.</span></span>
-<span id="cb7-41"><a href="#cb7-41"></a><span class="co"># The design is specified on the *full* data to capture the total population structure.</span></span>
-<span id="cb7-42"><a href="#cb7-42"></a>design_full <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu,</span>
-<span id="cb7-43"><a href="#cb7-43"></a>                         <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
-<span id="cb7-44"><a href="#cb7-44"></a>                         <span class="at">weights =</span> <span class="sc">~</span>survey.weight.new,</span>
-<span id="cb7-45"><a href="#cb7-45"></a>                         <span class="at">nest =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb7-46"><a href="#cb7-46"></a>                         <span class="at">data =</span> <span class="fu">imputationList</span>(<span class="fu">split</span>(imputed_full_data, imputed_full_data<span class="sc">$</span>.imp)))</span>
-<span id="cb7-47"><a href="#cb7-47"></a></span>
-<span id="cb7-48"><a href="#cb7-48"></a><span class="co"># Subset the design object to include only the eligible participants for the analysis.</span></span>
-<span id="cb7-49"><a href="#cb7-49"></a><span class="co"># This ensures variance is calculated correctly based on the full sample design.</span></span>
-<span id="cb7-50"><a href="#cb7-50"></a>design_analytic <span class="ot">&lt;-</span> <span class="fu">subset</span>(design_full, eligible <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb7-51"><a href="#cb7-51"></a></span>
-<span id="cb7-52"><a href="#cb7-52"></a><span class="co"># Fit the Cox model across all 'm' imputed datasets using the `with()` function.</span></span>
-<span id="cb7-53"><a href="#cb7-53"></a><span class="co"># This is more efficient than a for-loop.</span></span>
-<span id="cb7-54"><a href="#cb7-54"></a>fit_pooled <span class="ot">&lt;-</span> <span class="fu">with</span>(design_analytic,</span>
-<span id="cb7-55"><a href="#cb7-55"></a>                   <span class="fu">svycoxph</span>(<span class="fu">Surv</span>(stime.since.birth, status_all) <span class="sc">~</span> exposure.cat <span class="sc">+</span> sex <span class="sc">+</span> race <span class="sc">+</span> year.cat))</span>
-<span id="cb7-56"><a href="#cb7-56"></a></span>
-<span id="cb7-57"><a href="#cb7-57"></a><span class="co"># Pool the results from the list of model fits using Rubin's Rules.</span></span>
-<span id="cb7-58"><a href="#cb7-58"></a>pooled_results <span class="ot">&lt;-</span> <span class="fu">pool</span>(fit_pooled)</span>
-<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
-<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt; With (301) clusters.</span></span>
-<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
-<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
-<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
-<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt;     ...)</span></span>
-<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
-<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt; With (301) clusters.</span></span>
-<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
-<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
-<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
-<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt;     ...)</span></span>
-<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
-<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt; With (301) clusters.</span></span>
-<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
-<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
-<span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
-<span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt;     ...)</span></span>
-<span id="cb7-77"><a href="#cb7-77"></a></span>
-<span id="cb7-78"><a href="#cb7-78"></a><span class="co"># Display the final, pooled results.</span></span>
-<span id="cb7-79"><a href="#cb7-79"></a><span class="fu">print</span>(<span class="st">"--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span>)</span>
-<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt; [1] "--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span></span>
-<span id="cb7-81"><a href="#cb7-81"></a><span class="fu">summary</span>(pooled_results, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># --- 5. Survival Analysis on Imputed Data  ---</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co"># --- Step 5.1: Re-integrate Ineligible Subjects for Correct Survey Variance ---</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co"># First, extract the 'm' imputed datasets into a single long-format data frame.</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co"># Add a flag to identify this group as our analytic/eligible sample.</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a>imputed_analytic_data <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data, <span class="st">"long"</span>, <span class="at">include =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-8"><a href="#cb8-8"></a>imputed_analytic_data<span class="sc">$</span>eligible <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co"># Next, identify the subjects from the original full dataset who were NOT in our analytic sample.</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="co"># The analytic sample was defined as age &gt;= 20 &amp; age &lt; 80.</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a>dat_ineligible <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full.with.mortality, <span class="sc">!</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">80</span>))</span>
+<span id="cb8-13"><a href="#cb8-13"></a></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co"># Replicate this ineligible dataset 'm' times, once for each imputation.</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a>ineligible_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>imputed_data<span class="sc">$</span>m, <span class="cf">function</span>(i) {</span>
+<span id="cb8-16"><a href="#cb8-16"></a>  df <span class="ot">&lt;-</span> dat_ineligible</span>
+<span id="cb8-17"><a href="#cb8-17"></a>  df<span class="sc">$</span>.imp <span class="ot">&lt;-</span> i <span class="co"># Add the imputation number</span></span>
+<span id="cb8-18"><a href="#cb8-18"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb8-19"><a href="#cb8-19"></a>})</span>
+<span id="cb8-20"><a href="#cb8-20"></a>ineligible_stacked <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, ineligible_list)</span>
+<span id="cb8-21"><a href="#cb8-21"></a></span>
+<span id="cb8-22"><a href="#cb8-22"></a><span class="co"># Now, align the columns. Add columns that exist in the imputed data (like 'nelson_aalen')</span></span>
+<span id="cb8-23"><a href="#cb8-23"></a><span class="co"># to the ineligible data, filling them with NA.</span></span>
+<span id="cb8-24"><a href="#cb8-24"></a>cols_to_add <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(imputed_analytic_data), <span class="fu">names</span>(ineligible_stacked))</span>
+<span id="cb8-25"><a href="#cb8-25"></a>ineligible_stacked[, cols_to_add] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb8-26"><a href="#cb8-26"></a></span>
+<span id="cb8-27"><a href="#cb8-27"></a><span class="co"># Set the eligibility flag for this group to 0.</span></span>
+<span id="cb8-28"><a href="#cb8-28"></a>ineligible_stacked<span class="sc">$</span>eligible <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-29"><a href="#cb8-29"></a></span>
+<span id="cb8-30"><a href="#cb8-30"></a><span class="co"># CRITICAL: Ensure the column order is identical before row-binding.</span></span>
+<span id="cb8-31"><a href="#cb8-31"></a>ineligible_final <span class="ot">&lt;-</span> ineligible_stacked[, <span class="fu">names</span>(imputed_analytic_data)]</span>
+<span id="cb8-32"><a href="#cb8-32"></a></span>
+<span id="cb8-33"><a href="#cb8-33"></a><span class="co"># Finally, combine the imputed analytic data with the prepared ineligible data.</span></span>
+<span id="cb8-34"><a href="#cb8-34"></a>imputed_full_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(imputed_analytic_data, ineligible_final)</span>
+<span id="cb8-35"><a href="#cb8-35"></a></span>
+<span id="cb8-36"><a href="#cb8-36"></a></span>
+<span id="cb8-37"><a href="#cb8-37"></a><span class="co"># --- Step 5.2: Create Survey Design and Run Pooled Analysis ---</span></span>
+<span id="cb8-38"><a href="#cb8-38"></a></span>
+<span id="cb8-39"><a href="#cb8-39"></a><span class="co"># Create the complex survey design object using an `imputationList`.</span></span>
+<span id="cb8-40"><a href="#cb8-40"></a><span class="co"># This tells the survey package how to handle the 'm' imputed datasets.</span></span>
+<span id="cb8-41"><a href="#cb8-41"></a><span class="co"># The design is specified on the *full* data to capture the total population structure.</span></span>
+<span id="cb8-42"><a href="#cb8-42"></a>design_full <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu,</span>
+<span id="cb8-43"><a href="#cb8-43"></a>                         <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
+<span id="cb8-44"><a href="#cb8-44"></a>                         <span class="at">weights =</span> <span class="sc">~</span>survey.weight.new,</span>
+<span id="cb8-45"><a href="#cb8-45"></a>                         <span class="at">nest =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-46"><a href="#cb8-46"></a>                         <span class="at">data =</span> <span class="fu">imputationList</span>(<span class="fu">split</span>(imputed_full_data, imputed_full_data<span class="sc">$</span>.imp)))</span>
+<span id="cb8-47"><a href="#cb8-47"></a></span>
+<span id="cb8-48"><a href="#cb8-48"></a><span class="co"># Subset the design object to include only the eligible participants for the analysis.</span></span>
+<span id="cb8-49"><a href="#cb8-49"></a><span class="co"># This ensures variance is calculated correctly based on the full sample design.</span></span>
+<span id="cb8-50"><a href="#cb8-50"></a>design_analytic <span class="ot">&lt;-</span> <span class="fu">subset</span>(design_full, eligible <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb8-51"><a href="#cb8-51"></a></span>
+<span id="cb8-52"><a href="#cb8-52"></a><span class="co"># Fit the Cox model across all 'm' imputed datasets using the `with()` function.</span></span>
+<span id="cb8-53"><a href="#cb8-53"></a><span class="co"># This is more efficient than a for-loop.</span></span>
+<span id="cb8-54"><a href="#cb8-54"></a>fit_pooled <span class="ot">&lt;-</span> <span class="fu">with</span>(design_analytic,</span>
+<span id="cb8-55"><a href="#cb8-55"></a>                   <span class="fu">svycoxph</span>(<span class="fu">Surv</span>(stime.since.birth, status_all) <span class="sc">~</span> exposure.cat <span class="sc">+</span> sex <span class="sc">+</span> race <span class="sc">+</span> year.cat))</span>
+<span id="cb8-56"><a href="#cb8-56"></a></span>
+<span id="cb8-57"><a href="#cb8-57"></a><span class="co"># Pool the results from the list of model fits using Rubin's Rules.</span></span>
+<span id="cb8-58"><a href="#cb8-58"></a>pooled_results <span class="ot">&lt;-</span> <span class="fu">pool</span>(fit_pooled)</span>
+<span id="cb8-59"><a href="#cb8-59"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
+<span id="cb8-60"><a href="#cb8-60"></a><span class="co">#&gt; With (301) clusters.</span></span>
+<span id="cb8-61"><a href="#cb8-61"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
+<span id="cb8-62"><a href="#cb8-62"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
+<span id="cb8-63"><a href="#cb8-63"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
+<span id="cb8-64"><a href="#cb8-64"></a><span class="co">#&gt;     ...)</span></span>
+<span id="cb8-65"><a href="#cb8-65"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
+<span id="cb8-66"><a href="#cb8-66"></a><span class="co">#&gt; With (301) clusters.</span></span>
+<span id="cb8-67"><a href="#cb8-67"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
+<span id="cb8-68"><a href="#cb8-68"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
+<span id="cb8-69"><a href="#cb8-69"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
+<span id="cb8-70"><a href="#cb8-70"></a><span class="co">#&gt;     ...)</span></span>
+<span id="cb8-71"><a href="#cb8-71"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
+<span id="cb8-72"><a href="#cb8-72"></a><span class="co">#&gt; With (301) clusters.</span></span>
+<span id="cb8-73"><a href="#cb8-73"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
+<span id="cb8-74"><a href="#cb8-74"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
+<span id="cb8-75"><a href="#cb8-75"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
+<span id="cb8-76"><a href="#cb8-76"></a><span class="co">#&gt;     ...)</span></span>
+<span id="cb8-77"><a href="#cb8-77"></a></span>
+<span id="cb8-78"><a href="#cb8-78"></a><span class="co"># Display the final, pooled results.</span></span>
+<span id="cb8-79"><a href="#cb8-79"></a><span class="fu">print</span>(<span class="st">"--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span>)</span>
+<span id="cb8-80"><a href="#cb8-80"></a><span class="co">#&gt; [1] "--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span></span>
+<span id="cb8-81"><a href="#cb8-81"></a><span class="fu">summary</span>(pooled_results, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1683,14 +1875,14 @@ Tip
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Option A: Fallacy-safe table showing only the main exposure</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">svypooled</span>(</span>
-<span id="cb8-3"><a href="#cb8-3"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
-<span id="cb8-4"><a href="#cb8-4"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
-<span id="cb8-6"><a href="#cb8-6"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
-<span id="cb8-7"><a href="#cb8-7"></a>  <span class="at">title =</span> <span class="st">"Adjusted Hazard Ratios for All-Cause Mortality"</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Option A: Fallacy-safe table showing only the main exposure</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="fu">svypooled</span>(</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
+<span id="cb9-6"><a href="#cb9-6"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7"></a>  <span class="at">title =</span> <span class="st">"Adjusted Hazard Ratios for All-Cause Mortality"</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
 <caption>Adjusted Hazard Ratios for All-Cause Mortality</caption>
@@ -1737,16 +1929,16 @@ Tip
 </tr></tfoot>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a></span>
-<span id="cb9-2"><a href="#cb9-2"></a><span class="co"># Option B: Full table for an appendix</span></span>
-<span id="cb9-3"><a href="#cb9-3"></a><span class="fu">svypooled</span>(</span>
-<span id="cb9-4"><a href="#cb9-4"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
-<span id="cb9-5"><a href="#cb9-5"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
-<span id="cb9-6"><a href="#cb9-6"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
-<span id="cb9-7"><a href="#cb9-7"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
-<span id="cb9-8"><a href="#cb9-8"></a>  <span class="at">title =</span> <span class="st">"Full Adjusted Model Results (for Appendix)"</span>,</span>
-<span id="cb9-9"><a href="#cb9-9"></a>  <span class="at">fallacy_safe =</span> <span class="cn">FALSE</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co"># Option B: Full table for an appendix</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="fu">svypooled</span>(</span>
+<span id="cb10-4"><a href="#cb10-4"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
+<span id="cb10-5"><a href="#cb10-5"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
+<span id="cb10-7"><a href="#cb10-7"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
+<span id="cb10-8"><a href="#cb10-8"></a>  <span class="at">title =</span> <span class="st">"Full Adjusted Model Results (for Appendix)"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9"></a>  <span class="at">fallacy_safe =</span> <span class="cn">FALSE</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
 <caption>Full Adjusted Model Results (for Appendix)</caption>
@@ -1862,7 +2054,7 @@ Tip
 </table>
 </div>
 </div>
-</section><section id="conclusion" class="level2"><h2 class="anchored" data-anchor-id="conclusion">6. Conclusion</h2>
+</section><section id="conclusion" class="level2"><h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>This tutorial demonstrated how to replace a complete-case analysis with a multiple imputation workflow for a survey-weighted survival analysis. By correctly preparing the data, configuring <code>mice</code> with survival-specific information, and pooling the final results, we can generate valid estimates that properly account for missing data.</p>
 </section><section id="references" class="level2"><h2 class="anchored" data-anchor-id="references">References</h2>
 
