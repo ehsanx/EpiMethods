@@ -1,0 +1,237 @@
+## Survival Analysis {.unnumbered}
+
+::: callout-tip
+We are going to use the data from a published article [@karim2025examining]. The reproducible analysis codes are available [here](https://ehsanx.github.io/Reproducible-NHANES-Analysis/). The authors performed a complete-case analysis in that article, which was appropriate since only a very small number of participants (0.5%) were excluded due to missing data on the exposure or outcome variables before the final cohort was established.
+::: 
+
+This tutorial demonstrates how to perform a survey-weighted survival analysis using NHANES data when there are missing values in the predictors. Instead of relying on a complete-case analysis, which can lose statistical power and introduce bias, we will use **multiple imputation** with the `mice` package in R.
+
+The workflow follows the structure of a standard epidemiological analysis:
+
+1.  **Data Preparation**: Load and clean the raw data to create analytic variables and remove unnecessary columns.
+2.  **Multiple Imputation**: Use `mice` to create multiple complete datasets, correctly specifying the imputation model for survival data.
+3.  **Analysis & Pooling**: Run the survey-weighted survival model on each imputed dataset and pool the results for a final estimate.
+
+***
+
+## Setup
+
+First, we load the necessary R packages. We then load the `dat.full.with.mortality.RDS` file (from [here](https://ehsanx.github.io/Reproducible-NHANES-Analysis/)), which contains the merged NHANES and mortality data from 1999-2018.
+
+```{r setup, message=FALSE, warning=FALSE, cache=TRUE}
+# Load all necessary packages for the analysis
+library(dplyr)
+library(car)
+library(survey)
+library(survival)
+library(mice)
+library(Publish)
+library(DataExplorer)
+library(knitr)
+library(kableExtra)
+# devtools::install_github("ehsanx/svyTable1", build_vignettes = TRUE, dependencies = TRUE)
+library(svyTable1)
+
+# Set survey option for compatibility
+options(survey.want.obsolete = TRUE)
+
+# Load the full, merged dataset with mortality information
+dat.full.with.mortality <- readRDS("Data/missingdata/dat.full.with.mortality.RDS")
+```
+
+***
+
+## 3. Data Preparation and Cleaning
+
+Before imputation, we must create the final analytic variables and clean the dataset. This includes creating the exposure, survival time, and status variables, and then dropping all unnecessary raw or intermediate columns.
+
+```{r variable-creation-and-cleaning, cache=TRUE}
+# --- Create Analytic Variables ---
+
+# 1. Exposure Variable ('exposure.cat')
+dat.full.with.mortality$exposure.cat <- car::recode(
+  dat.full.with.mortality$smoking.age,
+  "0 = 'Never smoked'; 1:9 = 'Started before 10';
+   10:14 = 'Started at 10-14'; 15:17 = 'Started at 15-17';
+   18:20 = 'Started at 18-20'; 21:80 = 'Started after 20';
+   else = NA",
+  as.factor = TRUE
+)
+dat.full.with.mortality$exposure.cat <- factor(
+  dat.full.with.mortality$exposure.cat,
+  levels = c("Never smoked", "Started before 10", "Started at 10-14",
+             "Started at 15-17", "Started at 18-20", "Started after 20")
+)
+
+# 2. Survival Time ('stime.since.birth') and Status ('status_all')
+dat.full.with.mortality$stime.since.birth <-
+  ((dat.full.with.mortality$age * 12) + dat.full.with.mortality$mort_permth_int) / 12
+# 'status_all' is our event indicator, derived from 'mort_stat'. It's essential for the Surv() object.
+dat.full.with.mortality$status_all <- dat.full.with.mortality$mort_stat
+
+# 3. Categorical Year ('year.cat')
+dat.full.with.mortality$year.cat <- dat.full.with.mortality$year
+levels(dat.full.with.mortality$year.cat) <- c(
+  "1999-2000", "2001-2002", "2003-2004", "2005-2006", "2007-2008",
+  "2009-2010", "2011-2012", "2013-2014", "2015-2016", "2017-2018"
+)
+
+# --- Define the Analytic Cohort & Drop Unnecessary Variables ---
+
+# 4. Apply age restriction (20-79 years)
+dat.analytic <- subset(dat.full.with.mortality, age >= 20 & age < 80)
+
+# 5. Drop all raw, intermediate, or unused columns
+vars_to_drop <- c(
+  "age", "born", "smoking.age", "smoked.while.child", "smoking", "year",
+  "mort_eligstat", "mort_stat", "mort_ucod_leading", "mort_diabetes",
+  "mort_hyperten", "mort_permth_int", "mort_permth_exm"
+)
+dat.analytic[vars_to_drop] <- NULL
+
+# Verify the cleaned data
+cat("Remaining columns for analysis:\n")
+names(dat.analytic)
+plot_missing(dat.analytic)
+profile_missing(dat.analytic)
+```
+
+***
+
+## Multiple Imputation with `mice` 🪄
+
+We will impute the missing values in `dat.analytic` before running the final models.
+
+### Preparing for Imputation
+
+We must include the survival outcome information in the imputation model. The best way to do this is by creating and including the **Nelson-Aalen cumulative hazard** estimate [@white2009imputing].
+
+```{r mice-prep, cache=TRUE}
+# Create the Nelson-Aalen cumulative hazard estimate
+# It's a more informative summary of survival than time alone
+dat.analytic$nelson_aalen <- nelsonaalen(
+  dat.analytic,
+  time = stime.since.birth,
+  status = status_all
+)
+summary(dat.analytic$stime.since.birth)
+summary(dat.analytic$stime.since.birth)
+table(dat.analytic$status_all)
+hist(dat.analytic$nelson_aalen)
+```
+
+### 4.2 Configuring the Predictor Matrix
+
+The `predictorMatrix` tells `mice` what to do. Here’s the logic for our setup:
+
+* **What variable are we imputing?**
+    * `exposure.cat`
+
+Since `exposure.cat` is the only **predictor** with missing data, it's the only variable we will actively impute in this tutorial.
+
+* **What about the missing outcome data?**
+    * Your data shows that `stime.since.birth` and `status_all` also have missing values (134 observations each).
+    * It is standard practice not to impute the outcome variables in a survival analysis. 
+
+* **What variables will help the imputation (i.e., act as predictors)?**
+    * **Outcome Information**: `status_all` and `nelson_aalen`. These are crucial for making the imputation model compatible with the survival analysis.
+    * **Confounders**: `sex`, `race`, `year.cat`.
+    * **Auxiliary Variables**: `psu`, `strata`, and `survey.weight.new`. Including the survey design variables makes the imputation "survey-aware" and more accurate.
+
+* **What variables will we ignore as predictors?**
+    * `id` (it's just an identifier).
+    * `stime.since.birth` (its information is better and more simply captured by `nelson_aalen`).
+
+```{r run-mice, cache=TRUE, cache=TRUE}
+# Initialize the predictor matrix
+pred_matrix <- make.predictorMatrix(dat.analytic)
+
+# --- DO NOT use these variables AS PREDICTORS ---
+# We exclude the raw survival time and identifier variables from being predictors.
+pred_matrix[, c("id", "stime.since.birth")] <- 0
+
+# --- DO NOT IMPUTE these variables ---
+# These variables are complete, identifiers, or part of the outcome.
+pred_matrix[c("id", "sex", "race", "psu", "strata", "survey.weight.new",
+              "stime.since.birth", "status_all", "year.cat",
+              "nelson_aalen"), ] <- 0
+
+# Run the imputation. m and maxit are low for demonstration
+imputed_data <- mice(
+  dat.analytic,
+  m = 2,              # Number of imputed datasets
+  maxit = 2,         # Number of iterations per imputation
+  predictorMatrix = pred_matrix,
+  method = 'pmm',     # Predictive Mean Matching is a good default
+  seed = 123          # For reproducibility
+)
+```
+
+***
+
+## 5. Survival Analysis on Imputed Data 📊
+
+With our `m=2` complete datasets, we follow the "analyze then pool" procedure:
+
+1.  **Analyze**: Run the `svycoxph` model on each of the 2 datasets.
+2.  **Pool**: Combine the 2 sets of results into a single, final estimate using `pool()`.
+
+```{r analyze-pool}
+# --- 5. Survival Analysis on Imputed Data (Corrected) ---
+
+# 1. Create an empty list to store the results of each analysis
+fit_list <- list()
+
+# 2. Loop through each of the 'm' imputed datasets
+for (i in 1:imputed_data$m) {
+  
+  # Get the i-th completed dataset
+  completed_data <- mice::complete(imputed_data, i)
+  
+  # Create a survey design object *specifically for this dataset*
+  design_i <- svydesign(ids = ~psu, 
+                        strata = ~strata, 
+                        weights = ~survey.weight.new, 
+                        nest = TRUE, 
+                        data = completed_data)
+  
+  # Fit the survey-weighted Cox model using this design
+  fit_list[[i]] <- svycoxph(Surv(stime.since.birth, status_all) ~ exposure.cat + sex + race + year.cat, 
+                            design = design_i)
+}
+
+# 3. Pool the results from the list of model fits
+pooled_results <- pool(fit_list)
+
+# 4. Display the final, pooled results
+print("--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---")
+summary(pooled_results, conf.int = TRUE, exponentiate = TRUE)
+```
+
+```{r publish, cache=TRUE}
+# Option A: Fallacy-safe table showing only the main exposure
+svypooled(
+  pooled_model = pooled_results,
+  main_exposure = "exposure.cat",
+  adj_var_names = c("sex", "race", "year.cat"),
+  measure = "HR",
+  title = "Adjusted Hazard Ratios for All-Cause Mortality"
+)
+
+# Option B: Full table for an appendix
+svypooled(
+  pooled_model = pooled_results,
+  main_exposure = "exposure.cat",
+  adj_var_names = c("sex", "race", "year.cat"),
+  measure = "HR",
+  title = "Full Adjusted Model Results (for Appendix)",
+  fallacy_safe = FALSE
+)
+```
+
+
+## 6. Conclusion
+
+This tutorial demonstrated how to replace a complete-case analysis with a multiple imputation workflow for a survey-weighted survival analysis. By correctly preparing the data, configuring `mice` with survival-specific information, and pooling the final results, we can generate valid estimates that properly account for missing data.
+
+## References
