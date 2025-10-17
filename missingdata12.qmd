@@ -18,20 +18,24 @@ The workflow follows the structure of a standard epidemiological analysis:
 
 First, we load the necessary R packages. We then load the `dat.full.with.mortality.RDS` file (from [here](https://ehsanx.github.io/Reproducible-NHANES-Analysis/)), which contains the merged NHANES and mortality data from 1999-2018.
 
-```{r setup, message=FALSE, warning=FALSE, cache=TRUE}
+```{r setup, message=FALSE, warning=FALSE}
 # Load all necessary packages for the analysis
 library(dplyr)
 library(car)
-library(survey)
 library(survival)
-library(mice)
+library(mice)         # For imputation
+library(survey)       # For survey analysis (svydesign, svyglm, etc.)
+library(mitools)      # FOR imputationList() and other MI tools
 library(Publish)
 library(DataExplorer)
 library(knitr)
 library(kableExtra)
 # devtools::install_github("ehsanx/svyTable1", build_vignettes = TRUE, dependencies = TRUE)
-library(svyTable1)
+library(svyTable1) # for svypooled
+```
 
+
+```{r setup2, message=FALSE, warning=FALSE, cache=TRUE}
 # Set survey option for compatibility
 options(survey.want.obsolete = TRUE)
 
@@ -114,7 +118,7 @@ dat.analytic$nelson_aalen <- nelsonaalen(
   time = stime.since.birth,
   status = status_all
 )
-summary(dat.analytic$stime.since.birth)
+summary(dat.analytic$nelson_aalen)
 summary(dat.analytic$stime.since.birth)
 table(dat.analytic$status_all)
 hist(dat.analytic$nelson_aalen)
@@ -130,7 +134,7 @@ The `predictorMatrix` tells `mice` what to do. Here’s the logic for our setup:
 Since `exposure.cat` is the only **predictor** with missing data, it's the only variable we will actively impute in this tutorial.
 
 * **What about the missing outcome data?**
-    * Your data shows that `stime.since.birth` and `status_all` also have missing values (134 observations each).
+    * Data shows that `stime.since.birth` and `status_all` also have missing values.
     * It is standard practice not to impute the outcome variables in a survival analysis. 
 
 * **What variables will help the imputation (i.e., act as predictors)?**
@@ -177,33 +181,66 @@ With our `m=2` complete datasets, we follow the "analyze then pool" procedure:
 2.  **Pool**: Combine the 2 sets of results into a single, final estimate using `pool()`.
 
 ```{r analyze-pool}
-# --- 5. Survival Analysis on Imputed Data (Corrected) ---
+# --- 5. Survival Analysis on Imputed Data  ---
 
-# 1. Create an empty list to store the results of each analysis
-fit_list <- list()
+# --- Step 5.1: Re-integrate Ineligible Subjects for Correct Survey Variance ---
 
-# 2. Loop through each of the 'm' imputed datasets
-for (i in 1:imputed_data$m) {
-  
-  # Get the i-th completed dataset
-  completed_data <- mice::complete(imputed_data, i)
-  
-  # Create a survey design object *specifically for this dataset*
-  design_i <- svydesign(ids = ~psu, 
-                        strata = ~strata, 
-                        weights = ~survey.weight.new, 
-                        nest = TRUE, 
-                        data = completed_data)
-  
-  # Fit the survey-weighted Cox model using this design
-  fit_list[[i]] <- svycoxph(Surv(stime.since.birth, status_all) ~ exposure.cat + sex + race + year.cat, 
-                            design = design_i)
-}
+# First, extract the 'm' imputed datasets into a single long-format data frame.
+# Add a flag to identify this group as our analytic/eligible sample.
+imputed_analytic_data <- complete(imputed_data, "long", include = FALSE)
+imputed_analytic_data$eligible <- 1
 
-# 3. Pool the results from the list of model fits
-pooled_results <- pool(fit_list)
+# Next, identify the subjects from the original full dataset who were NOT in our analytic sample.
+# The analytic sample was defined as age >= 20 & age < 80.
+dat_ineligible <- subset(dat.full.with.mortality, !(age >= 20 & age < 80))
 
-# 4. Display the final, pooled results
+# Replicate this ineligible dataset 'm' times, once for each imputation.
+ineligible_list <- lapply(1:imputed_data$m, function(i) {
+  df <- dat_ineligible
+  df$.imp <- i # Add the imputation number
+  return(df)
+})
+ineligible_stacked <- do.call(rbind, ineligible_list)
+
+# Now, align the columns. Add columns that exist in the imputed data (like 'nelson_aalen')
+# to the ineligible data, filling them with NA.
+cols_to_add <- setdiff(names(imputed_analytic_data), names(ineligible_stacked))
+ineligible_stacked[, cols_to_add] <- NA
+
+# Set the eligibility flag for this group to 0.
+ineligible_stacked$eligible <- 0
+
+# CRITICAL: Ensure the column order is identical before row-binding.
+ineligible_final <- ineligible_stacked[, names(imputed_analytic_data)]
+
+# Finally, combine the imputed analytic data with the prepared ineligible data.
+imputed_full_data <- rbind(imputed_analytic_data, ineligible_final)
+
+
+# --- Step 5.2: Create Survey Design and Run Pooled Analysis ---
+
+# Create the complex survey design object using an `imputationList`.
+# This tells the survey package how to handle the 'm' imputed datasets.
+# The design is specified on the *full* data to capture the total population structure.
+design_full <- svydesign(ids = ~psu,
+                         strata = ~strata,
+                         weights = ~survey.weight.new,
+                         nest = TRUE,
+                         data = imputationList(split(imputed_full_data, imputed_full_data$.imp)))
+
+# Subset the design object to include only the eligible participants for the analysis.
+# This ensures variance is calculated correctly based on the full sample design.
+design_analytic <- subset(design_full, eligible == 1)
+
+# Fit the Cox model across all 'm' imputed datasets using the `with()` function.
+# This is more efficient than a for-loop.
+fit_pooled <- with(design_analytic,
+                   svycoxph(Surv(stime.since.birth, status_all) ~ exposure.cat + sex + race + year.cat))
+
+# Pool the results from the list of model fits using Rubin's Rules.
+pooled_results <- pool(fit_pooled)
+
+# Display the final, pooled results.
 print("--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---")
 summary(pooled_results, conf.int = TRUE, exponentiate = TRUE)
 ```

@@ -1389,90 +1389,92 @@ Tip
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load all necessary packages for the analysis</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(car)</span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(survey)</span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(survival)</span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(mice)</span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">library</span>(Publish)</span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="fu">library</span>(DataExplorer)</span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="fu">library</span>(kableExtra)</span>
-<span id="cb1-11"><a href="#cb1-11"></a><span class="co"># devtools::install_github("ehsanx/svyTable1", build_vignettes = TRUE, dependencies = TRUE)</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="fu">library</span>(svyTable1)</span>
-<span id="cb1-13"><a href="#cb1-13"></a></span>
-<span id="cb1-14"><a href="#cb1-14"></a><span class="co"># Set survey option for compatibility</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a><span class="fu">options</span>(<span class="at">survey.want.obsolete =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-16"><a href="#cb1-16"></a></span>
-<span id="cb1-17"><a href="#cb1-17"></a><span class="co"># Load the full, merged dataset with mortality information</span></span>
-<span id="cb1-18"><a href="#cb1-18"></a>dat.full.with.mortality <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"Data/missingdata/dat.full.with.mortality.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(survival)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(mice)         <span class="co"># For imputation</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(survey)       <span class="co"># For survey analysis (svydesign, svyglm, etc.)</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">library</span>(mitools)      <span class="co"># FOR imputationList() and other MI tools</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="fu">library</span>(Publish)</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="fu">library</span>(DataExplorer)</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co"># devtools::install_github("ehsanx/svyTable1", build_vignettes = TRUE, dependencies = TRUE)</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="fu">library</span>(svyTable1) <span class="co"># for svypooled</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Set survey option for compatibility</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">options</span>(<span class="at">survey.want.obsolete =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Load the full, merged dataset with mortality information</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>dat.full.with.mortality <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"Data/missingdata/dat.full.with.mortality.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr></section><section id="data-preparation-and-cleaning" class="level2"><h2 class="anchored" data-anchor-id="data-preparation-and-cleaning">3. Data Preparation and Cleaning</h2>
 <p>Before imputation, we must create the final analytic variables and clean the dataset. This includes creating the exposure, survival time, and status variables, and then dropping all unnecessary raw or intermediate columns.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># --- Create Analytic Variables ---</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># 1. Exposure Variable ('exposure.cat')</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>dat.full.with.mortality<span class="sc">$</span>exposure.cat <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(</span>
-<span id="cb2-5"><a href="#cb2-5"></a>  dat.full.with.mortality<span class="sc">$</span>smoking.age,</span>
-<span id="cb2-6"><a href="#cb2-6"></a>  <span class="st">"0 = 'Never smoked'; 1:9 = 'Started before 10';</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="st">   10:14 = 'Started at 10-14'; 15:17 = 'Started at 15-17';</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="st">   18:20 = 'Started at 18-20'; 21:80 = 'Started after 20';</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="st">   else = NA"</span>,</span>
-<span id="cb2-10"><a href="#cb2-10"></a>  <span class="at">as.factor =</span> <span class="cn">TRUE</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a>)</span>
-<span id="cb2-12"><a href="#cb2-12"></a>dat.full.with.mortality<span class="sc">$</span>exposure.cat <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
-<span id="cb2-13"><a href="#cb2-13"></a>  dat.full.with.mortality<span class="sc">$</span>exposure.cat,</span>
-<span id="cb2-14"><a href="#cb2-14"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Never smoked"</span>, <span class="st">"Started before 10"</span>, <span class="st">"Started at 10-14"</span>,</span>
-<span id="cb2-15"><a href="#cb2-15"></a>             <span class="st">"Started at 15-17"</span>, <span class="st">"Started at 18-20"</span>, <span class="st">"Started after 20"</span>)</span>
-<span id="cb2-16"><a href="#cb2-16"></a>)</span>
-<span id="cb2-17"><a href="#cb2-17"></a></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co"># 2. Survival Time ('stime.since.birth') and Status ('status_all')</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a>dat.full.with.mortality<span class="sc">$</span>stime.since.birth <span class="ot">&lt;-</span></span>
-<span id="cb2-20"><a href="#cb2-20"></a>  ((dat.full.with.mortality<span class="sc">$</span>age <span class="sc">*</span> <span class="dv">12</span>) <span class="sc">+</span> dat.full.with.mortality<span class="sc">$</span>mort_permth_int) <span class="sc">/</span> <span class="dv">12</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co"># 'status_all' is our event indicator, derived from 'mort_stat'. It's essential for the Surv() object.</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a>dat.full.with.mortality<span class="sc">$</span>status_all <span class="ot">&lt;-</span> dat.full.with.mortality<span class="sc">$</span>mort_stat</span>
-<span id="cb2-23"><a href="#cb2-23"></a></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="co"># 3. Categorical Year ('year.cat')</span></span>
-<span id="cb2-25"><a href="#cb2-25"></a>dat.full.with.mortality<span class="sc">$</span>year.cat <span class="ot">&lt;-</span> dat.full.with.mortality<span class="sc">$</span>year</span>
-<span id="cb2-26"><a href="#cb2-26"></a><span class="fu">levels</span>(dat.full.with.mortality<span class="sc">$</span>year.cat) <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb2-27"><a href="#cb2-27"></a>  <span class="st">"1999-2000"</span>, <span class="st">"2001-2002"</span>, <span class="st">"2003-2004"</span>, <span class="st">"2005-2006"</span>, <span class="st">"2007-2008"</span>,</span>
-<span id="cb2-28"><a href="#cb2-28"></a>  <span class="st">"2009-2010"</span>, <span class="st">"2011-2012"</span>, <span class="st">"2013-2014"</span>, <span class="st">"2015-2016"</span>, <span class="st">"2017-2018"</span></span>
-<span id="cb2-29"><a href="#cb2-29"></a>)</span>
-<span id="cb2-30"><a href="#cb2-30"></a></span>
-<span id="cb2-31"><a href="#cb2-31"></a><span class="co"># --- Define the Analytic Cohort &amp; Drop Unnecessary Variables ---</span></span>
-<span id="cb2-32"><a href="#cb2-32"></a></span>
-<span id="cb2-33"><a href="#cb2-33"></a><span class="co"># 4. Apply age restriction (20-79 years)</span></span>
-<span id="cb2-34"><a href="#cb2-34"></a>dat.analytic <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full.with.mortality, age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
-<span id="cb2-35"><a href="#cb2-35"></a></span>
-<span id="cb2-36"><a href="#cb2-36"></a><span class="co"># 5. Drop all raw, intermediate, or unused columns</span></span>
-<span id="cb2-37"><a href="#cb2-37"></a>vars_to_drop <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb2-38"><a href="#cb2-38"></a>  <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"smoking.age"</span>, <span class="st">"smoked.while.child"</span>, <span class="st">"smoking"</span>, <span class="st">"year"</span>,</span>
-<span id="cb2-39"><a href="#cb2-39"></a>  <span class="st">"mort_eligstat"</span>, <span class="st">"mort_stat"</span>, <span class="st">"mort_ucod_leading"</span>, <span class="st">"mort_diabetes"</span>,</span>
-<span id="cb2-40"><a href="#cb2-40"></a>  <span class="st">"mort_hyperten"</span>, <span class="st">"mort_permth_int"</span>, <span class="st">"mort_permth_exm"</span></span>
-<span id="cb2-41"><a href="#cb2-41"></a>)</span>
-<span id="cb2-42"><a href="#cb2-42"></a>dat.analytic[vars_to_drop] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb2-43"><a href="#cb2-43"></a></span>
-<span id="cb2-44"><a href="#cb2-44"></a><span class="co"># Verify the cleaned data</span></span>
-<span id="cb2-45"><a href="#cb2-45"></a><span class="fu">cat</span>(<span class="st">"Remaining columns for analysis:</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb2-46"><a href="#cb2-46"></a><span class="co">#&gt; Remaining columns for analysis:</span></span>
-<span id="cb2-47"><a href="#cb2-47"></a><span class="fu">names</span>(dat.analytic)</span>
-<span id="cb2-48"><a href="#cb2-48"></a><span class="co">#&gt;  [1] "id"                "sex"               "race"             </span></span>
-<span id="cb2-49"><a href="#cb2-49"></a><span class="co">#&gt;  [4] "psu"               "strata"            "survey.weight.new"</span></span>
-<span id="cb2-50"><a href="#cb2-50"></a><span class="co">#&gt;  [7] "exposure.cat"      "stime.since.birth" "status_all"       </span></span>
-<span id="cb2-51"><a href="#cb2-51"></a><span class="co">#&gt; [10] "year.cat"</span></span>
-<span id="cb2-52"><a href="#cb2-52"></a><span class="fu">plot_missing</span>(dat.analytic)</span>
-<span id="cb2-53"><a href="#cb2-53"></a><span class="co">#&gt; Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
-<span id="cb2-54"><a href="#cb2-54"></a><span class="co">#&gt; ℹ Please use tidy evaluation idioms with `aes()`.</span></span>
-<span id="cb2-55"><a href="#cb2-55"></a><span class="co">#&gt; ℹ See also `vignette("ggplot2-in-packages")` for more information.</span></span>
-<span id="cb2-56"><a href="#cb2-56"></a><span class="co">#&gt; ℹ The deprecated feature was likely used in the DataExplorer package.</span></span>
-<span id="cb2-57"><a href="#cb2-57"></a><span class="co">#&gt;   Please report the issue at</span></span>
-<span id="cb2-58"><a href="#cb2-58"></a><span class="co">#&gt;   &lt;https://github.com/boxuancui/DataExplorer/issues&gt;.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># --- Create Analytic Variables ---</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co"># 1. Exposure Variable ('exposure.cat')</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>dat.full.with.mortality<span class="sc">$</span>exposure.cat <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  dat.full.with.mortality<span class="sc">$</span>smoking.age,</span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="st">"0 = 'Never smoked'; 1:9 = 'Started before 10';</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="st">   10:14 = 'Started at 10-14'; 15:17 = 'Started at 15-17';</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">   18:20 = 'Started at 18-20'; 21:80 = 'Started after 20';</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="st">   else = NA"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10"></a>  <span class="at">as.factor =</span> <span class="cn">TRUE</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12"></a>dat.full.with.mortality<span class="sc">$</span>exposure.cat <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb3-13"><a href="#cb3-13"></a>  dat.full.with.mortality<span class="sc">$</span>exposure.cat,</span>
+<span id="cb3-14"><a href="#cb3-14"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Never smoked"</span>, <span class="st">"Started before 10"</span>, <span class="st">"Started at 10-14"</span>,</span>
+<span id="cb3-15"><a href="#cb3-15"></a>             <span class="st">"Started at 15-17"</span>, <span class="st">"Started at 18-20"</span>, <span class="st">"Started after 20"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17"></a></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co"># 2. Survival Time ('stime.since.birth') and Status ('status_all')</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>dat.full.with.mortality<span class="sc">$</span>stime.since.birth <span class="ot">&lt;-</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>  ((dat.full.with.mortality<span class="sc">$</span>age <span class="sc">*</span> <span class="dv">12</span>) <span class="sc">+</span> dat.full.with.mortality<span class="sc">$</span>mort_permth_int) <span class="sc">/</span> <span class="dv">12</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co"># 'status_all' is our event indicator, derived from 'mort_stat'. It's essential for the Surv() object.</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a>dat.full.with.mortality<span class="sc">$</span>status_all <span class="ot">&lt;-</span> dat.full.with.mortality<span class="sc">$</span>mort_stat</span>
+<span id="cb3-23"><a href="#cb3-23"></a></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co"># 3. Categorical Year ('year.cat')</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a>dat.full.with.mortality<span class="sc">$</span>year.cat <span class="ot">&lt;-</span> dat.full.with.mortality<span class="sc">$</span>year</span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="fu">levels</span>(dat.full.with.mortality<span class="sc">$</span>year.cat) <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb3-27"><a href="#cb3-27"></a>  <span class="st">"1999-2000"</span>, <span class="st">"2001-2002"</span>, <span class="st">"2003-2004"</span>, <span class="st">"2005-2006"</span>, <span class="st">"2007-2008"</span>,</span>
+<span id="cb3-28"><a href="#cb3-28"></a>  <span class="st">"2009-2010"</span>, <span class="st">"2011-2012"</span>, <span class="st">"2013-2014"</span>, <span class="st">"2015-2016"</span>, <span class="st">"2017-2018"</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a>)</span>
+<span id="cb3-30"><a href="#cb3-30"></a></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co"># --- Define the Analytic Cohort &amp; Drop Unnecessary Variables ---</span></span>
+<span id="cb3-32"><a href="#cb3-32"></a></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co"># 4. Apply age restriction (20-79 years)</span></span>
+<span id="cb3-34"><a href="#cb3-34"></a>dat.analytic <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full.with.mortality, age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
+<span id="cb3-35"><a href="#cb3-35"></a></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co"># 5. Drop all raw, intermediate, or unused columns</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a>vars_to_drop <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb3-38"><a href="#cb3-38"></a>  <span class="st">"age"</span>, <span class="st">"born"</span>, <span class="st">"smoking.age"</span>, <span class="st">"smoked.while.child"</span>, <span class="st">"smoking"</span>, <span class="st">"year"</span>,</span>
+<span id="cb3-39"><a href="#cb3-39"></a>  <span class="st">"mort_eligstat"</span>, <span class="st">"mort_stat"</span>, <span class="st">"mort_ucod_leading"</span>, <span class="st">"mort_diabetes"</span>,</span>
+<span id="cb3-40"><a href="#cb3-40"></a>  <span class="st">"mort_hyperten"</span>, <span class="st">"mort_permth_int"</span>, <span class="st">"mort_permth_exm"</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a>)</span>
+<span id="cb3-42"><a href="#cb3-42"></a>dat.analytic[vars_to_drop] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb3-43"><a href="#cb3-43"></a></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co"># Verify the cleaned data</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a><span class="fu">cat</span>(<span class="st">"Remaining columns for analysis:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt; Remaining columns for analysis:</span></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="fu">names</span>(dat.analytic)</span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="co">#&gt;  [1] "id"                "sex"               "race"             </span></span>
+<span id="cb3-49"><a href="#cb3-49"></a><span class="co">#&gt;  [4] "psu"               "strata"            "survey.weight.new"</span></span>
+<span id="cb3-50"><a href="#cb3-50"></a><span class="co">#&gt;  [7] "exposure.cat"      "stime.since.birth" "status_all"       </span></span>
+<span id="cb3-51"><a href="#cb3-51"></a><span class="co">#&gt; [10] "year.cat"</span></span>
+<span id="cb3-52"><a href="#cb3-52"></a><span class="fu">plot_missing</span>(dat.analytic)</span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co">#&gt; Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
+<span id="cb3-54"><a href="#cb3-54"></a><span class="co">#&gt; ℹ Please use tidy evaluation idioms with `aes()`.</span></span>
+<span id="cb3-55"><a href="#cb3-55"></a><span class="co">#&gt; ℹ See also `vignette("ggplot2-in-packages")` for more information.</span></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="co">#&gt; ℹ The deprecated feature was likely used in the DataExplorer package.</span></span>
+<span id="cb3-57"><a href="#cb3-57"></a><span class="co">#&gt;   Please report the issue at</span></span>
+<span id="cb3-58"><a href="#cb3-58"></a><span class="co">#&gt;   &lt;https://github.com/boxuancui/DataExplorer/issues&gt;.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure"><p><img src="missingdata12_files/figure-html/variable-creation-and-cleaning-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">profile_missing</span>(dat.analytic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">profile_missing</span>(dat.analytic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1486,24 +1488,24 @@ Tip
 <section id="preparing-for-imputation" class="level3"><h3 class="anchored" data-anchor-id="preparing-for-imputation">Preparing for Imputation</h3>
 <p>We must include the survival outcome information in the imputation model. The best way to do this is by creating and including the <strong>Nelson-Aalen cumulative hazard</strong> estimate <span class="citation" data-cites="white2009imputing">(<a href="#ref-white2009imputing" role="doc-biblioref">White and Royston 2009</a>)</span>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Create the Nelson-Aalen cumulative hazard estimate</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="co"># It's a more informative summary of survival than time alone</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a>dat.analytic<span class="sc">$</span>nelson_aalen <span class="ot">&lt;-</span> <span class="fu">nelsonaalen</span>(</span>
-<span id="cb4-4"><a href="#cb4-4"></a>  dat.analytic,</span>
-<span id="cb4-5"><a href="#cb4-5"></a>  <span class="at">time =</span> stime.since.birth,</span>
-<span id="cb4-6"><a href="#cb4-6"></a>  <span class="at">status =</span> status_all</span>
-<span id="cb4-7"><a href="#cb4-7"></a>)</span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="fu">summary</span>(dat.analytic<span class="sc">$</span>stime.since.birth)</span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt;   21.08   43.67   57.08   57.22   70.58   99.42     134</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="fu">summary</span>(dat.analytic<span class="sc">$</span>stime.since.birth)</span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
-<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt;   21.08   43.67   57.08   57.22   70.58   99.42     134</span></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="fu">table</span>(dat.analytic<span class="sc">$</span>status_all)</span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; </span></span>
-<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt;     0     1 </span></span>
-<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; 44475  6215</span></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="fu">hist</span>(dat.analytic<span class="sc">$</span>nelson_aalen)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Create the Nelson-Aalen cumulative hazard estimate</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co"># It's a more informative summary of survival than time alone</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>dat.analytic<span class="sc">$</span>nelson_aalen <span class="ot">&lt;-</span> <span class="fu">nelsonaalen</span>(</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  dat.analytic,</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="at">time =</span> stime.since.birth,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>  <span class="at">status =</span> status_all</span>
+<span id="cb5-7"><a href="#cb5-7"></a>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">summary</span>(dat.analytic<span class="sc">$</span>nelson_aalen)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.     NA's </span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; 0.000000 0.006434 0.026145 0.122797 0.112218 2.763365      134</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="fu">summary</span>(dat.analytic<span class="sc">$</span>stime.since.birth)</span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;   21.08   43.67   57.08   57.22   70.58   99.42     134</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="fu">table</span>(dat.analytic<span class="sc">$</span>status_all)</span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt; </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt;     0     1 </span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; 44475  6215</span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="fu">hist</span>(dat.analytic<span class="sc">$</span>nelson_aalen)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure"><p><img src="missingdata12_files/figure-html/mice-prep-1.png" class="img-fluid figure-img" width="672"></p>
@@ -1526,7 +1528,7 @@ Tip
 <li>
 <strong>What about the missing outcome data?</strong>
 <ul>
-<li>Your data shows that <code>stime.since.birth</code> and <code>status_all</code> also have missing values (134 observations each).</li>
+<li>Data shows that <code>stime.since.birth</code> and <code>status_all</code> also have missing values.</li>
 <li>It is standard practice not to impute the outcome variables in a survival analysis.</li>
 </ul>
 </li>
@@ -1552,35 +1554,35 @@ Tip
 </li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Initialize the predictor matrix</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a>pred_matrix <span class="ot">&lt;-</span> <span class="fu">make.predictorMatrix</span>(dat.analytic)</span>
-<span id="cb5-3"><a href="#cb5-3"></a></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="co"># --- DO NOT use these variables AS PREDICTORS ---</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="co"># We exclude the raw survival time and identifier variables from being predictors.</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a>pred_matrix[, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"stime.since.birth"</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="co"># --- DO NOT IMPUTE these variables ---</span></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="co"># These variables are complete, identifiers, or part of the outcome.</span></span>
-<span id="cb5-10"><a href="#cb5-10"></a>pred_matrix[<span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"psu"</span>, <span class="st">"strata"</span>, <span class="st">"survey.weight.new"</span>,</span>
-<span id="cb5-11"><a href="#cb5-11"></a>              <span class="st">"stime.since.birth"</span>, <span class="st">"status_all"</span>, <span class="st">"year.cat"</span>,</span>
-<span id="cb5-12"><a href="#cb5-12"></a>              <span class="st">"nelson_aalen"</span>), ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb5-13"><a href="#cb5-13"></a></span>
-<span id="cb5-14"><a href="#cb5-14"></a><span class="co"># Run the imputation. m and maxit are low for demonstration</span></span>
-<span id="cb5-15"><a href="#cb5-15"></a>imputed_data <span class="ot">&lt;-</span> <span class="fu">mice</span>(</span>
-<span id="cb5-16"><a href="#cb5-16"></a>  dat.analytic,</span>
-<span id="cb5-17"><a href="#cb5-17"></a>  <span class="at">m =</span> <span class="dv">2</span>,              <span class="co"># Number of imputed datasets</span></span>
-<span id="cb5-18"><a href="#cb5-18"></a>  <span class="at">maxit =</span> <span class="dv">2</span>,         <span class="co"># Number of iterations per imputation</span></span>
-<span id="cb5-19"><a href="#cb5-19"></a>  <span class="at">predictorMatrix =</span> pred_matrix,</span>
-<span id="cb5-20"><a href="#cb5-20"></a>  <span class="at">method =</span> <span class="st">'pmm'</span>,     <span class="co"># Predictive Mean Matching is a good default</span></span>
-<span id="cb5-21"><a href="#cb5-21"></a>  <span class="at">seed =</span> <span class="dv">123</span>          <span class="co"># For reproducibility</span></span>
-<span id="cb5-22"><a href="#cb5-22"></a>)</span>
-<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; </span></span>
-<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt;  iter imp variable</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt;   1   1  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
-<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt;   1   2  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
-<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;   2   1  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
-<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;   2   2  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
-<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt; Warning: Number of logged events: 8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Initialize the predictor matrix</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>pred_matrix <span class="ot">&lt;-</span> <span class="fu">make.predictorMatrix</span>(dat.analytic)</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># --- DO NOT use these variables AS PREDICTORS ---</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co"># We exclude the raw survival time and identifier variables from being predictors.</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>pred_matrix[, <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"stime.since.birth"</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co"># --- DO NOT IMPUTE these variables ---</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co"># These variables are complete, identifiers, or part of the outcome.</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>pred_matrix[<span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"psu"</span>, <span class="st">"strata"</span>, <span class="st">"survey.weight.new"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11"></a>              <span class="st">"stime.since.birth"</span>, <span class="st">"status_all"</span>, <span class="st">"year.cat"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12"></a>              <span class="st">"nelson_aalen"</span>), ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co"># Run the imputation. m and maxit are low for demonstration</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>imputed_data <span class="ot">&lt;-</span> <span class="fu">mice</span>(</span>
+<span id="cb6-16"><a href="#cb6-16"></a>  dat.analytic,</span>
+<span id="cb6-17"><a href="#cb6-17"></a>  <span class="at">m =</span> <span class="dv">2</span>,              <span class="co"># Number of imputed datasets</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a>  <span class="at">maxit =</span> <span class="dv">2</span>,         <span class="co"># Number of iterations per imputation</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a>  <span class="at">predictorMatrix =</span> pred_matrix,</span>
+<span id="cb6-20"><a href="#cb6-20"></a>  <span class="at">method =</span> <span class="st">'pmm'</span>,     <span class="co"># Predictive Mean Matching is a good default</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a>  <span class="at">seed =</span> <span class="dv">123</span>          <span class="co"># For reproducibility</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a>)</span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt; </span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt;  iter imp variable</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt;   1   1  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt;   1   2  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="co">#&gt;   2   1  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt;   2   2  exposure.cat*  stime.since.birth  status_all  nelson_aalen</span></span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt; Warning: Number of logged events: 8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr></section></section><section id="survival-analysis-on-imputed-data" class="level2"><h2 class="anchored" data-anchor-id="survival-analysis-on-imputed-data">5. Survival Analysis on Imputed Data 📊</h2>
 <p>With our <code>m=2</code> complete datasets, we follow the “analyze then pool” procedure:</p>
@@ -1591,48 +1593,87 @@ Tip
 <strong>Pool</strong>: Combine the 2 sets of results into a single, final estimate using <code>pool()</code>.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># --- 5. Survival Analysis on Imputed Data (Corrected) ---</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># 1. Create an empty list to store the results of each analysis</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>fit_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb6-5"><a href="#cb6-5"></a></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co"># 2. Loop through each of the 'm' imputed datasets</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>imputed_data<span class="sc">$</span>m) {</span>
-<span id="cb6-8"><a href="#cb6-8"></a>  </span>
-<span id="cb6-9"><a href="#cb6-9"></a>  <span class="co"># Get the i-th completed dataset</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a>  completed_data <span class="ot">&lt;-</span> mice<span class="sc">::</span><span class="fu">complete</span>(imputed_data, i)</span>
-<span id="cb6-11"><a href="#cb6-11"></a>  </span>
-<span id="cb6-12"><a href="#cb6-12"></a>  <span class="co"># Create a survey design object *specifically for this dataset*</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a>  design_i <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu, </span>
-<span id="cb6-14"><a href="#cb6-14"></a>                        <span class="at">strata =</span> <span class="sc">~</span>strata, </span>
-<span id="cb6-15"><a href="#cb6-15"></a>                        <span class="at">weights =</span> <span class="sc">~</span>survey.weight.new, </span>
-<span id="cb6-16"><a href="#cb6-16"></a>                        <span class="at">nest =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb6-17"><a href="#cb6-17"></a>                        <span class="at">data =</span> completed_data)</span>
-<span id="cb6-18"><a href="#cb6-18"></a>  </span>
-<span id="cb6-19"><a href="#cb6-19"></a>  <span class="co"># Fit the survey-weighted Cox model using this design</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a>  fit_list[[i]] <span class="ot">&lt;-</span> <span class="fu">svycoxph</span>(<span class="fu">Surv</span>(stime.since.birth, status_all) <span class="sc">~</span> exposure.cat <span class="sc">+</span> sex <span class="sc">+</span> race <span class="sc">+</span> year.cat, </span>
-<span id="cb6-21"><a href="#cb6-21"></a>                            <span class="at">design =</span> design_i)</span>
-<span id="cb6-22"><a href="#cb6-22"></a>}</span>
-<span id="cb6-23"><a href="#cb6-23"></a></span>
-<span id="cb6-24"><a href="#cb6-24"></a><span class="co"># 3. Pool the results from the list of model fits</span></span>
-<span id="cb6-25"><a href="#cb6-25"></a>pooled_results <span class="ot">&lt;-</span> <span class="fu">pool</span>(fit_list)</span>
-<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
-<span id="cb6-27"><a href="#cb6-27"></a><span class="co">#&gt; With (301) clusters.</span></span>
-<span id="cb6-28"><a href="#cb6-28"></a><span class="co">#&gt; svydesign(ids = ~psu, strata = ~strata, weights = ~survey.weight.new, </span></span>
-<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt;     nest = TRUE, data = completed_data)</span></span>
-<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
-<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt; With (301) clusters.</span></span>
-<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt; svydesign(ids = ~psu, strata = ~strata, weights = ~survey.weight.new, </span></span>
-<span id="cb6-33"><a href="#cb6-33"></a><span class="co">#&gt;     nest = TRUE, data = completed_data)</span></span>
-<span id="cb6-34"><a href="#cb6-34"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
-<span id="cb6-35"><a href="#cb6-35"></a><span class="co">#&gt; With (301) clusters.</span></span>
-<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt; svydesign(ids = ~psu, strata = ~strata, weights = ~survey.weight.new, </span></span>
-<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt;     nest = TRUE, data = completed_data)</span></span>
-<span id="cb6-38"><a href="#cb6-38"></a></span>
-<span id="cb6-39"><a href="#cb6-39"></a><span class="co"># 4. Display the final, pooled results</span></span>
-<span id="cb6-40"><a href="#cb6-40"></a><span class="fu">print</span>(<span class="st">"--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span>)</span>
-<span id="cb6-41"><a href="#cb6-41"></a><span class="co">#&gt; [1] "--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span></span>
-<span id="cb6-42"><a href="#cb6-42"></a><span class="fu">summary</span>(pooled_results, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># --- 5. Survival Analysis on Imputed Data  ---</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co"># --- Step 5.1: Re-integrate Ineligible Subjects for Correct Survey Variance ---</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co"># First, extract the 'm' imputed datasets into a single long-format data frame.</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co"># Add a flag to identify this group as our analytic/eligible sample.</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>imputed_analytic_data <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data, <span class="st">"long"</span>, <span class="at">include =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-8"><a href="#cb7-8"></a>imputed_analytic_data<span class="sc">$</span>eligible <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co"># Next, identify the subjects from the original full dataset who were NOT in our analytic sample.</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co"># The analytic sample was defined as age &gt;= 20 &amp; age &lt; 80.</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a>dat_ineligible <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat.full.with.mortality, <span class="sc">!</span>(age <span class="sc">&gt;=</span> <span class="dv">20</span> <span class="sc">&amp;</span> age <span class="sc">&lt;</span> <span class="dv">80</span>))</span>
+<span id="cb7-13"><a href="#cb7-13"></a></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co"># Replicate this ineligible dataset 'm' times, once for each imputation.</span></span>
+<span id="cb7-15"><a href="#cb7-15"></a>ineligible_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>imputed_data<span class="sc">$</span>m, <span class="cf">function</span>(i) {</span>
+<span id="cb7-16"><a href="#cb7-16"></a>  df <span class="ot">&lt;-</span> dat_ineligible</span>
+<span id="cb7-17"><a href="#cb7-17"></a>  df<span class="sc">$</span>.imp <span class="ot">&lt;-</span> i <span class="co"># Add the imputation number</span></span>
+<span id="cb7-18"><a href="#cb7-18"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb7-19"><a href="#cb7-19"></a>})</span>
+<span id="cb7-20"><a href="#cb7-20"></a>ineligible_stacked <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, ineligible_list)</span>
+<span id="cb7-21"><a href="#cb7-21"></a></span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="co"># Now, align the columns. Add columns that exist in the imputed data (like 'nelson_aalen')</span></span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="co"># to the ineligible data, filling them with NA.</span></span>
+<span id="cb7-24"><a href="#cb7-24"></a>cols_to_add <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(imputed_analytic_data), <span class="fu">names</span>(ineligible_stacked))</span>
+<span id="cb7-25"><a href="#cb7-25"></a>ineligible_stacked[, cols_to_add] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb7-26"><a href="#cb7-26"></a></span>
+<span id="cb7-27"><a href="#cb7-27"></a><span class="co"># Set the eligibility flag for this group to 0.</span></span>
+<span id="cb7-28"><a href="#cb7-28"></a>ineligible_stacked<span class="sc">$</span>eligible <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a></span>
+<span id="cb7-30"><a href="#cb7-30"></a><span class="co"># CRITICAL: Ensure the column order is identical before row-binding.</span></span>
+<span id="cb7-31"><a href="#cb7-31"></a>ineligible_final <span class="ot">&lt;-</span> ineligible_stacked[, <span class="fu">names</span>(imputed_analytic_data)]</span>
+<span id="cb7-32"><a href="#cb7-32"></a></span>
+<span id="cb7-33"><a href="#cb7-33"></a><span class="co"># Finally, combine the imputed analytic data with the prepared ineligible data.</span></span>
+<span id="cb7-34"><a href="#cb7-34"></a>imputed_full_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(imputed_analytic_data, ineligible_final)</span>
+<span id="cb7-35"><a href="#cb7-35"></a></span>
+<span id="cb7-36"><a href="#cb7-36"></a></span>
+<span id="cb7-37"><a href="#cb7-37"></a><span class="co"># --- Step 5.2: Create Survey Design and Run Pooled Analysis ---</span></span>
+<span id="cb7-38"><a href="#cb7-38"></a></span>
+<span id="cb7-39"><a href="#cb7-39"></a><span class="co"># Create the complex survey design object using an `imputationList`.</span></span>
+<span id="cb7-40"><a href="#cb7-40"></a><span class="co"># This tells the survey package how to handle the 'm' imputed datasets.</span></span>
+<span id="cb7-41"><a href="#cb7-41"></a><span class="co"># The design is specified on the *full* data to capture the total population structure.</span></span>
+<span id="cb7-42"><a href="#cb7-42"></a>design_full <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span>psu,</span>
+<span id="cb7-43"><a href="#cb7-43"></a>                         <span class="at">strata =</span> <span class="sc">~</span>strata,</span>
+<span id="cb7-44"><a href="#cb7-44"></a>                         <span class="at">weights =</span> <span class="sc">~</span>survey.weight.new,</span>
+<span id="cb7-45"><a href="#cb7-45"></a>                         <span class="at">nest =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-46"><a href="#cb7-46"></a>                         <span class="at">data =</span> <span class="fu">imputationList</span>(<span class="fu">split</span>(imputed_full_data, imputed_full_data<span class="sc">$</span>.imp)))</span>
+<span id="cb7-47"><a href="#cb7-47"></a></span>
+<span id="cb7-48"><a href="#cb7-48"></a><span class="co"># Subset the design object to include only the eligible participants for the analysis.</span></span>
+<span id="cb7-49"><a href="#cb7-49"></a><span class="co"># This ensures variance is calculated correctly based on the full sample design.</span></span>
+<span id="cb7-50"><a href="#cb7-50"></a>design_analytic <span class="ot">&lt;-</span> <span class="fu">subset</span>(design_full, eligible <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb7-51"><a href="#cb7-51"></a></span>
+<span id="cb7-52"><a href="#cb7-52"></a><span class="co"># Fit the Cox model across all 'm' imputed datasets using the `with()` function.</span></span>
+<span id="cb7-53"><a href="#cb7-53"></a><span class="co"># This is more efficient than a for-loop.</span></span>
+<span id="cb7-54"><a href="#cb7-54"></a>fit_pooled <span class="ot">&lt;-</span> <span class="fu">with</span>(design_analytic,</span>
+<span id="cb7-55"><a href="#cb7-55"></a>                   <span class="fu">svycoxph</span>(<span class="fu">Surv</span>(stime.since.birth, status_all) <span class="sc">~</span> exposure.cat <span class="sc">+</span> sex <span class="sc">+</span> race <span class="sc">+</span> year.cat))</span>
+<span id="cb7-56"><a href="#cb7-56"></a></span>
+<span id="cb7-57"><a href="#cb7-57"></a><span class="co"># Pool the results from the list of model fits using Rubin's Rules.</span></span>
+<span id="cb7-58"><a href="#cb7-58"></a>pooled_results <span class="ot">&lt;-</span> <span class="fu">pool</span>(fit_pooled)</span>
+<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
+<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt; With (301) clusters.</span></span>
+<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
+<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
+<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
+<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt;     ...)</span></span>
+<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
+<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt; With (301) clusters.</span></span>
+<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
+<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
+<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
+<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt;     ...)</span></span>
+<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt; Stratified 1 - level Cluster Sampling design (with replacement)</span></span>
+<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt; With (301) clusters.</span></span>
+<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt; svydesign(ids = ids, probs = probs, strata = strata, variables = variables, </span></span>
+<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt;     fpc = fpc, nest = nest, check.strata = check.strata, weights = weights, </span></span>
+<span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt;     data = d, pps = pps, calibrate.formula = calibrate.formula, </span></span>
+<span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt;     ...)</span></span>
+<span id="cb7-77"><a href="#cb7-77"></a></span>
+<span id="cb7-78"><a href="#cb7-78"></a><span class="co"># Display the final, pooled results.</span></span>
+<span id="cb7-79"><a href="#cb7-79"></a><span class="fu">print</span>(<span class="st">"--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span>)</span>
+<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt; [1] "--- Final Adjusted Cox Model Results (from Pooled Imputed Data) ---"</span></span>
+<span id="cb7-81"><a href="#cb7-81"></a><span class="fu">summary</span>(pooled_results, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1642,14 +1683,14 @@ Tip
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Option A: Fallacy-safe table showing only the main exposure</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">svypooled</span>(</span>
-<span id="cb7-3"><a href="#cb7-3"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
-<span id="cb7-4"><a href="#cb7-4"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
-<span id="cb7-5"><a href="#cb7-5"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
-<span id="cb7-6"><a href="#cb7-6"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
-<span id="cb7-7"><a href="#cb7-7"></a>  <span class="at">title =</span> <span class="st">"Adjusted Hazard Ratios for All-Cause Mortality"</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Option A: Fallacy-safe table showing only the main exposure</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">svypooled</span>(</span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
+<span id="cb8-6"><a href="#cb8-6"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7"></a>  <span class="at">title =</span> <span class="st">"Adjusted Hazard Ratios for All-Cause Mortality"</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
 <caption>Adjusted Hazard Ratios for All-Cause Mortality</caption>
@@ -1696,16 +1737,16 @@ Tip
 </tr></tfoot>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="co"># Option B: Full table for an appendix</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="fu">svypooled</span>(</span>
-<span id="cb8-4"><a href="#cb8-4"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
-<span id="cb8-5"><a href="#cb8-5"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
-<span id="cb8-6"><a href="#cb8-6"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
-<span id="cb8-7"><a href="#cb8-7"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
-<span id="cb8-8"><a href="#cb8-8"></a>  <span class="at">title =</span> <span class="st">"Full Adjusted Model Results (for Appendix)"</span>,</span>
-<span id="cb8-9"><a href="#cb8-9"></a>  <span class="at">fallacy_safe =</span> <span class="cn">FALSE</span></span>
-<span id="cb8-10"><a href="#cb8-10"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co"># Option B: Full table for an appendix</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="fu">svypooled</span>(</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="at">pooled_model =</span> pooled_results,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="at">main_exposure =</span> <span class="st">"exposure.cat"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>  <span class="at">adj_var_names =</span> <span class="fu">c</span>(<span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"year.cat"</span>),</span>
+<span id="cb9-7"><a href="#cb9-7"></a>  <span class="at">measure =</span> <span class="st">"HR"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8"></a>  <span class="at">title =</span> <span class="st">"Full Adjusted Model Results (for Appendix)"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9"></a>  <span class="at">fallacy_safe =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
 <caption>Full Adjusted Model Results (for Appendix)</caption>
