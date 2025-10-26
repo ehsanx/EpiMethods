@@ -1334,11 +1334,7 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
-<li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li>
-<a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
-  <ul class="collapse">
-<li><a href="#data-and-variables" id="toc-data-and-variables" class="nav-link" data-scroll-target="#data-and-variables">Data and variables</a></li>
+<li><a href="#data-and-variables" id="toc-data-and-variables" class="nav-link active" data-scroll-target="#data-and-variables">Data and variables</a></li>
   <li>
 <a href="#models" id="toc-models" class="nav-link" data-scroll-target="#models">Models</a>
   <ul class="collapse">
@@ -1346,24 +1342,21 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   <li><a href="#model-2.-interaction-term-model" id="toc-model-2.-interaction-term-model" class="nav-link" data-scroll-target="#model-2.-interaction-term-model">Model 2. Interaction term model</a></li>
   </ul>
 </li>
+  <li>
+<a href="#joint-effects-from-either-parameterization" id="toc-joint-effects-from-either-parameterization" class="nav-link" data-scroll-target="#joint-effects-from-either-parameterization">Joint effects from either parameterization</a>
+  <ul class="collapse">
+<li><a href="#check-equivalence-of-results-obtained-from-joint-variable-model" id="toc-check-equivalence-of-results-obtained-from-joint-variable-model" class="nav-link" data-scroll-target="#check-equivalence-of-results-obtained-from-joint-variable-model">Check equivalence of results obtained from joint variable model</a></li>
   </ul>
 </li>
   <li>
-<a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+<a href="#simple-effects-within-strata" id="toc-simple-effects-within-strata" class="nav-link" data-scroll-target="#simple-effects-within-strata">Simple effects within strata</a>
   <ul class="collapse">
-<li><a href="#joint-effects-from-either-parameterization" id="toc-joint-effects-from-either-parameterization" class="nav-link" data-scroll-target="#joint-effects-from-either-parameterization">Joint effects from either parameterization</a></li>
-  <li><a href="#simple-effects-within-strata" id="toc-simple-effects-within-strata" class="nav-link" data-scroll-target="#simple-effects-within-strata">Simple effects within strata</a></li>
+<li><a href="#check-equivalence-of-results-obtained-from-interaction-model" id="toc-check-equivalence-of-results-obtained-from-interaction-model" class="nav-link" data-scroll-target="#check-equivalence-of-results-obtained-from-interaction-model">Check equivalence of results obtained from interaction model</a></li>
+  </ul>
+</li>
   <li><a href="#additive-interaction-measures" id="toc-additive-interaction-measures" class="nav-link" data-scroll-target="#additive-interaction-measures">Additive interaction measures</a></li>
-  </ul>
-</li>
-  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  <li><a href="#reporting-guideline" id="toc-reporting-guideline" class="nav-link" data-scroll-target="#reporting-guideline">Reporting guideline</a></li>
   <li><a href="#key-messages" id="toc-key-messages" class="nav-link" data-scroll-target="#key-messages">Key messages</a></li>
-  <li>
-<a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a>
-  <ul class="collapse">
-<li><a href="#minimal-code-to-reproduce-tables" id="toc-minimal-code-to-reproduce-tables" class="nav-link" data-scroll-target="#minimal-code-to-reproduce-tables">Minimal code to reproduce tables</a></li>
-  </ul>
-</li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></nav>
     </div>
@@ -1383,11 +1376,15 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   
 
 
-</header><section id="introduction" class="level1 unnumbered"><h1 class="unnumbered">Introduction</h1>
-<p>Interaction is commonly assessed by either creating a <strong>joint exposure</strong> factor or by including <strong>main effects and a product term</strong>. When the specification is saturated, these parameterizations are mathematically equivalent and encode the same set of contrasts on the log-odds scale. For clear presentation, it is often helpful to report the full set of joint effects relative to a single reference, and selected simple effects within strata, alongside additive interaction measures <span class="citation" data-cites="knol2012recommendations">(<a href="#ref-knol2012recommendations" role="doc-biblioref">Knol and VanderWeele 2012</a>)</span>.</p>
+</header><p>Interaction is commonly assessed by either</p>
+<ol type="1">
+<li>creating a <strong>joint exposure</strong> factor or</li>
+<li>by including <strong>main effects and a product term</strong>.</li>
+</ol>
+<p>When the specification is saturated, these parameterizations are mathematically equivalent and encode the same set of contrasts on the log-odds scale.</p>
+<p>For clear presentation, it is often helpful to report the full set of joint effects relative to a single reference, and selected simple effects within strata, alongside additive interaction measures <span class="citation" data-cites="knol2012recommendations">(<a href="#ref-knol2012recommendations" role="doc-biblioref">Knol and VanderWeele 2012</a>)</span>.</p>
 <p>The motivating example in this document uses publicly available <strong>NHANES 2009–2012</strong> data, studying hypertension defined by systolic blood pressure ≥ 130 mmHg and examining whether the effect of obesity differs across levels of self reported race or ethnicity.</p>
 <p>We will use interaction analysis functions (<code>jointeffects, inteffects, addint, addintlist</code> from <code>svyTable1</code> package) to compute and present joint effects, simple effects, and additive interaction measures with appropriate survey adjustments from saturated logistic regression models.</p>
-</section><section id="methods" class="level1 unnumbered"><h1 class="unnumbered">Methods</h1>
 <section id="data-and-variables" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="data-and-variables">Data and variables</h2>
 <p>We use <strong>NHANES 2009–2012</strong> adults (Age ≥ 20) with survey design variables. The binary outcome is <strong>Hypertension_130</strong>, defined from average systolic BP. The two interacting exposures are <strong>Race1</strong> and <strong>ObeseStatus</strong> derived from BMI ≥ 30, with <code>"White"</code> and <code>"Not Obese"</code> as reference levels. We adjust for <strong>Age</strong>.</p>
 <div class="cell">
@@ -1425,89 +1422,167 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <span id="cb2-22"><a href="#cb2-22"></a>)</span>
 <span id="cb2-23"><a href="#cb2-23"></a></span>
 <span id="cb2-24"><a href="#cb2-24"></a>f1_levels <span class="ot">&lt;-</span> <span class="fu">levels</span>(adult_design<span class="sc">$</span>variables<span class="sc">$</span>Race1)</span>
-<span id="cb2-25"><a href="#cb2-25"></a>f2_levels <span class="ot">&lt;-</span> <span class="fu">levels</span>(adult_design<span class="sc">$</span>variables<span class="sc">$</span>ObeseStatus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="fu">kable</span>(f1_levels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead><tr class="header">
+<th style="text-align: left;">x</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">White</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Black</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hispanic</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mexican</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Other</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>f2_levels <span class="ot">&lt;-</span> <span class="fu">levels</span>(adult_design<span class="sc">$</span>variables<span class="sc">$</span>ObeseStatus)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">kable</span>(f2_levels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead><tr class="header">
+<th style="text-align: left;">x</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Not Obese</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Obese</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </section><section id="models" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="models">Models</h2>
 <section id="model-1.-joint-variable-model" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="model-1.-joint-variable-model">Model 1. Joint variable model</h3>
-<p>Create one factor for all combinations of Race1 × ObeseStatus with <code>"White_Not Obese"</code> as the reference, and fit a survey-weighted logistic regression adjusting for Age.</p>
+<p>Create one factor (variable) for all combinations of Race1 × ObeseStatus with <code>"White_Not Obese"</code> as the reference, and fit a survey-weighted logistic regression adjusting for Age.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Create joint exposure factor inside the data</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>nhanes_adults <span class="ot">&lt;-</span> nhanes_adults <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-4"><a href="#cb3-4"></a>    <span class="at">Race1_ObeseStatus =</span> <span class="fu">interaction</span>(Race1, ObeseStatus, <span class="at">sep =</span> <span class="st">"_"</span>),</span>
-<span id="cb3-5"><a href="#cb3-5"></a>    <span class="at">Race1_ObeseStatus =</span> <span class="fu">relevel</span>(Race1_ObeseStatus, <span class="at">ref =</span> <span class="st">"White_Not Obese"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6"></a>  )</span>
-<span id="cb3-7"><a href="#cb3-7"></a></span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="co"># Recreate survey design with the new variable included</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a>adult_design_joint <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(</span>
-<span id="cb3-10"><a href="#cb3-10"></a>  <span class="at">id =</span> <span class="sc">~</span>SDMVPSU,</span>
-<span id="cb3-11"><a href="#cb3-11"></a>  <span class="at">strata =</span> <span class="sc">~</span>SDMVSTRA,</span>
-<span id="cb3-12"><a href="#cb3-12"></a>  <span class="at">weights =</span> <span class="sc">~</span>WTMEC2YR,</span>
-<span id="cb3-13"><a href="#cb3-13"></a>  <span class="at">nest =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-14"><a href="#cb3-14"></a>  <span class="at">data =</span> nhanes_adults</span>
-<span id="cb3-15"><a href="#cb3-15"></a>)</span>
-<span id="cb3-16"><a href="#cb3-16"></a></span>
-<span id="cb3-17"><a href="#cb3-17"></a><span class="co"># Fit joint model using the explicitly named variable</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a>joint_model <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
-<span id="cb3-19"><a href="#cb3-19"></a>  Hypertension_130 <span class="sc">~</span> Race1_ObeseStatus <span class="sc">+</span> Age,</span>
-<span id="cb3-20"><a href="#cb3-20"></a>  <span class="at">design =</span> adult_design_joint,</span>
-<span id="cb3-21"><a href="#cb3-21"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
-<span id="cb3-22"><a href="#cb3-22"></a>)</span>
-<span id="cb3-23"><a href="#cb3-23"></a></span>
-<span id="cb3-24"><a href="#cb3-24"></a>m1 <span class="ot">&lt;-</span> <span class="fu">publish</span>(joint_model)</span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt;           Variable              Units OddsRatio       CI.95     p-value </span></span>
-<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt;  Race1_ObeseStatus    White_Not Obese       Ref                         </span></span>
-<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt;                       Black_Not Obese      2.11 [1.73;2.58]     &lt; 1e-04 </span></span>
-<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt;                    Hispanic_Not Obese      0.99 [0.77;1.27]   0.9374741 </span></span>
-<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt;                     Mexican_Not Obese      1.17 [0.95;1.43]   0.1510628 </span></span>
-<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt;                       Other_Not Obese      1.05 [0.87;1.28]   0.6050711 </span></span>
-<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt;                           White_Obese      1.40 [1.21;1.61]   0.0001361 </span></span>
-<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt;                           Black_Obese      2.53 [1.98;3.24]     &lt; 1e-04 </span></span>
-<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt;                        Hispanic_Obese      1.65 [1.27;2.13]   0.0009516 </span></span>
-<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt;                         Mexican_Obese      1.92 [1.55;2.39]     &lt; 1e-04 </span></span>
-<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt;                           Other_Obese      1.15 [0.74;1.80]   0.5437189 </span></span>
-<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt;                Age                         1.06 [1.06;1.06]     &lt; 1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Create joint exposure factor inside the data</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>nhanes_adults <span class="ot">&lt;-</span> nhanes_adults <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="at">Race1_ObeseStatus =</span> <span class="fu">interaction</span>(Race1, ObeseStatus, <span class="at">sep =</span> <span class="st">"_"</span>),</span>
+<span id="cb4-5"><a href="#cb4-5"></a>    <span class="at">Race1_ObeseStatus =</span> <span class="fu">relevel</span>(Race1_ObeseStatus, <span class="at">ref =</span> <span class="st">"White_Not Obese"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  )</span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="fu">kable</span>(<span class="fu">levels</span>(nhanes_adults<span class="sc">$</span>Race1_ObeseStatus))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead><tr class="header">
+<th style="text-align: left;">x</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">White_Not Obese</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Black_Not Obese</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hispanic_Not Obese</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mexican_Not Obese</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Other_Not Obese</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">White_Obese</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Black_Obese</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hispanic_Obese</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mexican_Obese</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Other_Obese</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co"># Recreate survey design with the new variable included</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>adult_design_joint <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="at">id =</span> <span class="sc">~</span>SDMVPSU,</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="at">strata =</span> <span class="sc">~</span>SDMVSTRA,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>  <span class="at">weights =</span> <span class="sc">~</span>WTMEC2YR,</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  <span class="at">nest =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-8"><a href="#cb5-8"></a>  <span class="at">data =</span> nhanes_adults</span>
+<span id="cb5-9"><a href="#cb5-9"></a>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co"># Fit joint model using the explicitly named variable</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a>joint_model <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
+<span id="cb5-13"><a href="#cb5-13"></a>  Hypertension_130 <span class="sc">~</span> Race1_ObeseStatus <span class="sc">+</span> Age,</span>
+<span id="cb5-14"><a href="#cb5-14"></a>  <span class="at">design =</span> adult_design_joint,</span>
+<span id="cb5-15"><a href="#cb5-15"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
+<span id="cb5-16"><a href="#cb5-16"></a>)</span>
+<span id="cb5-17"><a href="#cb5-17"></a>m1 <span class="ot">&lt;-</span> <span class="fu">publish</span>(joint_model) </span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt;           Variable              Units OddsRatio       CI.95     p-value </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt;  Race1_ObeseStatus    White_Not Obese       Ref                         </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt;                       Black_Not Obese      2.11 [1.73;2.58]     &lt; 1e-04 </span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt;                    Hispanic_Not Obese      0.99 [0.77;1.27]   0.9374741 </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt;                     Mexican_Not Obese      1.17 [0.95;1.43]   0.1510628 </span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt;                       Other_Not Obese      1.05 [0.87;1.28]   0.6050711 </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt;                           White_Obese      1.40 [1.21;1.61]   0.0001361 </span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt;                           Black_Obese      2.53 [1.98;3.24]     &lt; 1e-04 </span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt;                        Hispanic_Obese      1.65 [1.27;2.13]   0.0009516 </span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;                         Mexican_Obese      1.92 [1.55;2.39]     &lt; 1e-04 </span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;                           Other_Obese      1.15 [0.74;1.80]   0.5437189 </span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;                Age                         1.06 [1.06;1.06]     &lt; 1e-04</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="model-2.-interaction-term-model" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="model-2.-interaction-term-model">Model 2. Interaction term model</h3>
 <p>Include main effects and their product term for Race1 and ObeseStatus, adjusting for Age. This is the saturated parameterization equivalent to the joint-variable model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>interaction_model <span class="ot">&lt;-</span> survey<span class="sc">::</span><span class="fu">svyglm</span>(</span>
-<span id="cb4-2"><a href="#cb4-2"></a>  Hypertension_130 <span class="sc">~</span> Race1 <span class="sc">*</span> ObeseStatus <span class="sc">+</span> Age,</span>
-<span id="cb4-3"><a href="#cb4-3"></a>  <span class="at">design =</span> adult_design,</span>
-<span id="cb4-4"><a href="#cb4-4"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
-<span id="cb4-5"><a href="#cb4-5"></a>)</span>
-<span id="cb4-6"><a href="#cb4-6"></a></span>
-<span id="cb4-7"><a href="#cb4-7"></a>m2 <span class="ot">&lt;-</span> <span class="fu">publish</span>(interaction_model)</span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt;                                          Variable Units OddsRatio       CI.95     p-value </span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt;                                               Age            1.06 [1.06;1.06]     &lt; 1e-04 </span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt;     Race1(White): ObeseStatus(Obese vs Not Obese)            1.40 [1.21;1.61]     &lt; 1e-04 </span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;     Race1(Black): ObeseStatus(Obese vs Not Obese)            1.20 [0.95;1.52]   0.1302843 </span></span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt;  Race1(Hispanic): ObeseStatus(Obese vs Not Obese)            1.66 [1.25;2.20]   0.0004009 </span></span>
-<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt;   Race1(Mexican): ObeseStatus(Obese vs Not Obese)            1.65 [1.30;2.10]     &lt; 1e-04 </span></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt;     Race1(Other): ObeseStatus(Obese vs Not Obese)            1.09 [0.68;1.77]   0.7152699 </span></span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt;     ObeseStatus(Not Obese): Race1(Black vs White)            2.11 [1.73;2.58]     &lt; 1e-04 </span></span>
-<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt;  ObeseStatus(Not Obese): Race1(Hispanic vs White)            0.99 [0.77;1.27]   0.9367881 </span></span>
-<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt;   ObeseStatus(Not Obese): Race1(Mexican vs White)            1.17 [0.95;1.43]   0.1374845 </span></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt;     ObeseStatus(Not Obese): Race1(Other vs White)            1.05 [0.87;1.28]   0.6000542 </span></span>
-<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt;         ObeseStatus(Obese): Race1(Black vs White)            1.81 [1.41;2.33]     &lt; 1e-04 </span></span>
-<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt;      ObeseStatus(Obese): Race1(Hispanic vs White)            1.18 [0.92;1.51]   0.1960934 </span></span>
-<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt;       ObeseStatus(Obese): Race1(Mexican vs White)            1.38 [1.03;1.84]   0.0296074 </span></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt;         ObeseStatus(Obese): Race1(Other vs White)            0.82 [0.52;1.31]   0.4136666</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>interaction_model <span class="ot">&lt;-</span> survey<span class="sc">::</span><span class="fu">svyglm</span>(</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  Hypertension_130 <span class="sc">~</span> Race1 <span class="sc">*</span> ObeseStatus <span class="sc">+</span> Age,</span>
+<span id="cb6-3"><a href="#cb6-3"></a>  <span class="at">design =</span> adult_design,</span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
+<span id="cb6-5"><a href="#cb6-5"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>m2 <span class="ot">&lt;-</span> <span class="fu">publish</span>(interaction_model) </span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;                                          Variable Units OddsRatio       CI.95     p-value </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;                                               Age            1.06 [1.06;1.06]     &lt; 1e-04 </span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;     Race1(White): ObeseStatus(Obese vs Not Obese)            1.40 [1.21;1.61]     &lt; 1e-04 </span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;     Race1(Black): ObeseStatus(Obese vs Not Obese)            1.20 [0.95;1.52]   0.1302843 </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;  Race1(Hispanic): ObeseStatus(Obese vs Not Obese)            1.66 [1.25;2.20]   0.0004009 </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;   Race1(Mexican): ObeseStatus(Obese vs Not Obese)            1.65 [1.30;2.10]     &lt; 1e-04 </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;     Race1(Other): ObeseStatus(Obese vs Not Obese)            1.09 [0.68;1.77]   0.7152699 </span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;     ObeseStatus(Not Obese): Race1(Black vs White)            2.11 [1.73;2.58]     &lt; 1e-04 </span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;  ObeseStatus(Not Obese): Race1(Hispanic vs White)            0.99 [0.77;1.27]   0.9367881 </span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;   ObeseStatus(Not Obese): Race1(Mexican vs White)            1.17 [0.95;1.43]   0.1374845 </span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;     ObeseStatus(Not Obese): Race1(Other vs White)            1.05 [0.87;1.28]   0.6000542 </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt;         ObeseStatus(Obese): Race1(Black vs White)            1.81 [1.41;2.33]     &lt; 1e-04 </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt;      ObeseStatus(Obese): Race1(Hispanic vs White)            1.18 [0.92;1.51]   0.1960934 </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt;       ObeseStatus(Obese): Race1(Mexican vs White)            1.38 [1.03;1.84]   0.0296074 </span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt;         ObeseStatus(Obese): Race1(Other vs White)            0.82 [0.52;1.31]   0.4136666</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section></section><section id="results" class="level1 unnumbered"><h1 class="unnumbered">Results</h1>
-<section id="joint-effects-from-either-parameterization" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="joint-effects-from-either-parameterization">Joint effects from either parameterization</h2>
+</section></section><section id="joint-effects-from-either-parameterization" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="joint-effects-from-either-parameterization">Joint effects from either parameterization</h2>
 <p>Retrieve the <strong>joint effects</strong> for each Race1 × ObeseStatus combination relative to <code>"White &amp; Not Obese"</code>. From the interaction model we obtain these by post-estimation transformation using the function <code>jointeffects</code>. From the joint model they correspond directly to exponentiated coefficients for the non-reference levels.</p>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>joint_from_interaction <span class="ot">&lt;-</span> <span class="fu">jointeffects</span>(</span>
-<span id="cb5-2"><a href="#cb5-2"></a>  <span class="at">interaction_model =</span> interaction_model,</span>
-<span id="cb5-3"><a href="#cb5-3"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5"></a>  <span class="at">scale =</span> <span class="st">"ratio"</span>,</span>
-<span id="cb5-6"><a href="#cb5-6"></a>  <span class="at">digits =</span> <span class="dv">2</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a>)</span>
-<span id="cb5-8"><a href="#cb5-8"></a></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="fu">kable</span>(joint_from_interaction,</span>
-<span id="cb5-10"><a href="#cb5-10"></a>      <span class="at">caption =</span> <span class="st">"Table 1. Joint effects (OR) for Race1 × ObeseStatus vs White &amp; Not Obese"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>joint_from_interaction <span class="ot">&lt;-</span> <span class="fu">jointeffects</span>(</span>
+<span id="cb7-2"><a href="#cb7-2"></a>  <span class="at">interaction_model =</span> interaction_model,</span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5"></a>  <span class="at">scale =</span> <span class="st">"ratio"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  <span class="at">digits =</span> <span class="dv">2</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8"></a></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="fu">kable</span>(joint_from_interaction,</span>
+<span id="cb7-10"><a href="#cb7-10"></a>      <span class="at">caption =</span> <span class="st">"Table 1. Joint effects (OR) for Race1 × ObeseStatus vs White &amp; Not Obese"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <table class="table caption-top" data-quarto-postprocess="true">
 <caption>Table 1. Joint effects (OR) for Race1 × ObeseStatus vs White &amp; Not Obese</caption>
 <thead><tr class="header">
@@ -1601,8 +1676,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </tr>
 </tbody>
 </table>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">kable</span>(m1<span class="sc">$</span>regressionTable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="check-equivalence-of-results-obtained-from-joint-variable-model" class="level3"><h3 class="anchored" data-anchor-id="check-equivalence-of-results-obtained-from-joint-variable-model">Check equivalence of results obtained from joint variable model</h3>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">kable</span>(m1<span class="sc">$</span>regressionTable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 26%">
@@ -1697,23 +1772,23 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <td style="text-align: left;">&lt; 1e-04</td>
 </tr>
 </tbody>
-</table></section><section id="simple-effects-within-strata" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="simple-effects-within-strata">Simple effects within strata</h2>
+</table></section></section><section id="simple-effects-within-strata" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="simple-effects-within-strata">Simple effects within strata</h2>
 <p>From the joint model we compute <strong>simple effects</strong> such as Obese vs Not Obese within each Race1 level using <code>inteffects</code> function.</p>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>simple_from_joint <span class="ot">&lt;-</span> <span class="fu">inteffects</span>(</span>
-<span id="cb7-2"><a href="#cb7-2"></a>  <span class="at">joint_model =</span> joint_model,</span>
-<span id="cb7-3"><a href="#cb7-3"></a>  joint_var_name <span class="ot">&lt;-</span> <span class="st">"Race1_ObeseStatus"</span>,</span>
-<span id="cb7-4"><a href="#cb7-4"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
-<span id="cb7-5"><a href="#cb7-5"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
-<span id="cb7-6"><a href="#cb7-6"></a>  <span class="at">factor1_levels =</span> f1_levels,</span>
-<span id="cb7-7"><a href="#cb7-7"></a>  <span class="at">factor2_levels =</span> f2_levels,</span>
-<span id="cb7-8"><a href="#cb7-8"></a>  <span class="at">level_separator =</span> <span class="st">"_"</span>, </span>
-<span id="cb7-9"><a href="#cb7-9"></a>  <span class="at">scale =</span> <span class="st">"ratio"</span>,</span>
-<span id="cb7-10"><a href="#cb7-10"></a>  <span class="at">digits =</span> <span class="dv">2</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a>)</span>
-<span id="cb7-12"><a href="#cb7-12"></a></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="fu">kable</span>(simple_from_joint,</span>
-<span id="cb7-14"><a href="#cb7-14"></a>      <span class="at">caption =</span> <span class="st">"Table 2. Simple effects: Obese vs Not Obese within Race1 strata"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-15"><a href="#cb7-15"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>simple_from_joint <span class="ot">&lt;-</span> <span class="fu">inteffects</span>(</span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="at">joint_model =</span> joint_model,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  joint_var_name <span class="ot">&lt;-</span> <span class="st">"Race1_ObeseStatus"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>  <span class="at">factor1_levels =</span> f1_levels,</span>
+<span id="cb9-7"><a href="#cb9-7"></a>  <span class="at">factor2_levels =</span> f2_levels,</span>
+<span id="cb9-8"><a href="#cb9-8"></a>  <span class="at">level_separator =</span> <span class="st">"_"</span>, </span>
+<span id="cb9-9"><a href="#cb9-9"></a>  <span class="at">scale =</span> <span class="st">"ratio"</span>,</span>
+<span id="cb9-10"><a href="#cb9-10"></a>  <span class="at">digits =</span> <span class="dv">2</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>)</span>
+<span id="cb9-12"><a href="#cb9-12"></a></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="fu">kable</span>(simple_from_joint,</span>
+<span id="cb9-14"><a href="#cb9-14"></a>      <span class="at">caption =</span> <span class="st">"Table 2. Simple effects: Obese vs Not Obese within Race1 strata"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <table class="table caption-top" data-quarto-postprocess="true">
 <caption>Table 2. Simple effects: Obese vs Not Obese within Race1 strata</caption>
 <thead><tr class="header">
@@ -1831,8 +1906,8 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </tr>
 </tbody>
 </table>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">kable</span>(m2<span class="sc">$</span>regressionTable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="check-equivalence-of-results-obtained-from-interaction-model" class="level3"><h3 class="anchored" data-anchor-id="check-equivalence-of-results-obtained-from-interaction-model">Check equivalence of results obtained from interaction model</h3>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">kable</span>(m2<span class="sc">$</span>regressionTable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 56%">
@@ -1948,19 +2023,19 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <td style="text-align: left;">0.4136666</td>
 </tr>
 </tbody>
-</table></section><section id="additive-interaction-measures" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="additive-interaction-measures">Additive interaction measures</h2>
+</table></section></section><section id="additive-interaction-measures" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="additive-interaction-measures">Additive interaction measures</h2>
 <p>We also summarize additive interaction using <code>addintlist</code> to report RERI, AP, and S, with <code>"White &amp; Not Obese"</code> as the joint reference.</p>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>add_tab <span class="ot">&lt;-</span> <span class="fu">addintlist</span>(</span>
-<span id="cb9-2"><a href="#cb9-2"></a>  <span class="at">model =</span> interaction_model,</span>
-<span id="cb9-3"><a href="#cb9-3"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
-<span id="cb9-4"><a href="#cb9-4"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
-<span id="cb9-5"><a href="#cb9-5"></a>  <span class="at">measures =</span> <span class="st">"all"</span>,</span>
-<span id="cb9-6"><a href="#cb9-6"></a>  <span class="at">digits =</span> <span class="dv">3</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a>)</span>
-<span id="cb9-8"><a href="#cb9-8"></a></span>
-<span id="cb9-9"><a href="#cb9-9"></a><span class="fu">kable</span>(add_tab,</span>
-<span id="cb9-10"><a href="#cb9-10"></a>      <span class="at">caption =</span> <span class="st">"Table 3. Additive interaction measures by Race1 with obesity as the binary factor"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>add_tab <span class="ot">&lt;-</span> <span class="fu">addintlist</span>(</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="at">model =</span> interaction_model,</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5"></a>  <span class="at">measures =</span> <span class="st">"all"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6"></a>  <span class="at">digits =</span> <span class="dv">3</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a>)</span>
+<span id="cb11-8"><a href="#cb11-8"></a></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="fu">kable</span>(add_tab,</span>
+<span id="cb11-10"><a href="#cb11-10"></a>      <span class="at">caption =</span> <span class="st">"Table 3. Additive interaction measures by Race1 with obesity as the binary factor"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <table class="table caption-top" data-quarto-postprocess="true">
 <caption>Table 3. Additive interaction measures by Race1 with obesity as the binary factor</caption>
 <thead><tr class="header">
@@ -2108,54 +2183,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 <td style="text-align: right;">10.567</td>
 </tr>
 </tbody>
-</table></section></section><section id="discussion" class="level1 unnumbered"><h1 class="unnumbered">Discussion</h1>
+</table></section><section id="reporting-guideline" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="reporting-guideline">Reporting guideline</h2>
 <p>The NHANES example illustrates that, under saturation, the joint-variable and interaction-term parameterizations are equivalent on the multiplicative scale. The joint-variable model directly presents the set of contrasts most often recommended for reporting, while the interaction model provides the traditional interaction coefficient and requires transformation to recover the same joint effects. Either model supports simple effects within strata. Reporting both joint and selected simple effects, together with additive interaction measures, provides a more complete summary.</p>
-</section><section id="key-messages" class="level1 unnumbered"><h1 class="unnumbered">Key messages</h1>
+</section><section id="key-messages" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="key-messages">Key messages</h2>
 <ul>
 <li>Under saturation, joint and interaction models encode the same multiplicative contrasts.</li>
 <li>Present the full set of joint effects against a single reference profile.</li>
 <li>Include selected simple effects and additive interaction measures for clarity.</li>
-</ul></section><section id="appendix" class="level1 unnumbered"><h1 class="unnumbered">Appendix</h1>
-<section id="minimal-code-to-reproduce-tables" class="level2 unnumbered"><h2 class="unnumbered anchored" data-anchor-id="minimal-code-to-reproduce-tables">Minimal code to reproduce tables</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Joint effects from interaction model</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a>joint_from_interaction <span class="ot">&lt;-</span> <span class="fu">jointeffects</span>(</span>
-<span id="cb10-3"><a href="#cb10-3"></a>  <span class="at">interaction_model =</span> interaction_model,</span>
-<span id="cb10-4"><a href="#cb10-4"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
-<span id="cb10-5"><a href="#cb10-5"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
-<span id="cb10-6"><a href="#cb10-6"></a>  <span class="at">scale =</span> <span class="st">"ratio"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7"></a>  <span class="at">digits =</span> <span class="dv">2</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a>)</span>
-<span id="cb10-9"><a href="#cb10-9"></a></span>
-<span id="cb10-10"><a href="#cb10-10"></a><span class="co"># Simple effects from joint model</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a>simple_from_joint <span class="ot">&lt;-</span> <span class="fu">inteffects</span>(</span>
-<span id="cb10-12"><a href="#cb10-12"></a>  <span class="at">joint_model =</span> joint_model,</span>
-<span id="cb10-13"><a href="#cb10-13"></a>  <span class="at">joint_var_name =</span> <span class="st">"Race1_ObeseStatus"</span>,</span>
-<span id="cb10-14"><a href="#cb10-14"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
-<span id="cb10-15"><a href="#cb10-15"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
-<span id="cb10-16"><a href="#cb10-16"></a>  <span class="at">factor1_levels =</span> f1_levels,</span>
-<span id="cb10-17"><a href="#cb10-17"></a>  <span class="at">factor2_levels =</span> f2_levels,</span>
-<span id="cb10-18"><a href="#cb10-18"></a>  <span class="at">level_separator =</span> <span class="st">"-"</span>,</span>
-<span id="cb10-19"><a href="#cb10-19"></a>  <span class="at">scale =</span> <span class="st">"ratio"</span>,</span>
-<span id="cb10-20"><a href="#cb10-20"></a>  <span class="at">digits =</span> <span class="dv">2</span></span>
-<span id="cb10-21"><a href="#cb10-21"></a>)</span>
-<span id="cb10-22"><a href="#cb10-22"></a></span>
-<span id="cb10-23"><a href="#cb10-23"></a><span class="co"># Additive interaction measures</span></span>
-<span id="cb10-24"><a href="#cb10-24"></a>add_tab <span class="ot">&lt;-</span> <span class="fu">addintlist</span>(</span>
-<span id="cb10-25"><a href="#cb10-25"></a>  <span class="at">model =</span> interaction_model,</span>
-<span id="cb10-26"><a href="#cb10-26"></a>  <span class="at">factor1_name =</span> <span class="st">"Race1"</span>,</span>
-<span id="cb10-27"><a href="#cb10-27"></a>  <span class="at">factor2_name =</span> <span class="st">"ObeseStatus"</span>,</span>
-<span id="cb10-28"><a href="#cb10-28"></a>  <span class="at">measures =</span> <span class="st">"all"</span>,</span>
-<span id="cb10-29"><a href="#cb10-29"></a>  <span class="at">digits =</span> <span class="dv">3</span></span>
-<span id="cb10-30"><a href="#cb10-30"></a>)</span>
-<span id="cb10-31"><a href="#cb10-31"></a></span>
-<span id="cb10-32"><a href="#cb10-32"></a><span class="fu">list</span>(</span>
-<span id="cb10-33"><a href="#cb10-33"></a>  <span class="at">joint_effects =</span> <span class="fu">head</span>(joint_from_interaction, <span class="dv">4</span>),</span>
-<span id="cb10-34"><a href="#cb10-34"></a>  <span class="at">simple_effects =</span> <span class="fu">head</span>(simple_from_joint, <span class="dv">4</span>),</span>
-<span id="cb10-35"><a href="#cb10-35"></a>  <span class="at">additive =</span> <span class="fu">head</span>(add_tab, <span class="dv">4</span>)</span>
-<span id="cb10-36"><a href="#cb10-36"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section></section><section id="references" class="level1"><h1>References</h1>
+</ul></section><section id="references" class="level1"><h1>References</h1>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">

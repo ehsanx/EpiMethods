@@ -1,14 +1,17 @@
 ## Interaction {.unnumbered}
 
-# Introduction  {-}
+Interaction is commonly assessed by either 
 
-Interaction is commonly assessed by either creating a **joint exposure** factor or by including **main effects and a product term**. When the specification is saturated, these parameterizations are mathematically equivalent and encode the same set of contrasts on the log-odds scale. For clear presentation, it is often helpful to report the full set of joint effects relative to a single reference, and selected simple effects within strata, alongside additive interaction measures [@knol2012recommendations].
+(1) creating a **joint exposure** factor or 
+(2) by including **main effects and a product term**. 
+
+When the specification is saturated, these parameterizations are mathematically equivalent and encode the same set of contrasts on the log-odds scale. 
+
+For clear presentation, it is often helpful to report the full set of joint effects relative to a single reference, and selected simple effects within strata, alongside additive interaction measures [@knol2012recommendations].
 
 The motivating example in this document uses publicly available **NHANES 2009–2012** data, studying hypertension defined by systolic blood pressure ≥ 130 mmHg and examining whether the effect of obesity differs across levels of self reported race or ethnicity.
 
 We will use interaction analysis functions (`jointeffects, inteffects, addint, addintlist` from `svyTable1` package) to compute and present joint effects, simple effects, and additive interaction measures with appropriate survey adjustments from saturated logistic regression models.
-
-# Methods  {-}
 
 ## Data and variables  {-}
 
@@ -54,14 +57,16 @@ adult_design <- svydesign(
 )
 
 f1_levels <- levels(adult_design$variables$Race1)
+kable(f1_levels)
 f2_levels <- levels(adult_design$variables$ObeseStatus)
+kable(f2_levels)
 ```
 
 ## Models  {-}
 
 ### Model 1. Joint variable model  {-}
 
-Create one factor for all combinations of Race1 × ObeseStatus with `"White_Not Obese"` as the reference, and fit a survey-weighted logistic regression adjusting for Age.
+Create one factor (variable) for all combinations of Race1 × ObeseStatus with `"White_Not Obese"` as the reference, and fit a survey-weighted logistic regression adjusting for Age.
 
 ```{r joint-model, cache=TRUE}
 # Create joint exposure factor inside the data
@@ -70,6 +75,7 @@ nhanes_adults <- nhanes_adults %>%
     Race1_ObeseStatus = interaction(Race1, ObeseStatus, sep = "_"),
     Race1_ObeseStatus = relevel(Race1_ObeseStatus, ref = "White_Not Obese")
   )
+kable(levels(nhanes_adults$Race1_ObeseStatus))
 
 # Recreate survey design with the new variable included
 adult_design_joint <- svydesign(
@@ -86,8 +92,7 @@ joint_model <- svyglm(
   design = adult_design_joint,
   family = binomial()
 )
-
-m1 <- publish(joint_model)
+m1 <- publish(joint_model) 
 ```
 
 ### Model 2. Interaction term model  {-}
@@ -100,11 +105,8 @@ interaction_model <- survey::svyglm(
   design = adult_design,
   family = binomial()
 )
-
-m2 <- publish(interaction_model)
+m2 <- publish(interaction_model) 
 ```
-
-# Results  {-}
 
 ## Joint effects from either parameterization  {-}
 
@@ -122,7 +124,11 @@ joint_from_interaction <- jointeffects(
 kable(joint_from_interaction,
       caption = "Table 1. Joint effects (OR) for Race1 × ObeseStatus vs White & Not Obese") %>%
   kable_styling(full_width = FALSE)
+```
 
+### Check equivalence of results obtained from joint variable model
+
+```{r joint-effects-table2, results='asis', cache=TRUE}
 kable(m1$regressionTable)
 ```
 
@@ -146,7 +152,11 @@ simple_from_joint <- inteffects(
 kable(simple_from_joint,
       caption = "Table 2. Simple effects: Obese vs Not Obese within Race1 strata") %>%
   kable_styling(full_width = FALSE)
+```
 
+### Check equivalence of results obtained from interaction model
+
+```{r simple-effects-table2, results='asis', cache=TRUE}
 kable(m2$regressionTable)
 ```
 
@@ -168,57 +178,14 @@ kable(add_tab,
   kable_styling(full_width = FALSE)
 ```
 
-# Discussion  {-}
+## Reporting guideline  {-}
 
 The NHANES example illustrates that, under saturation, the joint-variable and interaction-term parameterizations are equivalent on the multiplicative scale. The joint-variable model directly presents the set of contrasts most often recommended for reporting, while the interaction model provides the traditional interaction coefficient and requires transformation to recover the same joint effects. Either model supports simple effects within strata. Reporting both joint and selected simple effects, together with additive interaction measures, provides a more complete summary.
 
-# Key messages  {-}
+## Key messages  {-}
 
 - Under saturation, joint and interaction models encode the same multiplicative contrasts.
 - Present the full set of joint effects against a single reference profile.
 - Include selected simple effects and additive interaction measures for clarity.
-
-# Appendix  {-}
-
-## Minimal code to reproduce tables  {-}
-
-```{r echo=TRUE, eval=FALSE, cache=TRUE}
-# Joint effects from interaction model
-joint_from_interaction <- jointeffects(
-  interaction_model = interaction_model,
-  factor1_name = "Race1",
-  factor2_name = "ObeseStatus",
-  scale = "ratio",
-  digits = 2
-)
-
-# Simple effects from joint model
-simple_from_joint <- inteffects(
-  joint_model = joint_model,
-  joint_var_name = "Race1_ObeseStatus",
-  factor1_name = "Race1",
-  factor2_name = "ObeseStatus",
-  factor1_levels = f1_levels,
-  factor2_levels = f2_levels,
-  level_separator = "-",
-  scale = "ratio",
-  digits = 2
-)
-
-# Additive interaction measures
-add_tab <- addintlist(
-  model = interaction_model,
-  factor1_name = "Race1",
-  factor2_name = "ObeseStatus",
-  measures = "all",
-  digits = 3
-)
-
-list(
-  joint_effects = head(joint_from_interaction, 4),
-  simple_effects = head(simple_from_joint, 4),
-  additive = head(add_tab, 4)
-)
-```
 
 # References
