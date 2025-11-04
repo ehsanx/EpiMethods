@@ -45,6 +45,7 @@ Optional reading:
 ### The Counterfactual Framework for Defining Causality
 
 #### Defining the Causal Effect: Potential Outcomes
+
 To understand causality, one must first be able to imagine a world that does not exist. The potential outcomes framework formalizes this by defining the causal effect of an exposure in terms of what *would have happened* under different exposure scenarios. Let us define the key notations:
 
 -   **A**: The exposure status of an individual (e.g., $A=1$ if a smoker, $A=0$ if a non-smoker).
@@ -60,16 +61,19 @@ For any individual, we can define two **potential outcomes**:
 The **Individual Treatment Effect (TE)** is the difference between these two potential outcomes for a single person: $TE = Y(A=1) - Y(A=0)$. For example, if a patient named John smokes ($A=1$) and develops hypertension, while he *would not have* developed hypertension had he not smoked ($A=0$), the causal effect of smoking for John is present.
 
 #### The Fundamental Problem of Causal Inference
+
 The definition of the individual TE immediately presents a profound challenge. For any given individual, we can only ever observe one of their potential outcomes. If John smokes, we observe $Y(A=1)$, but his counterfactual outcome, $Y(A=0)$, remains unobserved forever. This is known as the **fundamental problem of causal inference**; it is a problem of missing data where half the data is always missing for every subject.
 
 Because the individual TE is unobservable, the goal of epidemiology shifts from the individual to the population. We instead seek to estimate the **Average Treatment Effect (ATE)**, defined as the average of the individual effects across all subjects in a population: $ATE = E$.
 
 #### From Association to Causation: The Role of Confounding
+
 In the real world, we cannot directly observe both potential outcomes for a population. Instead, we observe outcomes in two different groups of people: those who happened to be exposed (smokers) and those who were not (non-smokers). We can calculate the **associational difference** between these groups: $E - E$. A critical error is to assume this associational difference is equal to the causal ATE.
 
 This difference arises because of **confounding**. The groups of smokers and non-smokers may differ systematically on factors that also affect the outcome. For instance, individuals with lower socioeconomic status may be more likely to smoke and also have a higher underlying risk of hypertension for reasons unrelated to smoking (e.g., diet, stress). In this case, the observed difference in outcomes is a mixture of the true treatment effect and these pre-existing, systematic differences between the groups.
 
 #### The Observational Study Solution: Conditional Exchangeability
+
 **Randomized Controlled Trials (RCTs)** are the gold standard for causal inference because the process of randomization, with a large enough sample size, ensures that the exposed and unexposed groups are, on average, identical ("exchangeable") on all baseline characteristics, both measured and unmeasured. In an RCT, any systematic differences are eliminated, making the associational difference a valid estimate of the causal ATE.
 
 In observational studies, where randomization is not possible, we cannot achieve this level of exchangeability. Instead, we strive for **conditional exchangeability**. This is the assumption that, within strata of the measured confounders, the exposed and unexposed groups are exchangeable. By estimating the effect of smoking separately within each level of the confounder(s) $L$ (e.g., estimating the effect of smoking separately for different age groups) and then averaging these stratum-specific effects, we can aim to reconstruct the causal ATE. This process of stratification, or "adjustment," is the conceptual basis for controlling for confounding in observational research. However, its validity rests entirely on the critical and untestable assumption that we have successfully identified and measured all important common causes of the exposure and the outcome.
@@ -97,6 +101,7 @@ The timestamps are also included in the YouTube video description.
 To properly address confounding, researchers need a tool to translate their subject-matter knowledge and assumptions about the world into a formal structure. **Directed Acyclic Graphs (DAGs)** serve this purpose, providing a visual language and a set of rigorous rules for identifying sources of bias and guiding statistical analysis.
 
 #### The Grammar of Causal Diagrams
+
 A DAG is a graphical model of causal relationships between variables. Its components follow a simple grammar:
 
 -   **Nodes**: Represent variables (e.g., smoking, hypertension, age).
@@ -107,27 +112,28 @@ A DAG is a graphical model of causal relationships between variables. Its compon
 Crucially, the most powerful assumptions in a DAG are the **absent arrows**. The absence of an arrow between two variables represents a strong claim of no direct causal effect.
 
 #### Paths: Causal and Non-Causal
+
 A path is any sequence of arrows connecting two variables, regardless of the direction of the arrowheads. When assessing the relationship between an exposure like smoking ($A$) and an outcome like hypertension ($Y$), paths can be categorized into two critical types:
 
 -   **Causal Paths (Front-door paths)**: These are paths that begin with an arrow originating from $A$ and moving toward $Y$ (e.g., $A \rightarrow \text{Stress} \rightarrow Y$). These paths transmit the causal effect of $A$ on $Y$ that we wish to estimate.
 -   **Non-Causal Paths (Back-door paths)**: These are paths between $A$ and $Y$ that begin with an arrow pointing *into* $A$ (e.g., $A \leftarrow \text{Age} \rightarrow Y$). These paths are sources of non-causal association (confounding) that can bias our estimate. The goal of adjustment is to "block" these backdoor paths.
 
 #### The Three Elementary Causal Structures
+
 All complex DAGs are composed of three fundamental building blocks. Understanding how information flows through these structures is the key to using DAGs to identify and control for bias.
 
 -   **The Fork (Confounding)**: The structure is $A \leftarrow L \rightarrow Y$. Here, $L$ is a **common cause** of both the exposure $A$ and the outcome $Y$.
     -   *Example*: Age ($L$) is a common cause of both smoking habits ($A$) and hypertension ($Y$).
-    -   *Rule*: The backdoor path through a common cause is **open by default**, creating a spurious association. To remove this confounding, one must **condition on the confounder $L$**, which blocks the path.
-
+    -   *Rule*: The backdoor path through a common cause is **open by default**, creating a spurious association. To remove this confounding, one must **condition on the confounder** $L$, which blocks the path.
 -   **The Chain (Mediation)**: The structure is $A \rightarrow M \rightarrow Y$. Here, $M$ is a **mediator** that lies on the causal pathway.
     -   *Example*: Smoking ($A$) causes chronic inflammation ($M$), which in turn causes hypertension ($Y$).
-    -   *Rule*: The causal path through a mediator is **open by default**. To estimate the *total effect* of $A$ on $Y$, one **must not condition on the mediator $M$**. Doing so would block this part of the causal effect.
-
+    -   *Rule*: The causal path through a mediator is **open by default**. To estimate the *total effect* of $A$ on $Y$, one **must not condition on the mediator** $M$. Doing so would block this part of the causal effect.
 -   **The Collider (Selection/Collider Bias)**: The structure is $A \rightarrow L \leftarrow Y$. Here, $L$ is a **common effect** of both $A$ and $Y$.
     -   *Example*: Both smoking ($A$) and a genetic predisposition ($Y$) can lead to a specific biomarker level ($L$).
-    -   *Rule*: The path through a collider is **blocked by default**. However, **conditioning on the collider $L$ *opens* the path**, inducing a spurious, non-causal association between $A$ and $Y$. Adjusting for a collider is a critical error that introduces bias.
+    -   *Rule*: The path through a collider is **blocked by default**. However, **conditioning on the collider** $L$ *opens* the path, inducing a spurious, non-causal association between $A$ and $Y$. Adjusting for a collider is a critical error that introduces bias.
 
 #### Applying the Rules with Dagitty
+
 In practice, causal systems can be highly complex. Software such as **Dagitty.net** automates the application of these path-blocking rules. Given a user-drawn DAG, Dagitty can identify all open backdoor paths and determine the **minimal sufficient adjustment sets**: the smallest set of covariates that, if conditioned on, will block all backdoor paths and allow for an unbiased estimation of the total causal effect.
 
 The video lesson split into 3 parts
@@ -195,12 +201,13 @@ Statistical methods can also be used for variable selection, but their applicati
 
 ::: callout-tip
 ## Collapsibility and the Choice of Effect Measure
+
 A crucial, and often overlooked, aspect of statistical adjustment is the concept of **collapsibility**. An effect measure is said to be collapsible if the marginal (crude) measure of association is equal to a weighted average of the stratum-specific measures of association after conditioning on another variable. This property has profound implications for how we interpret adjusted estimates.
 
 In the absence of confounding, some effect measures, like the **Risk Difference (RD)** and **Risk Ratio (RR)**, are collapsible. This means that if a variable is not a confounder, adjusting for it will not change the effect estimate. However, other common measures, most notably the **Odds Ratio (OR)**, are **non-collapsible**.
 
 The non-collapsibility of the odds ratio is a mathematical property stemming from the non-linearity of the logistic model's link function. It means that the adjusted OR can be different from the crude OR even when there is no confounding. This phenomenon, where an association in a population differs from the association within its subgroups, is also known as **Simpson's Paradox** (in the absence of confounding). This is precisely why the change-in-estimate criterion for confounder selection is invalid when using odds ratios—a change in the OR upon adjustment does not necessarily signal the presence of confounding.
-::: 
+:::
 
 ::: callout-tip
 ### Simpson's Paradox: A Case Study in Bias
@@ -208,7 +215,7 @@ The non-collapsibility of the odds ratio is a mathematical property stemming fro
 **Simpson's Paradox** is a statistical phenomenon where an association observed in a population is different from—and often in the opposite direction of—the associations observed in all of its subgroups. This paradox is a powerful illustration of how failing to account for a key third variable (a confounder or a collider) can lead to completely erroneous conclusions.
 
 A famous example is the **"Birthweight Paradox,"** where maternal smoking appeared to be protective against infant mortality among low-birthweight infants, a finding that contradicted the known harms of smoking. This occurred because birthweight acted as a collider. Adjusting for it induced a spurious association between smoking and other unmeasured causes of mortality (e.g., birth defects).
-::: 
+:::
 
 ::: callout-tip
 ### Unpacking Effect Heterogeneity: Interaction vs. Effect Modification
@@ -216,20 +223,101 @@ A famous example is the **"Birthweight Paradox,"** where maternal smoking appear
 The effect of an exposure may not be uniform across a population. A third variable can alter the exposure-outcome relationship, a phenomenon that leads to frequent confusion between two distinct concepts: interaction and effect modification.
 
 #### Formal Definitions
+
 While often used interchangeably, these terms address different causal questions:
 
 -   **Effect Modification**: This occurs when the causal effect of a **single exposure** (e.g., smoking) on an outcome (hypertension) differs across strata of a second variable (e.g., education level). The question is: "Is the effect of smoking different for people with high education versus people with low education?" This involves only **one intervention** (on smoking). The variable 'education' is treated as a baseline characteristic defining subgroups.
 -   **Interaction**: This refers to the **joint causal effect** of **two exposures** (e.g., smoking and low education) on an outcome (hypertension). The question is: "Is the effect of intervening on both smoking and education greater than the sum of the effects of intervening on each one alone?" This involves **two distinct interventions** and assesses synergy or antagonism.
 
 #### Implications for Confounding Control
+
 The distinction is critical for analytical strategy:
 
 -   **To assess Effect Modification**: When investigating if education modifies the effect of smoking on hypertension, a researcher only needs to control for the set of confounders of the `smoking -> hypertension` relationship.
 -   **To assess Interaction**: When investigating the causal interaction between smoking and education, a researcher must control for **all** confounders of the `smoking -> hypertension` relationship **AND** **all** confounders of the `education -> hypertension` relationship. This is a much more demanding requirement.
 
 #### The Role of the Scale: Effect Measure Modification
+
 Whether modification is detected can depend on the statistical scale used (e.g., additive scale for Risk Difference vs. multiplicative scale for Risk Ratio). For this reason, the more precise term is **effect measure modification**. A statistical finding of interaction is a property of the chosen model and does not necessarily correspond to a specific biological mechanism.
+
+#### Reporting guideline
+
+See @knol2012recommendations
 :::
+
+```{r intguide, cache=TRUE, echo=FALSE}
+# This chunk sets up the environment
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+# We need the kableExtra package for publication-quality tables
+if (!requireNamespace("kableExtra", quietly = TRUE)) {
+  install.packages("kableExtra")
+}
+library(kableExtra)
+# First, we create a data.frame containing all the text for our table.
+# Using a data.frame is cleaner than writing the markdown table by hand.
+# We use \n for line breaks and  for bold text.
+
+reporting_components <- c(
+  "Purpose",
+  "Step 1: Joint Effects",
+  "Step 2: Stratum-Specific Effects",
+  "Step 3: Interaction Measures",
+  "Step 4: Confounder Adjustment"
+)
+
+effect_modification_desc <- c(
+  "To show how the effect of one primary exposure (A) is modified by the strata of another factor (X).",
+  "Required. \n (e.g., ORs for all A/X combinations vs. a single reference, A=0, X=0).",
+  "Required (SUBSET). \n Show only the effect of A within each stratum of X.",
+  "Required. \n Report measures for both additive (e.g., RERI) and multiplicative (e.g., ROR) scales, with CIs and p-values.",
+  "Required. \n Adjust for confounders of the primary A-D relationship."
+)
+
+interaction_desc <- c(
+  "To show the causal, joint effect of two distinct exposures (A and B) acting together.",
+  "Required. \n (e.g., ORs for all A/B combinations vs. a single reference, A=0, B=0).",
+  "Required (FULL). \n Show the effect of A within each stratum of B... \n ...AND... \n ...the effect of B within each stratum of A.",
+  "Required. \n Report measures for both additive (e.g., RERI) and multiplicative (e.g., ROR) scales, with CIs and p-values.",
+  "Required. \n Adjust for confounders of *both* the A-D relationship *and* the B-D relationship."
+)
+
+guideline_table <- data.frame(
+  Component = reporting_components,
+  `Effect Modification` = effect_modification_desc,
+  `Interaction` = interaction_desc
+)
+# This chunk renders the final, publication-quality table using kableExtra
+
+guideline_table %>%
+  kableExtra::kbl(
+    # Set the column names for the final table
+    col.names = c(
+      "Reporting Component",
+      "Guideline for Effect Modification",
+      "Guideline for Interaction"
+    ),
+    # Use booktabs for a clean, academic look (no vertical lines)
+    booktabs = TRUE,
+    # escape = FALSE allows our Markdown (bold) and HTML (\n) to render
+    escape = FALSE,
+    caption = "Comparison of Reporting Guidelines (Knol & Vanderweele, 2012)"
+  ) %>%
+  # Apply standard bootstrap styling
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE
+  ) %>%
+  # Add a main header that spans the two guideline columns
+  kableExtra::add_header_above(
+    c(" " = 1, "Recommendations from Knol & Vanderweele (2012)" = 2)
+  ) %>%
+  # Style the columns for readability
+  kableExtra::column_spec(1, bold = TRUE, width = "15em") %>%
+  kableExtra::column_spec(2, width = "30em") %>%
+  kableExtra::column_spec(3, width = "30em")
+
+```
+
 
 ::: {style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"}
 <iframe src="https://www.youtube.com/embed/cxfwqBD1M1c" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen>
@@ -247,6 +335,7 @@ To revisit or deepen your grasp of these two concepts, consider reviewing this [
 One of the most common errors in reporting observational research is the **Table 2 Fallacy**. This fallacy is the practice of presenting a single multivariable regression model and interpreting the coefficients for all variables—the primary exposure and all adjustment covariates—as if they are equally valid estimates of the total causal effect of each variable on the outcome.
 
 #### Why A Single Model Fails: A DAG-Based Explanation
+
 A multivariable regression model is built to answer a single, specific causal question. The adjustment set required to estimate the causal effect of one variable is often different from the set required to estimate the effect of another.
 
 Consider a DAG for the effects of smoking, age, and hypertension:
@@ -257,6 +346,7 @@ Consider a DAG for the effects of smoking, age, and hypertension:
     -   In this same DAG, Smoking may be a *mediator* of the effect of Age (i.e., `Age -> Smoking -> Hypertension`). To estimate the *total* effect of Age, one must *not* adjust for the mediator, Smoking. The model built for Question 1 *does* adjust for Smoking. Therefore, the coefficient for Age in that first model is not an estimate of the total effect; it is an estimate of the **controlled direct effect**—the effect of Age on Hypertension that does not operate through the Smoking pathway.
 
 #### Best Practices for Reporting
+
 To avoid the Table 2 Fallacy, analysis and reporting must be driven by a "one exposure, one model" principle:
 
 -   **Be Explicit**: Clearly state the single primary exposure of interest for each model.
