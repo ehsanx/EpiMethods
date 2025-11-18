@@ -1539,10 +1539,17 @@ Empirical Criteria for DAG-Deficient Scenarios
 <div class="callout-body-container callout-body">
 <p>In many practical epidemiological investigations, particularly those involving novel exposures or complex metabolic pathways, the full causal structure is unknown. The uncertainty regarding the presence or direction of arrows makes the strict construction of a DAG impossible. In such “DAG-deficient” scenarios, epidemiologists must resort to pragmatic heuristics or empirical criteria that aim to approximate the Backdoor Criterion with less stringent assumptions.</p>
 <p>In the absence of a fully specified DAG, researchers can rely on a set of empirical criteria that require less stringent assumptions.</p>
-<ul>
-<li>
-<strong>Pre-treatment Criterion</strong>: One of the simplest and most intuitive heuristics is the Pre-treatment Criterion, which dictates adjusting for all covariates measured chronologically before the exposure was administered or assigned.</li>
-</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pre-treatment Criterion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>One of the simplest and most intuitive heuristics is the Pre-treatment Criterion, which dictates adjusting for all covariates measured chronologically before the exposure was administered or assigned.</p>
 <p><strong>Rationale:</strong> The logic is grounded in temporal causality; a variable occurring before the exposure cannot be a downstream effect (mediator) of the exposure. Therefore, adjusting for pre-treatment variables avoids the error of overadjustment via mediation.</p>
 <p><strong>Critique:</strong></p>
 <ol type="a">
@@ -1550,16 +1557,34 @@ Empirical Criteria for DAG-Deficient Scenarios
 <li><p>This “kitchen sink” approach often leads to the inclusion of Instrumental Variables (IVs)—pre-treatment variables that cause the exposure but have no independent effect on the outcome. As discussed later, adjusting for IVs inflates the variance of the estimator and can amplify bias due to residual unmeasured confounding (Z-bias).</p></li>
 </ol>
 <p>Thus, while the Pre-treatment Criterion is a helpful starting point, it is often too crude for high-stakes causal inference.</p>
-<ul>
-<li>
-<strong>Common Cause Criterion</strong>: The Common Cause Criterion refines the selection process by narrowing the adjustment set to variables known (or suspected) to be causes of <em>both</em> the exposure and the outcome.</li>
-</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Common Cause Criterion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Common Cause Criterion refines the selection process by narrowing the adjustment set to variables known (or suspected) to be causes of <em>both</em> the exposure and the outcome.</p>
 <p><strong>Rationale:</strong> This criterion targets the classical epidemiological definition of a confounder. By restricting selection to common causes, it theoretically avoids colliders (which are effects) and instruments (which are causes of exposure only).</p>
 <p><strong>Critique:</strong> The major limitation of this approach is its reliance on definitive knowledge. If a researcher is unsure whether a variable causes the outcome, the strict application of this criterion would lead to its exclusion. However, standard bias analysis suggests that omitting a true confounder (due to uncertainty) generally introduces more bias than including a non-confounder. Therefore, the Common Cause Criterion is often viewed as overly conservative, potentially leading to residual confounding in the pursuit of parsimony.</p>
-<ul>
-<li>
-<strong>Disjunctive Cause Criterion</strong>: To address the limitations of the Common Cause Criterion, VanderWeele (2019) proposed the Disjunctive Cause Criterion as a pragmatic strategy for confounder selection.</li>
-</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Disjunctive Cause Criterion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To address the limitations of the Common Cause Criterion, the Disjunctive Cause Criterion is proposed as a pragmatic strategy for confounder selection <span class="citation" data-cites="vanderweele2019principles">(<a href="#ref-vanderweele2019principles" role="doc-biblioref">VanderWeele 2019</a>)</span>.</p>
 <p><strong>The Rule:</strong> Control for any pre-exposure covariate that is</p>
 <ol type="a">
 <li>a cause of the exposure, <strong>OR</strong>
@@ -1570,12 +1595,23 @@ Empirical Criteria for DAG-Deficient Scenarios
 </ol>
 <p><strong>Mechanism:</strong> This union-based approach ensures that all common causes (confounders) are included, as they satisfy the condition of being a cause of both. By including variables that are only causes of the outcome, the method improves the precision of the estimate (reducing standard error) without introducing bias. By including variables that are only causes of the exposure (potential instruments), it risks some variance inflation, but this is often considered an acceptable trade-off to ensure no confounders are missed.</p>
 <p><strong>Strength:</strong> The primary strength of the Disjunctive Cause Criterion is its robustness to uncertainty regarding the full causal structure. The researcher does not need to know if a variable affects <em>both</em> exposure and outcome; knowing it affects <em>at least one</em> is sufficient for inclusion. This effectively minimizes the risk of unadjusted confounding while generally avoiding colliders (which are effects, not causes).</p>
-<ul>
-<li>
-<strong>Modified Disjunctive Cause Criterion</strong>: Refining the Disjunctive Cause Criterion further, the Modified Disjunctive Cause Criterion incorporates specific exclusions and inclusions to optimize both validity and efficiency.</li>
-</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Modified Disjunctive Cause Criterion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Refining the Disjunctive Cause Criterion further, the Modified Disjunctive Cause Criterion incorporates specific exclusions and inclusions to optimize both validity and efficiency.</p>
 <p><strong>Exclude IVs:</strong> Recognizing the variance inflation and Z-bias risks associated with instruments, the modified criterion explicitly removes variables known to affect the exposure but not the outcome. This requires some structural knowledge but yields a more efficient estimator.</p>
 <p><strong>Include Proxies:</strong> Acknowledging that true confounders are often unmeasured, the modified criterion mandates the inclusion of measured variables that serve as <em>proxies</em> for the unmeasured common causes. Even if a proxy is not a direct cause, adjusting for it partially blocks the backdoor path transmitted through the unobserved parent variable.</p>
+</div>
+</div>
 </div>
 </div>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
@@ -1593,24 +1629,49 @@ Modelling criteria for variable selection
 </div>
 <div class="callout-body-container callout-body">
 <p>Statistical methods can also be used for variable selection, but their application requires careful consideration of the research goal: prediction versus causal inference.</p>
-<ul>
-<li>
-<strong>Change-in-Estimate</strong>: The Change-in-Estimate (CIE) method represents an operationalization of the definition of confounding: if a variable is a confounder, adjusting for it should change the estimated effect of the exposure.</li>
-</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Change-in-Estimate
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Change-in-Estimate (CIE) method represents an operationalization of the definition of confounding: if a variable is a confounder, adjusting for it should change the estimated effect of the exposure.</p>
 <p><strong>The Procedure:</strong> The researcher begins with a “crude” model containing only the exposure and outcome. Potential confounders are added to the model one by one (or removed from a full model). If the regression coefficient for the exposure changes by more than a specified percentage (commonly 10%), the variable is deemed a confounder and retained in the model.</p>
 <p><strong>The Non-Collapsibility Trap:</strong> A critical flaw of the CIE method arises when using non-collapsible effect measures, such as the OR or HR. In logistic regression, the addition of a covariate that is strongly associated with the outcome (but independent of the exposure) will increase the magnitude of the exposure’s OR—driving it further from the null. This occurs not because of confounding bias, but because of a mathematical property known as non-collapsibility. A CIE algorithm would interpret this change as evidence of confounding and select the variable, potentially leading to over-adjustment or misinterpretation of the effect measure modification. Thus, CIE is safer for RDs or RRs but hazardous for ORs.</p>
-<ul>
-<li>
-<strong>Statistical Significance (Stepwise Selection)</strong>: Stepwise selection algorithms (forward selection, backward elimination, or bidirectional search) rely on statistical significance (p-values) to determine variable inclusion.</li>
-</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Statistical Significance (Stepwise Selection)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Stepwise selection algorithms (forward selection, backward elimination, or bidirectional search) rely on statistical significance (p-values) to determine variable inclusion.</p>
 <p><strong>The Procedure:</strong> Variables are added to the model if their association with the outcome yields a p-value below a certain threshold (e.g., 0.05) or removed if the p-value exceeds it.</p>
 <p><strong>The Confounding vs.&nbsp;Significance Fallacy:</strong> The most fundamental critique of this approach is that “confounding is not a significance test.” A variable can be a strong confounder—systematically biasing the effect estimate—even if its association with the outcome fails to reach statistical significance in a specific sample, particularly in small studies. Relying on p-values often leads to under-adjustment and residual confounding.</p>
 <p><strong>Post-Selection Inference:</strong> Stepwise selection invalidates the statistical theory behind confidence intervals. The final model treats the selected variables as if they were specified <em>a priori</em>, ignoring the immense “data dredging” and multiple testing that occurred during the selection process. This results in standard errors that are systematically too small and confidence intervals that are too narrow, creating a false sense of precision.</p>
 <p><strong>Prediction vs.&nbsp;Causation:</strong> Ultimately, stepwise algorithms are designed to maximize model fit (prediction). They will happily select a collider or a mediator if it is strongly correlated with the outcome, thereby maximizing <span class="math inline">\(R^2\)</span> while destroying the validity of the causal coefficient.</p>
-<ul>
-<li>
-<strong>Purposeful Selection of Covariates</strong> Recognizing the limitations of purely mechanical stepwise regression, the “Purposeful Selection” algorithm, a hybrid approach was proposed <span class="citation" data-cites="hosmer2013applied bursac2008purposeful">(<a href="#ref-hosmer2013applied" role="doc-biblioref">Hosmer, Lemeshow, and Sturdivant 2013</a>; <a href="#ref-bursac2008purposeful" role="doc-biblioref">Bursac et al. 2008</a>)</span>that combines statistical criteria with researcher judgment and confounding checks.</li>
-</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Purposeful Selection of Covariates
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Recognizing the limitations of purely mechanical stepwise regression, the “Purposeful Selection” algorithm, a hybrid approach was proposed <span class="citation" data-cites="hosmer2013applied bursac2008purposeful">(<a href="#ref-hosmer2013applied" role="doc-biblioref">Hosmer, Lemeshow, and Sturdivant 2013</a>; <a href="#ref-bursac2008purposeful" role="doc-biblioref">Bursac et al. 2008</a>)</span>that combines statistical criteria with researcher judgment and confounding checks.</p>
 <p><strong>The Algorithm:</strong></p>
 <ol type="a">
 <li>
@@ -1639,15 +1700,32 @@ Modelling criteria for variable selection
 </ol>
 <p><strong>Insight:</strong> Purposeful Selection is widely cited in epidemiology because it operationalizes the definition of confounding within the selection process. Unlike rigid stepwise regression, it prioritizes the stability of the exposure coefficient over the parsimony of the outcome model. It forces the analyst to examine the data at each step, acting as a safeguard against the automation of causal errors.</p>
 <p><strong>Criticism:</strong> Purposeful Selection is now considered outdated and flawed by modern causal inference standards. Its fundamental weakness is that it remains entirely driven by statistical associations within the data rather than by a priori causal structure. The “confounding check” (Step 3), its distinguishing feature, is ironically its most critical flaw. This change-in-estimator (CIE) criterion cannot distinguish true confounders from colliders or mediators. In the case of a collider, adjusting for it induces a spurious association (bias), which causes a large change in the exposure’s coefficient. The algorithm misinterprets this induced bias as a sign of confounding and therefore retains the collider, leading to a biased final estimate. Because it is “causally blind,” it is not a safeguard against causal errors and is superseded by methods like those based on DAGs.</p>
-<ul>
-<li>
-<strong>Machine Learning (ML)</strong>: Algorithms such as LASSO and Random Forests are excellent for high-dimensional <strong>prediction</strong>. Their primary role in causal inference is in developing <a href="propensityscore.html">propensity score (PS) models</a>, which is a prediction task for the exposure model <span class="citation" data-cites="karim2025effective">(<a href="#ref-karim2025effective" role="doc-biblioref">Karim and Lei 2025</a>)</span>. The goal is to create a score that balances measured covariates between the exposed and unexposed groups, mimicking randomization.</li>
-</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Machine Learning (ML)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Algorithms such as LASSO and Random Forests are excellent for high-dimensional <strong>prediction</strong>. Their primary role in causal inference is in developing <a href="propensityscore.html">propensity score (PS) models</a>, which is a prediction task for the exposure model <span class="citation" data-cites="karim2025effective">(<a href="#ref-karim2025effective" role="doc-biblioref">Karim and Lei 2025</a>)</span>. The goal is to create a score that balances measured covariates between the exposed and unexposed groups, mimicking randomization.</p>
 <p><strong>Criticism:</strong> The variance estimation can be poor depending on the machine learning method used to do the variable selection, often resulting in poor coverage.</p>
-<ul>
-<li>
-<strong>Advanced Causal Inference Methods, often incorporating ML</strong>:</li>
-</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Advanced Causal Inference Methods, often incorporating ML
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="a">
 <li>High-Dimensional Propensity Score (hdPS) <span class="citation" data-cites="schneeweiss2009high karim2025evaluating">(<a href="#ref-schneeweiss2009high" role="doc-biblioref">Schneeweiss et al. 2009</a>; <a href="#ref-karim2025evaluating" role="doc-biblioref">Karim et al. 2025</a>)</span>: designed for healthcare databases. It algorithmically scans thousands of proxy variables (e.g., prior diagnoses, medications) and selects those that are most likely to be confounders to include in the propensity score model.</li>
 <li>Machine learning versions of hdPS <span class="citation" data-cites="karim2025high karim2018can">(<a href="#ref-karim2025high" role="doc-biblioref">Karim 2025</a>; <a href="#ref-karim2018can" role="doc-biblioref">Karim, Pang, and Platt 2018</a>)</span>: These models are excellent at capturing complex, non-linear relationships and interactions among covariates. See <a href="https://ehsanx.github.io/hdPSv25/">external workshop materials here</a>.</li>
@@ -1655,6 +1733,8 @@ Modelling criteria for variable selection
 <li>Outcome-Adaptive Lasso <span class="citation" data-cites="shortreed2017outcome balde2023reader">(<a href="#ref-shortreed2017outcome" role="doc-biblioref">Shortreed and Ertefaie 2017</a>; <a href="#ref-balde2023reader" role="doc-biblioref">Baldé, Yang, and Lefebvre 2023</a>)</span>: This is a variation of LASSO that essentially performs “double selection” in a single step. It’s a penalized regression (LASSO) for the outcome model, but the penalty for each covariate is adapted (weighted). Covariates that are strongly predictive of the exposure are given a smaller penalty, making them more likely to be kept in the final outcome model, regardless of their association with the outcome.</li>
 <li>Collaborative Targeted Maximum Likelihood Estimation (C-TMLE) <span class="citation" data-cites="van2010collaborative">(<a href="#ref-van2010collaborative" role="doc-biblioref">Laan and Gruber 2010</a>)</span>: It uses machine learning (often a “Super Learner” that combines many ML algorithms) to build the best possible outcome model. Then, it collaboratively uses information from that model to decide which covariates also need to go into the propensity score model to minimize bias.</li>
 </ol>
+</div>
+</div>
 </div>
 </div>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
