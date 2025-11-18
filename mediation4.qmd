@@ -1,0 +1,517 @@
+## Mediation Software {.unnumbered}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(regmedint)
+```
+
+In this tutorial we:
+
+1. Walk through the weighting based mediation mechanism step by step (Steps 0 to 4).
+2. Implement the manual inverse probability weighting (IPW) approach.
+3. Fit a causal mediation model with the `regmedint` package on the same data.
+4. Compare 
+  - natural direct effect (NDE), 
+  - natural indirect effect (NIE), 
+  - total effect (TE), and 
+  - proportion mediated (PM) from the two approaches.
+
+::: callout-tip
+To focus on mediation ideas, we **ignore the complex survey design and sampling weights** here.  
+In a real analysis, at least the outcome model should incorporate survey features (strata, cluster, weights).
+:::
+
+---
+
+### Overall Steps
+
+```{r sall, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/ssteps.png")
+```
+
+---
+
+### 1. Load data and Step 0: build analysis dataset
+
+Step 0 in the [slides](mediation0.html):  
+> Include Y, A, M in the data and necessary C.
+
+```{r s0, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/s0.png")
+```
+
+Here
+
+- A = osteoarthritis (OA) indicator (1 = OA, 0 = non OA)
+- M = pain medication indicator
+- Y = CVD indicator
+- C = age, sex, BMI, SES and comorbidities
+
+```{r load-data, cache=TRUE}
+# Load the CCHS based dataset
+load("Data/mediation/cchs123pain.RData")
+
+# Create 0/1 numeric variables for the mediation analysis
+analytic.miss$mediator <- ifelse(analytic.miss$painmed == "Yes", 1, 0)   
+# pain medication (M)
+analytic.miss$exposure <- ifelse(analytic.miss$OA == "OA", 1, 0)         
+# osteoarthritis (A)
+analytic.miss$outcome  <- ifelse(analytic.miss$CVD == "event", 1, 0)     
+# CVD (Y)
+
+# List of baseline covariates (C)
+varlist <- c("age", "sex", "income", "race", "bmi", "edu",
+             "phyact", "smoke", "fruit", "diab")
+
+# Restrict to complete cases
+analysis_data <- subset(analytic.miss, miss == 0)
+
+nrow(analysis_data)
+```
+
+Short interpretation:
+
+- We have a complete case dataset with binary exposure, mediator and outcome.
+- The covariates C will be adjusted for in both the mediator model and the outcome model.
+
+---
+
+### 2. Step 1: create auxiliary exposure A* = A (facts)
+
+Step 1 in the [slides](mediation0.html):  
+> Replicate exposure A with same exposures A* ("facts").
+
+```{r s1, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/s1.png")
+```
+
+We create `exposureTemp` as the exposure used in the mediator model.
+
+```{r step1, cache=TRUE}
+# This corresponds to A* = A for all rows when we fit the mediator model
+analysis_data$exposureTemp <- analysis_data$exposure
+```
+
+---
+
+### 3. Step 2: duplicate data with alternative A* (alternative facts)
+
+Step 2 in the [slides](mediation0.html):  
+> Replicate exposure A with alternative exposures A* ("alternative facts").
+
+```{r s2, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/s2.png")
+```
+
+We create two copies of each subject:
+
+- One with A* equal to the observed exposure (factual row).
+- One with A* equal to the opposite exposure (counterfactual row).
+
+```{r step2, cache=TRUE}
+d1 <- d2 <- analysis_data
+
+# Factual copy: A* = A
+d1$exposure.counterfactual <- d1$exposure
+
+# Counterfactual copy: A* = 1 - A
+d2$exposure.counterfactual <- 1 - d2$exposure
+
+# Stack rows to form an expanded dataset
+newd <- rbind(d1, d2)
+
+nrow(analysis_data); nrow(newd)
+```
+
+Interpretation:
+
+- Each person now appears twice, once with their observed exposure and once with the opposite exposure encoded in `exposure.counterfactual`.
+- We keep the observed Y and M in both rows for now.
+
+---
+
+### 4. Step 3b: weighting via the mediator model
+
+Step 3, weighting branch (Step 3b in the [slides](mediation0.html)):
+
+1. Fit the mediator model M ~ A + C on the original data.
+2. Use that model to predict P(M | A, C) and P(M | A*, C) in the expanded data.
+3. Construct the mediator weight W^M = P(M | A*, C) / P(M | A, C).
+
+```{r s3b, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/s3b.png")
+```
+
+We **ignore survey weights** here to keep the focus on the mediation mechanism.  
+
+```{r mediator-model, cache=TRUE}
+# Build mediator model formula: M ~ A + C
+covariates_formula <- paste(varlist, collapse = " + ")
+mediator_formula_str <- paste("mediator ~ exposureTemp +", covariates_formula)
+mediator_formula <- as.formula(mediator_formula_str)
+
+# Fit mediator model on complete cases
+fit_mediator <- glm(mediator_formula,
+                    data   = analysis_data,
+                    family = binomial)
+
+summary(fit_mediator)$coefficients["exposureTemp", ]
+```
+
+Interpretation:
+
+- The coefficient of `exposureTemp` is the log odds ratio for OA compared with non OA on pain medication use, adjusting for C.
+- A positive and significant coefficient indicates the A to M path is present in the data.
+
+Now compute the mediator weights for each row in the expanded dataset.
+
+```{r weights, cache=TRUE}
+# Step 3b: compute P(M | A, C)
+newd$exposureTemp <- newd$exposure
+p_M_given_A <- predict(fit_mediator, newdata = newd, type = "response")
+prob_M_given_A <- ifelse(newd$mediator == 1, p_M_given_A, 1 - p_M_given_A)
+
+# Step 3b: compute P(M | A*, C)
+newd$exposureTemp <- newd$exposure.counterfactual
+p_M_given_Astar <- predict(fit_mediator, newdata = newd, type = "response")
+prob_M_given_Astar <- ifelse(newd$mediator == 1, p_M_given_Astar, 1 - p_M_given_Astar)
+
+# Mediator weights W^M = P(M | A*, C) / P(M | A, C)
+newd$W.mediator <- prob_M_given_Astar / prob_M_given_A
+
+summary(newd$W.mediator)
+```
+
+Interpretation:
+
+- If the mediator is more compatible with the counterfactual exposure than with the observed exposure, W.mediator > 1.
+- These weights reconstruct the counterfactual mediator distribution we need to identify natural direct and indirect effects.
+
+---
+
+### 5. Step 4b: weighted outcome model
+
+Step 4, weighting branch (Step 4b in the [slides](mediation0.html)):
+
+> Fit outcome model Y ~ A + A* + C using the mediator weights as model weights.  
+> The coefficient of A is the natural direct effect, and the coefficient of A* is the natural indirect effect.
+
+```{r s4b, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/s4b.png")
+```
+
+We fit
+
+logit P(Y = 1 | A, A*, C) = theta0 + theta1 A + theta2 A* + theta3 C
+
+with weights W.mediator.
+
+```{r outcome-weighted, cache=TRUE}
+outcome_formula_str <- paste("outcome ~ exposure + exposure.counterfactual +",
+                             covariates_formula)
+outcome_formula <- as.formula(outcome_formula_str)
+
+fit_outcome <- glm(outcome_formula,
+                   data   = newd,
+                   family = binomial,
+                   weights = W.mediator)
+
+summary(fit_outcome)$coefficients[c("exposure", "exposure.counterfactual"), ]
+```
+
+Interpretation:
+
+- `exposure` coefficient (theta1) represents the natural direct effect on the log odds ratio scale, holding the mediator path fixed.
+- `exposure.counterfactual` coefficient (theta2) represents the natural indirect effect on the log odds ratio scale, comparing mediator paths while holding exposure fixed.
+
+---
+
+### 6. Natural effects and proportion mediated from the manual model
+
+From the fitted coefficients:
+
+- NDE log OR = coefficient of `exposure`
+- NIE log OR = coefficient of `exposure.counterfactual`
+- TE log OR  = NDE log OR + NIE log OR
+- PM = NIE log OR / TE log OR
+
+```{r spm, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/spm.png")
+```
+
+```{r manual-effects, cache=TRUE}
+coefs <- summary(fit_outcome)$coefficients
+
+nde_log_or <- coefs["exposure", "Estimate"]
+nie_log_or <- coefs["exposure.counterfactual", "Estimate"]
+
+nde_or <- exp(nde_log_or)
+nie_or <- exp(nie_log_or)
+te_or  <- exp(nde_log_or + nie_log_or)
+
+pm_manual <- nie_log_or / (nde_log_or + nie_log_or)
+
+manual_results <- data.frame(
+  Method = "Manual IPW (weights, no survey design)",
+  TE  = te_or,
+  NDE = nde_or,
+  NIE = nie_or,
+  PM  = pm_manual
+)
+
+manual_results
+```
+
+Short interpretation:
+
+- TE is the total effect of OA on CVD combining direct and mediated paths.
+- NDE is the effect of OA on CVD not operating through pain medication.
+- NIE is the effect of OA on CVD that is transmitted through pain medication.
+- PM is the proportion of the log odds ratio that is mediated via pain medication.
+
+---
+
+### 7. regmedint: software based mediation
+
+One useful package is `regmedint`, which implements counterfactual mediation estimands such as NDE, NIE, and TE for generalized linear models.
+
+Here we fit a `regmedint` model using the same exposure, mediator, outcome and covariates, again ignoring the survey design to keep the comparison simple.
+
+#### 7.1 Numeric covariates and covariate profile
+
+`regmedint` expects numeric covariates and a numeric vector `c_cond` that defines the covariate profile at which effects are evaluated.
+
+We recode factors to numeric codes and set `c_cond` equal to the mean of each numeric covariate.
+
+```{r regmedint-covars, cache=TRUE}
+analysis_data$age_num <- as.numeric(analysis_data$age)
+analysis_data$sex_num <- as.numeric(analysis_data$sex)
+analysis_data$income_num <- as.numeric(analysis_data$income)
+analysis_data$race_num <- as.numeric(analysis_data$race)
+analysis_data$bmi_num <- as.numeric(analysis_data$bmi)
+analysis_data$edu_num <- as.numeric(analysis_data$edu)
+analysis_data$phyact_num <- as.numeric(analysis_data$phyact)
+analysis_data$smoke_num <- as.numeric(analysis_data$smoke)
+analysis_data$fruit_num <- as.numeric(analysis_data$fruit)
+analysis_data$diab_num <- as.numeric(analysis_data$diab)
+
+cvar_num <- c("age_num","sex_num","income_num","race_num","bmi_num",
+"edu_num","phyact_num","smoke_num","fruit_num","diab_num")
+
+c_cond_vec <- colMeans(analysis_data[, cvar_num])
+c_cond_vec
+m_cde_vec <- 0
+a0_vec <- 0
+a1_vec <- 1 
+```
+
+---
+
+#### 7.2 Fit regmedint model
+
+We specify:
+
+- logistic regression for Y given A, M and C
+- logistic regression for M given A and C
+- no exposure by mediator interaction
+- a0 = 0 and a1 = 1 for the exposure contrast
+- mediator fixed at 0 for the controlled direct effect value
+
+```{r regmedint-fit, cache=TRUE}
+fit_reg <- regmedint(
+  data   = analysis_data,
+  yvar   = "outcome",
+  avar   = "exposure",
+  mvar   = "mediator",
+  cvar   = cvar_num,
+  yreg   = "logistic",
+  mreg   = "logistic",
+  interaction = FALSE,
+  a0 = a0_vec,
+  a1 = a1_vec,
+  m_cde = m_cde_vec,
+  c_cond = c_cond_vec
+)
+
+summary(fit_reg)
+```
+
+From the summary table we extract:
+
+- tnde (total natural direct effect) on the log scale
+- tnie (total natural indirect effect) on the log scale
+- te (total effect) on the log scale
+- pm (proportion mediated) as a proportion on the log odds ratio scale
+
+#### 7.3 How `regmedint` computes standard errors
+
+```{r sse, echo=FALSE, out.width = '100%', cache=TRUE}
+knitr::include_graphics("Images/mediation/sse.png")
+```
+
+
+`regmedint` does **not** use bootstrap resampling by default. The package computes all standard errors through the **multivariate delta method** based on the estimated covariance matrix of the outcome and mediator models.
+
+After fitting the outcome model (`yreg`) and mediator model (`mreg`), the package forms a joint parameter vector $\theta = (\beta, \gamma)$ and obtains its covariance matrix $\widehat{\Sigma} = \operatorname{Var}(\theta)$ from the fitted GLMs (these are model-based SEs, not survey-robust).
+
+Each natural effect, such as the total natural direct effect (tnde), total natural indirect effect (tnie), total effect (te), and proportion mediated (pm), is a smooth function of all components of \(\theta\).  
+`regmedint` computes their gradients internally and applies $\operatorname{se}(\psi) \;=\; \sqrt{ G^\top \,\widehat{\Sigma}\, G }$ where $G$ is the gradient of the effect $\psi$ with respect to all parameters. This is implemented directly inside `se_fun()`, which evaluate the delta–method variance for each estimand.
+
+```{r regmedint-effects, cache=TRUE}
+est <- fit_reg$myreg$est_fun(a0_vec, a1_vec, m_cde_vec, c_cond_vec)
+se <- fit_reg$myreg$se_fun(a0_vec, a1_vec, m_cde_vec, c_cond_vec)
+
+reg_raw <- data.frame(
+  effect = names(est),
+  est = as.numeric(est),
+  se = as.numeric(se)
+)
+
+reg_raw$lower <- reg_raw$est - 1.96 * reg_raw$se
+reg_raw$upper <- reg_raw$est + 1.96 * reg_raw$se
+
+reg_or <- subset(reg_raw, effect %in% c("te","tnde","tnie"))
+reg_or$OR <- exp(reg_or$est)
+reg_or$OR_L <- exp(reg_or$lower)
+reg_or$OR_U <- exp(reg_or$upper)
+
+reg_or
+
+# Extract ORs from regmedint output already computed as reg_or
+tnde_or_reg <- reg_or$OR[reg_or$effect == "tnde"]
+tnie_or_reg <- reg_or$OR[reg_or$effect == "tnie"]
+te_or_reg   <- reg_or$OR[reg_or$effect == "te"]
+pm_reg      <- est["pm"]
+
+# Combine into regmedint row
+regmedint_results <- data.frame(
+  Method = "regmedint (no survey design)",
+  TE  = te_or_reg,
+  NDE = tnde_or_reg,
+  NIE = tnie_or_reg,
+  PM  = pm_reg
+)
+```
+
+Interpretation:
+
+- `regmedint` uses parametric standardisation based on the fitted outcome and mediator models.
+- Effects are evaluated at the mean covariate profile `c_cond_vec`, not over the full covariate distribution, but this is close enough for comparison with the IPW based approach.
+
+---
+
+### 8. Comparison table and brief interpretation
+
+#### 8.1 Combine and display results
+
+```{r compare, cache=TRUE}
+## Build tidy table from manual + regmedint
+
+# 1. Expand manual results into long form with NA SE/CI
+manual_long <- data.frame(
+  Method = "Manual IPW (weights, no survey design)",
+  Effect = c("TE", "NDE", "NIE", "PM"),
+  est    = c(manual_results$TE,
+             manual_results$NDE,
+             manual_results$NIE,
+             manual_results$PM),
+  se     = NA,
+  lower  = NA,
+  upper  = NA
+)
+
+# 2. Extract regmedint effects with SE and CI
+reg_long <- rbind(
+  data.frame(Method = "regmedint (no survey design)",
+             Effect = "TE",
+             est    = reg_or$OR[reg_or$effect == "te"],
+             se     = reg_or$se[reg_or$effect == "te"],
+             lower  = reg_or$OR_L[reg_or$effect == "te"],
+             upper  = reg_or$OR_U[reg_or$effect == "te"]),
+  data.frame(Method = "regmedint (no survey design)",
+             Effect = "NDE",
+             est    = reg_or$OR[reg_or$effect == "tnde"],
+             se     = reg_or$se[reg_or$effect == "tnde"],
+             lower  = reg_or$OR_L[reg_or$effect == "tnde"],
+             upper  = reg_or$OR_U[reg_or$effect == "tnde"]),
+  data.frame(Method = "regmedint (no survey design)",
+             Effect = "NIE",
+             est    = reg_or$OR[reg_or$effect == "tnie"],
+             se     = reg_or$se[reg_or$effect == "tnie"],
+             lower  = reg_or$OR_L[reg_or$effect == "tnie"],
+             upper  = reg_or$OR_U[reg_or$effect == "tnie"]),
+  data.frame(Method = "regmedint (no survey design)",
+             Effect = "PM",
+             est    = est["pm"],
+             se     = se["se_pm"],
+             lower  = est["pm"] - 1.96 * se["se_pm"],
+             upper  = est["pm"] + 1.96 * se["se_pm"])
+)
+
+# 3. Combine
+compare_full <- rbind(manual_long, reg_long)
+rownames(compare_full) <- NULL
+
+# 4. Pretty table
+library(kableExtra)
+kable(compare_full, digits = 2,
+      caption = "Comparison of natural effects with standard errors and confidence intervals") %>%
+  kable_styling(full_width = FALSE,
+                bootstrap_options = c("striped", "condensed"))
+```
+
+#### 8.2 Plot results
+
+```{r compare-plot, cache=TRUE, echo=FALSE}
+library(ggplot2)
+
+# prepare data for plotting
+plot_df <- compare_full
+
+# convert Effect to factor for nicer ordering
+plot_df$Effect <- factor(plot_df$Effect, levels = c("TE","NDE","NIE","PM"))
+
+# build plot
+ggplot(plot_df, aes(x = Effect, y = est, color = Method)) +
+  geom_point(position = position_dodge(width = 0.5), size = 3) +
+  
+  # draw CI bars only where available
+  geom_errorbar(
+    aes(ymin = lower, ymax = upper),
+    width = 0.15,
+    position = position_dodge(width = 0.5),
+    na.rm = TRUE
+  ) +
+  
+  labs(
+    title = "Comparison of Mediation Effects",
+    y = "Effect estimate (OR or proportion mediated)",
+    x = ""
+  ) +
+  
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",
+    panel.grid.minor = element_blank()
+  )
+
+
+```
+
+#### 8.3 Interpretation
+
+- Both approaches agree that osteoarthritis is associated with increased odds of CVD, with a total effect odds ratio around 1.5 to 1.6.
+- The natural direct effect is larger than the natural indirect effect in both approaches, indicating that most of the effect is not mediated by pain medication.
+- The natural indirect effect is modest but greater than one in both approaches, suggesting that some of the OA to CVD association is transmitted through pain medication.
+- The proportion mediated on the log odds ratio scale is of similar magnitude across methods (roughly 15 to 20 percent).
+
+Some differences between the manual and `regmedint` estimates are expected. 
+
+- The manual calculation relies on an IPW-based decomposition using fitted models that approximate counterfactual contrasts, while `regmedint` uses fully parametric standardization, integrating over the outcome and mediator models at the chosen covariate profile. 
+- IPW and parametric g-formula methods target the same estimands but use different estimating equations and weighting structures, so their results will not match exactly unless models are perfectly specified. 
+- `regmedint` evaluates effects at the mean covariate vector rather than averaging over the full empirical covariate distribution, which can introduce small discrepancies compared with the manual implementation.
+
+::: callout-tip
+Because we intentionally ignore survey design features in both implementations, these results are meant primarily to illustrate the mediation mechanisms and the comparability between a manual implementation and a software package. For final substantive inference, survey design and sampling weights should be incorporated as described in the lecture notes.
+::: 
