@@ -1,14 +1,14 @@
 ## Testing Interactions {.unnumbered}
 
-We will use the article. We will use the following article by [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639). We will use the same data as [before](surveydataEsolution.html).
+We will use the following article by [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639). We will use the same data as [before](surveydataEsolution.html).
 
 
-**Objective**: To statistically test whether an interaction term contributes significantly to a model when using complex survey data (NHANES) that has been imputed using `mice`.
+**Objective**: To statistically test whether an *interaction term* contributes significantly to a model when using complex survey data (NHANES) that has been imputed using `mice`.
 
 The Scenario:
 
 Outcome ($Y$): BMI (`BMXBMI`)  
-Predictor ($X$): Age (`RIDAGEYR`)  
+Exposure ($X$): Age (`RIDAGEYR`)  
 Moderator ($Z$): Smoking Status (`SMQ020`)
 
 **Question**: Does the effect of Age on BMI depend on whether the person smokes?
@@ -40,10 +40,10 @@ imp_list <- complete(imp, "all")
 
 To test an interaction, we must compare two models:
 
-The Full Model: Includes the interaction term (Age * Smoking).  
-The Reduced Model: Includes only main effects (Age + Smoking).
+- **The Full Model**: Includes the interaction term (Age * Smoking).  
+- **The Reduced Model**: Includes only main effects (Age + Smoking).
 
-We use lapply to fit these models across all 20 imputed datasets.
+We use `lapply` to fit these models across all 20 imputed datasets.
 
 ```{r design, cache=TRUE}
 # --- Helper: Calculate Design Degrees of Freedom (dfcom) ---
@@ -93,7 +93,9 @@ fit_reduced_list <- lapply(imp_list, function(df) {
 
 We convert our lists of models into mira objects (Multiply Imputed Repeated Analyses) so the mice package recognizes them. Then, we use the Wald Test ($D_1$). 
 
+::: callout-important
 Note that `pool.compare(fit_full, fit_reduced, method = "wald")` is deprecated. `D1` correctly accounts for the small sample correction inherent in your survey design (`dfcom`), whereas `pool.compare` might be overestimating the precision.
+::: 
 
 ```{r mira, cache=TRUE}
 # 1. Convert to 'mira' class
@@ -142,3 +144,11 @@ p.value | Significance Level. | < 0.05 indicates significant interaction.
 ## Scenario B: The Interaction NOT Significant (p > 0.05)
 
 "We tested for effect modification by smoking status using the $D_1$ Wald statistic. The interaction term was not statistically significant ($F(2, 105.2) = 0.88, p = 0.48$). Therefore, the interaction term was removed, and we proceeded with the main effects model adjusted for smoking status."
+
+::: callout-important
+You can use the same `D1` function and workflow to test any set of nested models to check specification.
+
+-  If you add an interaction term (e.g., Age * Smoking), the $D_1$ test checks if any of these interaction coefficients are non-zero.
+
+-  If you want to test whether adding a set of covariates (e.g., Race, Education, and Income) improves your model, you can compare a "Base Model" (without them) to a "Full Model" (with them). The $D_1$ test will tell you if the set of covariates significantly improves the fit.
+::: 

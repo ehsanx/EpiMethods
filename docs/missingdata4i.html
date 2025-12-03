@@ -1379,11 +1379,11 @@ window.Quarto = {
   
 
 
-</header><p>We will use the article. We will use the following article by <a href="https://jamanetwork.com/journals/jama/article-abstract/2526639">Flegal et al.&nbsp;(2016)</a>. We will use the same data as <a href="surveydataEsolution.html">before</a>.</p>
-<p><strong>Objective</strong>: To statistically test whether an interaction term contributes significantly to a model when using complex survey data (NHANES) that has been imputed using <code>mice</code>.</p>
+</header><p>We will use the following article by <a href="https://jamanetwork.com/journals/jama/article-abstract/2526639">Flegal et al.&nbsp;(2016)</a>. We will use the same data as <a href="surveydataEsolution.html">before</a>.</p>
+<p><strong>Objective</strong>: To statistically test whether an <em>interaction term</em> contributes significantly to a model when using complex survey data (NHANES) that has been imputed using <code>mice</code>.</p>
 <p>The Scenario:</p>
 <p>Outcome (<span class="math inline">\(Y\)</span>): BMI (<code>BMXBMI</code>)<br>
-Predictor (<span class="math inline">\(X\)</span>): Age (<code>RIDAGEYR</code>)<br>
+Exposure (<span class="math inline">\(X\)</span>): Age (<code>RIDAGEYR</code>)<br>
 Moderator (<span class="math inline">\(Z\)</span>): Smoking Status (<code>SMQ020</code>)</p>
 <p><strong>Question</strong>: Does the effect of Age on BMI depend on whether the person smokes?</p>
 <div class="cell">
@@ -1546,9 +1546,14 @@ Moderator (<span class="math inline">\(Z\)</span>): Smoking Status (<code>SMQ020
 </div>
 </section><section id="step-2-fitting-the-nested-models" class="level1"><h1>Step 2: Fitting the Nested Models</h1>
 <p>To test an interaction, we must compare two models:</p>
-<p>The Full Model: Includes the interaction term (Age * Smoking).<br>
-The Reduced Model: Includes only main effects (Age + Smoking).</p>
-<p>We use lapply to fit these models across all 20 imputed datasets.</p>
+<ul>
+<li>
+<strong>The Full Model</strong>: Includes the interaction term (Age * Smoking).<br>
+</li>
+<li>
+<strong>The Reduced Model</strong>: Includes only main effects (Age + Smoking).</li>
+</ul>
+<p>We use <code>lapply</code> to fit these models across all 20 imputed datasets.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># --- Helper: Calculate Design Degrees of Freedom (dfcom) ---</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="co"># We need this to prevent NaN errors in the final test.</span></span>
@@ -1589,7 +1594,19 @@ The Reduced Model: Includes only main effects (Age + Smoking).</p>
 </div>
 </section><section id="step-3-pooling-and-testing" class="level1"><h1>Step 3: Pooling and Testing</h1>
 <p>We convert our lists of models into mira objects (Multiply Imputed Repeated Analyses) so the mice package recognizes them. Then, we use the Wald Test (<span class="math inline">\(D_1\)</span>).</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Note that <code>pool.compare(fit_full, fit_reduced, method = "wald")</code> is deprecated. <code>D1</code> correctly accounts for the small sample correction inherent in your survey design (<code>dfcom</code>), whereas <code>pool.compare</code> might be overestimating the precision.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># 1. Convert to 'mira' class</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a>fit_full <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">analyses =</span> fit_full_list)</span>
@@ -1681,6 +1698,23 @@ The Reduced Model: Includes only main effects (Age + Smoking).</p>
 <p>“To test whether the association between age and BMI was modified by smoking status, we compared nested survey-weighted regression models using the multiparameter Wald test (<span class="math inline">\(D_1\)</span>) on 20 imputed datasets. We found a significant interaction between age and smoking (<span class="math inline">\(F(2, 350.5) = 4.52, p = 0.01\)</span>). Consequently, we present stratified results for smokers and non-smokers.”</p>
 </section><section id="scenario-b-the-interaction-not-significant-p-0.05" class="level2"><h2 class="anchored" data-anchor-id="scenario-b-the-interaction-not-significant-p-0.05">Scenario B: The Interaction NOT Significant (p &gt; 0.05)</h2>
 <p>“We tested for effect modification by smoking status using the <span class="math inline">\(D_1\)</span> Wald statistic. The interaction term was not statistically significant (<span class="math inline">\(F(2, 105.2) = 0.88, p = 0.48\)</span>). Therefore, the interaction term was removed, and we proceeded with the main effects model adjusted for smoking status.”</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can use the same <code>D1</code> function and workflow to test any set of nested models to check specification.</p>
+<ul>
+<li><p>If you add an interaction term (e.g., Age * Smoking), the <span class="math inline">\(D_1\)</span> test checks if any of these interaction coefficients are non-zero.</p></li>
+<li><p>If you want to test whether adding a set of covariates (e.g., Race, Education, and Income) improves your model, you can compare a “Base Model” (without them) to a “Full Model” (with them). The <span class="math inline">\(D_1\)</span> test will tell you if the set of covariates significantly improves the fit.</p></li>
+</ul>
+</div>
+</div>
 
 
 </section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
