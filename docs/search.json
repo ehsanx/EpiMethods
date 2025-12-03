@@ -5153,5 +5153,60 @@
       "Writing tools",
       "Formatting Tools"
     ]
+  },
+  {
+    "objectID": "missingdata4i.html",
+    "href": "missingdata4i.html",
+    "title": "Testing Interactions",
+    "section": "",
+    "text": "Step 1: Imputation\nWe will use the article. We will use the following article by Flegal et al. (2016). We will use the same data as before.\nObjective: To statistically test whether an interaction term contributes significantly to a model when using complex survey data (NHANES) that has been imputed using mice.\nThe Scenario:\nOutcome (\\(Y\\)): BMI (BMXBMI)\nPredictor (\\(X\\)): Age (RIDAGEYR)\nModerator (\\(Z\\)): Smoking Status (SMQ020)\nQuestion: Does the effect of Age on BMI depend on whether the person smokes?\nBefore modeling, we must handle missing data to avoid bias.\nlibrary(mice) \n#&gt; \n#&gt; Attaching package: 'mice'\n#&gt; The following object is masked from 'package:stats':\n#&gt; \n#&gt;     filter\n#&gt; The following objects are masked from 'package:base':\n#&gt; \n#&gt;     cbind, rbind\nlibrary(survey)\n#&gt; Loading required package: grid\n#&gt; Loading required package: Matrix\n#&gt; Loading required package: survival\n#&gt; \n#&gt; Attaching package: 'survey'\n#&gt; The following object is masked from 'package:graphics':\n#&gt; \n#&gt;     dotchart\n# 1. Impute the data\n# Recommendation: Set m = 20 for interaction tests to stabilize variance.\nimp &lt;- mice(dat.full, m = 20, maxit = 5)\n#&gt; \n#&gt;  iter imp variable\n#&gt;   1   1  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   2  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   3  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   4  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   5  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   6  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   7  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   8  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   9  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   10  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   11  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   12  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   13  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   14  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   15  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   16  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   17  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   18  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   19  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   1   20  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   1  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   2  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   3  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   4  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   5  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   6  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   7  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   8  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   9  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   10  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   11  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   12  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   13  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   14  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   15  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   16  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   17  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   18  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   19  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   2   20  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   1  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   2  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   3  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   4  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   5  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   6  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   7  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   8  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   9  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   10  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   11  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   12  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   13  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   14  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   15  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   16  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   17  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   18  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   19  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   3   20  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   1  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   2  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   3  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   4  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   5  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   6  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   7  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   8  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   9  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   10  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   11  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   12  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   13  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   14  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   15  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   16  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   17  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   18  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   19  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   4   20  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   1  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   2  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   3  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   4  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   5  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   6  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   7  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   8  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   9  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   10  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   11  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   12  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   13  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   14  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   15  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   16  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   17  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   18  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   19  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt;   5   20  DMDEDUC2  RIDEXPRG  BMXBMI  SMQ020  SMQ040\n#&gt; Warning: Number of logged events: 200\n\n# 2. Extract the data into a list\n# We cannot use 'with()' easily with svydesign, so we create a list of\n# completed dataframes to loop over manually.\nimp_list &lt;- complete(imp, \"all\")",
+    "crumbs": [
+      "Missing data analysis",
+      "Testing Interactions"
+    ]
+  },
+  {
+    "objectID": "missingdata4i.html#scenario-a-the-interaction-was-significant-p-0.05",
+    "href": "missingdata4i.html#scenario-a-the-interaction-was-significant-p-0.05",
+    "title": "Testing Interactions",
+    "section": "Scenario A: The Interaction Was Significant (p < 0.05)",
+    "text": "Scenario A: The Interaction Was Significant (p &lt; 0.05)\n“To test whether the association between age and BMI was modified by smoking status, we compared nested survey-weighted regression models using the multiparameter Wald test (\\(D_1\\)) on 20 imputed datasets. We found a significant interaction between age and smoking (\\(F(2, 350.5) = 4.52, p = 0.01\\)). Consequently, we present stratified results for smokers and non-smokers.”",
+    "crumbs": [
+      "Missing data analysis",
+      "Testing Interactions"
+    ]
+  },
+  {
+    "objectID": "missingdata4i.html#scenario-b-the-interaction-was-not-significant-p-0.05",
+    "href": "missingdata4i.html#scenario-b-the-interaction-was-not-significant-p-0.05",
+    "title": "Testing Interactions",
+    "section": "Scenario B: The Interaction Was NOT Significant (p > 0.05)",
+    "text": "Scenario B: The Interaction Was NOT Significant (p &gt; 0.05)\n“We tested for effect modification by smoking status using the \\(D_1\\) Wald statistic. The interaction term was not statistically significant (\\(F(2, 105.2) = 0.88, p = 0.48\\)). Therefore, the interaction term was removed, and we proceeded with the main effects model adjusted for smoking status.”",
+    "crumbs": [
+      "Missing data analysis",
+      "Testing Interactions"
+    ]
+  },
+  {
+    "objectID": "missingdata4i.html#scenario-a-the-interaction-significant-p-0.05",
+    "href": "missingdata4i.html#scenario-a-the-interaction-significant-p-0.05",
+    "title": "Testing Interactions",
+    "section": "Scenario A: The Interaction Significant (p < 0.05)",
+    "text": "Scenario A: The Interaction Significant (p &lt; 0.05)\n“To test whether the association between age and BMI was modified by smoking status, we compared nested survey-weighted regression models using the multiparameter Wald test (\\(D_1\\)) on 20 imputed datasets. We found a significant interaction between age and smoking (\\(F(2, 350.5) = 4.52, p = 0.01\\)). Consequently, we present stratified results for smokers and non-smokers.”",
+    "crumbs": [
+      "Missing data analysis",
+      "Testing Interactions"
+    ]
+  },
+  {
+    "objectID": "missingdata4i.html#scenario-b-the-interaction-not-significant-p-0.05",
+    "href": "missingdata4i.html#scenario-b-the-interaction-not-significant-p-0.05",
+    "title": "Testing Interactions",
+    "section": "Scenario B: The Interaction NOT Significant (p > 0.05)",
+    "text": "Scenario B: The Interaction NOT Significant (p &gt; 0.05)\n“We tested for effect modification by smoking status using the \\(D_1\\) Wald statistic. The interaction term was not statistically significant (\\(F(2, 105.2) = 0.88, p = 0.48\\)). Therefore, the interaction term was removed, and we proceeded with the main effects model adjusted for smoking status.”",
+    "crumbs": [
+      "Missing data analysis",
+      "Testing Interactions"
+    ]
   }
 ]

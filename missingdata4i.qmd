@@ -1,0 +1,142 @@
+## Testing Interactions {.unnumbered}
+
+We will use the article. We will use the following article by [Flegal et al. (2016)](https://jamanetwork.com/journals/jama/article-abstract/2526639). We will use the same data as [before](surveydataEsolution.html).
+
+
+**Objective**: To statistically test whether an interaction term contributes significantly to a model when using complex survey data (NHANES) that has been imputed using `mice`.
+
+The Scenario:
+
+Outcome ($Y$): BMI (`BMXBMI`)  
+Predictor ($X$): Age (`RIDAGEYR`)  
+Moderator ($Z$): Smoking Status (`SMQ020`)
+
+**Question**: Does the effect of Age on BMI depend on whether the person smokes?
+
+```{r load-data, cache=TRUE}
+load("Data/missingdata/Flegal2016.RData")
+ls()
+str(dat.full)
+```
+
+# Step 1: Imputation
+
+Before modeling, we must handle missing data to avoid bias.
+
+```{r mice, cache=TRUE}
+library(mice) 
+library(survey)
+# 1. Impute the data
+# Recommendation: Set m = 20 for interaction tests to stabilize variance.
+imp <- mice(dat.full, m = 20, maxit = 5)
+
+# 2. Extract the data into a list
+# We cannot use 'with()' easily with svydesign, so we create a list of
+# completed dataframes to loop over manually.
+imp_list <- complete(imp, "all")
+```
+
+# Step 2: Fitting the Nested Models
+
+To test an interaction, we must compare two models:
+
+The Full Model: Includes the interaction term (Age * Smoking).  
+The Reduced Model: Includes only main effects (Age + Smoking).
+
+We use lapply to fit these models across all 20 imputed datasets.
+
+```{r design, cache=TRUE}
+# --- Helper: Calculate Design Degrees of Freedom (dfcom) ---
+# We need this to prevent NaN errors in the final test.
+# It is usually (Number of PSUs - Number of Strata).
+# We calculate it once using the first imputed dataset.
+temp_des <- svydesign(id = ~SDMVPSU, 
+                      strata = ~SDMVSTRA, 
+                      weights = ~WTINT2YR, 
+                      data = imp_list[[1]], 
+                      nest = TRUE)
+df_degrees_freedom <- degf(temp_des)
+# May need to do subsetting if the original data was reduced.
+```
+
+
+Model A: The Full Model (With Interaction) 
+
+```{r int, cache=TRUE}
+fit_full_list <- lapply(imp_list, function(df) {
+  # 1. Define survey design for this iteration
+  des <- svydesign(id = ~SDMVPSU, 
+                   strata = ~SDMVSTRA, 
+                   weights = ~WTINT2YR, 
+                   data = df, 
+                   nest = TRUE)
+  
+  # 2. Fit the GLM
+  svyglm(BMXBMI ~ RIDAGEYR * SMQ020, design = des)
+})
+```
+
+Model B: The Reduced Model (No Interaction)
+
+```{r noint, cache=TRUE}
+fit_reduced_list <- lapply(imp_list, function(df) {
+  des <- svydesign(id = ~SDMVPSU, 
+                   strata = ~SDMVSTRA, 
+                   weights = ~WTINT2YR, 
+                   data = df, nest = TRUE)
+  
+  svyglm(BMXBMI ~ RIDAGEYR + SMQ020, design = des)
+})
+```
+
+# Step 3: Pooling and Testing
+
+We convert our lists of models into mira objects (Multiply Imputed Repeated Analyses) so the mice package recognizes them. Then, we use the Wald Test ($D_1$).
+
+```{r mira, cache=TRUE}
+# 1. Convert to 'mira' class
+fit_full <- list(analyses = fit_full_list)
+class(fit_full) <- "mira"
+
+fit_reduced <- list(analyses = fit_reduced_list)
+class(fit_reduced) <- "mira"
+
+# 2. Run the D1 Statistic (Multivariate Wald Test)
+# We pass the dfcom we calculated earlier to ensure stability
+test_result <- D1(fit_full, 
+                  fit_reduced, 
+                  dfcom = df_degrees_freedom)
+```
+
+
+# Step 4: Detailed Breakdown of the Output
+
+When you run `print(test_result)`, you get a row of statistics. 
+
+```{r print, cache=TRUE}
+names(test_result)
+test_result$dfcom
+library(kableExtra)
+kable(test_result$result)
+```
+
+The Definitions
+
+Metric | What it is | How to Interpret  
+------ | ----------- | -----------------  
+test statistic | The F-value of the Wald test. | High values (> 4) suggest the models are significantly different. Values near 1 suggest the interaction adds nothing.  
+df1 | Numerator Degrees of Freedom. | Number of parameters added.  
+dfcom | Complete Data Degrees of Freedom. | From survey design. Low dfcom (< 30) means limited power.  
+riv | Relative Increase in Variance. | Low (< 0.5) means stable imputations. High (> 1) means large uncertainty.  
+df2 | Denominator Degrees of Freedom. | Effective sample size after MI and design.  
+p.value | Significance Level. | < 0.05 indicates significant interaction.  
+
+# Step 5: How to Report This
+
+## Scenario A: The Interaction Significant (p < 0.05)
+
+"To test whether the association between age and BMI was modified by smoking status, we compared nested survey-weighted regression models using the multiparameter Wald test ($D_1$) on 20 imputed datasets. We found a significant interaction between age and smoking ($F(2, 350.5) = 4.52, p = 0.01$). Consequently, we present stratified results for smokers and non-smokers."
+
+## Scenario B: The Interaction NOT Significant (p > 0.05)
+
+"We tested for effect modification by smoking status using the $D_1$ Wald statistic. The interaction term was not statistically significant ($F(2, 105.2) = 0.88, p = 0.48$). Therefore, the interaction term was removed, and we proceeded with the main effects model adjusted for smoking status."
