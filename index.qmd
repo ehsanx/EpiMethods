@@ -98,7 +98,9 @@ table_content %>%
   row_spec(0, background = "black", color = "white", bold = T)
 ```
 
-::: callout-note
+::: {.callout-note collapse="true"}
+## Structure
+
 The tutorial is designed with a consistent structure across all chapters to provide a cohesive and thorough learning experience. Here is what you can expect in each chapter:
 
 1.  **Overview**: The first page of each chapter offers a concise summary that outlines the key learning objectives, topics covered, and what you can expect to gain from the chapter. The overview page will also feature links to the data sources used in the tutorials as well as a [form](https://forms.gle/YSwuiebtb1E9wjHu9) where you can report any bugs or issues you encounter. This helps you quickly grasp the chapter's essence and set learning expectations.
@@ -128,111 +130,191 @@ The content was primarily designed for a website in HTML format; however, a PDF 
 
 The materials in this OER are designed to support a staged capstone-style workflow where learners move from a research question to a **reproducible, defensible manuscript** through structured peer review and iterative refinement.
 
-Rather than treating statistical methods, computation, and writing as separate components, this training model integrates them into a single defensibility pipeline. Each stage of this workflow is supported by specific modules in this OER.
+Rather than treating statistical methods, computation, and writing as separate components, this training model integrates them into a single defensibility pipeline. Each stage of this workflow is supported by specific modules in this OER, which provide the conceptual and computational building blocks for analysis.
 
+The workflow is summarized below:
 
-```{r assignments, cache=TRUE, echo=FALSE, warning=FALSE,message=FALSE}
-kable(
+```{r assignments, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::kable(
   data.frame(
-    Stage = c(
-      "Frame",
-      "Plan",
-      "Build",
-      "Analyze",
-      "Draft",
-      "Final"
-    ),
-    Week = c(
-      "2–3",
-      "3–4",
-      "5–6",
-      "7–8",
-      "11–12",
-      "14"
-    ),
+    Stage = c("Frame","Plan","Build","Analyze","Draft","Final"),
+    Week  = c("2–3","3–4","5–6","7–8","11–12","14"),
     Deliverables = c(
       "Data orientation + question refinement (W, A, E modules)",
-      "Proposal + peer feedback (Q, R module)",
+      "Proposal + peer review (Q, R modules)",
       "SAP + Table 1 + reproducible data preparation (D, M modules) + SAP defense",
       "Analysis + reproducible code + Methods/Results (G module, Scientific Writing OER) + analysis defense",
-      "Full manuscript draft + full defense + peer review (Scientific Writing OER)",
-      "Final paper + code + optional journal submission"
+      "Full manuscript draft + full defense + structured peer review (Scientific Writing OER)",
+      "Final paper + reproducible code + optional journal submission"
     )
   ),
-  align = c("l", "l", "l"),
-  caption = "Defensibility pipeline used in capstone training"
+  align = c("l","l","l"),
+  caption = "Defensibility pipeline used in capstone training (14 weeks)"
 )
 ```
 
-Rather than treating statistical methods, computation, and writing as separate components, this training model integrates them into a single defensibility pipeline. This workflow emphasizes repeat critique, reproducibility, and the ability to defend analytic decisions at each stage.
+This workflow emphasizes repeated critique, reproducibility, and the ability to defend analytic decisions at each stage.
+
+
+::: {.callout-note collapse="true"}
+## Related Resources, Skills and Policies
 
 ### Relationship to Scientific Writing Training
 
-While this OER focuses on analytic design, reproducibility, and statistical reasoning, the companion writing resource [Scientific Writing for Health Researchch](https://ehsanx.github.io/Scientific-Writing-for-Health-Research/) supports learners in translating their work into the standard IMRaD (Introduction–Methods–Results–Discussion) format, navigating peer review, and preparing submissions to academic journals.
+While this OER focuses on analytic design, reproducibility, and statistical reasoning, the companion resource [Scientific Writing for Health Research](https://ehsanx.github.io/Scientific-Writing-for-Health-Research/) supports learners in translating their work into the standard IMRaD format (Introduction–Methods–Results–Discussion), navigating peer review, and preparing submissions to academic journals.
 
 These should not be viewed as separate components. Together, they form a unified pipeline in which:
+
 - analysis is developed with publication in mind  
 - writing is used to clarify and defend analytic decisions  
 - peer review is treated as a core research skill  
 
+### Reproducibility standard 
+
+Analyses should be runnable end‑to‑end by another analyst on a fresh machine without manual intervention. In this training model, auditability is part of the scientific product—not an optional add‑on.
+
+### Peer review as a learnable research skill
+
+This training model treats peer review as a core competency: giving constructive critique, identifying weaknesses, and proposing practical improvements. Named peer review and revision logic are integral to the workflow.
+
+### AI‑assisted workflows
+
+AI tools may be used to support coding and debugging, but learners remain fully responsible for correctness, bias, security, and reproducibility. Substantive AI use should be transparent, and outputs should be critically audited.
+
+### Related open tools
+
+- `svyTable1` (R package): A survey-aware analysis and reporting toolkit built on top of the `survey` package that generates reproducible Table 1 summaries, model diagnostics, and publication-ready outputs for epidemiological studies.  
+  Used primarily in the “SAP → Table 1 → analysis” stages of the workflow.
+::: 
+
+
+### Who this is for
+
+This OER is designed for health researchers and trainees who want to apply epidemiological and statistical methods responsibly using real data. It is especially useful for learners with uneven backgrounds in statistics, epidemiology, or programming, as the material supports “just‑in‑time” learning.
+
 ### Research outputs
 
-Selected examples of peer-reviewed outputs produced through this workflow are below. These examples span clinical, epidemiological, and global health applications, illustrating the generalizability of the approach.
+Examples of peer-reviewed outputs produced through this workflow are shown below.
 
 
-<button onclick="toggleExamples()">See example publications from this workflow</button>
+::: {.callout-note collapse="true"}
+## Click to show/hide publications table
 
-<div id="examples" style="display:none; margin-top:15px;">
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(readr)
+library(dplyr)
+library(stringr)
+library(glue)
+library(DT)
 
-<ul>
-  <li>Annals of Epidemiology (2022) — <a href="https://doi.org/10.1016/j.annepidem.2022.03.005" target="_blank">DOI</a></li>
-  <li>Annals of Epidemiology (2022) — <a href="https://doi.org/10.1016/j.annepidem.2022.01.002" target="_blank">DOI</a></li>
-  <li>Annals of Epidemiology (2022) — <a href="https://doi.org/10.1016/j.annepidem.2022.08.042" target="_blank">DOI</a></li>
+# --- 1. Read + clean -------------------------------------------------------
+pubs_raw <- read_csv("data/pubs.csv", show_col_types = FALSE)
 
-  <li>Annals of Work Exposures and Health (2024) — <a href="https://doi.org/10.1093/annweh/wxad065" target="_blank">DOI</a></li>
+pubs <- pubs_raw %>%
+  mutate(
+    year      = as.integer(year),
+    journal   = str_trim(journal),
+    dataset   = str_trim(dataset),
+    topic     = str_trim(topic),
+    link      = str_trim(link),
+    link_type = tolower(str_trim(link_type))
+  ) %>%
+  mutate(
+    link_url = case_when(
+      link_type == "doi"    & str_detect(link, "^https?://") ~ link,
+      link_type == "doi"    & str_detect(link, "^10\\.")     ~ paste0("https://doi.org/", link),
+      link_type == "pubmed" & str_detect(link, "^https?://") ~ link,
+      TRUE ~ NA_character_
+    ),
+    link_label = if_else(link_type == "doi", "DOI", "PubMed"),
+    link_color = if_else(link_type == "doi", "#1d4ed8", "#15803d")
+  )
 
-  <li>BMC Infectious Diseases (2023) — <a href="https://doi.org/10.1186/s12879-023-08254-4" target="_blank">DOI</a></li>
-  <li>BMC Pregnancy and Childbirth (2020) — <a href="https://doi.org/10.1186/s12884-020-2775-8" target="_blank">DOI</a></li>
-  <li>BMC Public Health (2021) — <a href="https://doi.org/10.1186/s12889-021-11267-w" target="_blank">DOI</a></li>
-
-  <li>Current Problems in Cancer (2025) — <a href="https://doi.org/10.1016/j.currproblcancer.2025.101184" target="_blank">DOI</a></li>
-
-  <li>International Archives of Occupational and Environmental Health (2021) — <a href="https://doi.org/10.1007/s00420-020-01592-9" target="_blank">DOI</a></li>
-  
-  <li>International Journal of Circumpolar Health (2019) — <a href="https://doi.org/10.1080/22423982.2019.1607703" target="_blank">DOI</a></li>
-  <li>International Journal of Gynecology &amp; Obstetrics (2023) — <a href="https://doi.org/10.1002/ijgo.14432" target="_blank">DOI</a></li>
-  <li>International Journal of Hygiene and Environmental Health (2024) — <a href="https://doi.org/10.1016/j.ijheh.2024.114429" target="_blank">DOI</a></li>
-
-  <li>Journal of Asthma (2024) — <a href="https://doi.org/10.1080/02770903.2024.2393677" target="_blank">DOI</a></li>
-  <li>Journal of Consumer Health on the Internet (2021) — <a href="https://doi.org/10.1080/15398285.2021.1943634" target="_blank">DOI</a></li>
-  <li>Journal of Human Hypertension (2021) — <a href="https://doi.org/10.1038/s41371-021-00614-4" target="_blank">DOI</a></li>
-
-  <li>Journal of Mental Health (2023) — <a href="https://doi.org/10.1080/09638237.2023.2245904" target="_blank">DOI</a></li>
-  <li>Journal of Mental Health (2023) — <a href="https://doi.org/10.1080/09638237.2020.1818192" target="_blank">DOI</a></li>
-
-  <li>Journal of the Canadian Academy of Child and Adolescent Psychiatry (2025) — <a href="https://pubmed.ncbi.nlm.nih.gov/40959830/" target="_blank">PMID</a></li>
-
-  <li>Vaccines (2022) — <a href="https://doi.org/10.3390/vaccines10122113" target="_blank">DOI</a></li>
-  <li>Vaccine (2020) — <a href="https://doi.org/10.1016/j.vaccine.2020.10.033" target="_blank">DOI</a></li>
-</ul>
-
-
-<p style="font-size: 0.9em; margin-top:10px;">
-These examples illustrate how learner-driven and collaborative projects using this structured, reproducible workflow can lead to peer-reviewed publications across epidemiology, clinical research, and global health.
-</p>
-
-</div>
-
-<script>
-function toggleExamples() {
-  var x = document.getElementById("examples");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
+# --- 2. Validate: every row must have a resolvable link --------------------
+bad <- pubs %>% filter(is.na(link_url) | link_url == "")
+if (nrow(bad) > 0) {
+  stop(
+    "Missing/invalid link for the following rows in data/pubs.csv:\n",
+    paste0("- ", bad$journal, " (", bad$year, ")\n", collapse = "")
+  )
 }
-</script>
+
+# --- 3. Categorical -> soft pill (stable color per unique value) -----------
+# Palette cycles, so new datasets/topics added to the CSV get colors too.
+make_badge <- function(x) {
+  pal <- c("#dbeafe","#dcfce7","#fef3c7","#fae8ff","#fee2e2",
+           "#e0e7ff","#ffedd5","#ccfbf1","#fce7f3","#f1f5f9")
+  vals <- sort(unique(x))
+  cmap <- setNames(pal[(seq_along(vals) - 1) %% length(pal) + 1], vals)
+  glue(
+    '<span style="display:inline-block;padding:2px 10px;border-radius:9999px;',
+    'background:{cmap[x]};color:#1f2937;font-size:0.85em;white-space:nowrap;">',
+    '{x}</span>'
+  )
+}
+
+# --- 4. Build display table -----------------------------------------------
+pubs_display <- pubs %>%
+  mutate(
+    Dataset_b = make_badge(dataset),
+    Topic_b   = make_badge(topic),
+    link_html = glue(
+      '<a href="{link_url}" target="_blank" rel="noopener noreferrer" ',
+      'title="{link_label}" aria-label="{link_label}" ',
+      'style="text-decoration:none;color:{link_color};font-size:1.05em;">',
+      '<i class="bi bi-box-arrow-up-right"></i></a>'
+    )
+  ) %>%
+  select(
+    Year    = year,
+    Journal = journal,
+    Dataset = Dataset_b,
+    Topic   = Topic_b,
+    Link    = link_html
+  ) %>%
+  arrange(desc(Year), Journal)
+
+# --- 5. Render -------------------------------------------------------------
+datatable(
+  pubs_display,
+  filter = "top",
+  escape = FALSE,
+  rownames = FALSE,
+  # REMOVED "SearchHighlight" FROM HERE
+  extensions = c("Buttons"), 
+  class = "display compact stripe hover row-border",
+  caption = htmltools::tags$caption(
+    style = "caption-side: top; text-align: left; font-weight: 600;
+             color: #111827; padding: 4px 0 10px;",
+    "Peer-reviewed outputs — click any column header to sort, or filter above."
+  ),
+  options = list(
+    pageLength      = 25,
+    dom             = "Bftip",
+    autoWidth       = FALSE,
+    # KEEP THIS HERE — DT uses this option natively to enable highlighting!
+    searchHighlight = TRUE, 
+    order           = list(list(0, "desc")),
+    buttons = list(
+      list(extend = "copy",  text = "Copy"),
+      list(extend = "csv",   text = "CSV",   filename = "publications"),
+      list(extend = "excel", text = "Excel", filename = "publications")
+    ),
+    columnDefs = list(
+      list(targets = 0, className = "dt-right",  width = "8%"),                                 # Year
+      list(targets = 1, width = "38%"),                                                          # Journal
+      list(targets = 2, width = "14%"),                                                          # Dataset
+      list(targets = 3, width = "30%"),                                                          # Topic
+      list(targets = 4, className = "dt-center", width = "10%",                                  # Link
+           orderable = FALSE, searchable = FALSE)
+    )
+  )
+)
+```
+:::
+
+
+
 
 ## Open Copyright License {.unnumbered}
 
@@ -291,7 +373,11 @@ function toggleIframe() {
 ```
 
 ::: callout-tip
+### Recognition
+
 The PI was selected as a recipient of the [AMS UBC OER Champion Award 2024–2025](https://champions.open.ubc.ca/) in recognition of their outstanding commitment to equitable, inclusive, and innovative education—particularly through leadership in advancing affordable access via Open Educational Resources (OERs).
+
+![AMS UBC OER Champion Award](images/award.png){fig-align="center" width=50%}
 :::
 
 
