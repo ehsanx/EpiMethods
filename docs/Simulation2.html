@@ -197,6 +197,12 @@ window.Quarto = {
  <span class="menu-text">The Project</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup: Before you begin</span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
@@ -450,6 +456,12 @@ window.Quarto = {
  <span class="menu-text">Useful Packages</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (E)</span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -542,6 +554,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./Simulation3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimating Causal Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SimulationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (U)</span></a>
   </div>
 </li>
       </ul>
@@ -1092,14 +1110,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1361,6 +1379,29 @@ window.Quarto = {
  <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (G)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation and glossary</span></a>
+  </div>
+</li>
       </ul>
 </li>
     </ul>
@@ -1464,7 +1505,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>From the plot, we can see that our estimate appears to stabilize around 10,000 iterations, suggesting that the method produces stable estimates of the true probability of flipping exactly 3 heads in 5 coin flips.</p>
+<p>From the plot, we can see that the running estimate fluctuates early on and then settles near the true probability of flipping exactly 3 heads in 5 coin flips. The trace plot is best read qualitatively: because cumulative averages always flatten as more iterations accumulate, reading a specific “convergence point” (such as 10,000 iterations) off the curve is somewhat arbitrary. For a precise statement of how close the final estimate is to the truth, we rely instead on the Monte Carlo standard error, <span class="math inline">\(\text{MCSE} = \text{EmpSE}/\sqrt{n_{sim}}\)</span>, introduced below.</p>
 <hr>
 <p>In addition to observing the rate at which an estimate converges to its true value, mathematical measures can also be calculated to assess how well our simulation is performing. The following performance measures and syntax are referenced from the <code>rsimsum</code> package, which we will use to verify our simulations <span class="citation" data-cites="Gasparini2018">(<a href="#ref-Gasparini2018" role="doc-biblioref">Gasparini 2018</a>)</span>.</p>
 <p>For the explanations of the different performance measures, the following notation will be used:</p>
@@ -1546,7 +1587,7 @@ window.Quarto = {
 \]</span></p>
 <p><span class="citation" data-cites="Gasparini2024">(<a href="#ref-Gasparini2024" role="doc-biblioref">Gasparini 2024</a>)</span></p>
 </section><section id="power" class="level3"><h3 class="anchored" data-anchor-id="power">Power</h3>
-<p>Power is a key performance measure in Monte Carlo simulations, ensuring that our tests detect true effects with high probability. It measures the probability of correctly rejecting the null hypothesis (H0) when the alternative hypothesis (Ha) is true. In other words, power quantifies how effective a statistical test is at detecting a real effect when one exists. If power is too low, we may need to increase the sample size or improve the efficiency of our estimator to avoid missing important findings. Conversely, very high power may indicate that the test is too sensitive, potentially detecting trivial effects.</p>
+<p>Power is a key performance measure in Monte Carlo simulations, ensuring that our tests detect true effects with high probability. It measures the probability of correctly rejecting the null hypothesis (H0) when the alternative hypothesis (Ha) is true. The formula below computes the proportion of simulations in which the null is rejected; this quantity equals <strong>power only when the data-generating process is non-null</strong> (<span class="math inline">\(\theta \neq 0\)</span>). When the data are generated under the null (<span class="math inline">\(\theta = 0\)</span>), the same proportion estimates the <strong>type-I error rate (size)</strong> of the test instead. In other words, power quantifies how effective a statistical test is at detecting a real effect when one truly exists. If power is low under a non-null DGP, we may need to increase the sample size or improve the efficiency of our estimator to avoid missing important findings. High rejection rates are not in themselves a problem: with a large sample size even a small but genuine effect will be detected, which is an effect-size and sample-size consideration rather than the test being “too sensitive.”</p>
 <p><span class="math display">\[
 \text{Power} = \frac{1}{n_{sim}} \sum^{n_{sim}}_{i=1} I\bigg[| \hat\theta_i | \ge z_{\alpha/2} \times \sqrt{\widehat{Var}(\hat\theta_i)} \bigg]
 \]</span></p>
@@ -1616,11 +1657,24 @@ window.Quarto = {
 \text{Standard Deviation} = \sqrt{(p\times(1-p))} = \sqrt{0.3125*(1-0.3125)} = 0.4635
 \]</span></p>
 <p>The close match between our empirical SE (0.4626) and the theoretical standard deviation (0.4635) validates that our simulation is accurately capturing the variability of this Bernoulli process. Note that in larger simulations, the empirical SE will converge to the theoretical SE.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Each “estimate” in this example is a single 0/1 Bernoulli draw, so the Empirical SE reported here is the standard deviation of the Bernoulli <strong>outcome</strong> itself, not the variability of an estimator. It is therefore not a measure of estimator precision, and a <em>large</em> value (≈0.46) does not indicate a poor simulation. The precision of our estimate of the probability (the mean across iterations) is instead given by the Monte Carlo standard error, <span class="math inline">\(\text{MCSE} = \text{EmpSE}/\sqrt{n_{sim}} = 0.4626/\sqrt{100000} \approx 0.0015\)</span>, which is what tells us how close the simulated mean (0.3103) is to the truth (0.3125). The same caveat applies to the MSE below: it equals the variance of a single Bernoulli draw, not the mean squared error of an estimator. To make these quantities describe estimator performance, each replication would need to be an actual estimate (e.g., the proportion of successes over a batch of trials) rather than a single draw.</p>
+</div>
+</div>
 <p>The MSE is 0.214, which should approximately equal the variance since MSE = bias² + variance and our bias is very small. We can verify this:</p>
 <p><span class="math display">\[
 \text{Variance} = \text{Standard Deviation}^2 = 0.4635^2 =  0.2148
 \]</span></p>
-<p>The closeness between our MSE (0.214) and the theoretical variance (0.2148) further confirms that our simulation is accurately estimating the properties of this probability experiment.</p>
+<p>The closeness between our MSE (0.214) and the theoretical variance (0.2148) confirms that the simulation is accurately reproducing the variability of this Bernoulli process. As noted above, this value reflects the spread of a single Bernoulli draw rather than the (much smaller) error of our probability estimate.</p>
 </section><section id="references" class="level3"><h3 class="anchored" data-anchor-id="references">References</h3>
 
 

@@ -1,0 +1,55 @@
+# Setup: Before you begin {.unnumbered}
+
+::: callout-note
+This page is the starting point for running the tutorials yourself. It tells you what software to install, how to install **all** R packages used across the book in one step, and how the datasets are organized so the code runs end-to-end on a fresh machine.
+:::
+
+## Software
+
+-   **R** (version 4.2.0 or newer recommended). Download from [CRAN](https://cran.r-project.org/).
+-   **RStudio Desktop** (recommended IDE). Download from [posit.co](https://posit.co/download/rstudio-desktop/).
+-   The book itself is built with [Quarto](https://quarto.org/) (bundled with recent RStudio). You only need Quarto if you want to *render* the book; you do **not** need it to run the individual tutorial code.
+
+## Installing all R packages in one step
+
+Every package used anywhere in this book is listed in a single script, [`packages.R`](https://github.com/ehsanx/EpiMethods/blob/main/packages.R), in the repository root. It installs the CRAN packages and the few GitHub-only packages (including `simcausal`, `WeightedROC`, and `svyTable1`).
+
+From a fresh R session, run:
+
+``` r
+# from the root of a local clone of the EpiMethods repository
+source("packages.R")
+```
+
+or, to run it directly from GitHub without cloning:
+
+``` r
+source("https://raw.githubusercontent.com/ehsanx/EpiMethods/main/packages.R")
+```
+
+::: callout-important
+**GitHub-only packages.** A few packages are not on CRAN and are installed from GitHub by `packages.R` via `remotes::install_github()`:
+
+-   [`svyTable1`](https://github.com/ehsanx/svyTable1) — survey-aware Table 1 / reporting toolkit, used in several survey, confounding, and missing-data chapters.
+-   [`simcausal`](https://github.com/osofr/simcausal) — DAG-based data simulation, used in the Simulation and Causal Roles modules.
+-   [`WeightedROC`](https://github.com/tdhock/WeightedROC) — weighted ROC/AUC, used in the survey and missing-data modules.
+
+Installing GitHub packages requires the `remotes` package (handled automatically) and, for some packages, a working compiler toolchain (Rtools on Windows, Xcode command-line tools on macOS).
+:::
+
+## Datasets and data access
+
+Processed analytic datasets used by the tutorials are committed in the [`Data/`](https://github.com/ehsanx/EpiMethods/tree/main/Data) folder of the repository, organized by module (e.g., `Data/wrangling/`, `Data/propensityscore/`). Each chapter's **Overview** page links to the relevant data folder.
+
+-   **NHANES** (US CDC) data are publicly available; the relevant cycles are either pre-processed in `Data/` or downloaded in-tutorial via the `nhanesA`/`NHANES` packages.
+-   **CCHS** (Statistics Canada) microdata are not openly redistributable. The book ships the *processed* analytic objects needed to run the code; reproducing them from raw CCHS files requires institutional (e.g., UBC) access via the [Canadian Research Data Centre Network](https://www.statcan.gc.ca/en/microdata/data-centres) / UBC Abacus.
+
+::: callout-tip
+**Reproducibility standard.** The analyses are intended to run end-to-end by another analyst on a fresh machine after `source("packages.R")` and obtaining the committed `Data/` folder. Paths in the code are case-sensitive on Linux/macOS; keep the `Data/` folder name capitalized exactly as in the repository.
+:::
+
+## Reporting problems
+
+::: callout-warning
+Found a bug, a broken link, or a package that fails to install? Please report it via [this form](https://forms.gle/YSwuiebtb1E9wjHu9) so we can fix it.
+:::

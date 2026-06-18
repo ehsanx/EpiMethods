@@ -178,6 +178,12 @@ window.Quarto = {
  <span class="menu-text">The Project</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup: Before you begin</span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
@@ -431,6 +437,12 @@ window.Quarto = {
  <span class="menu-text">Useful Packages</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (E)</span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -523,6 +535,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./Simulation3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimating Causal Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SimulationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (U)</span></a>
   </div>
 </li>
       </ul>
@@ -1073,14 +1091,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1340,6 +1358,29 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./reporting2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Formatting Tools</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (G)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation and glossary</span></a>
   </div>
 </li>
       </ul>
@@ -1674,6 +1715,19 @@ The coefficient of A is the natural direct effect, and the coefficient of A* is 
 <section id="numeric-covariates-and-covariate-profile" class="level4"><h4 class="anchored" data-anchor-id="numeric-covariates-and-covariate-profile">7.1 Numeric covariates and covariate profile</h4>
 <p><code>regmedint</code> expects numeric covariates and a numeric vector <code>c_cond</code> that defines the covariate profile at which effects are evaluated.</p>
 <p>We recode factors to numeric codes and set <code>c_cond</code> equal to the mean of each numeric covariate.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Caveat on <code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> applied to a factor.</strong> Calling <code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> on a factor returns its <strong>integer level codes</strong> (1, 2, 3, …), not a meaningful numeric measurement. For a multi-level categorical covariate such as <code>race</code> or <code>bmi</code> category, this forces <code>regmedint</code> to treat it as a single continuous term, and <code>c_cond</code> is then set at a fractional “mean code” (for example <code>race</code> ≈ 1.88, <code>bmi</code> ≈ 2.49) that does not correspond to any real category. This is a structurally different covariate model from the dummy-expanded factors used in the manual IPW fit, and it is one reason the two approaches do not match exactly. A more faithful implementation would keep genuinely continuous/binary covariates as numeric and expand multi-level factors into dummy indicators (setting the corresponding <code>c_cond</code> entries to the observed proportions).</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>analysis_data<span class="sc">$</span>age_num <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(analysis_data<span class="sc">$</span>age)</span>
 <span id="cb8-2"><a href="#cb8-2"></a>analysis_data<span class="sc">$</span>sex_num <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(analysis_data<span class="sc">$</span>sex)</span>
@@ -1876,7 +1930,7 @@ The coefficient of A is the natural direct effect, and the coefficient of A* is 
 <ul>
 <li>
 <code>regmedint</code> uses parametric standardisation based on the fitted outcome and mediator models.</li>
-<li>Effects are evaluated at the mean covariate profile <code>c_cond_vec</code>, not over the full covariate distribution, but this is close enough for comparison with the IPW based approach.</li>
+<li>Effects are evaluated at the mean covariate profile <code>c_cond_vec</code>, not over the full covariate distribution; this, together with the factor-coding difference noted in Section 7.1, makes the comparison with the IPW based approach approximate rather than exact.</li>
 </ul>
 <hr></section></section><section id="comparison-table-and-brief-interpretation" class="level3"><h3 class="anchored" data-anchor-id="comparison-table-and-brief-interpretation">8. Comparison table and brief interpretation</h3>
 <section id="combine-and-display-results" class="level4"><h4 class="anchored" data-anchor-id="combine-and-display-results">8.1 Combine and display results</h4>
@@ -2032,6 +2086,8 @@ The coefficient of A is the natural direct effect, and the coefficient of A* is 
 </ul>
 <p>Some differences between the manual and <code>regmedint</code> estimates are expected.</p>
 <ul>
+<li>
+<strong>The two approaches fit structurally different covariate models</strong> (the leading reason for the gap here). The manual IPW fit uses the factor covariates with their dummy-expanded levels, whereas the <code>regmedint</code> fit recodes each factor to integer level codes via <code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> and treats it as a single linear term evaluated at a fractional “mean code” (see the caveat in Section 7.1). These are not the same adjustment set, so the estimands being compared are not identical and the agreement should be read as approximate rather than “close enough.”</li>
 <li>The manual calculation relies on an IPW-based decomposition using fitted models that approximate counterfactual contrasts, while <code>regmedint</code> uses fully parametric standardization, integrating over the outcome and mediator models at the chosen covariate profile.</li>
 <li>IPW and parametric g-formula methods target the same estimands but use different estimating equations and weighting structures, so their results will not match exactly unless models are perfectly specified.</li>
 <li>

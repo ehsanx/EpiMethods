@@ -37,7 +37,7 @@ topics <- c(
   "Crafting Data for Research", 
   "Simulation",  
   "Grasping Confounding", 
-  "Adjustment Techniques", 
+  "Predictive Modeling",
   "Complex Survey Analysis", 
   "Missing Data", 
   "Propensity Score Analysis", 
@@ -59,7 +59,7 @@ descriptions <- c(
   "Introduction to key concepts of prediction modelling.", 
   "Handle data sets obtained from complex survey designs.", 
   "Understand and tackle missingness in your data.", 
-  "Dive deeper into advanced observational data analyses.", 
+  "Reduce confounding via propensity score matching, weighting, and stratification, with covariate-balance checks.",
   "Introduction to machine learning algorithms, and applications.", 
   "Discusses the potential pitfalls and challenges in merging machine learning with causal inference, and a way forward.", 
   "Statistical techniques to deal with complex or non-binary outcomes", 
@@ -68,20 +68,22 @@ descriptions <- c(
   "Tools and guides for scientific writing and collaboration."
 )
 
-# Update the module numbers to go from 1 to 15
-df <- data.frame(`Module` = 1:length(topics), 'Topics.Indicators' = topics, Descriptions = descriptions)
+# Module numbering: 1 (intro, W) + 10 core + 5 bonus = 16 modules
+types <- c("Intro", "Core", "Core", "Core", "Bonus", "Core", "Core", "Core",
+           "Core", "Core", "Core", "Core", "Bonus", "Bonus", "Bonus", "Bonus")
+df <- data.frame(`Module` = 1:length(topics), 'Topics.Indicators' = topics, Type = types, Descriptions = descriptions)
 
 # Generate the table content
-table_content <- kable(df, "html", align = c("c", "l", "l"), escape = FALSE)
+table_content <- kable(df, "html", align = c("c", "l", "c", "l"), escape = FALSE)
 
 # Replace specific topics with hyperlinks
 table_content <- gsub("R Data Wrangling", "<a href='wrangling.html'>R for Data Wrangling (W)</a>", table_content)
 table_content <- gsub("Survey Data Resources", "<a href='accessing.html'>Accessing (A) Survey Data Resources</a>", table_content)
 table_content <- gsub("Exploratory Data Analysis", "<a href='exploring.html'>Exploratory (E) Data Analysis</a>", table_content)  
 table_content <- gsub("Crafting Data for Research", "<a href='researchquestion.html'>Crafting Analytic Data for Research Questions (Q)</a>", table_content)
-table_content <- gsub("Simulation", "<a href='simulation.html'>Simulation (U)</a>", table_content)
+table_content <- gsub("Simulation", "<a href='Simulation.html'>Simulation (U)</a>", table_content)
 table_content <- gsub("Grasping Confounding", "<a href='confounding.html'>Causal Roles (R)</a>", table_content)
-table_content <- gsub("Adjustment Techniques", "<a href='predictivefactors.html'>Predictive (P) modeling</a>", table_content)
+table_content <- gsub("Predictive Modeling", "<a href='predictivefactors.html'>Predictive (P) modeling</a>", table_content)
 table_content <- gsub("Complex Survey Analysis", "<a href='surveydata.html'>Complex Survey Data (D) Analysis</a>", table_content)
 table_content <- gsub("Missing Data", "<a href='missingdata.html'>Missing (M) Data Analysis</a>", table_content)
 table_content <- gsub("Propensity Score Analysis", "<a href='propensityscore.html'>Propensity Score (S) Analysis</a>", table_content)
@@ -205,7 +207,7 @@ library(glue)
 library(DT)
 
 # --- 1. Read + clean -------------------------------------------------------
-pubs_raw <- read_csv("data/pubs.csv", show_col_types = FALSE)
+pubs_raw <- read_csv("Data/pubs.csv", show_col_types = FALSE)
 
 pubs <- pubs_raw %>%
   mutate(

@@ -1,0 +1,105 @@
+## R Functions (E) {.unnumbered}
+
+::: {.callout-note}
+This review/summary page provides an extensive list of R functions tailored for exploratory data analysis tasks that we have used in this chapter. Each function is systematically described, highlighting its primary package source and its specific utility.
+:::
+
+To learn more about these functions, readers can:
+
+1.  **Use R's Built-in Help System**: For each function, access its documentation by prefixing the function name with a question mark in the R console, e.g., `?summary`. This displays the function's manual page with descriptions, usage, and examples.
+
+2.  **Search Websites**: Simply [Google](https://www.google.com/search?q=summary+in+R), or visit the [CRAN website](https://cran.r-project.org/) to search for specific function documentation. Websites like [Stack Overflow](https://stackoverflow.com/) and [RStudio Community](https://community.rstudio.com/) often have discussions related to R functions.
+
+3.  **Tutorials and Online Courses**: Platforms like DataCamp, Coursera, and edX offer R courses that cover many functions in depth. Also there are examples of dedicated R tutorial websites that you might find useful. One example is ["Introduction to R for health data analysis"](https://ehsanx.github.io/intro2R/) by Ehsan Karim, An Hoang and Qu.
+
+4.  **Books**: There are numerous R programming books, such as ["R for Data Science"](https://r4ds.had.co.nz/) by Hadley Wickham and ["The Art of R Programming"](https://nostarch.com/artofr.htm) by Norman Matloff.
+
+5.  **Workshops and Webinars**: Institutions and organizations occasionally offer R programming workshops or webinars.
+
+Whenever in doubt, exploring existing resources can be highly beneficial.
+
+```{r, echo=FALSE, warning=FALSE,message=FALSE}
+library(knitr)
+library(kableExtra)
+
+data <- data.frame(
+  Function_name = c("abs", "aes", "as.factor", "as_gt", "class", "clean_names", "coef", "colnames", "cor", "CreateTableOne", "create_report", "datasummary_balance", "datasummary_correlation", "datasummary_crosstab", "datasummary_skim", "dim", "element_text", "factor", "geom_bar", "geom_boxplot", "geom_density", "geom_histogram", "geom_point", "geom_tile", "gg_miss_upset", "gg_miss_var", "ggarrange", "ggpairs", "ggplot", "glance", "head", "introduce", "is.na", "kable", "lm", "md", "mean", "melt", "modelsummary", "na.omit", "plot_bar", "plot_boxplot", "plot_correlation", "plot_histogram", "plot_missing", "plot_qq", "readRDS", "require", "round", "sapply", "scale", "select", "skim", "stargazer", "sum", "summary", "tab_source_note", "table1", "tabyl", "tbl_summary", "texreg", "theme", "tidy", "vis_dat", "vis_miss", "which"),
+  Package_name = c("base", "ggplot2", "base", "gtsummary", "base", "janitor", "stats", "base", "stats", "tableone", "DataExplorer", "modelsummary", "modelsummary", "modelsummary", "modelsummary", "base", "ggplot2", "base", "ggplot2", "ggplot2", "ggplot2", "ggplot2", "ggplot2", "ggplot2", "naniar", "naniar", "ggpubr", "GGally", "ggplot2", "broom", "base", "DataExplorer", "base", "knitr", "stats", "gt", "base", "reshape2", "modelsummary", "base/stats", "DataExplorer", "DataExplorer", "DataExplorer", "DataExplorer", "DataExplorer", "DataExplorer", "base", "base", "base", "base", "base", "dplyr", "skimr", "stargazer", "base", "base", "gt", "table1", "janitor", "gtsummary", "texreg", "ggplot2", "broom", "visdat", "visdat", "base"),
+  Use = c(
+  "Returns the absolute value, used here to flag Z-scores beyond a threshold.",
+  "Defines aesthetic mappings (e.g., x, y, fill) for a ggplot.",
+  "Converts a variable to a factor. `as.factor` is a wrapper for the `factor` function.",
+  "Converts a `gtsummary` table object to a `gt` table for further styling.",
+  "Returns the class (type) of an object or variable.",
+  "Cleans column names to make them syntactically valid and consistent.",
+  "Extracts model coefficients (e.g., from a fitted regression model).",
+  "Returns the column names (variable names) of a data frame.",
+  "Computes the correlation matrix between numerical variables.",
+  "Creates the classic 'Table 1' summarizing dataset characteristics, optionally by strata.",
+  "Generates a full automated exploratory data analysis report as a document.",
+  "Creates a Table 1-style balance table comparing groups.",
+  "Extracts and displays correlations between variables.",
+  "Generates a contingency (cross-tabulation) table.",
+  "Produces a quick skim-style overview of each variable in a dataset.",
+  "Returns the dimensions of a data frame (rows x columns).",
+  "Controls text appearance (e.g., axis text angle) in a ggplot theme.",
+  "Creates a factor variable with specified levels and labels.",
+  "Draws bar charts to visualize counts of categorical variables.",
+  "Draws boxplots to summarize distributions and detect outliers.",
+  "Draws density plots, useful for comparing distributions across groups.",
+  "Draws histograms to visualize the distribution of continuous variables.",
+  "Draws scatterplots to examine relationships between two numerical variables.",
+  "Draws tiles, used here to build a correlation heatmap.",
+  "Plots an UpSet chart of missing data combinations.",
+  "Plots the number of missing values per variable.",
+  "Arranges multiple ggplot objects into a single figure.",
+  "Creates a matrix of pairwise plots for several variables.",
+  "Initializes a ggplot object for building plots layer by layer.",
+  "Returns a one-row summary of goodness-of-fit statistics for a model.",
+  "Displays the first six elements of an object (e.g., a dataset).",
+  "Provides an overview of dataset dimensions, variable types, and missingness.",
+  "Checks for missing values in a variable.",
+  "Renders a data frame as a formatted table.",
+  "Fits a linear regression model.",
+  "Formats text as markdown (used for table notes).",
+  "Computes the arithmetic mean, used here for mean imputation.",
+  "Reshapes a matrix from wide to long format (e.g., a correlation matrix).",
+  "Displays one or more regression models in a formatted table.",
+  "Removes all rows with missing values from a dataset.",
+  "Plots categorical variable distributions as bar charts.",
+  "Draws boxplots of variables grouped by a treatment or outcome.",
+  "Plots a correlation matrix of variables.",
+  "Plots histograms of numerical variables.",
+  "Plots the amount of missing data per variable.",
+  "Draws quantile-quantile plots to assess normality.",
+  "Reads a single R object stored in an RDS file.",
+  "Loads a package, returning a logical value rather than erroring if unavailable.",
+  "Rounds numeric values to a specified number of digits.",
+  "Applies a function over elements (e.g., columns) of an object.",
+  "Standardizes a numeric variable (computes Z-scores).",
+  "Selects specified variables from a dataset.",
+  "Provides a compact, type-aware summary of a dataset.",
+  "Outputs regression results in text, LaTeX, or HTML formats.",
+  "Returns the sum of values; with `is.na` counts missing values.",
+  "Provides a summary of an object, like variable statistics.",
+  "Adds a source note (caption) to a `gt` table.",
+  "Generates descriptive summary tables common in medical research.",
+  "Generates cross-tabulations from a data frame.",
+  "Creates customizable summary tables, including for survey data.",
+  "Exports regression tables to LaTeX, HTML, or Word.",
+  "Customizes non-data elements of a ggplot (e.g., legend, axis text).",
+  "Converts a model output into a tidy data frame.",
+  "Visualizes data types and missingness across a dataset.",
+  "Visualizes missing data patterns across a dataset.",
+  "Returns the indices of elements satisfying a condition (e.g., outliers)."
+)
+)
+
+kable(data, format = "html", escape = F, table.attr = 'class="table table-hover"') %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = F) %>%
+  column_spec(1, bold = T) %>%
+  column_spec(2, color = "blue") %>%
+  column_spec(3, italic = T) %>%
+  scroll_box(width = "100%", height = "500px")
+
+```

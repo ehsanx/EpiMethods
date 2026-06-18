@@ -149,9 +149,10 @@ The results indicated that the survival time depends on the sex (p-value = 0.001
 
 The Cox regression model (aka Cox proportional-hazard model) is semi-parametric model to quantify the effect size in survival analysis.
 
--   $h(t|X_i)=h_0(t)exp(\beta_0+\beta_1X_{i1}+\beta_2X_{i2}+\beta_3X_{i3}+...+\beta_pX_{ip})$, where
+-   $h(t|X_i)=h_0(t)exp(\beta_1X_{i1}+\beta_2X_{i2}+\beta_3X_{i3}+...+\beta_pX_{ip})$, where
     -   $h_0(t)$ is the baseline hazard and
     -   $h(t)$ is the hazard at time $t$
+-   Note that there is no intercept term ($\beta_0$) in the Cox model: any intercept would be absorbed into the unspecified baseline hazard $h_0(t)$, which is why the model is semi-parametric and the intercept is not separately identifiable.
 
 In R, we have "coxph" from survival package to fit a Cox PH model
 
@@ -275,10 +276,10 @@ plot_missing(analytic.miss)
 
 ```{r complex3, cache=TRUE}
 analytic.miss$ID <- 1:nrow(analytic.miss)
-analytic.miss$miss <- 0
+analytic.miss$miss <- 1
 analytic.cc <- as.data.frame(na.omit(analytic.miss))
 dim(analytic.cc)
-analytic.miss$miss[analytic.miss$ID %in% 
+analytic.miss$miss[analytic.miss$ID %in%
                      analytic.cc$ID] <- 0
 w.design0 <- svydesign(id=~SDMVPSU, 
                        strata=~SDMVSTRA, 

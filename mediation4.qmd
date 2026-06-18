@@ -284,6 +284,10 @@ Here we fit a `regmedint` model using the same exposure, mediator, outcome and c
 
 We recode factors to numeric codes and set `c_cond` equal to the mean of each numeric covariate.
 
+::: callout-warning
+**Caveat on `as.numeric()` applied to a factor.** Calling `as.numeric()` on a factor returns its **integer level codes** (1, 2, 3, ...), not a meaningful numeric measurement. For a multi-level categorical covariate such as `race` or `bmi` category, this forces `regmedint` to treat it as a single continuous term, and `c_cond` is then set at a fractional "mean code" (for example `race` ≈ 1.88, `bmi` ≈ 2.49) that does not correspond to any real category. This is a structurally different covariate model from the dummy-expanded factors used in the manual IPW fit, and it is one reason the two approaches do not match exactly. A more faithful implementation would keep genuinely continuous/binary covariates as numeric and expand multi-level factors into dummy indicators (setting the corresponding `c_cond` entries to the observed proportions).
+:::
+
 ```{r regmedint-covars, cache=TRUE}
 analysis_data$age_num <- as.numeric(analysis_data$age)
 analysis_data$sex_num <- as.numeric(analysis_data$sex)
@@ -397,7 +401,7 @@ regmedint_results <- data.frame(
 Interpretation:
 
 - `regmedint` uses parametric standardisation based on the fitted outcome and mediator models.
-- Effects are evaluated at the mean covariate profile `c_cond_vec`, not over the full covariate distribution, but this is close enough for comparison with the IPW based approach.
+- Effects are evaluated at the mean covariate profile `c_cond_vec`, not over the full covariate distribution; this, together with the factor-coding difference noted in Section 7.1, makes the comparison with the IPW based approach approximate rather than exact.
 
 ---
 
@@ -506,10 +510,11 @@ ggplot(plot_df, aes(x = Effect, y = est, color = Method)) +
 - The natural indirect effect is modest but greater than one in both approaches, suggesting that some of the OA to CVD association is transmitted through pain medication.
 - The proportion mediated on the log odds ratio scale is of similar magnitude across methods (roughly 15 to 20 percent).
 
-Some differences between the manual and `regmedint` estimates are expected. 
+Some differences between the manual and `regmedint` estimates are expected.
 
-- The manual calculation relies on an IPW-based decomposition using fitted models that approximate counterfactual contrasts, while `regmedint` uses fully parametric standardization, integrating over the outcome and mediator models at the chosen covariate profile. 
-- IPW and parametric g-formula methods target the same estimands but use different estimating equations and weighting structures, so their results will not match exactly unless models are perfectly specified. 
+- **The two approaches fit structurally different covariate models** (the leading reason for the gap here). The manual IPW fit uses the factor covariates with their dummy-expanded levels, whereas the `regmedint` fit recodes each factor to integer level codes via `as.numeric()` and treats it as a single linear term evaluated at a fractional "mean code" (see the caveat in Section 7.1). These are not the same adjustment set, so the estimands being compared are not identical and the agreement should be read as approximate rather than "close enough."
+- The manual calculation relies on an IPW-based decomposition using fitted models that approximate counterfactual contrasts, while `regmedint` uses fully parametric standardization, integrating over the outcome and mediator models at the chosen covariate profile.
+- IPW and parametric g-formula methods target the same estimands but use different estimating equations and weighting structures, so their results will not match exactly unless models are perfectly specified.
 - `regmedint` evaluates effects at the mean covariate vector rather than averaging over the full empirical covariate distribution, which can introduce small discrepancies compared with the manual implementation.
 
 ::: callout-tip

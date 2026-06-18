@@ -138,6 +138,10 @@ head(analytic.data3)
 dim(analytic.data3)
 ```
 
+::: callout-note
+The pre-built `analyticNHANES2013.RData` file contains the same `analytic.data3` object built in [Reproducing results](accessing4.html), but with the survey-design columns already derived and attached: `psu` (from the masked pseudo-PSU `SDMVPSU`), `strata` (from the masked pseudo-stratum `SDMVSTRA`), and `survey.weight`. The `accessing4` tutorial does not itself download or derive these design columns, so they are added here via this pre-built file; the construction mirrors the explicit derivation shown in [Importing NHIS to R](accessing5.html) and [Importing MICS to R](accessing6.html). Because the BMI outcome is measured in the Mobile Examination Center (MEC), the MEC exam weight `WTMEC2YR` (rather than the interview weight `WTINT2YR`) is the methodologically appropriate basis for `survey.weight`, consistent with the weight used elsewhere in this module (see [NHANES dataset](accessing8.html)).
+:::
+
 #### Merge mortality data and NHANES 2013-14 using unique identifier
 
 Let us merge the mortality and NHANES datasets using the `SEQN` variable.
@@ -172,8 +176,12 @@ tab1a <- CreateTableOne(var = c("AgeCat", "Gender", "Race", "eligstat", "mortsta
 print(tab1a, showAllLevels = T, format = "f")
 
 # Table 1 - weighted percentage or mean
-tab1b <- svyCreateTableOne(var = c("AgeCat", "Gender", "Race", "eligstat", "mortstat", 
-                                "diabetes", "hyperten", "permth_int", "permth_exm"), 
+tab1b <- svyCreateTableOne(var = c("AgeCat", "Gender", "Race", "eligstat", "mortstat",
+                                "diabetes", "hyperten", "permth_int", "permth_exm"),
                            data = w.design, includeNA = T)
 print(tab1b, showAllLevels = T, format = "p")
 ```
+
+::: callout-important
+Here the survey design `w.design` is built directly on the already-subsetted `dat.nhanes` object. For methodologically correct variance estimation, the recommended practice is to build the design on the **full** survey cycle and then use `subset()` to restrict to the analytic sample (domain/subpopulation estimation), as demonstrated in [Importing NHIS to R](accessing5.html) and [Importing MICS to R](accessing6.html). Point estimates (weighted percentages and means) are unaffected by which approach is used, but subsetting the data before constructing the design can distort the standard errors and degrees of freedom. See the [survey data analysis](surveydata.html) chapter for details.
+:::

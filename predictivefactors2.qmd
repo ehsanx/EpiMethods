@@ -211,16 +211,21 @@ crPlots(fit0)
 We fit polynomial models of orders 2 and 3 to explore non-linear relationships between cholesterol and triglycerides.
 
 ```{r refit2, warning=FALSE, cache=TRUE}
-formula1 <- as.formula("cholesterol~poly(triglycerides,2)")
-formula1 <- as.formula("cholesterol~triglycerides^2")
-fit1 <- lm(formula1,data = analytic3)
+# Genuine quadratic fit via a precomputed squared term.
+# (publish()/regressionTable cannot parse in-formula poly() or I() terms,
+#  so we add the polynomial columns to the data explicitly.)
+analytic3.poly <- transform(analytic3,
+                            triglycerides2 = triglycerides^2,
+                            triglycerides3 = triglycerides^3)
+formula1 <- as.formula("cholesterol ~ triglycerides + triglycerides2")
+fit1 <- lm(formula1, data = analytic3.poly)
 publish(fit1)
 
 # Partial Residual Plots
 crPlots(fit1)
 ```
 
-It seems triglyceride has a quadratic effect on cholesterol. We can compare models fit0 and fit1 using the `anova` function:
+We can compare the linear model `fit0` and the second-order polynomial model `fit1` using the `anova` function to assess whether the quadratic term improves the fit:
 
 ```{r refit2b, warning=FALSE, cache=F}
 # compare fit0 and fit1 models
@@ -231,10 +236,9 @@ print(res0)
 ##### Polynomial order 3
 
 ```{r refit3, warning=FALSE, cache=TRUE}
-# Fit a polynomial of order 3
-formula2 <- as.formula("cholesterol~poly(triglycerides,3)")
-formula2 <- as.formula("cholesterol~triglycerides^3")
-fit2 <- lm(formula2,data = analytic3)
+# Fit a polynomial of order 3 (precomputed cubic term)
+formula2 <- as.formula("cholesterol ~ triglycerides + triglycerides2 + triglycerides3")
+fit2 <- lm(formula2, data = analytic3.poly)
 publish(fit2)
 
 # Partial Residual Plots

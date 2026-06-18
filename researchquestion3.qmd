@@ -1,6 +1,6 @@
 ## Causal question-1 {.unnumbered}
 
-### Working with a Predictive question using CCHS
+### Working with a causal (associational) question using CCHS
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -95,7 +95,7 @@ Generally try to include basic demographics (e.g., age, sex, education etc. are 
 | BMI                         | Covariate        | Category   | Underweight; Normal; Overweight; Obese                              |
 | Physical activity           | Covariate        | Category   | Active; Moderate; Inactive                                          |
 | Smoking                     | Covariate        | Category   | Non-smoker; Currently; Former                                       |
-| Fruit/vegetable consumption | Covariate        | Category   | 0-3; 4-6 ; 6+ servings daily                                        |
+| Fruit/vegetable consumption | Covariate        | Category   | 0-3; 4-6 ; \>6 servings daily                                       |
 | Pain medication use         | Covariate        | Binary     |                                                                     |
 | Hypertension                | Covariate        | Binary     |                                                                     |
 | COPD                        | Covariate        | Binary     |                                                                     |
@@ -403,8 +403,7 @@ table(c123sub3$smoke)
 c123sub3$smoke <- car::recode(c123sub3$smoke,
                         "c('DAILY','OCCASIONAL',
                            'ALWAYS OCCASION.')='Current smoker';
-                         c('FORMER DAILY','FORMER OCCASION.',
-                           'ALWAYS OCCASION.') = 'Former smoker';
+                         c('FORMER DAILY','FORMER OCCASION.') = 'Former smoker';
                          'NEVER SMOKED' = 'Never smoker';
                          else = NA",
                          as.factor = FALSE)
@@ -418,10 +417,14 @@ summary(c123sub3$fruit2)
 c123sub3$fruit2 <- cut(c123sub3$fruit2,
                       breaks = c(0,3,6,Inf),
                       right = TRUE,
-                      labels = c("0-3 daily serving", 
-                                 "4-6 daily serving", 
-                                 "6+ daily serving"))
+                      include.lowest = TRUE,
+                      labels = c("0-3 daily serving",
+                                 "4-6 daily serving",
+                                 ">6 daily serving"))
 table(c123sub3$fruit2, useNA = "always")
+# Sanity check: true zeros must not be dropped to NA by the cut()
+fruit.num <- as.numeric(as.character(c123sub3$fruit.cont))
+stopifnot(all(!is.na(c123sub3$fruit2[!is.na(fruit.num) & fruit.num == 0])))
 c123sub3$fruit <- c123sub3$fruit2
 c123sub3$fruit2 <- NULL
 # pain medication

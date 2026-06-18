@@ -55,15 +55,15 @@ knitr::include_graphics("Images/machinelearning/enet.png")
 
 In this code chunk, we implement a machine learning model training process with a focus on utilizing cross-validation and tuning parameters to optimize the model. Cross-validation is a technique used to assess how well the model will generalize to an independent dataset by partitioning the original dataset into a training set to train the model, and a test set to evaluate it. Here, we specify that we are using a particular type of cross-validation, denoted as "cv", and that we will be creating 5 folds (or partitions) of the data, as indicated by `number = 5`.
 
-The model being trained is specified to use a method known as "glmnet", which is capable of performing lasso, ridge, and elastic net regularization regressions. Tuning parameters are crucial in controlling the behavior of our learning algorithm. In this instance, we specify `lambda` and `alpha` as our tuning parameters, which control the amount of regularization applied to the model and the mixing percentage between lasso and ridge regression, respectively. The `tuneGrid` argument is used to specify the exact values of `alpha` and `lambda` that the model should consider during training. The `verbose = FALSE` argument ensures that additional model training details are not printed during the training process. Finally, the trained model is stored in an object for further examination and use.
+The model being trained is specified to use a method known as "glmnet", which is capable of performing lasso, ridge, and elastic net regularization regressions. Tuning parameters are crucial in controlling the behavior of our learning algorithm. In this instance, we specify `lambda` and `alpha` as our tuning parameters, which control the amount of regularization applied to the model and the mixing percentage between lasso and ridge regression, respectively. The `tuneGrid` argument is used to specify the exact values of `alpha` and `lambda` that the model should consider during training. Here we tune over a grid of positive `lambda` values so that cross-validation can actually select the amount of shrinkage (a single `lambda = 0` would apply no penalty and simply recover the ordinary least squares fit). The `verbose = FALSE` argument ensures that additional model training details are not printed during the training process. Finally, the trained model is stored in an object for further examination and use.
 
 ```{r cvbinlasso22, cache = TRUE}
 ctrl <- trainControl(method = "cv", number = 5)
-fit.cv.con <- train(out.formula1, 
+fit.cv.con <- train(out.formula1,
                     trControl = ctrl,
                     data = ObsData, method = "glmnet",
-                    lambda= 0,
-                    tuneGrid = expand.grid(alpha = 1, lambda = 0),
+                    tuneGrid = expand.grid(alpha = 1,
+                                           lambda = 10^seq(-4, 1, length = 50)),
                     verbose = FALSE)
 fit.cv.con
 ```
@@ -74,11 +74,11 @@ Subsequent code chunks explore Ridge regression and Elastic Net, employing simil
 
 ```{r cvbinridge22, cache = TRUE}
 ctrl <- trainControl(method = "cv", number = 5)
-fit.cv.con <-train(out.formula1, 
+fit.cv.con <-train(out.formula1,
                    trControl = ctrl,
                    data = ObsData, method = "glmnet",
-                   lambda= 0,
-                   tuneGrid = expand.grid(alpha = 0, lambda = 0),
+                   tuneGrid = expand.grid(alpha = 0,
+                                          lambda = 10^seq(-4, 1, length = 50)),
                    verbose = FALSE)
 fit.cv.con
 ```
@@ -93,12 +93,12 @@ We then shift to binary outcomes, exploring LASSO and Ridge regression with simi
 ctrl<-trainControl(method = "cv", number = 5,
                    classProbs = TRUE,
                    summaryFunction = twoClassSummary)
-fit.cv.bin<-train(out.formula2, 
+fit.cv.bin<-train(out.formula2,
                   trControl = ctrl,
-                  data = ObsData, 
+                  data = ObsData,
                   method = "glmnet",
-                  lambda= 0,
-                  tuneGrid = expand.grid(alpha = 1, lambda = 0),
+                  tuneGrid = expand.grid(alpha = 1,
+                                         lambda = 10^seq(-4, 1, length = 50)),
                   verbose = FALSE,
                   metric="ROC")
 fit.cv.bin
@@ -114,9 +114,8 @@ ctrl<-trainControl(method = "cv", number = 5,
                    summaryFunction = twoClassSummary)
 fit.cv.bin<-train(out.formula2, trControl = ctrl,
                data = ObsData, method = "glmnet",
-               lambda= 0,
-               tuneGrid = expand.grid(alpha = 0,  
-                                      lambda = 0),
+               tuneGrid = expand.grid(alpha = 0,
+                                      lambda = 10^seq(-4, 1, length = 50)),
                verbose = FALSE,
                metric="ROC")
 fit.cv.bin
@@ -156,6 +155,10 @@ Decision trees are then introduced and implemented, with visualizations and eval
     -   Unstable, prone to overfitting, suffers from high variance
 
 ##### Simple CART
+
+::: callout-note
+The AUC values reported for the CART models below are computed on the same data used to fit the trees, so they are *apparent* (optimistic) estimates of discrimination. The cross-validation chunks in this chapter give less biased estimates of out-of-sample performance.
+:::
 
 ```{r cart, cache= TRUE, warning=FALSE}
 require(rpart)
@@ -308,6 +311,7 @@ Training different models on the same data
 -   Cross-validation: CL applied on training data, prediction made on test data
 -   Final prediction uses a weighted version of all predictions
     -   Weights = coef of Observed outcome \~ prediction from each CL
+    -   The weights are estimated under a convex-combination constraint: they are non-negative and sum to one (e.g., SuperLearner's `method.NNLS` for continuous outcomes or `method.NNloglik` for binary outcomes), so the ensemble prediction is a weighted average of the candidate learners' predictions.
 
 #### Steps
 

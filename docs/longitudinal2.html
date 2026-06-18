@@ -196,6 +196,12 @@ window.Quarto = {
  <span class="menu-text">The Project</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup: Before you begin</span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
@@ -449,6 +455,12 @@ window.Quarto = {
  <span class="menu-text">Useful Packages</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (E)</span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -541,6 +553,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./Simulation3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimating Causal Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SimulationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (U)</span></a>
   </div>
 </li>
       </ul>
@@ -1091,14 +1109,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1360,6 +1378,29 @@ window.Quarto = {
  <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (G)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation and glossary</span></a>
+  </div>
+</li>
       </ul>
 </li>
     </ul>
@@ -1409,7 +1450,7 @@ Note
 <div class="callout-body-container callout-body">
 <ul>
 <li><p>GEE is a population-averaged (e.g., marginal) model, whereas mixed effects models are subject/cluster-specific. For example, we can use GEE when we are interested in exploring the population average effect. On the other hand, when we are interested in individual/cluster-specific effects, we can use the mixed effects models.</p></li>
-<li><p>Also, in contrast to the mixed effects models where we assume error term and beta coefficients for subject <span class="math inline">\(i\)</span> both follow normal distribution, GEE is distribution free. However, in GEE, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.</p></li>
+<li><p>Also, in contrast to the mixed effects models where we assume that the error term and the random effects (for subject <span class="math inline">\(i\)</span>) both follow a normal distribution, GEE makes no full likelihood (distributional) assumption: it only specifies a mean model, a variance function, and a working correlation structure for the within subjects/clusters measurements. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.</p></li>
 </ul>
 </div>
 </div>
@@ -1816,32 +1857,36 @@ Note
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="do">## Generalized mixed effect model model</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">library</span>(<span class="st">"lme4"</span>)</span>
-<span id="cb10-3"><a href="#cb10-3"></a>resp_lmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb10-4"><a href="#cb10-4"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span> </span>
-<span id="cb10-5"><a href="#cb10-5"></a>                    (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">family =</span> <span class="fu">binomial</span>(), </span>
-<span id="cb10-6"><a href="#cb10-6"></a>                  <span class="at">data =</span> resp)</span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.197382 (tol = 0.002, component 1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-3"><a href="#cb10-3"></a>resp_lmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a>                    (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">family =</span> <span class="fu">binomial</span>(),</span>
+<span id="cb10-6"><a href="#cb10-6"></a>                  <span class="at">data =</span> resp,</span>
+<span id="cb10-7"><a href="#cb10-7"></a>                  <span class="at">control =</span> <span class="fu">glmerControl</span>(<span class="at">optimizer =</span> <span class="st">"bobyqa"</span>))</span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0662377 (tol = 0.002, component 1)</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model is nearly unidentifiable: very large eigenvalue</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt;  - Rescale variables?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">require</span>(afex)</span>
-<span id="cb11-2"><a href="#cb11-2"></a>resp_afex <span class="ot">&lt;-</span> <span class="fu">mixed</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span> </span>
-<span id="cb11-3"><a href="#cb11-3"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span> </span>
-<span id="cb11-4"><a href="#cb11-4"></a>                    (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">family =</span> <span class="fu">binomial</span>(), </span>
-<span id="cb11-5"><a href="#cb11-5"></a>                  <span class="at">data =</span> resp, <span class="at">method =</span> <span class="st">"LRT"</span>)</span>
-<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; Contrasts set to contr.sum for the following variables: baseline, month, treatment, gender, centre, subject</span></span>
-<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt; Numerical variables NOT centered on 0: age</span></span>
-<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt; If in interactions, interpretation of lower order (e.g., main) effects difficult.</span></span>
-<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.00495329 (tol = 0.002, component 1)</span></span>
-<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span id="cb11-12"><a href="#cb11-12"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.00478889 (tol = 0.002, component 1)</span></span>
-<span id="cb11-13"><a href="#cb11-13"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span id="cb11-14"><a href="#cb11-14"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0466122 (tol = 0.002, component 1)</span></span>
-<span id="cb11-15"><a href="#cb11-15"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span id="cb11-16"><a href="#cb11-16"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0949357 (tol = 0.002, component 1)</span></span>
-<span id="cb11-17"><a href="#cb11-17"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span id="cb11-18"><a href="#cb11-18"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0416611 (tol = 0.002, component 1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-2"><a href="#cb11-2"></a>resp_afex <span class="ot">&lt;-</span> <span class="fu">mixed</span>(nstat <span class="sc">~</span> baseline <span class="sc">+</span> month <span class="sc">+</span> treatment <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>                   gender <span class="sc">+</span> age <span class="sc">+</span> centre <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>                    (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">family =</span> <span class="fu">binomial</span>(),</span>
+<span id="cb11-5"><a href="#cb11-5"></a>                  <span class="at">data =</span> resp, <span class="at">method =</span> <span class="st">"LRT"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6"></a>                  <span class="at">control =</span> <span class="fu">glmerControl</span>(<span class="at">optimizer =</span> <span class="st">"bobyqa"</span>))</span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt; Contrasts set to contr.sum for the following variables: baseline, month, treatment, gender, centre, subject</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt; Numerical variables NOT centered on 0: age</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt; If in interactions, interpretation of lower order (e.g., main) effects difficult.</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0735995 (tol = 0.002, component 1)</span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model is nearly unidentifiable: very large eigenvalue</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co">#&gt;  - Rescale variables?</span></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0758745 (tol = 0.002, component 1)</span></span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model is nearly unidentifiable: very large eigenvalue</span></span>
+<span id="cb11-17"><a href="#cb11-17"></a><span class="co">#&gt;  - Rescale variables?</span></span>
+<span id="cb11-18"><a href="#cb11-18"></a><span class="co">#&gt; Warning in mixed(nstat ~ baseline + month + treatment + gender + age + centre + : Following nested model(s) provide better fit than full model: gender, age </span></span>
+<span id="cb11-19"><a href="#cb11-19"></a><span class="co">#&gt;   Results cannot be trusted. Try all_fit=TRUE or reduce random effect structure!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="do">## GEE model</span></span>
@@ -1936,29 +1981,29 @@ Note
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="do">## compare estimates (conditional vs. marginal)</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">summary</span>(resp_lmer)<span class="sc">$</span>coefficients <span class="co"># Model failed to converge</span></span>
-<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt;                       Estimate Std. Error    z value     Pr(&gt;|z|)</span></span>
-<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; (Intercept)        -1.65459986 0.77620476 -2.1316538 3.303531e-02</span></span>
-<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt; baselinegood        3.08897132 0.59858148  5.1604860 2.463096e-07</span></span>
-<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; month.L            -0.20348327 0.27957504 -0.7278306 4.667173e-01</span></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt; month.Q            -0.02821444 0.27907489 -0.1010999 9.194712e-01</span></span>
-<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt; month.C            -0.35570944 0.28084948 -1.2665483 2.053168e-01</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; treatmenttreatment  2.16620464 0.55157208  3.9273283 8.589470e-05</span></span>
-<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; gendermale          0.23836010 0.66606345  0.3578640 7.204451e-01</span></span>
-<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; age                -0.02557320 0.01993984 -1.2825178 1.996611e-01</span></span>
-<span id="cb13-12"><a href="#cb13-12"></a><span class="co">#&gt; centre2             1.03849878 0.54182274  1.9166762 5.527908e-02</span></span>
-<span id="cb13-13"><a href="#cb13-13"></a><span class="fu">summary</span>(resp_afex)<span class="sc">$</span>coefficients <span class="co"># Model failed to converge</span></span>
-<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt;                Estimate Std. Error    z value     Pr(&gt;|z|)</span></span>
-<span id="cb13-15"><a href="#cb13-15"></a><span class="co">#&gt; (Intercept)  1.61366355 0.79598978  2.0272415 4.263772e-02</span></span>
-<span id="cb13-16"><a href="#cb13-16"></a><span class="co">#&gt; baseline1   -1.55321951 0.30467553 -5.0979463 3.433581e-07</span></span>
-<span id="cb13-17"><a href="#cb13-17"></a><span class="co">#&gt; month1       0.21660822 0.24441676  0.8862249 3.754963e-01</span></span>
-<span id="cb13-18"><a href="#cb13-18"></a><span class="co">#&gt; month2      -0.17701748 0.24250584 -0.7299514 4.654199e-01</span></span>
-<span id="cb13-19"><a href="#cb13-19"></a><span class="co">#&gt; month3       0.21559489 0.24440444  0.8821235 3.777101e-01</span></span>
-<span id="cb13-20"><a href="#cb13-20"></a><span class="co">#&gt; treatment1  -1.09162957 0.28098789 -3.8849701 1.023425e-04</span></span>
-<span id="cb13-21"><a href="#cb13-21"></a><span class="co">#&gt; gender1     -0.10313396 0.33932981 -0.3039343 7.611780e-01</span></span>
-<span id="cb13-22"><a href="#cb13-22"></a><span class="co">#&gt; age         -0.02576276 0.02031589 -1.2681088 2.047591e-01</span></span>
-<span id="cb13-23"><a href="#cb13-23"></a><span class="co">#&gt; centre1     -0.52829986 0.27639204 -1.9114149 5.595128e-02</span></span>
-<span id="cb13-24"><a href="#cb13-24"></a><span class="fu">summary</span>(resp_gee3)<span class="sc">$</span>coefficients <span class="co"># Marginalized model</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">summary</span>(resp_lmer)<span class="sc">$</span>coefficients <span class="co"># Conditional (subject-specific) model</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt;                       Estimate  Std. Error     z value     Pr(&gt;|z|)</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; (Intercept)        -1.21917311 0.001131074 -1077.88954 0.000000e+00</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt; baselinegood        2.45537471 0.001130911  2171.14791 0.000000e+00</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; month.L            -0.20634926 0.001130363  -182.55128 0.000000e+00</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt; month.Q            -0.02081465 0.001130436   -18.41295 1.034409e-75</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt; month.C            -0.31755153 0.001130339  -280.93473 0.000000e+00</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; treatmenttreatment  1.70415034 0.001130867  1506.94210 0.000000e+00</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; gendermale          0.14957187 0.001130423   132.31490 0.000000e+00</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; age                -0.02128593 0.001138574   -18.69525 5.411496e-78</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a><span class="co">#&gt; centre2             0.87797915 0.001130860   776.38152 0.000000e+00</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="fu">summary</span>(resp_afex)<span class="sc">$</span>coefficients <span class="co"># Conditional (subject-specific) model</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt;                Estimate  Std. Error     z value     Pr(&gt;|z|)</span></span>
+<span id="cb13-15"><a href="#cb13-15"></a><span class="co">#&gt; (Intercept)  1.27061631 0.001050646  1209.36640 0.000000e+00</span></span>
+<span id="cb13-16"><a href="#cb13-16"></a><span class="co">#&gt; baseline1   -1.22444525 0.001084932 -1128.59191 0.000000e+00</span></span>
+<span id="cb13-17"><a href="#cb13-17"></a><span class="co">#&gt; month1       0.16912545 0.001050348   161.01846 0.000000e+00</span></span>
+<span id="cb13-18"><a href="#cb13-18"></a><span class="co">#&gt; month2      -0.12163481 0.001050872  -115.74654 0.000000e+00</span></span>
+<span id="cb13-19"><a href="#cb13-19"></a><span class="co">#&gt; month3       0.21269802 0.001050771   202.42083 0.000000e+00</span></span>
+<span id="cb13-20"><a href="#cb13-20"></a><span class="co">#&gt; treatment1  -0.86352075 0.001084942  -795.91414 0.000000e+00</span></span>
+<span id="cb13-21"><a href="#cb13-21"></a><span class="co">#&gt; gender1     -0.09402864 0.001050363   -89.52016 0.000000e+00</span></span>
+<span id="cb13-22"><a href="#cb13-22"></a><span class="co">#&gt; age         -0.01862935 0.001055502   -17.64976 1.021958e-69</span></span>
+<span id="cb13-23"><a href="#cb13-23"></a><span class="co">#&gt; centre1     -0.43283612 0.001050522  -412.01998 0.000000e+00</span></span>
+<span id="cb13-24"><a href="#cb13-24"></a><span class="fu">summary</span>(resp_gee3)<span class="sc">$</span>coefficients <span class="co"># Marginal (population-averaged) model</span></span>
 <span id="cb13-25"><a href="#cb13-25"></a><span class="co">#&gt;                       Estimate Naive S.E.    Naive z Robust S.E.   Robust z</span></span>
 <span id="cb13-26"><a href="#cb13-26"></a><span class="co">#&gt; (Intercept)        -0.90565507 0.47940039 -1.8891413  0.46042640 -1.9669920</span></span>
 <span id="cb13-27"><a href="#cb13-27"></a><span class="co">#&gt; baselinegood        1.86665412 0.34220231  5.4548261  0.35023043  5.3297885</span></span>
@@ -1969,7 +2014,7 @@ Note
 <span id="cb13-32"><a href="#cb13-32"></a><span class="co">#&gt; gendermale          0.11513183 0.41851611  0.2750953  0.44135628  0.2608592</span></span>
 <span id="cb13-33"><a href="#cb13-33"></a><span class="co">#&gt; age                -0.01785399 0.01258158 -1.4190585  0.01299686 -1.3737157</span></span>
 <span id="cb13-34"><a href="#cb13-34"></a><span class="co">#&gt; centre2             0.68481139 0.34010911  2.0135050  0.35681635  1.9192265</span></span>
-<span id="cb13-35"><a href="#cb13-35"></a><span class="fu">summary</span>(resp_gee4)<span class="sc">$</span>coefficients <span class="co"># Marginalized model</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-35"><a href="#cb13-35"></a><span class="fu">summary</span>(resp_gee4)<span class="sc">$</span>coefficients <span class="co"># Marginal (population-averaged) model</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
@@ -1978,7 +2023,7 @@ Note
 </div>
 </div>
 </div>
-<p>The significance of variables are similar in both variables, but the estimated coefficients are larger in generalized mixed effect model. However, it does not mean the estimated coefficients are inconsistent. Instead, two models are estimating different parameters. Remember, the mixed effect model is conditional on random effects, while the GEE is a marginalized model.</p>
+<p>These two approaches estimate different parameters, so their coefficients are not expected to be numerically equal even when both fit the data well. The generalized mixed effect model is <em>conditional</em> on the random effects (a subject-specific effect), whereas the GEE is a <em>marginal</em> (population-averaged) model. For a nonlinear link such as the logit, the conditional (subject-specific) log-odds coefficients are, in theory, larger in magnitude than the corresponding marginal (population-averaged) coefficients; this attenuation of the marginal estimates is a feature of the different estimands, not evidence that either model is biased.</p>
 </section><section id="video-content-optional" class="level3"><h3 class="anchored" data-anchor-id="video-content-optional">Video content (optional)</h3>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

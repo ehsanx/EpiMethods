@@ -254,8 +254,8 @@ auc.lasso
 dat.test$pred.lasso.logit <- Logit(dat.test$pred.lasso)
 
 # Weighted calibration slope
-mod.cal <- glm(HICP ~ pred.lasso.logit, data = dat.test, 
-               family = binomial, weights = wgt)
+mod.cal <- glm(HICP ~ pred.lasso.logit, data = dat.test,
+               family = quasibinomial, weights = wgt)
 cal.slope.lasso <- summary(mod.cal)$coef[2,1]
 cal.slope.lasso
 ```
@@ -316,8 +316,11 @@ for(ii in 1:nrow(grid.search)) {
                         importance = 'impurity', 
                         case.weights = dat.train$wgt)
   
-  # Add Out-of-bag (OOB) error to each grid
-  grid.search$oob_error[ii] <- sqrt(fit.rf.tune$prediction.error)
+  # Add Out-of-bag (OOB) error to each grid.
+  # For this classification forest, ranger's prediction.error is the OOB
+  # misclassification error (a proportion), not a mean squared error, so we
+  # do not take its square root.
+  grid.search$oob_error[ii] <- fit.rf.tune$prediction.error
 }
 head(grid.search)
 ```
@@ -375,9 +378,9 @@ dat.test$pred.rf[dat.test$pred.rf == 0] <- 0.00001
 dat.test$pred.rf.logit <- Logit(dat.test$pred.rf)
 
 # Weighted calibration slope
-mod.cal <- glm(HICP ~ pred.rf.logit, 
-               data = dat.test, 
-               family = binomial, 
+mod.cal <- glm(HICP ~ pred.rf.logit,
+               data = dat.test,
+               family = quasibinomial,
                weights = wgt)
 cal.slope.rf <- summary(mod.cal)$coef[2,1]
 cal.slope.rf

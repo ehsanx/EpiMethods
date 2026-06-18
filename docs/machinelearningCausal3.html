@@ -197,6 +197,12 @@ window.Quarto = {
  <span class="menu-text">The Project</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup: Before you begin</span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
@@ -450,6 +456,12 @@ window.Quarto = {
  <span class="menu-text">Useful Packages</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (E)</span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -542,6 +554,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./Simulation3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimating Causal Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SimulationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (U)</span></a>
   </div>
 </li>
       </ul>
@@ -1092,14 +1110,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1361,6 +1379,29 @@ window.Quarto = {
  <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (G)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation and glossary</span></a>
+  </div>
+</li>
       </ul>
 </li>
     </ul>
@@ -1449,19 +1490,25 @@ window.Quarto = {
 <td style="text-align: left;">Distribution</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">V</td>
-<td style="text-align: left;">Cross-validation folds for exposure and outcome modeling</td>
+<td style="text-align: left;">V.Q</td>
+<td style="text-align: left;">Cross-validation folds for outcome modeling</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">V.g</td>
+<td style="text-align: left;">Cross-validation folds for exposure modeling</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">Q.SL.library</td>
 <td style="text-align: left;">Set of machine learning methods to use for SuperLearner for outcome modeling</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">g.SL.library</td>
 <td style="text-align: left;">Set of machine learning methods to use for SuperLearner for exposure modeling</td>
 </tr>
 </tbody>
-</table></section><section id="constructing-superlearner" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="constructing-superlearner">Constructing SuperLearner</h3>
+</table>
+<p>The <code>V.Q</code> and <code>V.g</code> arguments set the number of cross-validation folds for the outcome and exposure models separately; alternatively, a single <code>V</code> argument sets the same number of folds for both.</p>
+</section><section id="constructing-superlearner" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="constructing-superlearner">Constructing SuperLearner</h3>
 <p>We will need to specify two SuperLearners, one for the exposure and one for the outcome model. We will need to consider the characteristics of our sample in order to decide the number of cross-validation folds and construct a diverse and computationally feasible library of algorithms.</p>
 <section id="number-of-folds" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="number-of-folds">Number of folds</h4>
 <p>First, we need to define the number of cross-validation folds to use for each model. This depends on our effective sample size <span class="citation" data-cites="phillips2023ConsiderationsSL">(<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">Phillips et al. 2023</a>)</span>.</p>
@@ -1475,12 +1522,12 @@ window.Quarto = {
 </div>
 <p>Our effective sample size for the exposure model is:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>p_exp <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>RHC.use <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n </span>
-<span id="cb3-2"><a href="#cb3-2"></a>n_eff_exp <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p, <span class="dv">1</span><span class="sc">-</span>p))) </span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>p_exp <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ObsData[ObsData<span class="sc">$</span>RHC.use <span class="sc">==</span> <span class="dv">1</span>,])<span class="sc">/</span>n</span>
+<span id="cb3-2"><a href="#cb3-2"></a>n_eff_exp <span class="ot">&lt;-</span> <span class="fu">min</span>(n, <span class="dv">5</span><span class="sc">*</span>(n<span class="sc">*</span><span class="fu">min</span>(p_exp, <span class="dv">1</span><span class="sc">-</span>p_exp)))</span>
 <span id="cb3-3"><a href="#cb3-3"></a>n_eff_exp</span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; [1] 5735</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>For both models, the effective sample size is the same as our sample size, <span class="math inline">\(n = 5,735\)</span>.</p>
+<p>For both models, the effective sample size equals our sample size, <span class="math inline">\(n = 5,735\)</span>. Note that <span class="math inline">\(n_{eff}\)</span> floors to <span class="math inline">\(n\)</span> here only because the outcome (and exposure) are common; with a rare outcome the effective sample size would be smaller than <span class="math inline">\(n\)</span> (see <a href="machinelearningCausal2.html">the SuperLearner tutorial</a> for the formula).</p>
 <p>Since <span class="math inline">\(5,000 \leq n_{eff} \leq 10,000\)</span>, we should use 5 or more cross-validation folds according to <span class="citation" data-cites="phillips2023ConsiderationsSL">Phillips et al. (<a href="#ref-phillips2023ConsiderationsSL" role="doc-biblioref">2023</a>)</span>. For the sake of computational feasibility, we will use <strong>5 folds</strong> in this example.</p>
 </section><section id="candidate-learners" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="candidate-learners">Candidate learners</h4>
 <p>The second step is to define the library of learners we will feed in to SuperLearner as potential options for each model (exposure and outcome). In this example, some of our covariates are continuous variables, such as temperature and blood pressure, so we need to include learners that allow non-linear/monotonic relationships.</p>
@@ -1562,7 +1609,20 @@ window.Quarto = {
 <span id="cb8-12"><a href="#cb8-12"></a>tmle.est.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
 <span id="cb8-13"><a href="#cb8-13"></a>tmle.ci.bin <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>ATE for binary outcome using user-specified library: 1.29 and 95% CI is 1.2011697, 1.3878896</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a binary outcome, the <code>tmle</code> package returns three marginal estimands: the ATE on the risk-difference scale (<code>estimates$ATE</code>), the marginal risk ratio (<code>estimates$RR</code>), and the marginal odds ratio (<code>estimates$OR</code>). Below we extract <code>estimates$OR$psi</code>, so the reported quantity is the <strong>marginal odds ratio</strong>, not the ATE (risk difference).</p>
+</div>
+</div>
+<p>Marginal odds ratio for binary outcome using user-specified library: 1.29 and 95% CI is 1.2011697, 1.3878896</p>
 <p>These results show those who received RHC had odds of death that were 1.29 times as high as the odds of death in those who did not receive RHC.</p>
 </section><section id="understanding-defaults" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="understanding-defaults">Understanding defaults</h3>
 <p>We can compare the results using our specified SuperLearner library to the results we would get when using the <code>tmle</code> package’s default SuperLearner libraries. To do this we simply do not specify libraries for the <code>Q.SL.library</code> and <code>g.SL.library</code> arguments.</p>
@@ -1587,8 +1647,8 @@ window.Quarto = {
 <span id="cb10-12"><a href="#cb10-12"></a>tmle.est.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>psi</span>
 <span id="cb10-13"><a href="#cb10-13"></a>tmle.ci.bin.def <span class="ot">&lt;-</span> tmle.fit.def<span class="sc">$</span>estimates<span class="sc">$</span>OR<span class="sc">$</span>CI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>ATE for binary outcome using default library: 1.32 with 95% CI 1.1808107, 1.4657624.</p>
-<p>These ATE when using the default SuperLearner library (1.31) is very close to the ATE when using our user-specified SuperLearner library (1.29). However, the confidence interval from TMLE using the default SuperLearner library (1.17, 1.46) is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library (1.20, 1.39).</p>
+<p>Marginal odds ratio for binary outcome using default library: 1.32 with 95% CI 1.1808107, 1.4657624.</p>
+<p>The marginal odds ratio when using the default SuperLearner library is very close to the marginal odds ratio when using our user-specified SuperLearner library. However, the confidence interval from TMLE using the default SuperLearner library is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library.</p>
 </section><section id="comparison-of-results" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="comparison-of-results">Comparison of results</h3>
 <p>We can also compare these results to those from a basic regression and from the literature.</p>
 <div class="cell">

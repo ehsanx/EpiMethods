@@ -177,6 +177,12 @@ window.Quarto = {
  <span class="menu-text">The Project</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup: Before you begin</span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
@@ -430,6 +436,12 @@ window.Quarto = {
  <span class="menu-text">Useful Packages</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (E)</span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -522,6 +534,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./Simulation3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimating Causal Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SimulationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (U)</span></a>
   </div>
 </li>
       </ul>
@@ -1072,14 +1090,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1341,6 +1359,29 @@ window.Quarto = {
  <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (G)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation and glossary</span></a>
+  </div>
+</li>
       </ul>
 </li>
     </ul>
@@ -1423,42 +1464,93 @@ Note
 </div>
 </div>
 <p>In this code chunk, we implement a machine learning model training process with a focus on utilizing cross-validation and tuning parameters to optimize the model. Cross-validation is a technique used to assess how well the model will generalize to an independent dataset by partitioning the original dataset into a training set to train the model, and a test set to evaluate it. Here, we specify that we are using a particular type of cross-validation, denoted as “cv”, and that we will be creating 5 folds (or partitions) of the data, as indicated by <code>number = 5</code>.</p>
-<p>The model being trained is specified to use a method known as “glmnet”, which is capable of performing lasso, ridge, and elastic net regularization regressions. Tuning parameters are crucial in controlling the behavior of our learning algorithm. In this instance, we specify <code>lambda</code> and <code>alpha</code> as our tuning parameters, which control the amount of regularization applied to the model and the mixing percentage between lasso and ridge regression, respectively. The <code>tuneGrid</code> argument is used to specify the exact values of <code>alpha</code> and <code>lambda</code> that the model should consider during training. The <code>verbose = FALSE</code> argument ensures that additional model training details are not printed during the training process. Finally, the trained model is stored in an object for further examination and use.</p>
+<p>The model being trained is specified to use a method known as “glmnet”, which is capable of performing lasso, ridge, and elastic net regularization regressions. Tuning parameters are crucial in controlling the behavior of our learning algorithm. In this instance, we specify <code>lambda</code> and <code>alpha</code> as our tuning parameters, which control the amount of regularization applied to the model and the mixing percentage between lasso and ridge regression, respectively. The <code>tuneGrid</code> argument is used to specify the exact values of <code>alpha</code> and <code>lambda</code> that the model should consider during training. Here we tune over a grid of positive <code>lambda</code> values so that cross-validation can actually select the amount of shrinkage (a single <code>lambda = 0</code> would apply no penalty and simply recover the ordinary least squares fit). The <code>verbose = FALSE</code> argument ensures that additional model training details are not printed during the training process. Finally, the trained model is stored in an object for further examination and use.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a>fit.cv.con <span class="ot">&lt;-</span> <span class="fu">train</span>(out.formula1, </span>
+<span id="cb2-2"><a href="#cb2-2"></a>fit.cv.con <span class="ot">&lt;-</span> <span class="fu">train</span>(out.formula1,</span>
 <span id="cb2-3"><a href="#cb2-3"></a>                    <span class="at">trControl =</span> ctrl,</span>
 <span id="cb2-4"><a href="#cb2-4"></a>                    <span class="at">data =</span> ObsData, <span class="at">method =</span> <span class="st">"glmnet"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5"></a>                    <span class="at">lambda=</span> <span class="dv">0</span>,</span>
-<span id="cb2-6"><a href="#cb2-6"></a>                    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">lambda =</span> <span class="dv">0</span>),</span>
+<span id="cb2-5"><a href="#cb2-5"></a>                    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">1</span>,</span>
+<span id="cb2-6"><a href="#cb2-6"></a>                                           <span class="at">lambda =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">1</span>, <span class="at">length =</span> <span class="dv">50</span>)),</span>
 <span id="cb2-7"><a href="#cb2-7"></a>                    <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-8"><a href="#cb2-8"></a>fit.cv.con</span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; glmnet </span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; </span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 5735 samples</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt;   50 predictor</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; </span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; No pre-processing</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; Summary of sample sizes: 4589, 4588, 4587, 4588, 4588 </span></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; Resampling results:</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; </span></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt;   RMSE      Rsquared    MAE     </span></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt;   25.11407  0.05861443  15.21187</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; </span></span>
-<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 1</span></span>
-<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt; Tuning</span></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt;  parameter 'lambda' was held constant at a value of 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info = trainInfo,</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; : There were missing values in resampled performance measures.</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>fit.cv.con</span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; glmnet </span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; </span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; 5735 samples</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt;   50 predictor</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; </span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; No pre-processing</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; Summary of sample sizes: 4589, 4587, 4588, 4588, 4588 </span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt; Resampling results across tuning parameters:</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; </span></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt;   lambda        RMSE      Rsquared    MAE     </span></span>
+<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt;   1.000000e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt;   1.264855e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt;   1.599859e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt;   2.023590e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt;   2.559548e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt;   3.237458e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt;   4.094915e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-29"><a href="#cb2-29"></a><span class="co">#&gt;   5.179475e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#&gt;   6.551286e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-31"><a href="#cb2-31"></a><span class="co">#&gt;   8.286428e-04  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-32"><a href="#cb2-32"></a><span class="co">#&gt;   1.048113e-03  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-33"><a href="#cb2-33"></a><span class="co">#&gt;   1.325711e-03  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-34"><a href="#cb2-34"></a><span class="co">#&gt;   1.676833e-03  24.98173  0.06021230  15.15948</span></span>
+<span id="cb2-35"><a href="#cb2-35"></a><span class="co">#&gt;   2.120951e-03  24.98170  0.06021389  15.15935</span></span>
+<span id="cb2-36"><a href="#cb2-36"></a><span class="co">#&gt;   2.682696e-03  24.98153  0.06021977  15.15894</span></span>
+<span id="cb2-37"><a href="#cb2-37"></a><span class="co">#&gt;   3.393222e-03  24.98114  0.06023267  15.15805</span></span>
+<span id="cb2-38"><a href="#cb2-38"></a><span class="co">#&gt;   4.291934e-03  24.98064  0.06024766  15.15687</span></span>
+<span id="cb2-39"><a href="#cb2-39"></a><span class="co">#&gt;   5.428675e-03  24.98003  0.06026594  15.15539</span></span>
+<span id="cb2-40"><a href="#cb2-40"></a><span class="co">#&gt;   6.866488e-03  24.97927  0.06028799  15.15363</span></span>
+<span id="cb2-41"><a href="#cb2-41"></a><span class="co">#&gt;   8.685114e-03  24.97833  0.06031563  15.15148</span></span>
+<span id="cb2-42"><a href="#cb2-42"></a><span class="co">#&gt;   1.098541e-02  24.97718  0.06034932  15.14873</span></span>
+<span id="cb2-43"><a href="#cb2-43"></a><span class="co">#&gt;   1.389495e-02  24.97586  0.06038364  15.14531</span></span>
+<span id="cb2-44"><a href="#cb2-44"></a><span class="co">#&gt;   1.757511e-02  24.97433  0.06042067  15.14117</span></span>
+<span id="cb2-45"><a href="#cb2-45"></a><span class="co">#&gt;   2.222996e-02  24.97235  0.06047265  15.13611</span></span>
+<span id="cb2-46"><a href="#cb2-46"></a><span class="co">#&gt;   2.811769e-02  24.96953  0.06056579  15.12989</span></span>
+<span id="cb2-47"><a href="#cb2-47"></a><span class="co">#&gt;   3.556480e-02  24.96611  0.06068631  15.12298</span></span>
+<span id="cb2-48"><a href="#cb2-48"></a><span class="co">#&gt;   4.498433e-02  24.96210  0.06082935  15.11547</span></span>
+<span id="cb2-49"><a href="#cb2-49"></a><span class="co">#&gt;   5.689866e-02  24.95773  0.06097846  15.10689</span></span>
+<span id="cb2-50"><a href="#cb2-50"></a><span class="co">#&gt;   7.196857e-02  24.95335  0.06111854  15.09830</span></span>
+<span id="cb2-51"><a href="#cb2-51"></a><span class="co">#&gt;   9.102982e-02  24.94942  0.06122207  15.08935</span></span>
+<span id="cb2-52"><a href="#cb2-52"></a><span class="co">#&gt;   1.151395e-01  24.94571  0.06131902  15.07965</span></span>
+<span id="cb2-53"><a href="#cb2-53"></a><span class="co">#&gt;   1.456348e-01  24.94254  0.06141272  15.07106</span></span>
+<span id="cb2-54"><a href="#cb2-54"></a><span class="co">#&gt;   1.842070e-01  24.94170  0.06141400  15.06578</span></span>
+<span id="cb2-55"><a href="#cb2-55"></a><span class="co">#&gt;   2.329952e-01  24.94405  0.06129930  15.05873</span></span>
+<span id="cb2-56"><a href="#cb2-56"></a><span class="co">#&gt;   2.947052e-01  24.95311  0.06079563  15.05728</span></span>
+<span id="cb2-57"><a href="#cb2-57"></a><span class="co">#&gt;   3.727594e-01  24.96846  0.05999554  15.06658</span></span>
+<span id="cb2-58"><a href="#cb2-58"></a><span class="co">#&gt;   4.714866e-01  24.99549  0.05853464  15.09248</span></span>
+<span id="cb2-59"><a href="#cb2-59"></a><span class="co">#&gt;   5.963623e-01  25.03812  0.05609877  15.13807</span></span>
+<span id="cb2-60"><a href="#cb2-60"></a><span class="co">#&gt;   7.543120e-01  25.09467  0.05295167  15.19973</span></span>
+<span id="cb2-61"><a href="#cb2-61"></a><span class="co">#&gt;   9.540955e-01  25.14669  0.05096275  15.26115</span></span>
+<span id="cb2-62"><a href="#cb2-62"></a><span class="co">#&gt;   1.206793e+00  25.21234  0.04888299  15.34021</span></span>
+<span id="cb2-63"><a href="#cb2-63"></a><span class="co">#&gt;   1.526418e+00  25.30650  0.04527545  15.44342</span></span>
+<span id="cb2-64"><a href="#cb2-64"></a><span class="co">#&gt;   1.930698e+00  25.43380  0.03869498  15.58248</span></span>
+<span id="cb2-65"><a href="#cb2-65"></a><span class="co">#&gt;   2.442053e+00  25.58755  0.02209982  15.74909</span></span>
+<span id="cb2-66"><a href="#cb2-66"></a><span class="co">#&gt;   3.088844e+00  25.68147  0.01919278  15.85082</span></span>
+<span id="cb2-67"><a href="#cb2-67"></a><span class="co">#&gt;   3.906940e+00  25.72171         NaN  15.89151</span></span>
+<span id="cb2-68"><a href="#cb2-68"></a><span class="co">#&gt;   4.941713e+00  25.72171         NaN  15.89151</span></span>
+<span id="cb2-69"><a href="#cb2-69"></a><span class="co">#&gt;   6.250552e+00  25.72171         NaN  15.89151</span></span>
+<span id="cb2-70"><a href="#cb2-70"></a><span class="co">#&gt;   7.906043e+00  25.72171         NaN  15.89151</span></span>
+<span id="cb2-71"><a href="#cb2-71"></a><span class="co">#&gt;   1.000000e+01  25.72171         NaN  15.89151</span></span>
+<span id="cb2-72"><a href="#cb2-72"></a><span class="co">#&gt; </span></span>
+<span id="cb2-73"><a href="#cb2-73"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 1</span></span>
+<span id="cb2-74"><a href="#cb2-74"></a><span class="co">#&gt; RMSE was used to select the optimal model using the smallest value.</span></span>
+<span id="cb2-75"><a href="#cb2-75"></a><span class="co">#&gt; The final values used for the model were alpha = 1 and lambda = 0.184207.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="cross-validation-ridge" class="level4"><h4 class="anchored" data-anchor-id="cross-validation-ridge">Cross-validation Ridge</h4>
 <p>Subsequent code chunks explore Ridge regression and Elastic Net, employing similar methodologies but adjusting tuning parameters accordingly.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>)</span>
-<span id="cb3-2"><a href="#cb3-2"></a>fit.cv.con <span class="ot">&lt;-</span><span class="fu">train</span>(out.formula1, </span>
+<span id="cb3-2"><a href="#cb3-2"></a>fit.cv.con <span class="ot">&lt;-</span><span class="fu">train</span>(out.formula1,</span>
 <span id="cb3-3"><a href="#cb3-3"></a>                   <span class="at">trControl =</span> ctrl,</span>
 <span id="cb3-4"><a href="#cb3-4"></a>                   <span class="at">data =</span> ObsData, <span class="at">method =</span> <span class="st">"glmnet"</span>,</span>
-<span id="cb3-5"><a href="#cb3-5"></a>                   <span class="at">lambda=</span> <span class="dv">0</span>,</span>
-<span id="cb3-6"><a href="#cb3-6"></a>                   <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> <span class="dv">0</span>),</span>
+<span id="cb3-5"><a href="#cb3-5"></a>                   <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">0</span>,</span>
+<span id="cb3-6"><a href="#cb3-6"></a>                                          <span class="at">lambda =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">1</span>, <span class="at">length =</span> <span class="dv">50</span>)),</span>
 <span id="cb3-7"><a href="#cb3-7"></a>                   <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb3-8"><a href="#cb3-8"></a>fit.cv.con</span>
 <span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; glmnet </span></span>
@@ -1468,15 +1560,64 @@ Note
 <span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt; </span></span>
 <span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt; No pre-processing</span></span>
 <span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; Summary of sample sizes: 4588, 4588, 4588, 4587, 4589 </span></span>
-<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; Resampling results:</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; Summary of sample sizes: 4587, 4589, 4588, 4589, 4587 </span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; Resampling results across tuning parameters:</span></span>
 <span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; </span></span>
-<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt;   RMSE      Rsquared    MAE     </span></span>
-<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt;   25.05711  0.06233138  15.15647</span></span>
-<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; </span></span>
-<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 0</span></span>
-<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; Tuning</span></span>
-<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt;  parameter 'lambda' was held constant at a value of 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt;   lambda        RMSE      Rsquared    MAE     </span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt;   1.000000e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt;   1.264855e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt;   1.599859e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt;   2.023590e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt;   2.559548e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt;   3.237458e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt;   4.094915e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt;   5.179475e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt;   6.551286e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt;   8.286428e-04  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt;   1.048113e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt;   1.325711e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt;   1.676833e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt;   2.120951e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt;   2.682696e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt;   3.393222e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt;   4.291934e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt;   5.428675e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt;   6.866488e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt;   8.685114e-03  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt;   1.098541e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt;   1.389495e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="co">#&gt;   1.757511e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-43"><a href="#cb3-43"></a><span class="co">#&gt;   2.222996e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="co">#&gt;   2.811769e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a><span class="co">#&gt;   3.556480e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-46"><a href="#cb3-46"></a><span class="co">#&gt;   4.498433e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-47"><a href="#cb3-47"></a><span class="co">#&gt;   5.689866e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="co">#&gt;   7.196857e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-49"><a href="#cb3-49"></a><span class="co">#&gt;   9.102982e-02  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-50"><a href="#cb3-50"></a><span class="co">#&gt;   1.151395e-01  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-51"><a href="#cb3-51"></a><span class="co">#&gt;   1.456348e-01  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-52"><a href="#cb3-52"></a><span class="co">#&gt;   1.842070e-01  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co">#&gt;   2.329952e-01  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-54"><a href="#cb3-54"></a><span class="co">#&gt;   2.947052e-01  25.05686  0.06001154  15.14951</span></span>
+<span id="cb3-55"><a href="#cb3-55"></a><span class="co">#&gt;   3.727594e-01  25.05643  0.06001864  15.14821</span></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="co">#&gt;   4.714866e-01  25.05501  0.06004207  15.14437</span></span>
+<span id="cb3-57"><a href="#cb3-57"></a><span class="co">#&gt;   5.963623e-01  25.05332  0.06006965  15.13991</span></span>
+<span id="cb3-58"><a href="#cb3-58"></a><span class="co">#&gt;   7.543120e-01  25.05129  0.06010447  15.13464</span></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="co">#&gt;   9.540955e-01  25.04891  0.06014610  15.12857</span></span>
+<span id="cb3-60"><a href="#cb3-60"></a><span class="co">#&gt;   1.206793e+00  25.04615  0.06019508  15.12168</span></span>
+<span id="cb3-61"><a href="#cb3-61"></a><span class="co">#&gt;   1.526418e+00  25.04303  0.06025261  15.11399</span></span>
+<span id="cb3-62"><a href="#cb3-62"></a><span class="co">#&gt;   1.930698e+00  25.03965  0.06031553  15.10530</span></span>
+<span id="cb3-63"><a href="#cb3-63"></a><span class="co">#&gt;   2.442053e+00  25.03611  0.06038447  15.09595</span></span>
+<span id="cb3-64"><a href="#cb3-64"></a><span class="co">#&gt;   3.088844e+00  25.03274  0.06044847  15.08609</span></span>
+<span id="cb3-65"><a href="#cb3-65"></a><span class="co">#&gt;   3.906940e+00  25.02985  0.06050586  15.07615</span></span>
+<span id="cb3-66"><a href="#cb3-66"></a><span class="co">#&gt;   4.941713e+00  25.02796  0.06054741  15.06796</span></span>
+<span id="cb3-67"><a href="#cb3-67"></a><span class="co">#&gt;   6.250552e+00  25.02769  0.06056332  15.06270</span></span>
+<span id="cb3-68"><a href="#cb3-68"></a><span class="co">#&gt;   7.906043e+00  25.02984  0.06054186  15.06135</span></span>
+<span id="cb3-69"><a href="#cb3-69"></a><span class="co">#&gt;   1.000000e+01  25.03528  0.06047080  15.06476</span></span>
+<span id="cb3-70"><a href="#cb3-70"></a><span class="co">#&gt; </span></span>
+<span id="cb3-71"><a href="#cb3-71"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 0</span></span>
+<span id="cb3-72"><a href="#cb3-72"></a><span class="co">#&gt; RMSE was used to select the optimal model using the smallest value.</span></span>
+<span id="cb3-73"><a href="#cb3-73"></a><span class="co">#&gt; The final values used for the model were alpha = 0 and lambda = 6.250552.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="binary-outcome" class="level3"><h3 class="anchored" data-anchor-id="binary-outcome">Binary outcome</h3>
 <section id="cross-validation-lasso-1" class="level4"><h4 class="anchored" data-anchor-id="cross-validation-lasso-1">Cross-validation LASSO</h4>
@@ -1485,12 +1626,12 @@ Note
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>ctrl<span class="ot">&lt;-</span><span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>,</span>
 <span id="cb4-2"><a href="#cb4-2"></a>                   <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb4-3"><a href="#cb4-3"></a>                   <span class="at">summaryFunction =</span> twoClassSummary)</span>
-<span id="cb4-4"><a href="#cb4-4"></a>fit.cv.bin<span class="ot">&lt;-</span><span class="fu">train</span>(out.formula2, </span>
+<span id="cb4-4"><a href="#cb4-4"></a>fit.cv.bin<span class="ot">&lt;-</span><span class="fu">train</span>(out.formula2,</span>
 <span id="cb4-5"><a href="#cb4-5"></a>                  <span class="at">trControl =</span> ctrl,</span>
-<span id="cb4-6"><a href="#cb4-6"></a>                  <span class="at">data =</span> ObsData, </span>
+<span id="cb4-6"><a href="#cb4-6"></a>                  <span class="at">data =</span> ObsData,</span>
 <span id="cb4-7"><a href="#cb4-7"></a>                  <span class="at">method =</span> <span class="st">"glmnet"</span>,</span>
-<span id="cb4-8"><a href="#cb4-8"></a>                  <span class="at">lambda=</span> <span class="dv">0</span>,</span>
-<span id="cb4-9"><a href="#cb4-9"></a>                  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">lambda =</span> <span class="dv">0</span>),</span>
+<span id="cb4-8"><a href="#cb4-8"></a>                  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">1</span>,</span>
+<span id="cb4-9"><a href="#cb4-9"></a>                                         <span class="at">lambda =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">1</span>, <span class="at">length =</span> <span class="dv">50</span>)),</span>
 <span id="cb4-10"><a href="#cb4-10"></a>                  <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb4-11"><a href="#cb4-11"></a>                  <span class="at">metric=</span><span class="st">"ROC"</span>)</span>
 <span id="cb4-12"><a href="#cb4-12"></a>fit.cv.bin</span>
@@ -1502,15 +1643,64 @@ Note
 <span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; </span></span>
 <span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; No pre-processing</span></span>
 <span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; Summary of sample sizes: 4588, 4589, 4587, 4588, 4588 </span></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; Resampling results:</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; Summary of sample sizes: 4587, 4589, 4589, 4588, 4587 </span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; Resampling results across tuning parameters:</span></span>
 <span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; </span></span>
-<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt;   ROC        Sens       Spec     </span></span>
-<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt;   0.7554574  0.4669704  0.8533019</span></span>
-<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; </span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 1</span></span>
-<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; Tuning</span></span>
-<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;  parameter 'lambda' was held constant at a value of 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt;   lambda        ROC        Sens          Spec     </span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt;   1.000000e-04  0.7554201  0.4639840500  0.8565371</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt;   1.264855e-04  0.7554201  0.4639840500  0.8565371</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt;   1.599859e-04  0.7554308  0.4639840500  0.8562683</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt;   2.023590e-04  0.7554035  0.4634865375  0.8565371</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;   2.559548e-04  0.7553781  0.4624927472  0.8568059</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;   3.237458e-04  0.7553415  0.4624915127  0.8570748</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt;   4.094915e-04  0.7552896  0.4614964878  0.8568056</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt;   5.179475e-04  0.7552724  0.4605026974  0.8562680</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt;   6.551286e-04  0.7551131  0.4580200733  0.8570737</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt;   8.286428e-04  0.7549745  0.4575225609  0.8581489</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt;   1.048113e-03  0.7550079  0.4560349617  0.8586862</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt;   1.325711e-03  0.7549476  0.4550399368  0.8605672</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co">#&gt;   1.676833e-03  0.7548311  0.4515610533  0.8613730</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="co">#&gt;   2.120951e-03  0.7545292  0.4485821513  0.8635228</span></span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="co">#&gt;   2.682696e-03  0.7544181  0.4441094774  0.8670149</span></span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co">#&gt;   3.393222e-03  0.7543359  0.4391466983  0.8686267</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a><span class="co">#&gt;   4.291934e-03  0.7543183  0.4336814686  0.8702371</span></span>
+<span id="cb4-42"><a href="#cb4-42"></a><span class="co">#&gt;   5.428675e-03  0.7537122  0.4247410590  0.8742682</span></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co">#&gt;   6.866488e-03  0.7526631  0.4138143032  0.8777614</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a><span class="co">#&gt;   8.685114e-03  0.7507882  0.4013826648  0.8831327</span></span>
+<span id="cb4-45"><a href="#cb4-45"></a><span class="co">#&gt;   1.098541e-02  0.7488829  0.3730627261  0.8944165</span></span>
+<span id="cb4-46"><a href="#cb4-46"></a><span class="co">#&gt;   1.389495e-02  0.7461829  0.3447526635  0.9067760</span></span>
+<span id="cb4-47"><a href="#cb4-47"></a><span class="co">#&gt;   1.757511e-02  0.7415286  0.3000444428  0.9210154</span></span>
+<span id="cb4-48"><a href="#cb4-48"></a><span class="co">#&gt;   2.222996e-02  0.7336198  0.2473957755  0.9352533</span></span>
+<span id="cb4-49"><a href="#cb4-49"></a><span class="co">#&gt;   2.811769e-02  0.7229930  0.1793402713  0.9572848</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a><span class="co">#&gt;   3.556480e-02  0.7151051  0.1097897609  0.9734037</span></span>
+<span id="cb4-51"><a href="#cb4-51"></a><span class="co">#&gt;   4.498433e-02  0.7091101  0.0427231090  0.9911341</span></span>
+<span id="cb4-52"><a href="#cb4-52"></a><span class="co">#&gt;   5.689866e-02  0.6985177  0.0009925558  0.9997315</span></span>
+<span id="cb4-53"><a href="#cb4-53"></a><span class="co">#&gt;   7.196857e-02  0.6874605  0.0000000000  1.0000000</span></span>
+<span id="cb4-54"><a href="#cb4-54"></a><span class="co">#&gt;   9.102982e-02  0.5808116  0.0000000000  1.0000000</span></span>
+<span id="cb4-55"><a href="#cb4-55"></a><span class="co">#&gt;   1.151395e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-56"><a href="#cb4-56"></a><span class="co">#&gt;   1.456348e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-57"><a href="#cb4-57"></a><span class="co">#&gt;   1.842070e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-58"><a href="#cb4-58"></a><span class="co">#&gt;   2.329952e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-59"><a href="#cb4-59"></a><span class="co">#&gt;   2.947052e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-60"><a href="#cb4-60"></a><span class="co">#&gt;   3.727594e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-61"><a href="#cb4-61"></a><span class="co">#&gt;   4.714866e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-62"><a href="#cb4-62"></a><span class="co">#&gt;   5.963623e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-63"><a href="#cb4-63"></a><span class="co">#&gt;   7.543120e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-64"><a href="#cb4-64"></a><span class="co">#&gt;   9.540955e-01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-65"><a href="#cb4-65"></a><span class="co">#&gt;   1.206793e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-66"><a href="#cb4-66"></a><span class="co">#&gt;   1.526418e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-67"><a href="#cb4-67"></a><span class="co">#&gt;   1.930698e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-68"><a href="#cb4-68"></a><span class="co">#&gt;   2.442053e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-69"><a href="#cb4-69"></a><span class="co">#&gt;   3.088844e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-70"><a href="#cb4-70"></a><span class="co">#&gt;   3.906940e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-71"><a href="#cb4-71"></a><span class="co">#&gt;   4.941713e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-72"><a href="#cb4-72"></a><span class="co">#&gt;   6.250552e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-73"><a href="#cb4-73"></a><span class="co">#&gt;   7.906043e+00  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-74"><a href="#cb4-74"></a><span class="co">#&gt;   1.000000e+01  0.5000000  0.0000000000  1.0000000</span></span>
+<span id="cb4-75"><a href="#cb4-75"></a><span class="co">#&gt; </span></span>
+<span id="cb4-76"><a href="#cb4-76"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 1</span></span>
+<span id="cb4-77"><a href="#cb4-77"></a><span class="co">#&gt; ROC was used to select the optimal model using the largest value.</span></span>
+<span id="cb4-78"><a href="#cb4-78"></a><span class="co">#&gt; The final values used for the model were alpha = 1 and lambda = 0.0001599859.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Not okay to select variables from a shrinkage model, and then use them in a regular regression</li>
@@ -1521,29 +1711,77 @@ Note
 <span id="cb5-3"><a href="#cb5-3"></a>                   <span class="at">summaryFunction =</span> twoClassSummary)</span>
 <span id="cb5-4"><a href="#cb5-4"></a>fit.cv.bin<span class="ot">&lt;-</span><span class="fu">train</span>(out.formula2, <span class="at">trControl =</span> ctrl,</span>
 <span id="cb5-5"><a href="#cb5-5"></a>               <span class="at">data =</span> ObsData, <span class="at">method =</span> <span class="st">"glmnet"</span>,</span>
-<span id="cb5-6"><a href="#cb5-6"></a>               <span class="at">lambda=</span> <span class="dv">0</span>,</span>
-<span id="cb5-7"><a href="#cb5-7"></a>               <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">0</span>,  </span>
-<span id="cb5-8"><a href="#cb5-8"></a>                                      <span class="at">lambda =</span> <span class="dv">0</span>),</span>
-<span id="cb5-9"><a href="#cb5-9"></a>               <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb5-10"><a href="#cb5-10"></a>               <span class="at">metric=</span><span class="st">"ROC"</span>)</span>
-<span id="cb5-11"><a href="#cb5-11"></a>fit.cv.bin</span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; glmnet </span></span>
-<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; </span></span>
-<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt; 5735 samples</span></span>
-<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;   50 predictor</span></span>
-<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt;    2 classes: 'No', 'Yes' </span></span>
-<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; </span></span>
-<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; No pre-processing</span></span>
-<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
-<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; Summary of sample sizes: 4589, 4587, 4587, 4588, 4589 </span></span>
-<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; Resampling results:</span></span>
-<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; </span></span>
-<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt;   ROC        Sens      Spec     </span></span>
-<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt;   0.7557931  0.468932  0.8519607</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; </span></span>
-<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 0</span></span>
-<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt; Tuning</span></span>
-<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;  parameter 'lambda' was held constant at a value of 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-6"><a href="#cb5-6"></a>               <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">0</span>,</span>
+<span id="cb5-7"><a href="#cb5-7"></a>                                      <span class="at">lambda =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">1</span>, <span class="at">length =</span> <span class="dv">50</span>)),</span>
+<span id="cb5-8"><a href="#cb5-8"></a>               <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb5-9"><a href="#cb5-9"></a>               <span class="at">metric=</span><span class="st">"ROC"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a>fit.cv.bin</span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; glmnet </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; 5735 samples</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;   50 predictor</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;    2 classes: 'No', 'Yes' </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; </span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; No pre-processing</span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; Resampling: Cross-Validated (5 fold) </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; Summary of sample sizes: 4589, 4588, 4587, 4587, 4589 </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; Resampling results across tuning parameters:</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt;   lambda        ROC        Sens         Spec     </span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt;   1.000000e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt;   1.264855e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt;   1.599859e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt;   2.023590e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;   2.559548e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;   3.237458e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;   4.094915e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt;   5.179475e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt;   6.551286e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt;   8.286428e-04  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt;   1.048113e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt;   1.325711e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt;   1.676833e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt;   2.120951e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt;   2.682696e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-38"><a href="#cb5-38"></a><span class="co">#&gt;   3.393222e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-39"><a href="#cb5-39"></a><span class="co">#&gt;   4.291934e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-40"><a href="#cb5-40"></a><span class="co">#&gt;   5.428675e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-41"><a href="#cb5-41"></a><span class="co">#&gt;   6.866488e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-42"><a href="#cb5-42"></a><span class="co">#&gt;   8.685114e-03  0.7538395  0.450537634  0.8632431</span></span>
+<span id="cb5-43"><a href="#cb5-43"></a><span class="co">#&gt;   1.098541e-02  0.7537514  0.448053776  0.8640496</span></span>
+<span id="cb5-44"><a href="#cb5-44"></a><span class="co">#&gt;   1.389495e-02  0.7535705  0.443086059  0.8664682</span></span>
+<span id="cb5-45"><a href="#cb5-45"></a><span class="co">#&gt;   1.757511e-02  0.7534170  0.440107157  0.8672747</span></span>
+<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#&gt;   2.222996e-02  0.7532248  0.433651840  0.8688872</span></span>
+<span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt;   2.811769e-02  0.7529892  0.426201499  0.8710356</span></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt;   3.556480e-02  0.7525827  0.416766046  0.8742596</span></span>
+<span id="cb5-49"><a href="#cb5-49"></a><span class="co">#&gt;   4.498433e-02  0.7521254  0.405838055  0.8793639</span></span>
+<span id="cb5-50"><a href="#cb5-50"></a><span class="co">#&gt;   5.689866e-02  0.7515507  0.393417528  0.8868871</span></span>
+<span id="cb5-51"><a href="#cb5-51"></a><span class="co">#&gt;   7.196857e-02  0.7509401  0.382488303  0.8930656</span></span>
+<span id="cb5-52"><a href="#cb5-52"></a><span class="co">#&gt;   9.102982e-02  0.7501439  0.368083898  0.9011261</span></span>
+<span id="cb5-53"><a href="#cb5-53"></a><span class="co">#&gt;   1.151395e-01  0.7493755  0.349700628  0.9113354</span></span>
+<span id="cb5-54"><a href="#cb5-54"></a><span class="co">#&gt;   1.456348e-01  0.7483673  0.323385554  0.9207393</span></span>
+<span id="cb5-55"><a href="#cb5-55"></a><span class="co">#&gt;   1.842070e-01  0.7473569  0.294081701  0.9322916</span></span>
+<span id="cb5-56"><a href="#cb5-56"></a><span class="co">#&gt;   2.329952e-01  0.7461759  0.262792736  0.9406199</span></span>
+<span id="cb5-57"><a href="#cb5-57"></a><span class="co">#&gt;   2.947052e-01  0.7449967  0.222058442  0.9540539</span></span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="co">#&gt;   3.727594e-01  0.7437458  0.176361369  0.9674872</span></span>
+<span id="cb5-59"><a href="#cb5-59"></a><span class="co">#&gt;   4.714866e-01  0.7423924  0.134629582  0.9790413</span></span>
+<span id="cb5-60"><a href="#cb5-60"></a><span class="co">#&gt;   5.963623e-01  0.7409952  0.098372900  0.9887144</span></span>
+<span id="cb5-61"><a href="#cb5-61"></a><span class="co">#&gt;   7.543120e-01  0.7397328  0.055152278  0.9959699</span></span>
+<span id="cb5-62"><a href="#cb5-62"></a><span class="co">#&gt;   9.540955e-01  0.7384724  0.018883251  0.9994624</span></span>
+<span id="cb5-63"><a href="#cb5-63"></a><span class="co">#&gt;   1.206793e+00  0.7373235  0.003476414  1.0000000</span></span>
+<span id="cb5-64"><a href="#cb5-64"></a><span class="co">#&gt;   1.526418e+00  0.7363039  0.000000000  1.0000000</span></span>
+<span id="cb5-65"><a href="#cb5-65"></a><span class="co">#&gt;   1.930698e+00  0.7354312  0.000000000  1.0000000</span></span>
+<span id="cb5-66"><a href="#cb5-66"></a><span class="co">#&gt;   2.442053e+00  0.7345345  0.000000000  1.0000000</span></span>
+<span id="cb5-67"><a href="#cb5-67"></a><span class="co">#&gt;   3.088844e+00  0.7337665  0.000000000  1.0000000</span></span>
+<span id="cb5-68"><a href="#cb5-68"></a><span class="co">#&gt;   3.906940e+00  0.7330925  0.000000000  1.0000000</span></span>
+<span id="cb5-69"><a href="#cb5-69"></a><span class="co">#&gt;   4.941713e+00  0.7325848  0.000000000  1.0000000</span></span>
+<span id="cb5-70"><a href="#cb5-70"></a><span class="co">#&gt;   6.250552e+00  0.7321423  0.000000000  1.0000000</span></span>
+<span id="cb5-71"><a href="#cb5-71"></a><span class="co">#&gt;   7.906043e+00  0.7317560  0.000000000  1.0000000</span></span>
+<span id="cb5-72"><a href="#cb5-72"></a><span class="co">#&gt;   1.000000e+01  0.7314491  0.000000000  1.0000000</span></span>
+<span id="cb5-73"><a href="#cb5-73"></a><span class="co">#&gt; </span></span>
+<span id="cb5-74"><a href="#cb5-74"></a><span class="co">#&gt; Tuning parameter 'alpha' was held constant at a value of 0</span></span>
+<span id="cb5-75"><a href="#cb5-75"></a><span class="co">#&gt; ROC was used to select the optimal model using the largest value.</span></span>
+<span id="cb5-76"><a href="#cb5-76"></a><span class="co">#&gt; The final values used for the model were alpha = 0 and lambda = 0.008685114.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="cross-validation-elastic-net" class="level4"><h4 class="anchored" data-anchor-id="cross-validation-elastic-net">Cross-validation Elastic net</h4>
 <ul>
@@ -1625,6 +1863,19 @@ Note
 </li>
 </ul>
 <section id="simple-cart" class="level5"><h5 class="anchored" data-anchor-id="simple-cart">Simple CART</h5>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The AUC values reported for the CART models below are computed on the same data used to fit the trees, so they are <em>apparent</em> (optimistic) estimates of discrimination. The cross-validation chunks in this chapter give less biased estimates of out-of-sample performance.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">require</span>(rpart)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>DASIndex) <span class="co"># Duke Activity Status Index</span></span>
@@ -1950,6 +2201,7 @@ Note
 <li>Final prediction uses a weighted version of all predictions
 <ul>
 <li>Weights = coef of Observed outcome ~ prediction from each CL</li>
+<li>The weights are estimated under a convex-combination constraint: they are non-negative and sum to one (e.g., SuperLearner’s <code>method.NNLS</code> for continuous outcomes or <code>method.NNloglik</code> for binary outcomes), so the ensemble prediction is a weighted average of the candidate learners’ predictions.</li>
 </ul>
 </li>
 </ul></section><section id="steps" class="level4"><h4 class="anchored" data-anchor-id="steps">Steps</h4>

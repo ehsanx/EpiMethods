@@ -131,6 +131,12 @@ kable(round(exp(cbind(coef(fit5), confint(fit5))),2))
 
 ### Ordinal Regression
 
+When the outcome categories have a natural ordering (here, mental-health condition from "Poor or Fair" to "Very good or excellent"), an ordinal model such as the proportional-odds (cumulative logit) model can be a more parsimonious choice than multinomial logistic regression: instead of estimating a separate set of coefficients for each non-reference category, it estimates a single coefficient per predictor. This parsimony comes at the cost of an additional assumption.
+
+::: callout-important
+**Proportional-odds (parallel-lines) assumption.** The ordinal logistic models fitted by `polr` and `svyolr` assume *proportional odds*: the effect of each predictor (the log-odds ratio) is the same across all cumulative splits of the ordered outcome, i.e., the cumulative logit lines are parallel. If this assumption is implausible, a partial-proportional-odds or multinomial model may be more appropriate. The assumption can be examined with a Brant-type test or by comparing the proportional-odds fit against a more flexible model; it is *not* tested by the Wald tests shown below.
+:::
+
 #### Ordering outcome
 
 Let's define `MHcondition` as an ordinal outcome. We can do it by using `ordered = TRUE` in the `factor` function.
@@ -175,9 +181,9 @@ fit5o <- svyolr(MHcondition3 ~CommunityBelonging2 + Sex2 + Age2 + RaceEthnicity2
 kable(round(exp(cbind(coef(fit5o), confint(fit5o))),2))
 ```
 
-#### Assessing model fit
+#### Assessing the contribution of each predictor
 
-We can use the `regTermTest` function from the `survey` package to do the Wald test of a regression coefficient.
+We can use the `regTermTest` function from the `survey` package to do the Wald test of a regression coefficient. Note that these Wald tests assess whether each predictor is *associated* with the outcome (whether its coefficients differ from zero); they do **not** test the proportional-odds assumption discussed above, nor do they constitute an overall goodness-of-fit test for the ordinal model.
 
 ```{r rolrsassess, cache=TRUE}
 regTermTest(fit5o, ~CommunityBelonging2 , df = Inf) 

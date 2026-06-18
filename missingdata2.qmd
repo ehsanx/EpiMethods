@@ -34,16 +34,14 @@ md.pattern(analyticx)
 In the following chunk, we address the missing data by performing multiple imputations. This means that instead of filling in each missing value with a single estimate, we create multiple versions (datasets) where each missing value is filled in differently based on a specified algorithm. This helps in capturing the uncertainty around the missing values. The chunk sets up the parameters for multiple imputations, ensuring reproducibility and efficiency, and then performs the imputations on the dataset with missing values.
 
 ```{r imp, cache=TRUE}
-# imputation <- mice(analyticx, m=5, maxit=5, seed = 504007)
-set.seed(504)
-imputation <- parlmice(analyticx, m=5, maxit=5, cluster.seed=504007)
+imputation <- mice(analyticx, m=5, maxit=5, seed = 504007)
 ```
 
 -   **Data Input**: The primary input for the imputation function is the dataset with missing values. This dataset is what we aim to impute.
 -   **Number of Imputations**: The option `m=5` indicates that we want to create 5 different imputed datasets. Each of these datasets will have the missing values filled in slightly differently, based on the underlying imputation algorithm and the randomness introduced.
 -   **Maximum Iterations**: The imputation process is iterative, meaning it refines its estimates over several rounds. The option `maxit=5` specifies that the algorithm should run for a maximum of 5 iterations. This helps in achieving more accurate imputations, especially when the missing data mechanism is complex.
--   **Setting Seed**: In computational processes that involve randomness, it's often useful to set a "seed" value. This ensures that the random processes are reproducible. If you run the imputation multiple times with the same seed, you'll get the same results each time. Two seed values are set in the chunk: one using the general `set.seed()` function and another specifically for the imputation function as `cluster.seed`.
--   **Parallel Processing**: The function `parlmice` used for imputation indicates that the imputations are done in parallel. This means that instead of imputing one dataset after the other, the function tries to impute multiple datasets simultaneously (if the computational resources allow). This can speed up the process, especially when dealing with large datasets or when creating many imputed datasets.
+-   **Setting Seed**: In computational processes that involve randomness, it's often useful to set a "seed" value. This ensures that the random processes are reproducible. If you run the imputation multiple times with the same seed, you'll get the same results each time. Here the seed is set through the `seed` argument of `mice()`.
+-   **Parallel Processing**: For large datasets or many imputed datasets, the imputations can be run in parallel to speed up the process. The previously used `parlmice()` function is deprecated; the current replacement is `mice::futuremice()` (with its own `parallelseed` argument), which imputes multiple datasets simultaneously when the computational resources allow.
 
 ### Create new variable
 
@@ -111,8 +109,8 @@ analytic.miss2$miss <- 1
 analytic.miss2$miss[analytic.miss2$ID %in% analytic2$ID] <- 0
 table(analytic.miss2$miss)
 
-head(analytic.miss1$ID[analytic.miss1$miss==1])
-tail(analytic.miss1$ID[analytic.miss1$miss==1])
+head(analytic.miss2$ID[analytic.miss2$miss==1])
+tail(analytic.miss2$ID[analytic.miss2$miss==1])
 ```
 
 **Aggregating Missingness Information Across All Imputed Datasets**:
@@ -124,7 +122,9 @@ tail(analytic.miss1$ID[analytic.miss1$miss==1])
 impdata$miss<-1
 m <- 5
 for (i in 1:m){
-  impdata$miss[impdata$.imp == i] <- analytic.miss2$miss
+  block.i <- subset(impdata, subset=.imp==i)
+  complete.ids <- as.data.frame(na.omit(block.i))$ID
+  impdata$miss[impdata$.imp == i & impdata$ID %in% complete.ids] <- 0
   print(table(impdata$miss[impdata$.imp == i]))
 }
 ```

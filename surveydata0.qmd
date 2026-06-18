@@ -79,7 +79,7 @@ $$DEFF = \frac{Var(\hat{\theta})_{complex}}{Var(\hat{\theta})_{srs}}$$
 Even with modern software that directly calculates correct variances, the DEFF remains a valuable concept for several reasons:
 
 1.  **Interpretation:** The DEFF provides a simple, intuitive metric for understanding the efficiency of the survey design for a particular estimate. A DEFF of 2.0, for instance, implies that the variance of the estimate is twice as large as it would have been under SRS, meaning the confidence interval is about 41% wider ($\sqrt{2} \approx 1.41$).
-2.  **Effective Sample Size:** The DEFF allows you to calculate the "effective sample size" ($n_{eff} = n / DEFF$), which is the size of an SRS that would yield the same level of precision. This is a powerful tool for communicating the statistical power of a study.
+2.  **Effective Sample Size:** The DEFF allows you to calculate the "effective sample size" ($n_{eff} = n / DEFF$) **for a particular estimate**, which is the size of an SRS that would yield the same level of precision for that estimate. Because the DEFF (and hence $n_{eff}$) is estimate-specific, it varies from one statistic to another rather than being a single property of the dataset. This is a powerful tool for communicating the statistical power of a study.
 3.  **Survey Planning:** In the design phase of a new survey, estimated DEFFs from previous, similar surveys are crucial for calculating the required sample size to achieve a desired level of precision.
 
 In essence, while software performs the complex calculations, the DEFF provides the conceptual understanding and interpretive context for the results.
@@ -151,8 +151,8 @@ While weights are used to obtain unbiased point estimates, the most critical adj
 
 While there is universal agreement that weights are necessary for descriptive statistics (e.g., population means or prevalences), their use in regression models is more nuanced and has been a subject of debate.
 
--   **The Argument for Using Weights:** The primary goal of most public health research using national survey data is to make inferences about the target population. In this case, weights **must** be used to obtain unbiased estimates of the population-level associations. Failing to do so can lead to biased coefficients if the sampling probabilities are related to the outcome variable.
--   **The Argument Against Using Weights:** Some argue that using weights can reduce precision (i.e., inflate standard errors), especially if the weights are highly variable. They contend that if a regression model is perfectly specified (includes all relevant predictors), the unweighted estimates may be more efficient.
+-   **The Argument for Using Weights:** The primary goal of most public health research using national survey data is to make inferences about the target population. In this case, weights **must** be used to obtain unbiased estimates of the population-level associations. Failing to do so can lead to biased coefficients under **informative sampling**, i.e., when the probability of selection is related to the outcome *even after conditioning on the covariates in the model* [@lumley2011complex] (see also Solon, Haider & Wooldridge, 2015).
+-   **The Argument Against Using Weights:** Some argue that using weights can reduce precision (i.e., inflate standard errors), especially if the weights are highly variable. They contend that if a regression model is correctly specified (includes all relevant predictors) and sampling is non-informative (selection does not depend on the outcome given those covariates), the unweighted estimates are **consistent and more efficient**.
 -   **Practical Recommendation:** In practice, one can never be certain that a model is perfectly specified. Therefore, the widely accepted best practice is to **use the survey weights in regression models as the default approach**. This prioritizes the avoidance of bias. A prudent strategy is to fit both weighted and unweighted models as a sensitivity analysis. If the coefficients differ substantially, it suggests the weights are correcting for significant bias, and the weighted results should be considered primary.
 
 ## 4.3. Assessing Model Fit and Performance
@@ -160,7 +160,7 @@ While there is universal agreement that weights are necessary for descriptive st
 Tools for assessing model performance must also be adapted for complex survey data.
 
 -   **Goodness-of-Fit:** For logistic regression, the standard Hosmer-Lemeshow test is invalid. The **Archer-Lemeshow goodness-of-fit test** is the design-based analogue that correctly accounts for the survey design. A non-significant p-value from this test suggests the model fits the data adequately.
--   **Predictive Performance:** Measures like pseudo-R² should be calculated using survey-weighted versions. For assessing a model's ability to discriminate between outcomes, the Area Under the ROC Curve (AUC) should be calculated as a **weighted AUC** to ensure the measure is representative of the model's performance in the target population.
+-   **Predictive Performance:** Measures like pseudo-R² should be calculated using survey-weighted versions. For assessing a model's ability to discriminate between outcomes, the Area Under the ROC Curve (AUC) should be calculated as a **weighted AUC** to ensure the measure is representative of the model's performance in the target population. Note that a weighted-only AUC or goodness-of-fit statistic (built with `id = ~1`) accounts for the **weights** but not for stratification and clustering; a fully design-correct version additionally incorporates the strata and PSU/cluster identifiers (or replicate weights).
 
 ### TLDR
 

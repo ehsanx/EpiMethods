@@ -176,6 +176,12 @@ window.Quarto = {
  <span class="menu-text">The Project</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup: Before you begin</span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./wrangling.html" class="sidebar-item-text sidebar-link">
@@ -429,6 +435,12 @@ window.Quarto = {
  <span class="menu-text">Useful Packages</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (E)</span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -521,6 +533,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./Simulation3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimating Causal Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SimulationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (U)</span></a>
   </div>
 </li>
       </ul>
@@ -1071,14 +1089,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1340,6 +1358,29 @@ window.Quarto = {
  <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (G)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation and glossary</span></a>
+  </div>
+</li>
       </ul>
 </li>
     </ul>
@@ -1450,6 +1491,19 @@ window.Quarto = {
 </div>
 </section></section><section id="setting-design" class="level3"><h3 class="anchored" data-anchor-id="setting-design">Setting Design</h3>
 <p>The code sets up the survey design, specifying weights (but no specific clustering and stratification, as they are unavailable for CCHS public access data), for use in survey-weighted analyses.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The CCHS public-use microdata file (PUMF) does not release the strata and PSU identifiers needed for design-based variance estimation; instead, Statistics Canada releases a set of <strong>bootstrap (replicate) weights</strong> for that purpose. Because we build the design with <code>id = ~1</code> (a weighted simple-random-sample approximation) rather than <code>svrepdesign(type = "bootstrap", repweights = ...)</code>, the <strong>point estimates are valid</strong>, but all standard errors, design effects (DEFF), and Rao-Scott / Thomas-Rao tests below are <strong>illustrative weighted-SRS approximations only</strong> and will generally <strong>understate the true sampling variance</strong>. For a design-correct analysis, load the bootstrap weights and use <code>svrepdesign()</code>.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">require</span>(survey)</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="fu">summary</span>(analytic.miss<span class="sc">$</span>weight)</span>
@@ -1645,7 +1699,7 @@ window.Quarto = {
 <p>Note:</p>
 <ol type="1">
 <li>SE increases as value of weight increases (CCHS).</li>
-<li>NHANES has more things to worry about (strata, PSU)</li>
+<li>These weighted-SRS DEFFs/SEs are approximations: the design-correct CCHS analysis would use the StatCan <strong>bootstrap weights</strong> (<code>svrepdesign</code>), and NHANES additionally requires the strata and PSU identifiers (<code>SDMVSTRA</code>, <code>SDMVPSU</code>).</li>
 </ol>
 <p>DEFF = 2 means that the variance of the sample proportion, when choosing the sample by complex survey sampling, is nearly 2 times as large as the variance of the same estimator under simple random sampling/SRS.</p>
 <div class="cell">

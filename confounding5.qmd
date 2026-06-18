@@ -169,7 +169,7 @@ publish(fitx0, print = FALSE, confint.method = "robust",
         pvalue.method = "robust")$regressionTable[1,]
 ```
 
-The estimate we see as a `hazard ratio` is basically a `risk ratio`. 
+`Publish()` labels the exponentiated Poisson coefficient as `HazardRatio` by default. For a binary outcome fit with a Poisson distribution and log link, this quantity is the **risk ratio**, not a true hazard ratio; the `HazardRatio` label is only the function's default heading.
 
 #### Strtatum specific (2 variables)
 
@@ -248,7 +248,7 @@ publish(fitx0, print = FALSE, confint.method = "robust",
         pvalue.method = "robust")$regressionTable[1,]
 ```
 
-Since the marginal and conditional estimate are approximately the same, RD is a collapsible measure. 
+Since the marginal and conditional estimate are approximately the same, RR is a collapsible measure.
 
 ### Conditional and crude OR
 
@@ -413,11 +413,11 @@ fitx1 <- glm(hypertension ~ smoking,
              family=binomial(link = "logit"), data=Obs.Data)
 Obs.Data.all.tx <- Obs.Data
 Obs.Data.all.tx$smoking <- 1
-p1 <- mean(predict(fitx0, 
+p1 <- mean(predict(fitx1,
                    newdata = Obs.Data.all.tx, type = "response"))
 Obs.Data.all.utx <- Obs.Data
 Obs.Data.all.utx$smoking <- 0
-p0 <- mean(predict(fitx0, 
+p0 <- mean(predict(fitx1,
                    newdata = Obs.Data.all.utx, type = "response"))
 
 RDm <- p1 - p0

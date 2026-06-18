@@ -60,7 +60,7 @@ plotDAG(Dset, xjitter = 0.1, yjitter = 0.9,
 
 ## Dataset Generation
 
-Based on the above structural causal model, we simulate a hypothetical dataset where each observation represents an individual with a given age ($L$), diabetes medication status ($A$), and cholesterol level ($Y$). We generate counterfactual cholesterol levels under both treatment ($A=1$, denoted as $Y_1$) and no treatment ($A=0$, denoted as $Y_0$), enabling us to estimate causal effects. Diabetes medication status is randomly assigned to individuals, and their cholesterol level will be assigned $Y=Y_1$ if cholesterol is treated, and $Y=Y_0$ if cholesterol is not treated.
+Based on the above structural causal model, we simulate a hypothetical dataset where each observation represents an individual with a given age ($L$), diabetes medication status ($A$), and cholesterol level ($Y$). We generate counterfactual cholesterol levels under both treatment ($A=1$, denoted as $Y_1$) and no treatment ($A=0$, denoted as $Y_0$), enabling us to estimate causal effects. The observed medication status $A$ is generated from the structural model $\text{Logit}\,P(A=1)\sim 0.4L$, so that age ($L$) genuinely confounds the exposure-outcome relationship. Each individual's observed cholesterol level is set to $Y=Y_1$ if treated and $Y=Y_0$ if not treated.
 
 ```{r, warning=FALSE, message=FALSE, cache=TRUE}
 # Creating a function for generating data based on the 3 variables, L, A, and Y.
@@ -84,25 +84,30 @@ simulate_data <- function(n = 10, seedx = 123){
   A0 <- node("A", distr = "rbern", prob = 0)
   Dset <- Dset + action("A0", nodes = A0)
   
-  # Simulate data based on on the intervention 
+  # Simulate the observational data (no intervention) so that the
+  # observed exposure A is generated from plogis(0.4*L) and is therefore
+  # confounded by age (L). This is the data an analyst would actually see.
+  Odat <- suppressMessages(sim(DAG = Dset, n = n, rndseed = 123))
+
+  # Simulate data based on on the intervention
   # (Simulate both L and Y for both interventions
   # (If Diabetes Medication is Given (A = 1) or if is not (A = 0)))
-  
-  Cdat <- suppressMessages(sim(DAG = Dset, actions = c("A1", "A0"), n = n, 
+
+  Cdat <- suppressMessages(sim(DAG = Dset, actions = c("A1", "A0"), n = n,
                                rndseed = 123))
-  
+
   # Round and bind the data to one dataframe
   generated.data <- round(cbind(Cdat$A1[c("ID", "L", "Y")],Cdat$A0[c("Y")]),2)
   names(generated.data) <- c("ID", "L", "Y1", "Y0")
-  
+
+  # Attach the confounded observational exposure (A depends on L).
+  generated.data$A <- Odat$A[match(generated.data$ID, Odat$ID)]
+
   # Order data by Age (L) and ID
   generated.data <- generated.data[order(generated.data$L, generated.data$ID),]
-  
-  # Randomly Assign data either A = 0 or A = 1
-  generated.data$A <- sample(c(0,1),n, replace = TRUE)
-  
+
   # If A=0, Y0 is assigned, else Y1 is assigned
-  # Y1 is cholesterol if treated (A=1), Y0 is cholesterol if not treated (A=0) 
+  # Y1 is cholesterol if treated (A=1), Y0 is cholesterol if not treated (A=0)
   # and Y is the observed cholesterol based on assigned treatment
   generated.data$Y <- ifelse(generated.data$A==0, generated.data$Y0, generated.data$Y1)
   
@@ -132,13 +137,28 @@ result.data$observed
 Let's also observe the counterfactual dataset, and see how cholesterol levels differ based on medication status.
 
 ```{r, warning=FALSE, message=FALSE, cache=TRUE}
-result.data$counterfactual$TE <- result.data$counterfactual$Y1- result.data$counterfactual$Y0
+# ITE: individual treatment effect (Y1 - Y0) for each person
+result.data$counterfactual$ITE <- result.data$counterfactual$Y1- result.data$counterfactual$Y0
 result.data$counterfactual
 ```
 
-When subtracting the cholesterol levels under the two medication statues, we can see that the difference for each individual is equal to the true effect, $\theta=0.7$, as defined earlier.
+When subtracting the cholesterol levels under the two medication statues, we can see that the difference for each individual is equal to the true effect, $\theta=0.7$, as defined earlier. Note that the individual-level effect $Y_1-Y_0$ equals 0.7 for every individual by construction: the data-generating model adds $\theta A$ with a constant $\theta$ and no interaction with $L$, so the treatment effect is homogeneous. Under this homogeneous-effect design the average treatment effect (ATE) and the average treatment effect among the treated (ATT) coincide trivially.
 
 We established that theoretically $Y$ follows a normal distribution with mean $\mu = 3L + \theta A$. Observing the data above, we see that the true effect of diabetes medication on cholesterol levels is 0.7, adjusted for age.
+
+Because the observed exposure $A$ is generated from $\text{Logit}\,P(A=1)\sim 0.4L$, age ($L$) is a genuine confounder. We can illustrate this by contrasting an unadjusted model (`Y ~ A`) with an age-adjusted model (`Y ~ A + L`) on a single larger dataset:
+
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
+demo.data <- simulate_data(n = 1000)$observed
+
+# Unadjusted (confounded) estimate of the medication effect
+coef(summary(glm(Y ~ A, family = "gaussian", data = demo.data)))["A", ]
+
+# Age-adjusted estimate of the medication effect
+coef(summary(glm(Y ~ A + L, family = "gaussian", data = demo.data)))["A", ]
+```
+
+The unadjusted estimate is biased away from the true effect of 0.7 because age is associated with both medication use and cholesterol; once we adjust for age, the estimate recovers the true treatment effect. This shows that the confounding is real and that adjustment is doing the work.
 
 ------------------------------------------------------------------------
 

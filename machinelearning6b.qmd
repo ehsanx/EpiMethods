@@ -247,9 +247,9 @@ for (fold in 1:k) {
   
   # Weighted calibration slope
   mod.cal <- glm(
-    HICP ~ Logit(dat.test$pred.lasso), 
-    data = dat.test, 
-    family = binomial, 
+    HICP ~ Logit(dat.test$pred.lasso),
+    data = dat.test,
+    family = quasibinomial,
     weights = wgt)
   cal.slope.lasso[fold] <- summary(mod.cal)$coef[2,1]
   
@@ -411,9 +411,9 @@ for (fold in 1:k) {
   
   # Weighted calibration slope
   dat.test$pred.rf[dat.test$pred.rf == 0] <- 0.00001
-  mod.cal <- glm(HICP ~ Logit(dat.test$pred.rf), 
-                 data = dat.test, 
-                 family = binomial, 
+  mod.cal <- glm(HICP ~ Logit(dat.test$pred.rf),
+                 data = dat.test,
+                 family = quasibinomial,
                  weights = wgt)
   cal.slope.rf[fold] <- summary(mod.cal)$coef[2,1]
   

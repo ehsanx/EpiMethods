@@ -1,0 +1,71 @@
+# Notation and glossary {.unnumbered}
+
+::: callout-note
+This appendix collects the symbols, estimands, and terminology conventions used throughout the book so that notation stays consistent across modules. Where individual chapters historically used a different word for the same idea, this page states the preferred convention.
+:::
+
+## Variables and symbols
+
+| Symbol | Meaning |
+|--------------------------|----------------------------------------------|
+| $Y$ | Outcome variable |
+| $A$ | **Exposure** (the primary variable whose effect we study). We use *exposure* throughout for observational studies; *treatment* is used only where it is part of an established term (e.g., "average **treatment** effect"). |
+| $L$, $C$, $X$ | Covariates / potential confounders |
+| $M$ | Mediator |
+| $Y^{a}$ or $Y(a)$ | **Potential (counterfactual) outcome** that would be observed if exposure were set to $A=a$ |
+| $E[\cdot]$ | Expectation. Conditional expectation is written $E[Y \mid A=a]$; the mean of a potential outcome is $E[Y(a)]$. |
+| $\hat{\theta}$ | An estimate of a parameter $\theta$ |
+
+## Estimands (what we are trying to estimate)
+
+| Term | Symbol | Definition |
+|-------------------|------------------|-----------------------------------|
+| Average Treatment Effect | ATE | $E[Y(1) - Y(0)]$ — the average effect in the **whole** target population, on the difference (risk-difference) scale |
+| Average Treatment effect on the Treated | ATT | $E[Y(1) - Y(0) \mid A=1]$ — average effect among the exposed |
+| Individual Treatment Effect | ITE | $Y_i(1) - Y_i(0)$ for a single unit $i$ (generally not identifiable) |
+| Total Effect | TE | The full effect of $A$ on $Y$, i.e. direct + indirect (mediated) effect |
+| Natural Direct Effect | NDE | Effect of $A$ on $Y$ **not** through $M$, with $M$ left at its natural value |
+| Natural Indirect Effect | NIE | Effect of $A$ on $Y$ operating **through** $M$ |
+| Controlled Direct Effect | CDE | Effect of $A$ on $Y$ when $M$ is **fixed** to a specific value (e.g., $M=0$) |
+
+::: callout-tip
+**Effect terminology.** Use **ITE** for an individual-level effect, **TE** for the total effect, and **CDE** vs **NDE/NIE** to distinguish *fixing* the mediator from leaving it at its natural value. Earlier drafts occasionally wrote "TE" for an individual effect or "TCE" for the total effect — prefer ITE and TE respectively.
+:::
+
+## Measures of association/effect
+
+-   **RD** (risk difference), **RR** (risk ratio), **OR** (odds ratio), **HR** (hazard ratio).
+-   **Marginal vs conditional.** A *marginal* effect is averaged over the covariate distribution; a *conditional* effect holds covariates fixed. For non-linear models (e.g., logistic), the OR is **non-collapsible**: a conditional OR and a marginal OR generally differ even with no confounding. State which one a quantity represents.
+-   **Collapsibility.** RD and RR are collapsible; OR and HR are not.
+
+## Weights
+
+Different "weights" appear in different modules; they are not interchangeable:
+
+| Weight | Where used | Purpose |
+|------------------|--------------------|----------------------------------|
+| **Survey (sampling) weight** | Complex Survey Data (D) | Inverse probability of *selection* into the sample; makes estimates representative of the target population |
+| **IPTW** (inverse-probability-of-treatment weight) | Propensity Score (S), Causal ML (C) | Inverse probability of the *observed exposure*; creates a pseudo-population in which exposure is independent of measured confounders |
+| **Matching weight** | Propensity Score (S) | Weight induced by a matching scheme (e.g., 1:k matching, matching with replacement) |
+| **MI / analysis weight** | Missing Data (M) | Combining/aggregating across multiply imputed datasets |
+
+When survey weights and IPTW (or matching weights) both apply, they are **multiplied** to form a combined weight.
+
+## Key causal assumptions
+
+-   **SUTVA** (stable unit treatment value assumption): no interference between units and one version of each exposure level.
+-   **Exchangeability / no unmeasured confounding**: $Y(a) \perp A \mid L$.
+-   **Positivity**: $0 < P(A=a \mid L) < 1$ for all covariate strata.
+-   **Consistency**: the observed outcome under the observed exposure equals the corresponding potential outcome.
+
+## Missing-data mechanisms
+
+-   **MCAR** (missing completely at random): missingness unrelated to observed or unobserved data.
+-   **MAR** (missing at random): missingness depends only on *observed* data.
+-   **MNAR** (missing not at random): missingness depends on *unobserved* values.
+
+## Other recurring terms
+
+-   **MSM** (marginal structural model): a model for the marginal mean of the **potential** outcomes, $E[Y(a)]$, typically estimated by an **IPTW-weighted** GLM/GEE. The weighting (not the GEE machinery alone) is what handles time-varying treatment–confounder feedback.
+-   **SMD** (standardized mean difference): a scale-free balance measure. This book uses **SMD < 0.2** as the working balance threshold consistently across tutorials and exercise solutions.
+-   **R Markdown**: written as two words ("R Markdown") throughout; file extension `.Rmd`. This book is itself built with **Quarto** (`.qmd`), a successor to R Markdown / bookdown.

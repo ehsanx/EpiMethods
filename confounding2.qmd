@@ -64,18 +64,18 @@ round(coef(fit),2)
 ```
 
 ::: callout-important
-You might notice a total effect that could differ from the true effects. In the lecture example, a crude association showed an effect of 1.69, which is the total effect combining both direct and indirect pathways.
+You might notice a total effect that could differ from the direct effect. Here the **direct effect** of A on Y (the coefficient on A in the M-adjusted model) is 1.3. The **indirect effect** of A through M is the product of the A→M effect (0.9) and the M→Y effect (0.5), i.e., $0.9 \times 0.5 = 0.45$. The **total effect** is therefore the sum of the direct and indirect effects: $1.3 + 0.45 = 1.75$.
 
-Upon adjusting for M, the coefficients will show you the direct effect of A on Y and the indirect effect through M. These should align closely with our true effects: a direct effect of 1.3 and an indirect effect of 0.5.
+When you do **not** adjust for M, the coefficient on A estimates this total effect (≈1.75). When you adjust for M, the coefficient on A estimates the direct effect (1.3) and the coefficient on M estimates the M→Y effect (0.5) — note that the M coefficient is the M→Y effect, **not** the indirect effect itself; the indirect effect is the product (A→M)×(M→Y) = 0.45.
 
-In this expanded tutorial, we've shown how essential it is to consider mediator variables when estimating treatment effects. We've also illustrated how adjusting for mediators allows you to differentiate between true direct and indirect effects, thereby reducing the risk of drawing incorrect conclusions from your data.
+In this expanded tutorial, we've shown how essential it is to consider mediator variables when estimating treatment effects. We've also illustrated how adjusting for mediators allows you to differentiate between direct and indirect effects, thereby reducing the risk of drawing incorrect conclusions from your data.
 
 Detailed on the mediation analysis can be found in the [Mediation analysis chapter](mediation.html).
-::: 
+:::
 
 ### Null effect
 
--   True treatment effect = 0
+-   True **direct** effect = 0 (total effect = 0.45 via the mediator)
 
 #### Data generating process
 
@@ -118,9 +118,11 @@ round(coef(fit),2)
 ```
 
 ::: callout-important
+**Direct vs. total effect here**: In this DGP the direct effect of A on Y is 0 (Y depends only on M), but A still affects M (A→M = 0.9) and M affects Y (M→Y = 0.5). So the indirect effect of A is $0.9 \times 0.5 = 0.45$ and the total effect is $0 + 0.45 = 0.45$. The unadjusted A coefficient estimates this total effect (≈0.45), not zero, even though the direct effect is null.
+
 **Total Effect**: If you want to measure the "total effect" of a treatment on an outcome, then you typically don't adjust for the mediator. The reason is that the total effect captures both the direct effect of the treatment on the outcome and the indirect effect through the mediator.
 
-**Direct and Indirect Effects**: If you want to separate out the direct and indirect effects, then you would adjust for the mediator. In essence, when you control for the mediator, what remains is the direct effect of the treatment on the outcome.
+**Direct and Indirect Effects**: If you want to separate out the direct and indirect effects, then you would adjust for the mediator. In essence, when you control for the mediator, what remains is the direct effect of the treatment on the outcome (here, 0).
 
 **Linearity and Decomposition**: In linear models with continuous outcomes, it is more straightforward to decompose total effects into direct and indirect effects. The mathematics get more complicated in non-linear models or when dealing with non-continuous outcomes.
 ::: 

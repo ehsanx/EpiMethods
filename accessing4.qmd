@@ -185,11 +185,15 @@ dim(analytic.data2)
 
 table(analytic.data2$RIDEXPRG,useNA = "always")
 # Pregnant women excluded
-analytic.data3 <- 
-  subset(analytic.data2, is.na(RIDEXPRG) | 
+analytic.data3 <-
+  subset(analytic.data2, is.na(RIDEXPRG) |
            RIDEXPRG != "Yes, positive lab pregnancy test")
 dim(analytic.data3)
 ```
+
+::: callout-note
+This exclusion keys on the exact translated factor label `"Yes, positive lab pregnancy test"`, so it is sensitive to any future change in the `nhanesA` translation labels; before relying on it, confirm the available levels (e.g., run `table(analytic.data2$RIDEXPRG, useNA = "always")` as shown above), or filter on the numeric code (`RIDEXPRG == 1`) prior to translation. Records with `RIDEXPRG` missing (`NA`) or coded as "cannot ascertain" are intentionally retained, since pregnancy status could not be confirmed positive for them. With the current labels the row count drops from 5520 to 5455, matching the eligible sample.
+:::
 
 ### Recoding variables
 

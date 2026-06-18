@@ -72,17 +72,17 @@ For any individual, we can define two **potential outcomes**:
 -   **Y(A=1)**: The outcome that would be observed if the individual were a smoker.
 -   **Y(A=0)**: The outcome that would be observed if that same individual were a non-smoker at the same point in time.
 
-The **Individual Treatment Effect (TE)** is the difference between these two potential outcomes for a single person: $TE = Y(A=1) - Y(A=0)$. For example, if a patient named John smokes ($A=1$) and develops hypertension, while he *would not have* developed hypertension had he not smoked ($A=0$), the causal effect of smoking for John is present.
+The **Individual Treatment Effect (ITE)** is the difference between these two potential outcomes for a single person: $ITE = Y(A=1) - Y(A=0)$. For example, if a patient named John smokes ($A=1$) and develops hypertension, while he *would not have* developed hypertension had he not smoked ($A=0$), the causal effect of smoking for John is present.
 
 #### The Fundamental Problem of Causal Inference
 
-The definition of the individual TE immediately presents a profound challenge. For any given individual, we can only ever observe one of their potential outcomes. If John smokes, we observe $Y(A=1)$, but his counterfactual outcome, $Y(A=0)$, remains unobserved forever. This is known as the **fundamental problem of causal inference**; it is a problem of missing data where half the data is always missing for every subject.
+The definition of the individual ITE immediately presents a profound challenge. For any given individual, we can only ever observe one of their potential outcomes. If John smokes, we observe $Y(A=1)$, but his counterfactual outcome, $Y(A=0)$, remains unobserved forever. This is known as the **fundamental problem of causal inference**; it is a problem of missing data where half the data is always missing for every subject.
 
-Because the individual TE is unobservable, the goal of epidemiology shifts from the individual to the population. We instead seek to estimate the **Average Treatment Effect (ATE)**, defined as the average of the individual effects across all subjects in a population: $ATE = E$.
+Because the individual ITE is unobservable, the goal of epidemiology shifts from the individual to the population. We instead seek to estimate the **Average Treatment Effect (ATE)**, defined as the average of the individual effects across all subjects in a population: $ATE = E[Y(A=1) - Y(A=0)]$.
 
 #### From Association to Causation: The Role of Confounding
 
-In the real world, we cannot directly observe both potential outcomes for a population. Instead, we observe outcomes in two different groups of people: those who happened to be exposed (smokers) and those who were not (non-smokers). We can calculate the **associational difference** between these groups: $E - E$. A critical error is to assume this associational difference is equal to the causal ATE.
+In the real world, we cannot directly observe both potential outcomes for a population. Instead, we observe outcomes in two different groups of people: those who happened to be exposed (smokers) and those who were not (non-smokers). We can calculate the **associational difference** between these groups: $E[Y \mid A=1] - E[Y \mid A=0]$. A critical error is to assume this associational difference is equal to the causal ATE.
 
 This difference arises because of **confounding**. The groups of smokers and non-smokers may differ systematically on factors that also affect the outcome. For instance, individuals with lower socioeconomic status may be more likely to smoke and also have a higher underlying risk of hypertension for reasons unrelated to smoking (e.g., diet, stress). In this case, the observed difference in outcomes is a mixture of the true treatment effect and these pre-existing, systematic differences between the groups.
 
@@ -361,6 +361,8 @@ The distinction is critical for analytical strategy:
 #### The Role of the Scale: Effect Measure Modification
 
 Whether modification is detected can depend on the statistical scale used (e.g., additive scale for Risk Difference vs. multiplicative scale for Risk Ratio). For this reason, the more precise term is **effect measure modification**. A statistical finding of interaction is a property of the chosen model and does not necessarily correspond to a specific biological mechanism.
+
+A reconciling note: when an analysis only *describes* how the effect of the exposure differs across strata of a second variable, controlling for the confounders of the `smoking -> hypertension` relationship suffices, and additive-scale effect-measure-modification summaries (such as RERI/AP/S and joint effects, as reported in [confounding9](confounding9.html) and [confoundingE2](confoundingE2.html)) are interpreted descriptively. However, if those joint-effect or interaction quantities are to be read *causally* for the second factor as well, then the confounders of the second factor's effect on the outcome must also be controlled, as described under "Implications for Confounding Control" above.
 
 #### Reporting guideline
 

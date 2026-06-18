@@ -66,7 +66,7 @@ d1 <- d2 <- analytic.miss
 d1$exposure.counterfactual <- d1$exposure
 
 # Exposed = Not exposed
-d2$exposure.counterfactual <- !d2$exposure 
+d2$exposure.counterfactual <- 1 - d2$exposure
 
 # duplicated data (double the amount)
 newd <- rbind(d1, d2)
@@ -83,9 +83,9 @@ $W^{M|C} = \frac{P(M|A^*, C)}{P(M|A, C)}$
 in all data `newd` (fact `d1` + alternative fact `d2`).
 
 -   $P(M|A, C)$ is computed from a logistic regression of $M$ on $A$ + $C$.
-    -   $logit [P(M=1 | C = c]) = \beta_0 + \beta_1 a + \beta_3 c$
+    -   $logit [P(M=1 | C = c)] = \beta_0 + \beta_1 a + \beta_3 c$
 -   $P(M|A^{*}, C)$ is computed from a logistic regression of $M$ on $A^*$ + $C$.
-    -   $logit [P(M=1 | C = c]) = \beta_0 + \beta'_1 a^* + \beta'_3 c$
+    -   $logit [P(M=1 | C = c)] = \beta_0 + \beta'_1 a^* + \beta'_3 c$
 
 ```{r weight, eval=TRUE, cache=TRUE}
 # First, use original exposure (all A + all A):
@@ -161,8 +161,10 @@ fit <- svyglm(outcome ~ exposure + exposure.counterfactual +
 Following are the conditional ORs:
 
 -   $OR_{TE}(C=c) = \exp(\theta_1 + \theta_2)$
--   $OR_{NDE}(A=1,M=0,C=c) = \exp(\theta_1)$
--   $OR_{NIE}(A^{*}=1,M=0,C=c) = \exp(\theta_2)$
+-   $OR_{NDE}(A=1,C=c) = \exp(\theta_1)$
+-   $OR_{NIE}(A^{*}=1,C=c) = \exp(\theta_2)$
+
+These are *natural* direct and indirect effects (the mediator is not fixed at any value; its distribution is shifted via the weights). They are not controlled effects, which would fix $M$ at a specific value such as $M=0$.
 
 ```{r outcomeextract, eval=TRUE, cache=TRUE}
 # total effect of A-> Y + A -> M -> Y

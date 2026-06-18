@@ -50,13 +50,14 @@ library(kableExtra)
 
 # Create a data frame for the table content
 df <- data.frame(
-  Term = c("Y", "A", "W", "family", "V", "Q.SL.library", "g.SL.library"),
+  Term = c("Y", "A", "W", "family", "V.Q", "V.g", "Q.SL.library", "g.SL.library"),
   Description = c(
     "Outcome vector",
     "Exposure vector",
     "Matrix that includes vectors of all covariates",
     "Distribution",
-    "Cross-validation folds for exposure and outcome modeling",
+    "Cross-validation folds for outcome modeling",
+    "Cross-validation folds for exposure modeling",
     "Set of machine learning methods to use for SuperLearner for outcome modeling",
     "Set of machine learning methods to use for SuperLearner for exposure modeling"
   )
@@ -67,6 +68,8 @@ kable(df, format = "html", align = 'll', col.names = c("Term", "Description")) %
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE) %>%
   row_spec(0, bold = TRUE, color = "white", background = "#D3D3D3")
 ```
+
+The `V.Q` and `V.g` arguments set the number of cross-validation folds for the outcome and exposure models separately; alternatively, a single `V` argument sets the same number of folds for both.
 
 ### Constructing SuperLearner {.unnumbered}
 
@@ -88,12 +91,12 @@ n_eff
 Our effective sample size for the exposure model is:
 
 ```{r, cache=TRUE}
-p_exp <- nrow(ObsData[ObsData$RHC.use == 1,])/n 
-n_eff_exp <- min(n, 5*(n*min(p, 1-p))) 
+p_exp <- nrow(ObsData[ObsData$RHC.use == 1,])/n
+n_eff_exp <- min(n, 5*(n*min(p_exp, 1-p_exp)))
 n_eff_exp
 ```
 
-For both models, the effective sample size is the same as our sample size, $n = 5,735$.
+For both models, the effective sample size equals our sample size, $n = 5,735$. Note that $n_{eff}$ floors to $n$ here only because the outcome (and exposure) are common; with a rare outcome the effective sample size would be smaller than $n$ (see [the SuperLearner tutorial](machinelearningCausal2.html) for the formula).
 
 Since $5,000 \leq n_{eff} \leq 10,000$, we should use 5 or more cross-validation folds according to @phillips2023ConsiderationsSL. For the sake of computational feasibility, we will use **5 folds** in this example.
 
@@ -200,7 +203,11 @@ tmle.est.bin <- readRDS("Data/machinelearningCausal/tmlebin.RDS")
 tmle.ci.bin <- readRDS("Data/machinelearningCausal/tmlebinci.RDS")
 ```
 
-ATE for binary outcome using user-specified library: `r round(tmle.est.bin, 2)` and 95% CI is `r tmle.ci.bin`
+::: callout-note
+For a binary outcome, the `tmle` package returns three marginal estimands: the ATE on the risk-difference scale (`estimates$ATE`), the marginal risk ratio (`estimates$RR`), and the marginal odds ratio (`estimates$OR`). Below we extract `estimates$OR$psi`, so the reported quantity is the **marginal odds ratio**, not the ATE (risk difference).
+:::
+
+Marginal odds ratio for binary outcome using user-specified library: `r round(tmle.est.bin, 2)` and 95% CI is `r tmle.ci.bin`
 
 These results show those who received RHC had odds of death that were `r round(tmle.est.bin, 2)` times as high as the odds of death in those who did not receive RHC.
 
@@ -241,9 +248,9 @@ tmle.est.bin.def <- readRDS("Data/machinelearningCausal/tmlebindef.RDS")
 tmle.ci.bin.def <- readRDS("Data/machinelearningCausal/tmlebincidef.RDS")
 ```
 
-ATE for binary outcome using default library: `r round(tmle.est.bin.def, 2)` with 95% CI `r tmle.ci.bin.def`.
+Marginal odds ratio for binary outcome using default library: `r round(tmle.est.bin.def, 2)` with 95% CI `r tmle.ci.bin.def`.
 
-These ATE when using the default SuperLearner library (1.31) is very close to the ATE when using our user-specified SuperLearner library (1.29). However, the confidence interval from TMLE using the default SuperLearner library (1.17, 1.46) is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library (1.20, 1.39).
+The marginal odds ratio when using the default SuperLearner library is very close to the marginal odds ratio when using our user-specified SuperLearner library. However, the confidence interval from TMLE using the default SuperLearner library is slightly wider than the confidence interval from TMLE using our user-specified SuperLearner library.
 
 ### Comparison of results {.unnumbered}
 

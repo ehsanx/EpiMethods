@@ -137,7 +137,7 @@ You should consider all four steps in the propensity score (PS) analysis:
 
 -   Step 2: Match an exposed subject (nocturia $\ge2$ times) with a control subject (nocturia \<2 times) without replacement within the caliper of 0.2 times the standard deviation of the logit of PS. Set your seed to 123.
 
--   Step 3: Balance checking using SMD. Consider SMD \<0.1 as a good covariate balancing.
+-   Step 3: Balance checking using SMD. Consider SMD \<0.2 as a good covariate balancing.
 
 -   Step 4: Fit the outcome model on the matched data. If needed, adjust for imbalanced covariates in the outcome model. Report the odds ratio with the 95% CI. You should utilize the survey feature as the design (NOT covariates).
 
@@ -195,7 +195,7 @@ vars <- c("age", "gender", "race", "bmi", "smoking", "alcohol", "sleep", "tchole
 
 tab1m <- CreateTableOne(vars = vars, strata = "nocturia", data = matched.data, 
                            test = F, includeNA = F)
-print(tab1m, smd = TRUE, format = "p") # All SMDs <0.1
+print(tab1m, smd = TRUE, format = "p") # All SMDs <0.2
 ```
 
 #### Step 4
@@ -235,7 +235,7 @@ You should consider all four steps in the propensity score (PS) analysis:
 
 -   Step 2: Match an exposed subject (nocturia $\ge2$ times) with 4 control subjects (nocturia \<2 times) with replacement within the caliper of 0.2 times the standard deviation of the logit of PS. Set your seed to 123.
 
--   Step 3: Balance checking using SMD. Consider SMD \<0.1 as a good covariate balancing. Remember, you need to consider matching weights in checking the covariate balance.
+-   Step 3: Balance checking using SMD. Consider SMD \<0.2 as a good covariate balancing. Remember, you need to consider matching weights in checking the covariate balance.
 
 -   Step 4: Fit the outcome model on the matched data. If needed, adjust for imbalanced covariates in the outcome model. Report the odds ratio with the 95% CI. You should utilize the survey feature as the design (NOT covariates).
 
@@ -276,8 +276,8 @@ match.obj3 <- matchit(ps.formula3,
                       replace = TRUE,
                       caliper = caliper3, 
                       ratio = 4)
-dat.analytic$PS3 <- match.obj$distance
-#summary(match.obj$distance)
+dat.analytic$PS3 <- match.obj3$distance
+#summary(match.obj3$distance)
 
 ## See how many matched
 #match.obj3
@@ -313,7 +313,7 @@ w.design.m <- subset(w.design0, matched == 1)
 
 tab13m <- svyCreateTableOne(vars = vars, strata = "nocturia", data = w.design.m, 
                            test = F, includeNA = F)
-print(tab13m, smd = TRUE, format = "p") # All SMDs <0.1
+print(tab13m, smd = TRUE, format = "p") # All SMDs <0.2
 ```
 
 #### Step 4

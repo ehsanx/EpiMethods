@@ -1,6 +1,6 @@
 ## Poisson {.unnumbered}
 
-In this tutorial, we will see how to use Poisson and negative binomial regression. In practice, we use Poisson regression to model a count outcome. Note that we assume the mean is equal to the variance in Poisson. When the variance is greater than what's assumed by the model, overdispersion occurs. Poisson regression of overdispersed data leads to under-estimated or deflated standard errors, which leads to inflated test statistics and p-values. We can use negative binomial regression to model overdispersed data.
+In this tutorial, we will see how to use Poisson and negative binomial regression. In practice, we use Poisson regression to model a count outcome. Note that we assume the mean is equal to the variance in Poisson. When the variance is greater than what's assumed by the model, overdispersion occurs. Poisson regression of overdispersed data leads to under-estimated or deflated standard errors, which leads to inflated test statistics and overly small (anti-conservative) p-values, increasing false positives. We can use negative binomial regression to model overdispersed data.
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
 # Load required packages
@@ -85,38 +85,52 @@ summ(fit2, confint = TRUE, digits = 3, vifs = TRUE)
 
 ### Negative binomial regression
 
-Let's fit the negative binomial regression model using the `glm` function. Below, we specify the dispersion parameter (theta) is equal to 1, which suggests that the ratio of mean and variance is assumed to be 1.
+Let's fit the negative binomial regression model using the `MASS::glm.nb` function, which estimates the dispersion parameter (theta, $\theta$) from the data rather than fixing it. In the negative binomial model the variance is $\text{Var}(Y) = \mu + \mu^2/\theta$, so the variance exceeds the mean whenever $\theta$ is finite, allowing the model to accommodate overdispersion. As $\theta \to \infty$ the variance approaches $\mu$ and the model reduces to Poisson. We report the estimated $\theta$ alongside the rate ratios.
 
 ```{r nb, cache=TRUE}
 require(MASS)
 analytic2$phyact2=relevel(analytic2$phyact, ref ="Inactive")
 
 # Negative binomial regression - crude
-fit3<- glm(fruit.cont ~ phyact2, data=analytic2, family = negative.binomial(theta = 1))
+fit3<- glm.nb(fruit.cont ~ phyact2, data=analytic2)
+fit3$theta # estimated dispersion parameter (theta)
 round(exp(cbind(coef(fit3), confint(fit3))),2)
 
 # Negative binomial regression - adjusted for covariates
-fit4<-glm(fruit.cont ~phyact2 + age + sex + income + race + bmicat + smoke + edu, data=analytic2,
-          family = negative.binomial(theta = 1))
+fit4<-glm.nb(fruit.cont ~phyact2 + age + sex + income + race + bmicat + smoke + edu, data=analytic2)
+fit4$theta # estimated dispersion parameter (theta)
 round(exp(cbind(coef(fit4), confint(fit4))),2)
 ```
 
+The exponentiated coefficients are rate ratios (IRRs). For example, the `phyact2` rate ratio compares the expected fruit consumption count for the corresponding physical-activity level relative to the inactive reference group, holding other covariates fixed.
+
 ### Survey weighted negative binomial regression
 
-Now, let's fit the design-adjusted negative binomial regression model:
+Now, let's fit the design-adjusted negative binomial regression model. The `svyglm.nb` fit returns the estimated dispersion parameter (theta) together with the mean-model coefficients (prefixed with `eta.`). We report theta separately and exponentiate only the mean-model (`eta.`) coefficients to obtain rate ratios; the `theta.(Intercept)` row is not a rate ratio and should not be exponentiated.
 
 ```{r nbs, cache=TRUE}
 require(sjstats)
 
+# Helper: exponentiate only the mean-model (eta.) coefficients as rate ratios
+nb_irr <- function(fit){
+  est <- cbind(coef(fit), confint(fit))
+  eta.rows <- grepl("^eta\\.", rownames(est))
+  round(exp(est[eta.rows, , drop = FALSE]), 2)
+}
+
 # Design-adjusted negative binomial - crude
 fit3<- svyglm.nb(fruit.cont ~phyact2, design=w.design)
-round(exp(cbind(coef(fit3), confint(fit3))),2)
+attr(fit3, "nb.theta") # estimated dispersion parameter (theta)
+nb_irr(fit3)
 
 # Design-adjusted negative binomial - adjusted for covariates
-fit4<-svyglm.nb(fruit.cont ~phyact2 + age + sex + income + race + bmicat + smoke + edu, 
+fit4<-svyglm.nb(fruit.cont ~phyact2 + age + sex + income + race + bmicat + smoke + edu,
                 design=w.design)
-round(exp(cbind(coef(fit4), confint(fit4))),2)
+attr(fit4, "nb.theta") # estimated dispersion parameter (theta)
+nb_irr(fit4)
 ```
+
+As above, these exponentiated `eta.` coefficients are design-adjusted rate ratios (IRRs); a rate ratio above 1 indicates higher expected counts relative to the inactive reference group, and a value below 1 indicates lower expected counts.
 
 ### Video content (optional)
 

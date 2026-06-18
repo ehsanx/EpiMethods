@@ -67,7 +67,7 @@ ggplot(trace_data, aes(x = Iteration, y = ProbabilityEstimate)) +
 
 ```
 
-From the plot, we can see that our estimate appears to stabilize around 10,000 iterations, suggesting that the method produces stable estimates of the true probability of flipping exactly 3 heads in 5 coin flips.
+From the plot, we can see that the running estimate fluctuates early on and then settles near the true probability of flipping exactly 3 heads in 5 coin flips. The trace plot is best read qualitatively: because cumulative averages always flatten as more iterations accumulate, reading a specific "convergence point" (such as 10,000 iterations) off the curve is somewhat arbitrary. For a precise statement of how close the final estimate is to the truth, we rely instead on the Monte Carlo standard error, $\text{MCSE} = \text{EmpSE}/\sqrt{n_{sim}}$, introduced below.
 
 ------------------------------------------------------------------------
 
@@ -194,7 +194,7 @@ $$
 
 ### Power
 
-Power is a key performance measure in Monte Carlo simulations, ensuring that our tests detect true effects with high probability. It measures the probability of correctly rejecting the null hypothesis (H0) when the alternative hypothesis (Ha) is true. In other words, power quantifies how effective a statistical test is at detecting a real effect when one exists. If power is too low, we may need to increase the sample size or improve the efficiency of our estimator to avoid missing important findings. Conversely, very high power may indicate that the test is too sensitive, potentially detecting trivial effects.
+Power is a key performance measure in Monte Carlo simulations, ensuring that our tests detect true effects with high probability. It measures the probability of correctly rejecting the null hypothesis (H0) when the alternative hypothesis (Ha) is true. The formula below computes the proportion of simulations in which the null is rejected; this quantity equals **power only when the data-generating process is non-null** ($\theta \neq 0$). When the data are generated under the null ($\theta = 0$), the same proportion estimates the **type-I error rate (size)** of the test instead. In other words, power quantifies how effective a statistical test is at detecting a real effect when one truly exists. If power is low under a non-null DGP, we may need to increase the sample size or improve the efficiency of our estimator to avoid missing important findings. High rejection rates are not in themselves a problem: with a large sample size even a small but genuine effect will be detected, which is an effect-size and sample-size consideration rather than the test being "too sensitive."
 
 $$
 \text{Power} = \frac{1}{n_{sim}} \sum^{n_{sim}}_{i=1} I\bigg[| \hat\theta_i | \ge z_{\alpha/2} \times \sqrt{\widehat{Var}(\hat\theta_i)} \bigg]
@@ -272,12 +272,16 @@ $$
 
 The close match between our empirical SE (0.4626) and the theoretical standard deviation (0.4635) validates that our simulation is accurately capturing the variability of this Bernoulli process. Note that in larger simulations, the empirical SE will converge to the theoretical SE.
 
+::: callout-important
+Each "estimate" in this example is a single 0/1 Bernoulli draw, so the Empirical SE reported here is the standard deviation of the Bernoulli **outcome** itself, not the variability of an estimator. It is therefore not a measure of estimator precision, and a *large* value (≈0.46) does not indicate a poor simulation. The precision of our estimate of the probability (the mean across iterations) is instead given by the Monte Carlo standard error, $\text{MCSE} = \text{EmpSE}/\sqrt{n_{sim}} = 0.4626/\sqrt{100000} \approx 0.0015$, which is what tells us how close the simulated mean (0.3103) is to the truth (0.3125). The same caveat applies to the MSE below: it equals the variance of a single Bernoulli draw, not the mean squared error of an estimator. To make these quantities describe estimator performance, each replication would need to be an actual estimate (e.g., the proportion of successes over a batch of trials) rather than a single draw.
+:::
+
 The MSE is 0.214, which should approximately equal the variance since MSE = bias² + variance and our bias is very small. We can verify this:
 
 $$
 \text{Variance} = \text{Standard Deviation}^2 = 0.4635^2 =  0.2148
 $$
 
-The closeness between our MSE (0.214) and the theoretical variance (0.2148) further confirms that our simulation is accurately estimating the properties of this probability experiment.
+The closeness between our MSE (0.214) and the theoretical variance (0.2148) confirms that the simulation is accurately reproducing the variability of this Bernoulli process. As noted above, this value reflects the spread of a single Bernoulli draw rather than the (much smaller) error of our probability estimate.
 
 ### References

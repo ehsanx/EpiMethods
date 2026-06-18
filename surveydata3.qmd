@@ -63,6 +63,10 @@ table(analytic.miss$miss)
 
 The code sets up the survey design, specifying weights (but no specific clustering and stratification, as they are unavailable for CCHS public access data), for use in survey-weighted analyses.
 
+::: callout-warning
+The CCHS public-use microdata file (PUMF) does not release the strata and PSU identifiers needed for design-based variance estimation; instead, Statistics Canada releases a set of **bootstrap (replicate) weights** for that purpose. Because we build the design with `id = ~1` (a weighted simple-random-sample approximation) rather than `svrepdesign(type = "bootstrap", repweights = ...)`, the **point estimates are valid**, but all standard errors, design effects (DEFF), and Rao-Scott / Thomas-Rao tests below are **illustrative weighted-SRS approximations only** and will generally **understate the true sampling variance**. For a design-correct analysis, load the bootstrap weights and use `svrepdesign()`.
+:::
+
 ```{r desgin0, warning=FALSE, message=FALSE, cache = TRUE}
 require(survey)
 summary(analytic.miss$weight)
@@ -143,7 +147,7 @@ DE = Effect of complex survey on the SEs, relative to a SRS of equal size.
 Note:
 
 1.  SE increases as value of weight increases (CCHS).
-2.  NHANES has more things to worry about (strata, PSU)
+2.  These weighted-SRS DEFFs/SEs are approximations: the design-correct CCHS analysis would use the StatCan **bootstrap weights** (`svrepdesign`), and NHANES additionally requires the strata and PSU identifiers (`SDMVSTRA`, `SDMVPSU`).
 
 DEFF = 2 means that the variance of the sample proportion, when choosing the sample by complex survey sampling, is nearly 2 times as large as the variance of the same estimator under simple random sampling/SRS.
 

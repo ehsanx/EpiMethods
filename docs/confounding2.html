@@ -105,7 +105,32 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </script><link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
-<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 <meta name="twitter:title" content="Mediator – Advanced Epidemiological Methods">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="confounding2_files/figure-html/dag-1.png">
@@ -150,6 +175,12 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Project</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup: Before you begin</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -405,6 +436,12 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
  <span class="menu-text">Useful Packages</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploringF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (E)</span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -497,6 +534,12 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
   <div class="sidebar-item-container"> 
   <a href="./Simulation3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimating Causal Effects</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SimulationF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (U)</span></a>
   </div>
 </li>
       </ul>
@@ -1047,14 +1090,14 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quiz (L)</span></a>
+  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R functions (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./machinelearningF.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">R functions (L)</span></a>
+  <a href="./machinelearningQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quiz (L)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1316,6 +1359,29 @@ gtag('config', 'G-CVBPG0RQMY', { 'anonymize_ip': true});
  <span class="menu-text">Formatting Tools</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reportingF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R Functions (G)</span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notation and glossary</span></a>
+  </div>
+</li>
       </ul>
 </li>
     </ul>
@@ -1423,15 +1489,15 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>You might notice a total effect that could differ from the true effects. In the lecture example, a crude association showed an effect of 1.69, which is the total effect combining both direct and indirect pathways.</p>
-<p>Upon adjusting for M, the coefficients will show you the direct effect of A on Y and the indirect effect through M. These should align closely with our true effects: a direct effect of 1.3 and an indirect effect of 0.5.</p>
-<p>In this expanded tutorial, we’ve shown how essential it is to consider mediator variables when estimating treatment effects. We’ve also illustrated how adjusting for mediators allows you to differentiate between true direct and indirect effects, thereby reducing the risk of drawing incorrect conclusions from your data.</p>
+<p>You might notice a total effect that could differ from the direct effect. Here the <strong>direct effect</strong> of A on Y (the coefficient on A in the M-adjusted model) is 1.3. The <strong>indirect effect</strong> of A through M is the product of the A→M effect (0.9) and the M→Y effect (0.5), i.e., <span class="math inline">\(0.9 \times 0.5 = 0.45\)</span>. The <strong>total effect</strong> is therefore the sum of the direct and indirect effects: <span class="math inline">\(1.3 + 0.45 = 1.75\)</span>.</p>
+<p>When you do <strong>not</strong> adjust for M, the coefficient on A estimates this total effect (≈1.75). When you adjust for M, the coefficient on A estimates the direct effect (1.3) and the coefficient on M estimates the M→Y effect (0.5) — note that the M coefficient is the M→Y effect, <strong>not</strong> the indirect effect itself; the indirect effect is the product (A→M)×(M→Y) = 0.45.</p>
+<p>In this expanded tutorial, we’ve shown how essential it is to consider mediator variables when estimating treatment effects. We’ve also illustrated how adjusting for mediators allows you to differentiate between direct and indirect effects, thereby reducing the risk of drawing incorrect conclusions from your data.</p>
 <p>Detailed on the mediation analysis can be found in the <a href="mediation.html">Mediation analysis chapter</a>.</p>
 </div>
 </div>
 </section></section><section id="null-effect" class="level3"><h3 class="anchored" data-anchor-id="null-effect">Null effect</h3>
 <ul>
-<li>True treatment effect = 0</li>
+<li>True <strong>direct</strong> effect = 0 (total effect = 0.45 via the mediator)</li>
 </ul>
 <section id="data-generating-process-1" class="level4"><h4 class="anchored" data-anchor-id="data-generating-process-1">Data generating process</h4>
 <div class="cell">
@@ -1492,8 +1558,9 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
+<p><strong>Direct vs.&nbsp;total effect here</strong>: In this DGP the direct effect of A on Y is 0 (Y depends only on M), but A still affects M (A→M = 0.9) and M affects Y (M→Y = 0.5). So the indirect effect of A is <span class="math inline">\(0.9 \times 0.5 = 0.45\)</span> and the total effect is <span class="math inline">\(0 + 0.45 = 0.45\)</span>. The unadjusted A coefficient estimates this total effect (≈0.45), not zero, even though the direct effect is null.</p>
 <p><strong>Total Effect</strong>: If you want to measure the “total effect” of a treatment on an outcome, then you typically don’t adjust for the mediator. The reason is that the total effect captures both the direct effect of the treatment on the outcome and the indirect effect through the mediator.</p>
-<p><strong>Direct and Indirect Effects</strong>: If you want to separate out the direct and indirect effects, then you would adjust for the mediator. In essence, when you control for the mediator, what remains is the direct effect of the treatment on the outcome.</p>
+<p><strong>Direct and Indirect Effects</strong>: If you want to separate out the direct and indirect effects, then you would adjust for the mediator. In essence, when you control for the mediator, what remains is the direct effect of the treatment on the outcome (here, 0).</p>
 <p><strong>Linearity and Decomposition</strong>: In linear models with continuous outcomes, it is more straightforward to decompose total effects into direct and indirect effects. The mathematics get more complicated in non-linear models or when dealing with non-continuous outcomes.</p>
 </div>
 </div>

@@ -5,7 +5,7 @@ In this section, we will learn about generalized estimating equation (GEE). GEE 
 ::: callout-note
 -   GEE is a population-averaged (e.g., marginal) model, whereas mixed effects models are subject/cluster-specific. For example, we can use GEE when we are interested in exploring the population average effect. On the other hand, when we are interested in individual/cluster-specific effects, we can use the mixed effects models.
 
--   Also, in contrast to the mixed effects models where we assume error term and beta coefficients for subject $i$ both follow normal distribution, GEE is distribution free. However, in GEE, we assume some correlation structures for within subjects/clusters. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.
+-   Also, in contrast to the mixed effects models where we assume that the error term and the random effects (for subject $i$) both follow a normal distribution, GEE makes no full likelihood (distributional) assumption: it only specifies a mean model, a variance function, and a working correlation structure for the within subjects/clusters measurements. Hence, we can use GEE for non-normal data such as skewed data, binary data, or count data.
 :::
 
 ```{r setup, warning=FALSE, message=FALSE, cache=TRUE}
@@ -250,18 +250,20 @@ Let us compare the GEE models with the mixed effect models.
 ```{r comp,cache=TRUE}
 ## Generalized mixed effect model model
 library("lme4")
-resp_lmer <- glmer(nstat ~ baseline + month + treatment + 
-                   gender + age + centre + 
-                    (1 | subject), family = binomial(), 
-                  data = resp)
+resp_lmer <- glmer(nstat ~ baseline + month + treatment +
+                   gender + age + centre +
+                    (1 | subject), family = binomial(),
+                  data = resp,
+                  control = glmerControl(optimizer = "bobyqa"))
 ```
 
 ```{r comp2,cache=TRUE}
 require(afex)
-resp_afex <- mixed(nstat ~ baseline + month + treatment + 
-                   gender + age + centre + 
-                    (1 | subject), family = binomial(), 
-                  data = resp, method = "LRT")
+resp_afex <- mixed(nstat ~ baseline + month + treatment +
+                   gender + age + centre +
+                    (1 | subject), family = binomial(),
+                  data = resp, method = "LRT",
+                  control = glmerControl(optimizer = "bobyqa"))
 ```
 
 ```{r comp3,cache=TRUE}
@@ -330,13 +332,13 @@ QIC(resp_gee4d)[2]
 
 ```{r compsumm,cache=TRUE}
 ## compare estimates (conditional vs. marginal)
-summary(resp_lmer)$coefficients # Model failed to converge
-summary(resp_afex)$coefficients # Model failed to converge
-summary(resp_gee3)$coefficients # Marginalized model
-summary(resp_gee4)$coefficients # Marginalized model
+summary(resp_lmer)$coefficients # Conditional (subject-specific) model
+summary(resp_afex)$coefficients # Conditional (subject-specific) model
+summary(resp_gee3)$coefficients # Marginal (population-averaged) model
+summary(resp_gee4)$coefficients # Marginal (population-averaged) model
 ```
 
-The significance of variables are similar in both variables, but the estimated coefficients are larger in generalized mixed effect model. However, it does not mean the estimated coefficients are inconsistent. Instead, two models are estimating different parameters. Remember, the mixed effect model is conditional on random effects, while the GEE is a marginalized model.
+These two approaches estimate different parameters, so their coefficients are not expected to be numerically equal even when both fit the data well. The generalized mixed effect model is *conditional* on the random effects (a subject-specific effect), whereas the GEE is a *marginal* (population-averaged) model. For a nonlinear link such as the logit, the conditional (subject-specific) log-odds coefficients are, in theory, larger in magnitude than the corresponding marginal (population-averaged) coefficients; this attenuation of the marginal estimates is a feature of the different estimands, not evidence that either model is biased.
 
 ### Video content (optional)
 

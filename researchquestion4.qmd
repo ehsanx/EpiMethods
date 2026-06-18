@@ -2,15 +2,15 @@
 
 ### Working with a causal question using NHANES
 
-We are interested in exploring the relationship between diabetes (binary exposure variable defined as whether the doctor ever told the participant has diabetes) and cholesterol (binary outcome variable defined as whether total cholesterol is more than 200 mg/dL). Below is the PICOT:
+We are interested in exploring the relationship between diabetes (binary exposure variable defined as whether the doctor ever told the participant has diabetes) and cholesterol (binary outcome variable). Following the book-wide convention, the cholesterol outcome is coded as `1 = desirable cholesterol` (total cholesterol \< 200 mg/dL) and `0` otherwise, so the modelled event is desirable cholesterol. Below is the PICOT:
 
-| PICOT element | Description                    |
-|---------------|--------------------------------|
-| P             | US adults                      |
-| I             | Diabetes                       |
-| C             | No diabetes                    |
-| O             | Total cholesterol \> 200 mg/dL |
-| T             | 2017--2018                     |
+| PICOT element | Description                          |
+|---------------|--------------------------------------|
+| P             | US adults                            |
+| I             | Diabetes                             |
+| C             | No diabetes                          |
+| O             | Desirable cholesterol (\< 200 mg/dL) |
+| T             | 2017--2018                           |
 
 First, we will prepare the analytic dataset from NHANES 2017--2018.
 
@@ -491,6 +491,8 @@ CreateTableOne(data = analytic.data15, includeNA = TRUE)
 ```
 
 #### Create complete case data (for now)
+
+Here `cholesterol.bin = 1` denotes **desirable cholesterol** (\< 200 mg/dL), consistent with the `1 = healthy` coding used elsewhere in the book. Any logistic regression fit to this variable therefore models the probability of the non-reference level (here, desirable cholesterol), so odds ratios should be read as the odds of *desirable* cholesterol (e.g., OR \< 1 means lower odds of desirable cholesterol).
 
 ```{r analytic1, eval=TRUE, cache=TRUE}
 analytic.with.miss <- analytic.data15

@@ -135,11 +135,16 @@ caret::R2(pred.y1, obs.y)
 
 #### RMSE
 
+The **root mean squared error (RMSE)** uses the sample size $n$ in the denominator, $\sqrt{SS_{res}/n}$, and matches `caret::RMSE`. By contrast, $\sqrt{SS_{res}/(n-p)}$ is the **residual standard error** (it divides by the residual degrees of freedom $n-p$), so the two quantities are not identical.
+
 ```{r rmse, cache=TRUE}
-# Find RMSE
-Rmse <- sqrt(SSE/(n-p)) 
+# Find RMSE (matches caret::RMSE)
+Rmse <- sqrt(SSE/n)
 Rmse
 caret::RMSE(pred.y1, obs.y)
+# Residual standard error (divides by residual df, n - p)
+res.se <- sqrt(SSE/(n-p))
+res.se
 ```
 
 See [@anova]
@@ -160,21 +165,21 @@ Where:
 - $SS_{\text{res}}$ and $SS_{\text{tot}}$ represent the residual and total sums of squares respectively.
 - $df_{\text{res}}$ and $df_{\text{tot}}$ refer to the degrees of freedom of the residual and total sums of squares. Usually, $df_{\text{res}} = n - p$ and $df_{\text{tot}} = n - 1$, where:
   - $n$ signifies the sample size.
-  - $p$ denotes the number of variables in the model.
+  - $p$ denotes the number of parameters in the model, **including the intercept** (as defined above, `p <- dim(model.matrix(fit1))[2]`).
 
 This metric plays a vital role in model selection and safeguards against overfitting by penalizing the inclusion of non-informative variables
 
-The alternate formula is:
+The alternate formula, written with an intercept-inclusive $p$, is:
 
 $$
-\bar{R}^2 = 1 - (1 - R^2) \frac{n-1}{n-p-1}
+\bar{R}^2 = 1 - (1 - R^2) \frac{n-1}{n-p}
 $$
 
-This formula modifies the $R^2$ value, accounting for the number of predictors and offering a more parsimonious model fit measure. 
+This formula modifies the $R^2$ value, accounting for the number of predictors and offering a more parsimonious model fit measure. Note that here $p$ counts the intercept; in the more common textbook form $\bar{R}^2 = 1 - (1 - R^2)\frac{n-1}{n-p-1}$, the symbol $p$ denotes the number of predictors *excluding* the intercept, so the two expressions agree.
 
 ```{r adjr2, cache=TRUE}
-# Find adj R2
-adjR2 <- 1-(1-R.2)*((n-1)/(n-p-1))
+# Find adj R2 (p includes the intercept, so the denominator df is n - p)
+adjR2 <- 1-(1-R.2)*((n-1)/(n-p))
 adjR2
 ```
 

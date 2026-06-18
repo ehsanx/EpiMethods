@@ -16,7 +16,9 @@ cran_packages <- c(
   "sjstats", "skimr", "stargazer", "stringr", "SuperLearner",
   "survey", "survival", "survminer", "svglite", "svyVGAM", "table1",
   "tableone", "texreg", "tidyverse", "tinytex", "tmle", "tweetrmd", "usethis",
-  "VGAM", "VIM", "visdat", "mvnmle", "MissMech"
+  "VGAM", "VIM", "visdat", "mvnmle", "MissMech",
+  # added to match packages actually used in the chapters (fresh-machine reproducibility)
+  "glue", "haven", "MASS", "NHANES", "pROC", "regmedint", "tidyr", "xgboost"
 )
 
 install.packages(setdiff(cran_packages, rownames(installed.packages())))
@@ -26,7 +28,10 @@ if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 
 github_packages <- c(
   "osofr/simcausal",
-  "tdhock/WeightedROC"
+  "tdhock/WeightedROC",
+  # svyTable1: survey-aware Table 1 / reporting toolkit used in several chapters
+  # (confounding9, surveydata5/9/9c, missingdata12, ...). GitHub-only (not on CRAN).
+  "ehsanx/svyTable1"
   # "warnes/SASxport"
 )
 

@@ -55,9 +55,11 @@ analytic.with.miss$survey.weight <- analytic.with.miss$weight
 analytic.with.miss$weight <- NULL
 
 #Creating binary variable for cholesterol
-analytic.with.miss$cholesterol.bin <- ifelse(analytic.with.miss$cholesterol <200, 
-                                             1, #"healthy",
-                                             0) #"unhealthy")
+# Note: 1 = healthy (cholesterol < 200), 0 = unhealthy (cholesterol >= 200)
+# This follows the book-wide convention where 1 = healthy.
+analytic.with.miss$cholesterol.bin <- ifelse(analytic.with.miss$cholesterol < 200,
+                                             1, # healthy
+                                             0) # unhealthy
 # exposure recoding
 analytic.with.miss$diabetes <- ifelse(analytic.with.miss$diabetes == "Yes", 1, 0)
 
@@ -111,6 +113,10 @@ dim(analytic.with.miss)
 analytic.data <- as.data.frame(na.omit(analytic.with.miss))
 dim(analytic.data) # complete case
 ```
+
+::: callout-note
+**Estimand.** All three approaches below (Zanutto, DuGoff, Austin) target the same survey-weighted population average treatment effect on the treated (PATT). They differ only in *how the survey design enters Steps 1-2* (propensity score estimation and matching), not in the estimand.
+:::
 
 ### Zanutto (2006)
 
@@ -173,7 +179,7 @@ match.obj <- matchit(ps.formula, data = analytic.data,
                      caliper = .2, 
                      ratio = 1)
 # see matchit function options here
-# https://www.rdocumentation.org/packages/MatchIt/versions/1.0-1/topics/matchit
+# https://kosukeimai.github.io/MatchIt/reference/matchit.html
 analytic.data$PS <- match.obj$distance
 summary(match.obj$distance)
 plot(match.obj, type = "jitter")
@@ -231,11 +237,17 @@ require(jtools)
 summ(sfit, exp = TRUE, confint = TRUE)
 ```
 
+::: callout-important
+**Interpreting the outcome model.** Here the outcome `cholesterol.bin` is coded so that `1 = healthy` (cholesterol \< 200) and `0 = unhealthy`. A binomial `glm`/`svyglm` models the probability of the non-reference level, so this model estimates P(healthy). The odds ratio for `diabetes` therefore describes the odds of being *healthy* (desirable cholesterol): an OR \< 1 means diabetes is associated with *lower* odds of healthy cholesterol. This event direction (event = healthy) applies to all of the outcome models in this tutorial and follows the book-wide `1 = healthy` coding convention.
+
+All outcome models in this tutorial use `family = binomial` (the convention used throughout this module). Because the standard errors here come from the survey design, the choice between `binomial` and `quasibinomial` does not affect the reported `svyglm` standard errors; `binomial` may emit a non-integer-successes warning when survey weights are non-integer, but the inference is unchanged.
+:::
+
 ### DuGoff et al. (2014)
 
 -   Ref: @dugoff2014generalizing
 
-Propensity score analysis in 4 steps (PATT)
+Propensity score analysis in 4 steps
 
 #### Video content (optional)
 
@@ -296,10 +308,12 @@ baselinevars <- c("gender", "born", "race", "education",
                   "psu", "strata", "survey.weight")
 matched.data$survey.weight <- as.numeric(as.character(matched.data$survey.weight))
 matched.data$strata <- as.numeric(as.character(matched.data$strata))
-tab1m <- CreateTableOne(strata = "diabetes", vars = baselinevars, 
+tab1m <- CreateTableOne(strata = "diabetes", vars = baselinevars,
                         data = matched.data, test = FALSE)
 print(tab1m, smd = TRUE)
 ```
+
+Note that here the design variables (`psu`, `strata`, `survey.weight`) are reported with the same SMD \< 0.2 balance criterion as the confounders. Their interpretive role differs, however: balancing the design variables is part of the DuGoff strategy for incorporating the survey design into the propensity score, whereas balancing the confounders is what removes confounding bias in the matched sample.
 
 #### Step 4
 
@@ -329,7 +343,7 @@ summ(sfit, exp = TRUE, confint = TRUE)
 
 -   Ref: @austin2018propensity
 
-Propensity score analysis in 4 steps (PATT)
+Propensity score analysis in 4 steps
 
 #### Video content (optional)
 
@@ -363,21 +377,22 @@ summary(analytic.data$PS)
 
 #### Step 2
 
-Match treated and untreated subjects on the estimated propensity scores. Two methods are explored: using the `Matching` package and the `MatchIt` package.
+Match treated and untreated subjects on the estimated propensity scores. The matched data used downstream (Steps 3-4) come from the `MatchIt` block below. The `Matching` package block is shown only as an *optional* alternative matcher; its result is stored in a separate object (`matched.data2.Match`) and is not used downstream.
 
 ```{r Ausstep2a, cache=TRUE}
+# Optional alternative matcher (Matching package); not used downstream
 require(Matching)
-match.obj2 <- Match(Y=analytic.data$cholesterol, 
-                    Tr=analytic.data$diabetes, 
-                    X=analytic.data$PS, 
-                    M=1, 
+match.obj2 <- Match(Y=analytic.data$cholesterol,
+                    Tr=analytic.data$diabetes,
+                    X=analytic.data$PS,
+                    M=1,
                     estimand = "ATT",
-                    replace=FALSE, 
+                    replace=FALSE,
                     caliper = 0.2)
 summary(match.obj2)
-matched.data2 <- analytic.data[c(match.obj2$index.treated, 
+matched.data2.Match <- analytic.data[c(match.obj2$index.treated,
                                  match.obj2$index.control),]
-dim(matched.data2)
+dim(matched.data2.Match)
 ```
 
 ```{r Ausstep2b, cache=TRUE}

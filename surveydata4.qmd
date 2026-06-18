@@ -78,10 +78,13 @@ Pseudo-R-square values indicate how much of the total variability in the outcome
 Evaluates the model fit using Akaike Information Criterion (AIC) and pseudo R-squared metrics.
 
 ```{r fit, warning=FALSE, message=FALSE, cache = TRUE}
-fit3 <- svyglm(formula1, 
-              design = w.design, 
-              family = quasibinomial(logit)) # publish does not work
-AIC(fit3) 
+fit3 <- svyglm(formula1,
+              design = w.design,
+              family = quasibinomial(logit))
+# Family choice here is stylistic: quasibinomial suppresses the
+# non-integer-#successes warning from weighted data. The design-based
+# AIC (Lumley-Scott) is defined for both binomial and quasibinomial svyglm.
+AIC(fit3)
 
 # AIC for survey weighted regressions
 psrsq(fit3, method = "Cox-Snell")
@@ -187,7 +190,7 @@ anova(fitstep, fit8c) # keep this interaction
 
 Updates the model to include significant interaction terms.
 
-Note that we have 0 effect modifier, 2 interactions
+Note that we have 0 effect modifiers and 2 interactions. Here a statistical *interaction* simply means that the effect of one variable on the outcome depends on the level of another (a product term improves model fit), whereas *effect modification* is the causal counterpart, where the causal effect of the exposure differs across strata of a third variable. See the [confounding module](confounding.html) for the distinction between interaction and effect modification.
 
 ```{r interactions3, warning=FALSE, message=FALSE, cache = TRUE}
 fit9 <- update(fitstep, .~. + interaction(age,sex) + interaction(bmi,diab))

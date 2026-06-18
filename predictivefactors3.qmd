@@ -44,6 +44,10 @@ A logistic regression is fitted to predict the binary cholesterol outcome from m
 We use the `glm` function to run generalized linear models. The default family is gaussian with identity link. Setting binomial family with logit link (logit link is default for binomial family) means fitting logistic regression.
 :::
 
+::: callout-important
+With a factor outcome, `glm` models the probability of the **non-reference level**. Because we set the reference category to `"unhealthy"` above, the model here estimates P(`healthy`), i.e., P(cholesterol < 200). Consequently each odds ratio describes the odds of being **healthy** (an OR > 1 means higher odds of healthy / desirable cholesterol, an OR < 1 means lower odds), so the ORs should be read in that direction. This matches the book-wide convention that `1 = healthy`; the rendered ROC output likewise reports `case = healthy`.
+:::
+
 ```{r glm, warning=FALSE, cache=TRUE}
 # Regression model
 formula5x <- as.formula("cholesterol.bin~gender + age + born + 
